@@ -8,7 +8,6 @@ export default async function handler(req, res) {
 
     const { url } = req.body;
     if (!url) {
-        // --- TRANSLATED ---
         return res.status(400).json({ error: 'URL daxil edilməyib.' });
     }
 
@@ -30,8 +29,10 @@ export default async function handler(req, res) {
             'cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'
         ];
         if (blockKeywords.some(keyword => articleText.toLowerCase().includes(keyword))) {
-            // --- TRANSLATED and UPDATED ---
-            throw new Error('Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və avtomatik təhlil edilə bilmir.');
+            // This is a special error. We'll add a flag to it.
+            const blockError = new Error('This website is protected by advanced bot detection.');
+            blockError.isBlockError = true; // Custom flag
+            throw blockError;
         }
 
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
@@ -54,10 +55,7 @@ export default async function handler(req, res) {
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
 
-        if (!geminiResponse.ok) {
-            // --- TRANSLATED ---
-            throw new Error(`Süni intellekt modelindən cavab alınarkən xəta baş verdi (Status: ${geminiResponse.status})`);
-        }
+        if (!geminiResponse.ok) throw new Error(`Süni intellekt modelindən cavab alınarkən xəta baş verdi (Status: ${geminiResponse.status})`);
         
         const geminiData = await geminiResponse.json();
         const analysisText = geminiData.candidates[0].content.parts[0].text;
@@ -66,8 +64,21 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error('An error occurred:', error);
-        // --- TRANSLATED ---
-        res.status(500).json({ error: `Təhlil zamanı xəta baş verdi: ${error.message}` });
+        
+        // --- NEW LOGIC: Check for our special error flag ---
+        let errorMessage;
+        if (error.isBlockError) {
+            // If it's a block error, construct the special message with the button
+            const geminiPrompt = `Analyze this article for media bias in Azerbaijani: ${url}`;
+            const encodedPrompt = encodeURIComponent(geminiPrompt);
+            const geminiUrl = `https://gemini.google.com/app?prompt=${encodedPrompt}`;
+            errorMessage = `Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və avtomatik təhlil edilə bilmir. <br><br><a href="${geminiUrl}" target="_blank" rel="noopener noreferrer" class="gemini-button">Bir də buradan sınayın</a>`;
+        } else {
+            // For all other errors, show a standard message
+            errorMessage = `Təhlil zamanı xəta baş verdi: ${error.message}`;
+        }
+        
+        res.status(500).json({ error: errorMessage });
     } finally {
         if (browser) {
             await browser.close();
