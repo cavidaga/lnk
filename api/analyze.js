@@ -1,8 +1,5 @@
 import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-
-puppeteer.use(StealthPlugin());
+import puppeteer from 'puppeteer-core';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -32,7 +29,7 @@ export default async function handler(req, res) {
             'cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'
         ];
         if (blockKeywords.some(keyword => articleText.toLowerCase().includes(keyword))) {
-            throw new Error('This website is protected by advanced bot detection (like Cloudflare) and cannot be analyzed automatically.');
+            throw new Error('This website is protected by advanced bot detection (like Cloudflare) and cannot be analyzed automatically. For this site, please use the Bookmarklet method.');
         }
 
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
