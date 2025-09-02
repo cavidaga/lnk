@@ -15,11 +15,11 @@ export default async function handler(req, res) {
 
     let browser = null;
     try {
-        // --- 1. Find the path to the downloaded browser using the new method ---
+        // --- 1. Find the path to the downloaded browser using the 'latest' tag ---
         const cacheDir = path.join(process.cwd(), '.cache');
         const executablePath = computeExecutablePath({
             browser: Browser.CHROMEHEADLESSSHELL,
-            buildId: '127.0.0.0', // This must match the buildId in package.json
+            buildId: 'latest', // This must match the buildId in package.json
             cacheDir,
         });
 
