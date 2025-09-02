@@ -65,20 +65,20 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error('An error occurred:', error);
         
-        // --- NEW LOGIC: Check for our special error flag ---
-        let errorMessage;
         if (error.isBlockError) {
-            // If it's a block error, construct the special message with the button
+            // If it's a block error, send back a special JSON structure
             const geminiPrompt = `Analyze this article for media bias in Azerbaijani: ${url}`;
-            const encodedPrompt = encodeURIComponent(geminiPrompt);
-            const geminiUrl = `https://gemini.google.com/app?prompt=${encodedPrompt}`;
-            errorMessage = `Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və avtomatik təhlil edilə bilmir. <br><br><a href="${geminiUrl}" target="_blank" rel="noopener noreferrer" class="gemini-button">Bir də buradan sınayın</a>`;
-        } else {
-            // For all other errors, show a standard message
-            errorMessage = `Təhlil zamanı xəta baş verdi: ${error.message}`;
+            const errorMessage = 'Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və avtomatik təhlil edilə bilmir.';
+            return res.status(500).json({ 
+                error: true,
+                isBlockError: true,
+                message: errorMessage,
+                prompt: geminiPrompt
+            });
         }
         
-        res.status(500).json({ error: errorMessage });
+        // For all other errors, send a standard message
+        res.status(500).json({ error: true, message: `Təhlil zamanı xəta baş verdi: ${error.message}` });
     } finally {
         if (browser) {
             await browser.close();
