@@ -1,8 +1,6 @@
-import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-
-puppeteer.use(StealthPlugin());
+import { Browser, computeExecutablePath } from '@puppeteer/browsers';
+import puppeteer from 'puppeteer';
+import path from 'path';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -16,27 +14,34 @@ export default async function handler(req, res) {
 
     let browser = null;
     try {
+        // --- Find the path to the downloaded STABLE browser ---
+        const executablePath = computeExecutablePath({
+            browser: Browser.CHROME,
+            buildId: 'stable', // This MUST match the version in package.json
+            cacheDir: path.join(process.cwd(), '.cache', 'puppeteer'),
+        });
+
+        // --- Launch Headless Chrome from that path ---
         browser = await puppeteer.launch({
-            args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
-            headless: chromium.headless,
-            ignoreHTTPSErrors: true,
+            headless: true,
+            executablePath: executablePath,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         
         const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 });
         let articleText = await page.evaluate(() => document.body.innerText);
         
-        const blockKeywords = [
-            'cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'
-        ];
-        if (blockKeywords.some(keyword => articleText.toLowerCase().includes(keyword))) {
-            throw new Error('This website is protected by advanced bot detection (like Cloudflare) and cannot be analyzed automatically.');
+        // --- Bot Detection Logic ---
+        const blockKeywords = ['cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'];
+        const lowerCaseText = articleText.toLowerCase();
+        if (blockKeywords.some(keyword => lowerCaseText.includes(keyword))) {
+            throw new Error('This website is protected by advanced bot detection (like Cloudflare) and cannot be analyzed automatically. For this site, please use the Bookmarklet method.');
         }
 
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
         
+        // --- Send content to the Gemini API ---
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
         const prompt = `
             You are "MediaBiasEvaluator", a neutral analyst AI. Analyze the article text below.
@@ -60,6 +65,7 @@ export default async function handler(req, res) {
         const geminiData = await geminiResponse.json();
         const analysisText = geminiData.candidates[0].content.parts[0].text;
 
+        // --- Send the final report back ---
         res.status(200).json({ analysis_text: analysisText });
 
     } catch (error) {
