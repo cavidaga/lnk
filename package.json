@@ -5,6 +5,7 @@
     "@sparticuz/chromium": "latest",
     "puppeteer-core": "latest",
     "puppeteer-extra": "latest",
-    "puppeteer-extra-plugin-stealth": "latest"
+    "puppeteer-extra-plugin-stealth": "latest",
+    "puppeteer-extra-plugin-user-data-dir": "latest"
   }
 }
