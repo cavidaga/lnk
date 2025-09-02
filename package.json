@@ -1,11 +1,10 @@
 {
-  "name": "vercel-media-analyzer-final",
+  "name": "vercel-media-analyzer-stealth-final",
   "version": "1.0.0",
-  "scripts": {
-    "postinstall": "node -e \"require('@puppeteer/browsers').install({ browser: require('@puppeteer/browsers').Browser.CHROME, buildId: 'latest', cacheDir: require('path').join(__dirname, '.cache')})\""
-  },
   "dependencies": {
-    "@puppeteer/browsers": "latest",
-    "puppeteer": "latest"
+    "@sparticuz/chromium": "latest",
+    "puppeteer-core": "latest",
+    "puppeteer-extra": "latest",
+    "puppeteer-extra-plugin-stealth": "latest"
   }
 }
