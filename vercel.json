@@ -3,7 +3,10 @@
     "api/analyze.js": {
       "maxDuration": 60,
       "memory": 1024,
-      "includeFiles": "node_modules/puppeteer-extra-plugin-stealth/**"
+      "includeFiles": [
+        "node_modules/puppeteer-extra/**",
+        "node_modules/puppeteer-extra-plugin-stealth/**"
+      ]
     }
   }
 }
