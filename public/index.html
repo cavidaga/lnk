@@ -8,6 +8,7 @@
   <meta name="theme-color" content="#0b0c10">
   <meta name="color-scheme" content="light dark" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
   <style>
     :root {
       --bg: #0b0c10; --panel: #111318; --muted: #8892a6; --text: #e8ecf1; --accent: #5aa9e6; --accent-2: #7ec9a3; --danger: #ef6461; --card: #0f1218; --border: #1f2430; --shadow: 0 10px 30px rgba(0,0,0,.35);
@@ -40,19 +41,53 @@
     .loading { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--muted); padding: 40px 0; }
     .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.25); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .error {    padding: 20px;    text-align: center;    border-radius: 10px;    border: 1px solid var(--danger);    background: rgba(239, 100, 97, 0.12); /* This light red background is fine */    color: var(--danger); /* This makes the text a strong, readable red */    font-weight: 500; /* A bit bolder to make it stand out */}
-    .error a.gemini-button {    display: inline-block;    text-decoration: none;    padding: 10px 20px;    margin-top: 10px;    border-radius: 8px;    background: var(--accent);    color: white !important; /* Use important to override default link colors */    font-weight: 500;    transition: transform 0.2s ease, background-color 0.2s ease;}
-    .error a.gemini-button:hover {        transform: translateY(-2px);        background: var(--accent-2);    }
+    .error { padding: 20px; text-align: center; border-radius: 10px; border: 1px solid var(--danger); background: rgba(239, 100, 97, 0.12); color: var(--danger); font-weight: 500; }
     .report h3 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 20px;}
     .report ul { padding-left: 20px; }
     .report li { margin-bottom: 10px; }
     .report strong { color: var(--accent-2); }
+
+    /* --- NEW STYLES for the Copy Prompt feature --- */
+    .prompt-box {
+        background-color: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+        text-align: left;
+        color: var(--muted);
+        font-family: monospace;
+        font-size: 14px;
+        word-wrap: break-word;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 15px;
+    }
+    .action-button {
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        background: var(--accent);
+        color: white !important;
+        font-weight: 500;
+        transition: transform 0.2s ease, background-color 0.2s ease;
+        border: 1px solid transparent;
+    }
+    .action-button.copy {
+        background: var(--accent-2);
+    }
+    .action-button:hover {
+        transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <img src="/static/lnk.png" alt="logo" class="logo-img" width="42" height="42" />
+      <img src="/static/lnk.svg" alt="logo" class="logo-img" width="42" height="42" />
       <div>
         <h1>Media qərəzi qiymətləndiricisi</h1>
         <div class="sub">Vercel & Puppeteer ilə gücləndirilmişdir</div>
@@ -68,41 +103,88 @@
     </div>
     <div id="result" class="result"></div>
   </div>
+
   <script>
     const urlInput = document.getElementById('urlInput');
     const analyseBtn = document.getElementById('btn-analyse');
     const resultDiv = document.getElementById('result');
-    async function analyzeUrl() {
-      const url = urlInput.value.trim();
-      if (!url || !url.startsWith('http')) {
-        resultDiv.innerHTML = `<div class="error">Zəhmət olmasa, düzgün bir URL daxil edin.</div>`;
-        resultDiv.classList.add('show');
-        return;
-      }
-      analyseBtn.disabled = true;
-      analyseBtn.textContent = 'Gözləyin...';
-      resultDiv.innerHTML = `<div class="loading"><span class="spinner"></span> <span>Veb səhifə analiz olunur… Bu, 30 saniyəyə qədər çəkə bilər.</span></div>`;
-      resultDiv.classList.add('show');
-      try {
-        const response = await fetch('/api/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: url })
+
+    // --- NEW: Copy to Clipboard function ---
+    function copyToClipboard(text, buttonElement) {
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = buttonElement.textContent;
+            buttonElement.textContent = 'Kopyalandı!';
+            setTimeout(() => {
+                buttonElement.textContent = originalText;
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
         });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || `Server error ${response.status}`);
-        }
-        const reportHtml = marked.parse(data.analysis_text);
-        resultDiv.innerHTML = `<div class="report">${reportHtml}</div>`;
-      } catch (error) {
-        console.error('Error details:', error);
-        resultDiv.innerHTML = `<div class="error">${error.message}</div>`;
-      } finally {
-        analyseBtn.disabled = false;
-        analyseBtn.textContent = 'Təhlil et';
-      }
     }
+
+    async function analyzeUrl() {
+        const url = urlInput.value.trim();
+        if (!url || !url.startsWith('http')) {
+            resultDiv.innerHTML = `<div class="error">Zəhmət olmasa, düzgün bir URL daxil edin.</div>`;
+            resultDiv.classList.add('show');
+            return;
+        }
+
+        analyseBtn.disabled = true;
+        analyseBtn.textContent = 'Gözləyin...';
+        resultDiv.innerHTML = `<div class="loading"><span class="spinner"></span> <span>Veb səhifə analiz olunur… Bu, 30 saniyəyə qədər çəkə bilər.</span></div>`;
+        resultDiv.classList.add('show');
+      
+        try {
+            const response = await fetch('/api/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // --- NEW: Check for our special block error ---
+                if (data.isBlockError) {
+                    const errorHtml = `
+                        <div class="error">
+                            <p>${data.message}</p>
+                            <div class="prompt-box">${data.prompt}</div>
+                            <div class="action-buttons">
+                                <button class="action-button copy" id="copyBtn">Promtu kopyalayın</button>
+                                <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="action-button">Gemini'ni açın</a>
+                            </div>
+                        </div>
+                    `;
+                    resultDiv.innerHTML = errorHtml;
+                    resultDiv.classList.add('show');
+                    
+                    // Add event listener to the new copy button
+                    document.getElementById('copyBtn').addEventListener('click', function() {
+                        copyToClipboard(data.prompt, this);
+                    });
+
+                } else {
+                    // For other errors
+                    throw new Error(data.message || `Server error ${response.status}`);
+                }
+            } else {
+                // If successful
+                const reportHtml = marked.parse(data.analysis_text);
+                resultDiv.innerHTML = `<div class="report">${reportHtml}</div>`;
+            }
+
+        } catch (error) {
+            console.error('Error details:', error);
+            resultDiv.innerHTML = `<div class="error">${error.message}</div>`;
+        } finally {
+            resultDiv.classList.add('show');
+            analyseBtn.disabled = false;
+            analyseBtn.textContent = 'Təhlil et';
+        }
+    }
+
     analyseBtn.addEventListener('click', analyzeUrl);
     urlInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
