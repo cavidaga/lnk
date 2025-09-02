@@ -7,8 +7,6 @@
   <title>Media qərəzi qiymətləndiricisi</title>
   <meta name="theme-color" content="#0b0c10">
   <meta name="color-scheme" content="light dark" />
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
   <style>
     :root {
       --bg: #0b0c10; --panel: #111318; --muted: #8892a6; --text: #e8ecf1; --accent: #5aa9e6; --accent-2: #7ec9a3; --danger: #ef6461; --card: #0f1218; --border: #1f2430; --shadow: 0 10px 30px rgba(0,0,0,.35);
@@ -36,52 +34,55 @@
     .btn { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border: 0; font-weight: 600; cursor: pointer; }
     .btn:hover { transform: translateY(-1px); }
     .btn:disabled { background: var(--border); cursor: not-allowed; transform: none; color: var(--muted); }
-    .result { display: none; margin-top: 20px; padding: 1px 20px; border: 1px solid var(--border); border-radius: 14px; }
+    .result { display: none; margin-top: 20px; }
     .result.show { display: block; }
     .loading { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--muted); padding: 40px 0; }
     .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.25); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .error { padding: 20px; text-align: center; border-radius: 10px; border: 1px solid var(--danger); background: rgba(239, 100, 97, 0.12); color: var(--danger); font-weight: 500; }
-    .report h3 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 20px;}
-    .report ul { padding-left: 20px; }
-    .report li { margin-bottom: 10px; }
-    .report strong { color: var(--accent-2); }
+    .action-button { text-decoration: none; padding: 10px 20px; border-radius: 8px; background: var(--accent); color: white !important; font-weight: 500; }
 
-    /* --- NEW STYLES for the Copy Prompt feature --- */
-    .prompt-box {
+    /* --- NEW CHART STYLES --- */
+    .analysis-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 20px;}
+    @media (min-width: 768px) { .analysis-grid { grid-template-columns: 300px 1fr; } }
+    
+    .bias-chart {
+        width: 100%;
+        height: 300px;
         background-color: var(--panel);
         border: 1px solid var(--border);
         border-radius: 8px;
-        padding: 15px;
-        margin-top: 20px;
-        text-align: left;
+        position: relative;
+        background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size: 100% 50%, 50% 100%;
+        background-repeat: no-repeat;
+        background-position: center, center;
+    }
+    .chart-point {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        background: radial-gradient(circle, #fff, var(--accent));
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        border: 2px solid white;
+        box-shadow: 0 0 15px rgba(90, 169, 230, 0.7);
+        transition: top 0.5s ease-out, left 0.5s ease-out;
+    }
+    .axis-label {
+        position: absolute;
         color: var(--muted);
-        font-family: monospace;
-        font-size: 14px;
-        word-wrap: break-word;
+        font-size: 11px;
+        text-transform: uppercase;
     }
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 15px;
-    }
-    .action-button {
-        text-decoration: none;
-        padding: 8px 16px;
-        border-radius: 8px;
-        background: var(--accent);
-        color: white !important;
-        font-weight: 500;
-        transition: transform 0.2s ease, background-color 0.2s ease;
-        border: 1px solid transparent;
-    }
-    .action-button.copy {
-        background: var(--accent-2);
-    }
-    .action-button:hover {
-        transform: translateY(-2px);
-    }
+    .y-axis-top { top: 5px; left: 50%; transform: translateX(-50%); }
+    .y-axis-bottom { bottom: 5px; left: 50%; transform: translateX(-50%); }
+    .x-axis-left { left: 5px; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; text-orientation: mixed; }
+    .x-axis-right { right: 5px; top: 50%; transform: translateY(-50%); writing-mode: vertical-rl; text-orientation: mixed; transform: translateY(-50%) rotate(180deg);}
+    .summary-card p { margin-bottom: 0; color: var(--muted); }
+    .score-details dt { font-weight: 600; color: var(--text); margin-top: 1em; }
+    .score-details dd { margin: 0 0 0 1em; color: var(--muted); font-size: 14px; border-left: 2px solid var(--border); padding-left: 1em; }
+    .score-details .value { font-family: monospace; color: var(--accent-2); font-weight: bold; }
   </style>
 </head>
 <body>
@@ -90,7 +91,7 @@
       <img src="/static/lnk.svg" alt="logo" class="logo-img" width="42" height="42" />
       <div>
         <h1>Media qərəzi qiymətləndiricisi</h1>
-        <div class="sub">Vercel & Puppeteer ilə gücləndirilmişdir</div>
+        <div class="sub">Ad Fontes metodologiyasından ilhamlanmışdır</div>
       </div>
     </header>
     <div class="card">
@@ -109,19 +110,58 @@
     const analyseBtn = document.getElementById('btn-analyse');
     const resultDiv = document.getElementById('result');
 
-    // --- NEW: Copy to Clipboard function ---
-    function copyToClipboard(text, buttonElement) {
-        navigator.clipboard.writeText(text).then(() => {
-            const originalText = buttonElement.textContent;
-            buttonElement.textContent = 'Kopyalandı!';
-            setTimeout(() => {
-                buttonElement.textContent = originalText;
-            }, 2000);
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-        });
-    }
+    // --- MAIN DISPLAY FUNCTION ---
+    function displayResult(data) {
+        const { scores = {}, human_summary = "Xülasə təqdim edilmədi." } = data;
+        
+        // Calculate chart positions
+        const reliability = scores.reliability?.value ?? 50;
+        const socioBias = scores.socio_cultural_bias?.value ?? 0;
+        const politicalBias = scores.political_establishment_bias?.value ?? 0;
 
+        // Position for the main chart (Reliability vs. Political Bias)
+        const topPos = 100 - reliability; // Y-axis is inverted
+        const leftPos = (politicalBias + 5) / 10 * 100; // Convert -5 to +5 range to 0-100%
+
+        const resultHTML = `
+            <div class="analysis-grid">
+                <div>
+                    <div class="bias-chart">
+                        <div class="chart-point" style="top: ${topPos}%; left: ${leftPos}%;"></div>
+                        <span class="axis-label y-axis-top">Etibarlı</span>
+                        <span class="axis-label y-axis-bottom">Qeyri-Etibarlı</span>
+                        <span class="axis-label x-axis-left">Müxalif</span>
+                        <span class="axis-label x-axis-right">Hökumətyönümlü</span>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <h4>Ümumi Xülasə</h4>
+                    <p>${escapeHTML(human_summary)}</p>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 20px;">
+                <div class="bd">
+                    <h3>Təfsilatlı Göstəricilər</h3>
+                    <dl class="score-details">
+                        <dt>Etibarlılıq: <span class="value">${scores.reliability?.value ?? 'N/A'}</span></dt>
+                        <dd>${escapeHTML(scores.reliability?.rationale || '')}</dd>
+                        
+                        <dt>Siyasi Hakimiyyət Meyli: <span class="value">${scores.political_establishment_bias?.value ?? 'N/A'}</span></dt>
+                        <dd>${escapeHTML(scores.political_establishment_bias?.rationale || '')}</dd>
+
+                        <dt>Sosial-Mədəni Meyl: <span class="value">${scores.socio_cultural_bias?.value ?? 'N/A'}</span></dt>
+                        <dd>${escapeHTML(scores.socio_cultural_bias?.rationale || '')}</dd>
+                    </dl>
+                </div>
+            </div>
+        `;
+        resultDiv.innerHTML = resultHTML;
+    }
+    
+    // Helper to escape HTML characters
+    function escapeHTML(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+    // --- MAIN NETWORK FUNCTION ---
     async function analyzeUrl() {
         const url = urlInput.value.trim();
         if (!url || !url.startsWith('http')) {
@@ -132,7 +172,7 @@
 
         analyseBtn.disabled = true;
         analyseBtn.textContent = 'Gözləyin...';
-        resultDiv.innerHTML = `<div class="loading"><span class="spinner"></span> <span>Veb səhifə analiz olunur… Bu, 30 saniyəyə qədər çəkə bilər.</span></div>`;
+        resultDiv.innerHTML = `<div class="loading"><span class="spinner"></span> <span>Məqalə təhlil olunur… Bu, 30 saniyəyə qədər çəkə bilər.</span></div>`;
         resultDiv.classList.add('show');
       
         try {
@@ -145,34 +185,20 @@
             const data = await response.json();
 
             if (!response.ok) {
-                // --- NEW: Check for our special block error ---
                 if (data.isBlockError) {
                     const errorHtml = `
                         <div class="error">
                             <p>${data.message}</p>
-                            <div class="prompt-box">${data.prompt}</div>
-                            <div class="action-buttons">
-                                <button class="action-button copy" id="copyBtn">Promtu kopyalayın</button>
-                                <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="action-button">Gemini'ni açın</a>
+                            <div style="margin-top: 15px;">
+                                <a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer" class="action-button">Gemini'ni açın və promtu kopyalayın</a>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                     resultDiv.innerHTML = errorHtml;
-                    resultDiv.classList.add('show');
-                    
-                    // Add event listener to the new copy button
-                    document.getElementById('copyBtn').addEventListener('click', function() {
-                        copyToClipboard(data.prompt, this);
-                    });
-
                 } else {
-                    // For other errors
                     throw new Error(data.message || `Server error ${response.status}`);
                 }
             } else {
-                // If successful
-                const reportHtml = marked.parse(data.analysis_text);
-                resultDiv.innerHTML = `<div class="report">${reportHtml}</div>`;
+                displayResult(data);
             }
 
         } catch (error) {
