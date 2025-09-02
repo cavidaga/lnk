@@ -2,7 +2,7 @@
   "name": "vercel-media-analyzer-final",
   "version": "1.0.0",
   "scripts": {
-    "postinstall": "node -e \"require('@puppeteer/browsers').install({ browser: require('@puppeteer/browsers').Browser.CHROMEHEADLESSSHELL, buildId: '127.0.0.0', cacheDir: require('path').join(__dirname, '.cache')})\""
+    "postinstall": "node -e \"require('@puppeteer/browsers').install({ browser: require('@puppeteer/browsers').Browser.CHROMEHEADLESSSHELL, buildId: 'latest', cacheDir: require('path').join(__dirname, '.cache')})\""
   },
   "dependencies": {
     "@puppeteer/browsers": "latest",
