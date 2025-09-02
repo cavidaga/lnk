@@ -1,0 +1,9 @@
+# Dependencies
+/node_modules
+
+# Downloaded browser cache
+/.cache
+
+# Logs & Environment Variables
+*.log
+.env
