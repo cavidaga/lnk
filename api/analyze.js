@@ -15,15 +15,15 @@ export default async function handler(req, res) {
 
     let browser = null;
     try {
-        // --- 1. Find the path to the downloaded browser using the 'latest' tag ---
+        // --- Find the path to the downloaded STABLE CHROME browser ---
         const cacheDir = path.join(process.cwd(), '.cache');
         const executablePath = computeExecutablePath({
-            browser: Browser.CHROMEHEADLESSSHELL,
-            buildId: 'latest', // This must match the buildId in package.json
+            browser: Browser.CHROME, // Use the stable Chrome
+            buildId: 'latest',
             cacheDir,
         });
 
-        // --- 2. Launch Headless Chrome from that path ---
+        // --- Launch Headless Chrome from that path ---
         browser = await puppeteer.launch({
             headless: true,
             executablePath: executablePath,
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
         
-        // --- 3. Send content to the Gemini API ---
+        // --- Send content to the Gemini API ---
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
         const prompt = `
             You are "MediaBiasEvaluator", a neutral analyst AI. Analyze the article text below.
@@ -77,7 +77,7 @@ export default async function handler(req, res) {
         const geminiData = await geminiResponse.json();
         const analysisText = geminiData.candidates[0].content.parts[0].text;
 
-        // --- 4. Send the final report back ---
+        // --- Send the final report back ---
         res.status(200).json({ analysis_text: analysisText });
 
     } catch (error) {
