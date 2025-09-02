@@ -2,7 +2,7 @@
   "name": "vercel-media-analyzer-final",
   "version": "1.0.0",
   "scripts": {
-    "postinstall": "npx @puppeteer/browsers install 'chrome@113.0.570.16' --path ./.cache/puppeteer"
+    "postinstall": "npx @puppeteer/browsers install chrome@stable --path ./.cache/puppeteer"
   },
   "dependencies": {
     "@puppeteer/browsers": "latest",
