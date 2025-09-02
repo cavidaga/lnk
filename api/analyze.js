@@ -1,6 +1,12 @@
-import { install_browser, Browser, Cache } from '@puppeteer/browsers';
-import puppeteer from 'puppeteer';
-import path from 'path';
+// Import the special version of Chromium for serverless environments
+const chromium = require('@sparticuz/chromium');
+// Import puppeteer-extra, the enhanced version of Puppeteer
+const puppeteer = require('puppeteer-extra');
+// Import the stealth plugin
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+
+// Tell puppeteer-extra to use the stealth plugin
+puppeteer.use(StealthPlugin());
 
 // This is the main function Vercel will run
 export default async function handler(req, res) {
@@ -15,33 +21,24 @@ export default async function handler(req, res) {
 
     let browser = null;
     try {
-        // --- 1. Find the path to the downloaded browser ---
-        const cacheDir = path.join(process.cwd(), '.cache');
-        const browserInfo = await install_browser({
-            browser: Browser.CHROMEHEADLESSSHELL,
-            buildId: '127.0.0.0',
-            cacheDir,
-        });
-
-        // --- 2. Launch Headless Chrome from that path ---
+        // --- 1. Launch Headless Chrome with Stealth Enabled ---
         browser = await puppeteer.launch({
-            headless: true,
-            executablePath: browserInfo.executablePath,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--single-process',
-                '--no-zygote'
-            ]
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
+            ignoreHTTPSErrors: true,
         });
         
         const page = await browser.newPage();
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36');
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 });
+        
+        // Go to the page and wait for it to be fully loaded
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+
         let articleText = await page.evaluate(() => document.body.innerText);
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
         
-        // --- 3. Send content to the Gemini API ---
+        // --- 2. Send content to the Gemini API ---
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
         const prompt = `
             You are "MediaBiasEvaluator", a neutral analyst AI. Analyze the article text below.
@@ -65,7 +62,7 @@ export default async function handler(req, res) {
         const geminiData = await geminiResponse.json();
         const analysisText = geminiData.candidates[0].content.parts[0].text;
 
-        // --- 4. Send the final report back ---
+        // --- 3. Send the final report back ---
         res.status(200).json({ analysis_text: analysisText });
 
     } catch (error) {
