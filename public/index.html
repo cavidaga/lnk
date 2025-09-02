@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="az" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Media qərəzi qiymətləndiricisi</title>
+  <meta name="theme-color" content="#0b0c10">
+  <meta name="color-scheme" content="light dark" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b0c10; --panel: #111318; --muted: #8892a6; --text: #e8ecf1; --accent: #5aa9e6; --accent-2: #7ec9a3; --danger: #ef6461; --card: #0f1218; --border: #1f2430; --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg: #f7f9fc; --panel: #ffffff; --muted: #556070; --text: #0b1324; --accent: #006dca; --accent-2: #0a8754; --danger: #b42318; --card: #ffffff; --border: #e7ebf3; --shadow: 0 10px 24px rgba(10, 31, 68, .08);
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans"; color: var(--text);
+      background: radial-gradient(1200px 900px at 10% -10%, rgba(90,169,230,.18), transparent 60%), radial-gradient(1000px 700px at 110% 0%, rgba(126,201,163,.18), transparent 60%), var(--bg);
+    }
+    .wrap { max-width: 800px; margin: 0 auto; padding: 32px 20px 60px; }
+    header { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+    .logo-img { width:42px; height:42px; border-radius:12px; box-shadow:var(--shadow); display:block; }
+    h1 { font-size: 26px; margin: 0; }
+    .sub { color: var(--muted); margin-top: -4px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+    .card > .bd { padding: 18px; }
+    .row { display: grid; gap: 12px; grid-template-columns: 1fr 140px; }
+    .input, .btn { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: 16px; outline: none; transition: all .2s ease; }
+    .input:focus { border-color: var(--accent); }
+    .btn { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #fff; border: 0; font-weight: 600; cursor: pointer; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { background: var(--border); cursor: not-allowed; transform: none; color: var(--muted); }
+    .result { display: none; margin-top: 20px; padding: 1px 20px; border: 1px solid var(--border); border-radius: 14px; }
+    .result.show { display: block; }
+    .loading { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--muted); padding: 40px 0; }
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.25); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error { padding: 20px; text-align: center; border-radius: 10px; border: 1px solid var(--danger); background: rgba(239,100,97,.12); color: #ffd7d5; }
+    .report h3 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 20px;}
+    .report ul { padding-left: 20px; }
+    .report li { margin-bottom: 10px; }
+    .report strong { color: var(--accent-2); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="/static/lnk.png" alt="logo" class="logo-img" width="42" height="42" />
+      <div>
+        <h1>Media qərəzi qiymətləndiricisi</h1>
+        <div class="sub">Vercel & Puppeteer ilə gücləndirilmişdir</div>
+      </div>
+    </header>
+    <div class="card">
+      <div class="bd">
+        <div class="row">
+          <input class="input" id="urlInput" type="url" placeholder="Məqalə linkini yapışdırın..." />
+          <button class="btn" id="btn-analyse">Təhlil et</button>
+        </div>
+      </div>
+    </div>
+    <div id="result" class="result"></div>
+  </div>
+  <script>
+    const urlInput = document.getElementById('urlInput');
+    const analyseBtn = document.getElementById('btn-analyse');
+    const resultDiv = document.getElementById('result');
+    async function analyzeUrl() {
+      const url = urlInput.value.trim();
+      if (!url || !url.startsWith('http')) {
+        resultDiv.innerHTML = `<div class="error">Zəhmət olmasa, düzgün bir URL daxil edin.</div>`;
+        resultDiv.classList.add('show');
+        return;
+      }
+      analyseBtn.disabled = true;
+      analyseBtn.textContent = 'Gözləyin...';
+      resultDiv.innerHTML = `<div class="loading"><span class="spinner"></span> <span>Veb səhifə analiz olunur… Bu, 30 saniyəyə qədər çəkə bilər.</span></div>`;
+      resultDiv.classList.add('show');
+      try {
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: url })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || `Server error ${response.status}`);
+        }
+        const reportHtml = marked.parse(data.analysis_text);
+        resultDiv.innerHTML = `<div class="report">${reportHtml}</div>`;
+      } catch (error) {
+        console.error('Error details:', error);
+        resultDiv.innerHTML = `<div class="error">${error.message}</div>`;
+      } finally {
+        analyseBtn.disabled = false;
+        analyseBtn.textContent = 'Təhlil et';
+      }
+    }
+    analyseBtn.addEventListener('click', analyzeUrl);
+    urlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        analyzeUrl();
+      }
+    });
+  </script>
+</body>
+</html>
