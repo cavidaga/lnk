@@ -36,9 +36,9 @@ export default async function handler(req, res) {
         
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-        // --- NEW, AD FONTES-INSPIRED PROMPT ---
+        // --- THE ULTIMATE PROMPT ---
         const prompt = `
-            You are "MediaBiasEvaluator", a sophisticated, neutral analyst AI. Your task is to analyze the provided ARTICLE TEXT based on a two-axis methodology (Reliability and Bias) and generate a single, valid JSON object.
+            You are "MediaBiasEvaluator", a sophisticated, neutral analyst AI. Analyze the provided ARTICLE TEXT and generate a single, valid JSON object with a comprehensive media bias and reliability report.
 
             ## CONTEXT ##
             Original URL: ${url}
@@ -47,34 +47,30 @@ export default async function handler(req, res) {
             ${articleText}
 
             ## JSON SCHEMA & METHODOLOGY INSTRUCTIONS ##
-            Your entire output must be a single, valid JSON object. All free-text rationales and summaries must be in Azerbaijani.
+            Your entire output must be a single, valid JSON object. All free-text values (rationales, summaries, etc.) must be in Azerbaijani. In the 'human_summary' and 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
 
-            The JSON must contain a "scores" object with three main keys: "reliability", "socio_cultural_bias", and "political_establishment_bias".
-            Each key must map to an object containing:
-            1.  "value": A numerical score (decimals are allowed).
-            2.  "rationale": A brief explanation for the score in Azerbaijani.
+            The JSON object must contain the following top-level keys: "meta", "scores", "diagnostics", "cited_sources", and "human_summary".
 
-            Analyze and score based on these definitions:
+            1.  "meta": An object containing:
+                - "article_type": Classify the article as one of: "Xəbər" (News), "Rəy" (Opinion), "Analiz" (Analysis), "İstintaq Jurnalistikası" (Investigative), "Müsahibə" (Interview), or "Press-reliz" (Press Release).
 
-            1.  "reliability" (Score: 0-100):
-                - 100: Original, factual, neutral reporting with high-quality sources.
-                - 50: Mix of fact and opinion, some analysis, decent sourcing.
-                - 0: Inaccurate, fabricated, or propaganda with no reliable sources.
-                - Rationale should explain sourcing, factuality, and expression (how it presents info).
+            2.  "scores": An object for the main two-axis scores. Each key must map to an object with a "value" (number, decimals allowed) and a "rationale" (string, Azerbaijani):
+                - "reliability" (Score: 0-100): 100 for original, factual reporting; 0 for fabricated propaganda.
+                - "socio_cultural_bias" (Score: -5.0 to +5.0): -5.0 for Strongly Conservative; +5.0 for Strongly Liberal.
+                - "political_establishment_bias" (Score: -5.0 to +5.0): -5.0 for Strongly Critical/Opposition; +5.0 for Strongly Pro-Government.
 
-            2.  "socio_cultural_bias" (Score: -5.0 to +5.0):
-                - -5.0: Strongly Conservative (Mühafizəkar).
-                - 0.0: Neutral/Balanced.
-                - +5.0: Strongly Liberal.
-                - Rationale should explain why, based on stances on social/cultural issues.
+            3.  "diagnostics": An object for granular scores (0-100, integers only):
+                - "language_loadedness": How much it relies on emotionally charged language.
+                - "sourcing_transparency": How clearly it identifies and cites its sources.
+                - "headline_accuracy": How well the headline reflects the article's content.
+                - "language_flags": A list of specific examples of problematic language. Each item should be an object with "term" and "category" (e.g., "Yüklü dil", "Spekulyativ dil").
 
-            3.  "political_establishment_bias" (Score: -5.0 to +5.0):
-                - -5.0: Strongly Critical/Opposition (Müxalif).
-                - 0.0: Neutral/Balanced.
-                - +5.0: Strongly Pro-Government (Hökumətyönümlü).
-                - Rationale should explain why, based on its stance towards government policies and officials.
-            
-            Additionally, include a top-level key "human_summary" containing a 4-5 line summary of your findings in Azerbaijani.
+            4.  "cited_sources": An array of objects for key people/organizations quoted. Each object must have:
+                - "name": The name of the person or organization.
+                - "role": Their title or role (e.g., "Aktivist", "Siyasətçi").
+                - "stance": Their apparent stance within the article: "Dəstəkləyici" (Supportive), "Tənqidi" (Critical), or "Neytral" (Neutral).
+
+            5.  "human_summary": A concise 4-5 line summary of your findings in Azerbaijani.
         `;
 
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
