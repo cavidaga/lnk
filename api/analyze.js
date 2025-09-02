@@ -73,7 +73,7 @@ export default async function handler(req, res) {
             5.  "human_summary": A concise 4-5 line summary of your findings in Azerbaijani.
         `;
 
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-pro:generateContent?key=${GEMINI_API_KEY}`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
         
         const geminiResponse = await fetch(geminiUrl, {
             method: 'POST',
