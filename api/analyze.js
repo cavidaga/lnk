@@ -8,7 +8,8 @@ export default async function handler(req, res) {
 
     const { url } = req.body;
     if (!url) {
-        return res.status(400).json({ error: 'URL is required.' });
+        // --- TRANSLATED ---
+        return res.status(400).json({ error: 'URL daxil edilməyib.' });
     }
 
     let browser = null;
@@ -29,7 +30,8 @@ export default async function handler(req, res) {
             'cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'
         ];
         if (blockKeywords.some(keyword => articleText.toLowerCase().includes(keyword))) {
-            throw new Error('This website is protected by advanced bot detection (like Cloudflare) and cannot be analyzed automatically. For this site, please use the Bookmarklet method.');
+            // --- TRANSLATED and UPDATED ---
+            throw new Error('Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və avtomatik təhlil edilə bilmir.');
         }
 
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
@@ -52,7 +54,10 @@ export default async function handler(req, res) {
             body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
 
-        if (!geminiResponse.ok) throw new Error(`Gemini API failed with status: ${geminiResponse.status}`);
+        if (!geminiResponse.ok) {
+            // --- TRANSLATED ---
+            throw new Error(`Süni intellekt modelindən cavab alınarkən xəta baş verdi (Status: ${geminiResponse.status})`);
+        }
         
         const geminiData = await geminiResponse.json();
         const analysisText = geminiData.candidates[0].content.parts[0].text;
@@ -61,7 +66,8 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error('An error occurred:', error);
-        res.status(500).json({ error: `An error occurred during analysis: ${error.message}` });
+        // --- TRANSLATED ---
+        res.status(500).json({ error: `Təhlil zamanı xəta baş verdi: ${error.message}` });
     } finally {
         if (browser) {
             await browser.close();
