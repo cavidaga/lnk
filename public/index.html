@@ -94,29 +94,27 @@
     const analyseBtn = document.getElementById('btn-analyse');
     const resultDiv = document.getElementById('result');
 
-    // --- MAIN DISPLAY FUNCTION (Corrected Version) ---
+    // --- MAIN DISPLAY FUNCTION (Corrected Version 2.0) ---
     function displayResult(data) {
-        const { scores = {}, human_summary = "Xülasə təqdim edilmədi." } = data;
+        const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = "Xülasə təqdim edilmədi." } = data;
         
-        // --- UPDATED to read the flat JSON structure ---
-        const reliability = scores.reliability ?? 50;
-        const politicalBias = scores.political_establishment_bias ?? 0;
-        const socioBias = scores.socio_cultural_bias ?? 0;
+        // --- CORRECTED to read the nested JSON structure ---
+        const reliability = scores.reliability?.value ?? 50;
+        const politicalBias = scores.political_establishment_bias?.value ?? 0;
 
         const topPos = 100 - reliability;
         const leftPos = (politicalBias + 5) / 10 * 100;
 
-        // This rendering logic is fine and does not need to be changed
-        const sourcesTableHTML = data.cited_sources?.length > 0 ? `
+        const sourcesTableHTML = cited_sources.length > 0 ? `
             <table class="sources-table">
                 <thead><tr><th>Ad</th><th>Rol</th><th>Mövqe</th></tr></thead>
                 <tbody>
-                    ${data.cited_sources.map(s => `<tr><td>${escapeHTML(s.name)}</td><td>${escapeHTML(s.role)}</td><td>${escapeHTML(s.stance)}</td></tr>`).join('')}
+                    ${cited_sources.map(s => `<tr><td>${escapeHTML(s.name)}</td><td>${escapeHTML(s.role)}</td><td>${escapeHTML(s.stance)}</td></tr>`).join('')}
                 </tbody>
             </table>` : '<p class="muted small">Məqalədə birbaşa mənbə göstərilməyib.</p>';
         
-        const languageFlagsHTML = data.diagnostics?.language_flags?.length > 0 ?
-            `<ul>${data.diagnostics.language_flags.map(f => `<li><strong>${escapeHTML(f.term)}:</strong> <span class="muted">${escapeHTML(f.category)}</span></li>`).join('')}</ul>` :
+        const languageFlagsHTML = diagnostics.language_flags?.length > 0 ?
+            `<ul>${diagnostics.language_flags.map(f => `<li><strong>${escapeHTML(f.term)}:</strong> <span class="muted">${escapeHTML(f.category)}</span></li>`).join('')}</ul>` :
             '<p class="muted small">Mənfi dil siqnalları aşkar edilmədi.</p>';
 
         const resultHTML = `
@@ -131,7 +129,7 @@
                     </div>
                 </div>
                 <div class="summary-card">
-                    ${data.meta?.article_type ? `<div class="article-type-tag">${escapeHTML(data.meta.article_type)}</div>` : ''}
+                    ${meta.article_type ? `<div class="article-type-tag">${escapeHTML(meta.article_type)}</div>` : ''}
                     <h4>Ümumi Xülasə</h4>
                     <p>${escapeHTML(human_summary).replace(/\n/g, '<br>')}</p>
                 </div>
@@ -140,9 +138,9 @@
                 <div class="bd">
                     <h3 class="sec-title">Diaqnostik Göstəricilər</h3>
                     <div class="diagnostics-grid">
-                        <div class="diag-item"><div class="label">Dilin Yüklülüyü</div><div class="value">${data.diagnostics?.language_loadedness ?? 'N/A'}</div></div>
-                        <div class="diag-item"><div class="label">Mənbə Şəffaflığı</div><div class="value">${data.diagnostics?.sourcing_transparency ?? 'N/A'}</div></div>
-                        <div class="diag-item"><div class="label">Başlığın Dəqiqliyi</div><div class="value">${data.diagnostics?.headline_accuracy ?? 'N/A'}</div></div>
+                        <div class="diag-item"><div class="label">Dilin Yüklülüyü</div><div class="value">${diagnostics.language_loadedness ?? 'N/A'}</div></div>
+                        <div class="diag-item"><div class="label">Mənbə Şəffaflığı</div><div class="value">${diagnostics.sourcing_transparency ?? 'N/A'}</div></div>
+                        <div class="diag-item"><div class="label">Başlığın Dəqiqliyi</div><div class="value">${diagnostics.headline_accuracy ?? 'N/A'}</div></div>
                     </div>
                     <h4 style="margin-top: 20px;">Konkret Dil Siqnalları</h4>
                     <div class="language-flags">${languageFlagsHTML}</div>
@@ -152,14 +150,14 @@
 
                     <h3 class="sec-title">Əsas Oxlar üzrə izah</h3>
                     <dl class="score-details">
-                        <dt>Etibarlılıq: <span class="value">${scores.reliability ?? 'N/A'}</span></dt>
-                        <dd>${escapeHTML(scores.reliability_rationale || '')}</dd>
+                        <dt>Etibarlılıq: <span class="value">${scores.reliability?.value ?? 'N/A'}</span></dt>
+                        <dd>${escapeHTML(scores.reliability?.rationale || '')}</dd>
                         
-                        <dt>Siyasi Hakimiyyət Meyli: <span class="value">${scores.political_establishment_bias ?? 'N/A'}</span></dt>
-                        <dd>${escapeHTML(scores.political_establishment_bias_rationale || '')}</dd>
+                        <dt>Siyasi Hakimiyyət Meyli: <span class="value">${scores.political_establishment_bias?.value ?? 'N/A'}</span></dt>
+                        <dd>${escapeHTML(scores.political_establishment_bias?.rationale || '')}</dd>
 
-                        <dt>Sosial-Mədəni Meyl: <span class="value">${scores.socio_cultural_bias ?? 'N/A'}</span></dt>
-                        <dd>${escapeHTML(scores.socio_cultural_bias_rationale || '')}</dd>
+                        <dt>Sosial-Mədəni Meyl: <span class="value">${scores.socio_cultural_bias?.value ?? 'N/A'}</span></dt>
+                        <dd>${escapeHTML(scores.socio_cultural_bias?.rationale || '')}</dd>
                     </dl>
                     
                     <details>
