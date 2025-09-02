@@ -41,6 +41,8 @@
     .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.25); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .error {    padding: 20px;    text-align: center;    border-radius: 10px;    border: 1px solid var(--danger);    background: rgba(239, 100, 97, 0.12); /* This light red background is fine */    color: var(--danger); /* This makes the text a strong, readable red */    font-weight: 500; /* A bit bolder to make it stand out */}
+    .error a.gemini-button {    display: inline-block;    text-decoration: none;    padding: 10px 20px;    margin-top: 10px;    border-radius: 8px;    background: var(--accent);    color: white !important; /* Use important to override default link colors */    font-weight: 500;    transition: transform 0.2s ease, background-color 0.2s ease;}
+    .error a.gemini-button:hover {        transform: translateY(-2px);        background: var(--accent-2);    }
     .report h3 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-top: 20px;}
     .report ul { padding-left: 20px; }
     .report li { margin-bottom: 10px; }
