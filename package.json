@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "dependencies": {
     "@sparticuz/chromium": "latest",
-    "puppeteer-core": "latest",
-    "puppeteer-extra": "latest",
-    "puppeteer-extra-plugin-stealth": "latest",
-    "puppeteer-extra-plugin-user-data-dir": "latest"
+    "puppeteer-core": "latest"
   }
 }
