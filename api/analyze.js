@@ -1,8 +1,9 @@
-import { Browser, computeExecutablePath } from '@puppeteer/browsers';
-import puppeteer from 'puppeteer';
-import path from 'path';
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
-// This is the main function Vercel will run
+puppeteer.use(StealthPlugin());
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
@@ -15,45 +16,27 @@ export default async function handler(req, res) {
 
     let browser = null;
     try {
-        // --- Find the path to the downloaded STABLE CHROME browser ---
-        const cacheDir = path.join(process.cwd(), '.cache');
-        const executablePath = computeExecutablePath({
-            browser: Browser.CHROME, // Use the stable Chrome
-            buildId: 'latest',
-            cacheDir,
-        });
-
-        // --- Launch Headless Chrome from that path ---
         browser = await puppeteer.launch({
-            headless: true,
-            executablePath: executablePath,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--single-process',
-                '--no-zygote'
-            ]
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
+            ignoreHTTPSErrors: true,
         });
         
         const page = await browser.newPage();
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 });
+        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
         let articleText = await page.evaluate(() => document.body.innerText);
         
-        // --- Bot Detection Logic ---
         const blockKeywords = [
-            'cloudflare',
-            'checking your browser',
-            'ddos protection',
-            'verifying you are human'
+            'cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'
         ];
-        const lowerCaseText = articleText.toLowerCase();
-        if (blockKeywords.some(keyword => lowerCaseText.includes(keyword))) {
-            throw new Error('This website is protected by advanced bot detection (like Cloudflare) and cannot be analyzed automatically. For this site, please use the Bookmarklet method.');
+        if (blockKeywords.some(keyword => articleText.toLowerCase().includes(keyword))) {
+            throw new Error('This website is protected by advanced bot detection (like Cloudflare) and cannot be analyzed automatically.');
         }
 
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
         
-        // --- Send content to the Gemini API ---
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
         const prompt = `
             You are "MediaBiasEvaluator", a neutral analyst AI. Analyze the article text below.
@@ -77,7 +60,6 @@ export default async function handler(req, res) {
         const geminiData = await geminiResponse.json();
         const analysisText = geminiData.candidates[0].content.parts[0].text;
 
-        // --- Send the final report back ---
         res.status(200).json({ analysis_text: analysisText });
 
     } catch (error) {
