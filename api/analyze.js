@@ -1,7 +1,8 @@
-import { install_browser, Browser } from '@puppeteer/browsers';
+import { Browser, computeExecutablePath } from '@puppeteer/browsers';
 import puppeteer from 'puppeteer';
 import path from 'path';
 
+// This is the main function Vercel will run
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method Not Allowed' });
@@ -14,41 +15,45 @@ export default async function handler(req, res) {
 
     let browser = null;
     try {
+        // --- 1. Find the path to the downloaded browser using the new method ---
         const cacheDir = path.join(process.cwd(), '.cache');
-        const browserInfo = await install_browser({
+        const executablePath = computeExecutablePath({
             browser: Browser.CHROMEHEADLESSSHELL,
-            buildId: '127.0.0.0',
+            buildId: '127.0.0.0', // This must match the buildId in package.json
             cacheDir,
         });
 
+        // --- 2. Launch Headless Chrome from that path ---
         browser = await puppeteer.launch({
             headless: true,
-            executablePath: browserInfo.executablePath,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--single-process', '--no-zygote']
+            executablePath: executablePath,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--single-process',
+                '--no-zygote'
+            ]
         });
         
         const page = await browser.newPage();
         await page.goto(url, { waitUntil: 'networkidle2', timeout: 25000 });
         let articleText = await page.evaluate(() => document.body.innerText);
         
-        // --- NEW: BOT DETECTION LOGIC ---
+        // --- Bot Detection Logic ---
         const blockKeywords = [
             'cloudflare',
             'checking your browser',
             'ddos protection',
-            'verifying you are human',
-            'verify you are a human',
-            'i am not a robot'
+            'verifying you are human'
         ];
         const lowerCaseText = articleText.toLowerCase();
         if (blockKeywords.some(keyword => lowerCaseText.includes(keyword))) {
-            // If we find a keyword, we know we're blocked. Throw a specific error.
             throw new Error('This website is protected by advanced bot detection (like Cloudflare) and cannot be analyzed automatically. For this site, please use the Bookmarklet method.');
         }
-        // --- END OF BOT DETECTION LOGIC ---
 
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
         
+        // --- 3. Send content to the Gemini API ---
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
         const prompt = `
             You are "MediaBiasEvaluator", a neutral analyst AI. Analyze the article text below.
@@ -72,11 +77,12 @@ export default async function handler(req, res) {
         const geminiData = await geminiResponse.json();
         const analysisText = geminiData.candidates[0].content.parts[0].text;
 
+        // --- 4. Send the final report back ---
         res.status(200).json({ analysis_text: analysisText });
 
     } catch (error) {
         console.error('An error occurred:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: `An error occurred during analysis: ${error.message}` });
     } finally {
         if (browser) {
             await browser.close();
