@@ -109,6 +109,7 @@ export default async function handler(req, res) {
         const analysisText = geminiData.candidates[0].content.parts[0].text;
         const finalData = JSON.parse(analysisText);
 
+        finalData.hash = cacheKey; // Add the hash to the object
         res.status(200).json(finalData);
 
     } catch (error) {
