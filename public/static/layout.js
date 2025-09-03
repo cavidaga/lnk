@@ -11,6 +11,7 @@
           </picture>
         </a>
 
+        <!-- Mobile menu toggle (hidden on desktop) -->
         <button class="nav-toggle" type="button" aria-label="Menyunu aç" aria-controls="primary-nav" aria-expanded="false" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -68,12 +69,11 @@
     `;
   }
 
+  // Backdrop AFTER modal (correct order for layering)
   function modalHTML() {
-    // NOTE: replace FORM_ENDPOINT if you change Formspree ID.
     const FORM_ENDPOINT = 'https://formspree.io/f/xgvlpegn';
     return `
-      <div class="modal-backdrop" data-modal-backdrop hidden></div>
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contact-title" aria-describedby="contact-desc" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contact-title" aria-describedby="contact-desc">
         <div class="modal-card">
           <div class="modal-head">
             <h3 id="contact-title">Bizə yazın</h3>
@@ -94,7 +94,6 @@
               <textarea class="modal-input" name="message" rows="5" required></textarea>
             </label>
 
-            <!-- honeypot -->
             <input type="text" name="_gotcha" style="display:none">
 
             <div class="modal-actions">
@@ -106,6 +105,7 @@
           </form>
         </div>
       </div>
+      <div class="modal-backdrop" aria-hidden="true"></div>
     `;
   }
 
@@ -143,9 +143,10 @@
     const html = footerHTML();
     if (container.id === 'site-footer') container.innerHTML = html;
     else { const tmp = document.createElement('div'); tmp.innerHTML = html.trim(); container.appendChild(tmp.firstElementChild); }
+
     const yearEl = document.getElementById('y'); if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-    // Inject modal markup once (after footer)
+    // Inject modal markup once (after footer) — correct order: modal then backdrop
     if (!document.querySelector('.modal')) {
       const wrap = document.querySelector('.wrap') || document.body;
       const tmp = document.createElement('div'); tmp.innerHTML = modalHTML();
@@ -155,7 +156,7 @@
     // Modal wiring
     const openBtn = document.getElementById('contact-open');
     const modal = document.querySelector('.modal');
-    const modalBackdrop = document.querySelector('[data-modal-backdrop]');
+    const modalBackdrop = document.querySelector('.modal-backdrop');
     const closeBtns = document.querySelectorAll('.modal-close');
     const form = document.getElementById('contact-form');
     const statusEl = document.getElementById('contact-status');
@@ -163,16 +164,11 @@
 
     function openModal(){
       lastFocus = document.activeElement;
-      modal.removeAttribute('hidden');
-      modalBackdrop.removeAttribute('hidden');
-      document.body.style.overflow = 'hidden';
-      // focus first input
-      const first = modal.querySelector('input, textarea, button'); first && first.focus();
+      document.body.classList.add('modal-open');
+      (modal.querySelector('input, textarea, button') || modal).focus();
     }
     function closeModal(){
-      modal.setAttribute('hidden','');
-      modalBackdrop.setAttribute('hidden','');
-      document.body.style.overflow = '';
+      document.body.classList.remove('modal-open');
       lastFocus && lastFocus.focus();
       if (statusEl) statusEl.textContent = '';
       form?.reset();
@@ -181,11 +177,11 @@
     openBtn?.addEventListener('click', openModal);
     modalBackdrop?.addEventListener('click', closeModal);
     closeBtns.forEach(b => b.addEventListener('click', closeModal));
-    document.addEventListener('keydown', e => { if (!modal.hasAttribute('hidden') && e.key === 'Escape') closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('modal-open')) closeModal(); });
 
-    // Basic focus trap
+    // Basic focus trap inside modal
     modal?.addEventListener('keydown', e => {
-      if (e.key !== 'Tab') return;
+      if (!document.body.classList.contains('modal-open') || e.key !== 'Tab') return;
       const focusables = modal.querySelectorAll('a,button,input,textarea,select,[tabindex]:not([tabindex="-1"])');
       const list = Array.from(focusables).filter(el => !el.hasAttribute('disabled'));
       const first = list[0], last = list[list.length - 1];
