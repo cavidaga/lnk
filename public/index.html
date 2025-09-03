@@ -9,7 +9,7 @@
   <meta name="description" content="LNK.az - Azərbaycanın ilk süni intellektə əsaslanan media qərəzi analizatoru. İstənilən xəbər linkini daxil edin və məqalənin etibarlılığını, siyasi meylini və tərəfsizliyini anında qiymətləndirin." />
   <meta name="theme-color" content="#0c0d12">
   <meta name="color-scheme" content="light dark" />
-
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,6 +26,13 @@
   <meta name="twitter:title" content="LNK - Media qərəzi qiymətləndiricisi" />
   <meta name="twitter:description" content="Süni intellekt ilə media qərəzini yoxlayın. Xəbərləri və məqalələri bir kliklə analiz edin. Obyektiv məlumat üçün LNK.az." />
   <meta name="twitter:image" content="https://lnk.az/static/og-cover.png" />
+  <!-- Explicit icons so the browser doesn’t guess (and accidentally hit http://) -->
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="/static/favicon-dark.svg"  media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#e10600">
 
   <!-- Structured data -->
   <script type="application/ld+json">
