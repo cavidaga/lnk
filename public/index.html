@@ -67,8 +67,8 @@
     details { margin-top: 20px; }
     summary { cursor: pointer; color: var(--muted); font-size: 14px; }
     pre { background-color: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 15px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto; }
-    .share-section {            margin-top: 20px;            padding: 15px;            background-color: var(--panel);            border-radius: 8px;            text-align: center;        }
-    .share-section input {            width: 100%;            background-color: var(--bg);            border: 1px solid var(--border);            color: var(--muted);            text-align: center;            padding: 8px;            border-radius: 5px;        }
+    .share-section { margin-top: 20px; padding: 15px; background-color: var(--panel); border-radius: 8px; text-align: center; }
+    .share-section input { width: 100%; background-color: var(--bg); border: 1px solid var(--border); color: var(--muted); text-align: center; padding: 8px; border-radius: 5px; }
   </style>
 </head>
 <body>
@@ -77,17 +77,21 @@
       <img src="/static/lnk.svg" alt="logo" class="logo-img" width="42" height="42" />
       <div>
         <h1>Media qərəzi qiymtləndiricisi</h1>
-        <div class="sub">Ad Fontes metodologiyasından ilhamlanmışdır</div>
+        <div class="sub">Bir Cavid Ağa layihəsidir</div>
       </div>
     </header>
-    <div class="card">
-      <div class="bd">
-        <div class="row">
-          <input class="input" id="urlInput" type="url" placeholder="Məqalə linkini yapışdırın..." />
-          <button class="btn" id="btn-analyse">Təhlil et</button>
+    
+    <div id="app-container">
+        <div class="card">
+            <div class="bd">
+                <div class="row">
+                    <input class="input" id="urlInput" type="url" placeholder="Məqalə linkini yapışdırın..." />
+                    <button class="btn" id="btn-analyse">Təhlil et</button>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
+    
     <div id="result" class="result"></div>
   </div>
 
@@ -100,12 +104,11 @@
     // --- ON PAGE LOAD ---
     document.addEventListener('DOMContentLoaded', () => {
         const path = window.location.pathname;
-        const parts = path.split('/').filter(Boolean); // filter(Boolean) removes empty strings
+        const parts = path.split('/').filter(Boolean);
 
-        // Check if we are in "viewer mode" (e.g., lnk.az/analysis/some_id)
         if (parts[0] === 'analysis' && parts[1]) {
             const analysisId = parts[1];
-            appContainer.style.display = 'none'; // Hide the input form
+            if (appContainer) appContainer.style.display = 'none'; // Hide the input form
             loadSharedAnalysis(analysisId);
         }
     });
@@ -119,20 +122,18 @@
             if (!response.ok) {
                 throw new Error(data.error || 'Analiz tapılmadı.');
             }
-            displayResult(data, false); // 'false' indicates it's not a new analysis
+            displayResult(data, false); // 'false' indicates it's a shared view, not a new analysis
         } catch (error) {
             resultDiv.innerHTML = `<div class="error">${error.message}</div>`;
         }
     }
     
     // --- MAIN DISPLAY FUNCTION ---
-    function displayResult(data) {
+    function displayResult(data, isNewAnalysis = true) {
         const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = "Xülasə təqdim edilmədi." } = data;
         
-        // --- CORRECTED to read the nested JSON structure ---
         const reliability = scores.reliability?.value ?? 50;
         const politicalBias = scores.political_establishment_bias?.value ?? 0;
-
         const topPos = 100 - reliability;
         const leftPos = (politicalBias + 5) / 10 * 100;
 
@@ -148,13 +149,13 @@
             `<ul>${diagnostics.language_flags.map(f => `<li><strong>${escapeHTML(f.term)}:</strong> <span class="muted">${escapeHTML(f.category)}</span></li>`).join('')}</ul>` :
             '<p class="muted small">Mənfi dil siqnalları aşkar edilmədi.</p>';
 
-        const resultHTML = `
+        let resultHTML = `
             <div class="analysis-grid">
                 <div>
                     <div class="bias-chart">
                         <div class="chart-point" style="top: ${topPos}%; left: ${leftPos}%;"></div>
                         <span class="axis-label y-axis-top">Etibarlı</span>
-                        <span class="axis-label y-axis-bottom">Qeyri-Etibarlı</span>
+                        <span class="axis-label y-axis-bottom">Etibarsız</span>
                         <span class="axis-label x-axis-left">Müxalif</span>
                         <span class="axis-label x-axis-right">Hökumətyönümlü</span>
                     </div>
@@ -169,28 +170,23 @@
                 <div class="bd">
                     <h3 class="sec-title">Diaqnostik Göstəricilər</h3>
                     <div class="diagnostics-grid">
-                        <div class="diag-item"><div class="label">Dilin Yüklülüyü</div><div class="value">${diagnostics.language_loadedness ?? 'N/A'}</div></div>
-                        <div class="diag-item"><div class="label">Mənbə Şəffaflığı</div><div class="value">${diagnostics.sourcing_transparency ?? 'N/A'}</div></div>
-                        <div class="diag-item"><div class="label">Başlığın Dəqiqliyi</div><div class="value">${diagnostics.headline_accuracy ?? 'N/A'}</div></div>
+                        <div class="diag-item"><div class="label">Dilin yüklülüyü</div><div class="value">${diagnostics.language_loadedness ?? 'N/A'}</div></div>
+                        <div class="diag-item"><div class="label">Mənbə şəffaflığı</div><div class="value">${diagnostics.sourcing_transparency ?? 'N/A'}</div></div>
+                        <div class="diag-item"><div class="label">Başlığın dəqiqliyi</div><div class="value">${diagnostics.headline_accuracy ?? 'N/A'}</div></div>
                     </div>
                     <h4 style="margin-top: 20px;">Konkret Dil Siqnalları</h4>
                     <div class="language-flags">${languageFlagsHTML}</div>
-
                     <h3 class="sec-title">Mənbələr</h3>
                     ${sourcesTableHTML}
-
                     <h3 class="sec-title">Əsas Oxlar üzrə izah</h3>
                     <dl class="score-details">
                         <dt>Etibarlılıq: <span class="value">${scores.reliability?.value ?? 'N/A'}</span></dt>
                         <dd>${escapeHTML(scores.reliability?.rationale || '')}</dd>
-                        
-                        <dt>Siyasi Hakimiyyət Meyli: <span class="value">${scores.political_establishment_bias?.value ?? 'N/A'}</span></dt>
+                        <dt>Siyasi hakimiyyət meyli: <span class="value">${scores.political_establishment_bias?.value ?? 'N/A'}</span></dt>
                         <dd>${escapeHTML(scores.political_establishment_bias?.rationale || '')}</dd>
-
                         <dt>Sosial-Mədəni Meyl: <span class="value">${scores.socio_cultural_bias?.value ?? 'N/A'}</span></dt>
                         <dd>${escapeHTML(scores.socio_cultural_bias?.rationale || '')}</dd>
                     </dl>
-                    
                     <details>
                         <summary>Xam JSON datanı göstər</summary>
                         <pre>${escapeHTML(JSON.stringify(data, null, 2))}</pre>
@@ -198,22 +194,18 @@
                 </div>
             </div>
         `;
-
-      // --- NEW: Add the Shareable Link section if it's a new analysis ---
-        if (isNewAnalysis) {
-            const originalUrl = urlInput.value.trim();
-            const shareId = "your_md5_hash_logic"; // We'll compute this properly
-            // NOTE: Since the hash is computed on the server, we'll construct the link simply.
-            // A more advanced version might return the hash from the API.
-            const shareableLink = `${window.location.origin}/analysis/${data.hash}`; // Assuming API returns the hash
-
+        
+        // --- CORRECTED: Add the Shareable Link section ---
+        if (isNewAnalysis && data.hash) {
+            const shareableLink = `${window.location.origin}/analysis/${data.hash}`;
             resultHTML += `
                 <div class="share-section">
-                    <h4>Bu Analizi Paylaşın</h4>
-                    <input type="text" readonly value="${shareableLink}" onclick="this.select()" />
+                    <h4>Bu analizi paylaşın</h4>
+                    <input type="text" readonly value="${shareableLink}" onclick="this.select(); document.execCommand('copy');" />
                 </div>
             `;
         }
+        
         resultDiv.innerHTML = resultHTML;
     }
     
