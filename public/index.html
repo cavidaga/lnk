@@ -181,26 +181,39 @@
             const shareableLink = `${window.location.origin}/analysis/${data.hash}`;
             resultHTML += `
             <div class="share-section">
-              <h4>Bu Analizi Paylaşın</h4>
+              <h4>Bu analizi paylaşın</h4>
               <div class="share-row">
-                <input id="share-link" type="text" readonly value="${shareableLink}" aria-label="Paylaşım linki" />
+                <input id="share-link" class="share-input" type="text" readonly value="${shareableLink}" aria-label="Paylaşım linki" />
                 <button class="btn" type="button" id="copy-btn">Köçür</button>
               </div>
-              <p id="copy-status" class="small muted" style="margin-top:6px;min-height:1em;"></p>
+              <p id="copy-status" class="small muted status"></p>
             </div>`;
         }
         resultDiv.innerHTML = resultHTML;
         const copyBtn = document.getElementById('copy-btn');
         const shareInput = document.getElementById('share-link');
         const copyStatus = document.getElementById('copy-status');
+
         copyBtn?.addEventListener('click', async () => {
+          const txt = shareInput.value;
           try {
-            await navigator.clipboard.writeText(shareInput.value);
-            copyStatus.textContent = "Link köçürüldü ✔️";
-            setTimeout(() => copyStatus.textContent = "", 2000);
-          } catch (err) {
-            shareInput.select();
-            copyStatus.textContent = "Köçürmə uğursuz oldu";
+            if (navigator.clipboard?.writeText) {
+              await navigator.clipboard.writeText(txt);
+            } else {
+              shareInput.select();
+              document.execCommand('copy'); // fallback
+            }
+            copyBtn.disabled = true;
+            const old = copyBtn.textContent;
+            copyBtn.textContent = 'Köçürüldü ✔️';
+            copyStatus.textContent = 'Link köçürüldü.';
+            setTimeout(() => {
+              copyBtn.disabled = false;
+              copyBtn.textContent = old;
+              copyStatus.textContent = '';
+            }, 2000);
+          } catch {
+            copyStatus.textContent = 'Köçürülmə alınmadı. Əl ilə seçib köçürün.';
           }
         });
     }

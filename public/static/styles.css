@@ -233,26 +233,51 @@
     padding:15px; font-size:12px; white-space:pre-wrap; word-wrap:break-word; max-height:400px; overflow:auto
   }
 
-  share-section .share-row {
+  /* Share bar */
+  .share-section {
+    margin-top: 20px;
+    padding: 14px;
+    background-color: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-align: center;
+  }
+  .share-section h4 {
+    margin: 0 0 10px 0;
+    color: var(--muted);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .share-section .share-row {
     display: flex;
     gap: 8px;
     align-items: center;
     justify-content: center;
   }
-  .share-section h4{
-    margin:0 0 10px 0; color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:.1em
-  }
-  .share-section input {
+  .share-section .share-input {
     flex: 1;
-    min-width: 200px;
+    min-width: 240px;
     text-align: center;
+    padding: 10px 12px;
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
   }
-  /* Fix copy button size in share section */
   .share-section .btn {
-    width: auto;
-    padding: 8px 14px;
+    width: auto;                 /* prevent full-width */
+    padding: 10px 14px;
     font-size: 14px;
     white-space: nowrap;
+  }
+  .share-section .status {
+    margin-top: 6px;
+    min-height: 1em;
+  }
+  @media (max-width: 520px) {
+    .share-section .share-row { flex-direction: column; align-items: stretch; }
+    .share-section .btn { width: 100%; }
   }
 
   /* Footer */
