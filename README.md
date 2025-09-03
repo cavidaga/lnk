@@ -3,13 +3,13 @@
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/cavidaga/lnk)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-A web-based tool that uses Google's Gemini AI and headless browser technology to analyze the potential bias of a news article from a given URL. This project is designed to be deployed easily on serverless platforms like Vercel.
+A web-based tool that uses Google's Gemini AI and headless browser technology to analyze the potential bias of a news article from a given URL. This project is designed to be deployed easily on serverless platforms like Vercel. It is especially trained for Azerbaijani websites, however you can make your own version of tool.
 
 ***
 
 ## Screenshot
 
-![Tool Screenshot](https://i.imgur.com/your-screenshot.png)
+![Tool Screenshot](https://imgur.com/a/zbjOM7Z)
 *(To add a screenshot: take a picture of your running application, upload it to a service like [Imgur](https://imgur.com/), and replace the link above.)*
 
 ***
