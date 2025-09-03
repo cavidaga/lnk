@@ -233,16 +233,26 @@
     padding:15px; font-size:12px; white-space:pre-wrap; word-wrap:break-word; max-height:400px; overflow:auto
   }
 
-  .share-section{
-    margin-top:20px; padding:15px; background-color:var(--panel);
-    border:1px solid var(--border); border-radius:10px; text-align:center
+  share-section .share-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
   }
   .share-section h4{
     margin:0 0 10px 0; color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:.1em
   }
-  .share-section input{
-    width:100%; background-color:var(--bg); border:1px solid var(--border);
-    color:var(--text); text-align:center; padding:10px; border-radius:8px
+  .share-section input {
+    flex: 1;
+    min-width: 200px;
+    text-align: center;
+  }
+  /* Fix copy button size in share section */
+  .share-section .btn {
+    width: auto;
+    padding: 8px 14px;
+    font-size: 14px;
+    white-space: nowrap;
   }
 
   /* Footer */
