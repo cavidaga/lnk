@@ -71,7 +71,6 @@
   gap:20px;
   margin-bottom:22px;
   }
-
   .site-nav{
     display:flex;
     gap:20px;
@@ -104,6 +103,23 @@
   @media (prefers-color-scheme: light){
   .logo-img { color: #001F3F; }
   }
+  .intro{
+  margin: 24px 0 32px;
+  text-align: center;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.intro h2{
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+.intro p{
+  font-size: 16px;
+  margin: 6px 0;
+  line-height: 1.6;
+}
+.intro .muted{ display:block; margin-top:10px; }
   h1{ font-size:26px; margin:0; letter-spacing:.2px }
   .sub{ color:var(--muted); margin-top:-4px }
 
