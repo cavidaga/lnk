@@ -1,13 +1,12 @@
 {
   "functions": {
-    "api/analyze.js": {
-      "maxDuration": 90,
-      "includeFiles": "node_modules/{puppeteer-extra*,fs-extra,universalify,graceful-fs,jsonfile,rimraf,glob}/**"
-    },
-  "api/get-analysis.js": {
-      "maxDuration": 10
+    "api/**/*.js": {
+      "maxDuration": 60,
+      "memory": 1024,
+      "includeFiles": "node_modules/**",
+      "excludeFiles": "node_modules/@sparticuz/chromium/bin/{mac,mac-arm,win,win-x64}/**"
     }
-},
+  },
   "rewrites": [
     {
       "source": "/analysis/:id",
@@ -15,12 +14,3 @@
     }
   ]
 }
-
-
-
-
-
-
-
-
-
