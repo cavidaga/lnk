@@ -46,14 +46,6 @@
   <a class="skip-link" href="#main">Mündəricata keç</a>
 
   <div class="wrap">
-    <header>
-      <img src="/static/logo.svg" alt="LNK loqo" class="logo-img" width="42" height="42" />
-      <div>
-        <h1>LNK - Media qərəzi qiymətləndiricisi</h1>
-        <div class="sub">Azərbaycanın ilk süni zəkaya əsaslanan media qərəzi analizatoru. İstənilən xəbər linkini daxil edin və məqalənin etibarlılığını, siyasi meylini və tərəfsizliyini anında qiymətləndirin.</div>
-      </div>
-    </header>
-
     <main id="main" aria-labelledby="app-title">
       <div id="app-container">
         <div class="card" role="region" aria-label="Məqalə təhlili formu">
@@ -264,5 +256,6 @@
     analyseBtn.addEventListener('click', analyzeUrl);
     urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') analyzeUrl(); });
   </script>
+  <script src="/public/static/header.js" defer></script>
 </body>
 </html>
