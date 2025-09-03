@@ -255,4 +255,67 @@
     font-size:14px;
   }
   .site-nav a{ font-size:14px }
+  /* === Mobile navigation enhancements === */
+
+/* Toggle button (hidden on desktop) */
+.nav-toggle{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  width:40px; height:40px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  border-radius:10px;
+  cursor:pointer;
+}
+.nav-toggle:focus-visible{ outline:none; box-shadow: var(--ring) }
+.nav-toggle svg{ width:22px; height:22px }
+
+/* Backdrop for drawer */
+.nav-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.35);
+  opacity:0; pointer-events:none; transition:opacity .2s ease;
+  z-index: 60;
+}
+
+/* Drawer (mobile) */
+.site-nav{
+  display:flex; gap:20px;                 /* desktop default */
+}
+@media (max-width: 768px){
+  header{ position: relative }
+  .site-nav{
+    position: fixed; top:0; right:0; height:100vh;
+    width: min(78vw, 320px);
+    background: var(--panel);
+    border-left:1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 18px;
+    display:flex; flex-direction:column; gap:8px;
+    transform: translateX(100%);
+    transition: transform .25s ease;
+    z-index: 70;
+  }
+  .site-nav a{
+    padding:10px 8px; border-radius:8px;
+    font-size:16px;
+  }
+  .site-nav a:hover{ background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%) }
+  .nav-toggle{ display:inline-flex }       /* show burger */
+  /* Hide desktop inline menu until opened */
+  header .site-nav { gap: 12px; }
+}
+
+/* Open state */
+body.nav-open .site-nav{ transform: translateX(0) }
+body.nav-open .nav-backdrop{ opacity:1; pointer-events:auto }
+/* Prevent background scroll when drawer open */
+body.nav-open{ overflow:hidden }
+
+/* Keep your existing active link style */
+.site-nav a.active{
+  color:var(--accent);
+  border-bottom:2px solid var(--accent);
+  padding-bottom:2px;
+}
 }

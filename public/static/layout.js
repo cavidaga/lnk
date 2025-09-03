@@ -1,51 +1,33 @@
 // /public/static/layout.js
 (function () {
-  function injectHeader() {
-    const container =
-      document.getElementById('site-header') ||
-      document.querySelector('.wrap') ||
-      document.body;
-
-    const headerHTML = `
+  function headerHTML() {
+    return `
       <header>
         <a href="/" class="brand" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit">
           <img src="/static/logo.svg" alt="LNK loqo" class="logo-img" width="42" height="42" />
-          <h1 style="font-size:22px;margin:0;">LNK.az</h1>
         </a>
-        <nav class="site-nav" aria-label="Əsas menyu">
+
+        <!-- Mobile menu toggle -->
+        <button class="nav-toggle" type="button" aria-label="Menyunu aç" aria-controls="primary-nav" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <!-- Backdrop for drawer -->
+        <div class="nav-backdrop" hidden></div>
+
+        <nav id="primary-nav" class="site-nav" aria-label="Əsas menyu">
           <a href="/">Əsas səhifə</a>
           <a href="/about.html">Haqqımızda</a>
           <a href="/methodology.html">Metodologiya</a>
         </nav>
       </header>
     `;
-
-    if (container.id === 'site-header') {
-      container.innerHTML = headerHTML;
-    } else {
-      const tmp = document.createElement('div');
-      tmp.innerHTML = headerHTML.trim();
-      container.insertBefore(tmp.firstElementChild, container.firstChild);
-    }
-
-    // Active link highlight
-    const path = location.pathname.replace(/\/+$/, '') || '/';
-    document.querySelectorAll('.site-nav a').forEach(a => {
-      const href = (a.getAttribute('href') || '').replace(/\/+$/, '') || '/';
-      if (href === path) {
-        a.classList.add('active');
-        a.setAttribute('aria-current', 'page');
-      }
-    });
   }
 
-  function injectFooter() {
-    const container =
-      document.getElementById('site-footer') ||
-      document.querySelector('.wrap') ||
-      document.body;
-
-    const footerHTML = `
+  function footerHTML() {
+    return `
       <footer class="site-footer">
         <div class="footer-row footer-brand">
           <span class="small">LNK.AZ bir</span>
@@ -82,12 +64,69 @@
         <div class="small muted">© <span id="y"></span> LNK.AZ — Made by <a class="muted" href="https://cavid.info" target="_blank" rel="noopener">cavid.info</a></div>
       </footer>
     `;
+  }
 
-    if (container.id === 'site-footer') {
-      container.innerHTML = footerHTML;
+  function injectHeader() {
+    const container =
+      document.getElementById('site-header') ||
+      document.querySelector('.wrap') ||
+      document.body;
+
+    const html = headerHTML();
+    if (container.id === 'site-header') {
+      container.innerHTML = html;
     } else {
       const tmp = document.createElement('div');
-      tmp.innerHTML = footerHTML.trim();
+      tmp.innerHTML = html.trim();
+      container.insertBefore(tmp.firstElementChild, container.firstChild);
+    }
+
+    // Active link highlight
+    const path = location.pathname.replace(/\/+$/, '') || '/';
+    document.querySelectorAll('.site-nav a').forEach(a => {
+      const href = (a.getAttribute('href') || '').replace(/\/+$/, '') || '/';
+      if (href === path) {
+        a.classList.add('active');
+        a.setAttribute('aria-current', 'page');
+      }
+    });
+
+    // Toggle logic
+    const toggle = document.querySelector('.nav-toggle');
+    const drawer = document.getElementById('primary-nav');
+    const backdrop = document.querySelector('.nav-backdrop');
+
+    function openNav(){
+      document.body.classList.add('nav-open');
+      toggle.setAttribute('aria-expanded', 'true');
+      backdrop.removeAttribute('hidden');
+    }
+    function closeNav(){
+      document.body.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      backdrop.setAttribute('hidden', '');
+    }
+    toggle?.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      expanded ? closeNav() : openNav();
+    });
+    backdrop?.addEventListener('click', closeNav);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNav(); });
+    drawer?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+  }
+
+  function injectFooter() {
+    const container =
+      document.getElementById('site-footer') ||
+      document.querySelector('.wrap') ||
+      document.body;
+
+    const html = footerHTML();
+    if (container.id === 'site-footer') {
+      container.innerHTML = html;
+    } else {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html.trim();
       container.appendChild(tmp.firstElementChild);
     }
 
@@ -95,7 +134,7 @@
     if (yearEl) yearEl.textContent = new Date().getFullYear();
   }
 
-  function ready(fn){ 
+  function ready(fn){
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
     else fn();
   }
