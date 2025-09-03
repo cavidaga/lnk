@@ -70,24 +70,29 @@
   justify-content:space-between;
   gap:20px;
   margin-bottom:22px;
-}
+  }
 
-.site-nav{
-  display:flex;
-  gap:20px;
-}
-
-.site-nav a{
-  font-weight:500;
-  text-decoration:none;
-  color:var(--text);
-  font-size:15px;
-  transition:color .2s ease;
-}
-
-.site-nav a:hover{
-  color:var(--accent);
-}
+  .site-nav{
+    display:flex;
+    gap:20px;
+  }
+  
+  .site-nav a{
+    font-weight:500;
+    text-decoration:none;
+    color:var(--text);
+    font-size:15px;
+    transition:color .2s ease;
+  }
+  
+  .site-nav a:hover{
+    color:var(--accent);
+  }
+  .site-nav a.active{
+    color:var(--accent);
+    border-bottom:2px solid var(--accent);
+    padding-bottom:2px;
+  }
   .logo-img{
     /* Slightly responsive but capped, keeps crisp look */
     width: clamp(40px, 4vw, 56px);
