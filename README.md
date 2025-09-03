@@ -9,7 +9,7 @@ A web-based tool that uses Google's Gemini AI and headless browser technology to
 
 ## Screenshot
 
-![Tool Screenshot](https://imgur.com/a/zbjOM7Z)
+![Tool Screenshot](https://i.imgur.com/vK3nYoM.png)
 *(To add a screenshot: take a picture of your running application, upload it to a service like [Imgur](https://imgur.com/), and replace the link above.)*
 
 ***
