@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/analyze.js": {
-      "maxDuration": 60,
+      "maxDuration": 90,
       "includeFiles": "node_modules/{puppeteer-extra*,fs-extra,universalify,graceful-fs,jsonfile,rimraf,glob}/**"
     },
   "api/get-analysis.js": {
@@ -15,6 +15,7 @@
     }
   ]
 }
+
 
 
 
