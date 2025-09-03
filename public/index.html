@@ -180,12 +180,29 @@
         if (isNewAnalysis && data.hash) {
             const shareableLink = `${window.location.origin}/analysis/${data.hash}`;
             resultHTML += `
-                <div class="share-section">
-                  <h4>Bu Analizi Paylaşın</h4>
-                  <input type="text" readonly value="${shareableLink}" onclick="this.select();" aria-label="Paylaşım linki" />
-                </div>`;
+            <div class="share-section">
+              <h4>Bu Analizi Paylaşın</h4>
+              <div style="display:flex;gap:8px;align-items:center;justify-content:center;">
+                <input id="share-link" type="text" readonly value="${shareableLink}" aria-label="Paylaşım linki" style="flex:1;min-width:200px;text-align:center;" />
+                <button class="btn" type="button" id="copy-btn">Köçür</button>
+              </div>
+              <p id="copy-status" class="small muted" style="margin-top:6px;min-height:1em;"></p>
+            </div>`;
         }
         resultDiv.innerHTML = resultHTML;
+        const copyBtn = document.getElementById('copy-btn');
+        const shareInput = document.getElementById('share-link');
+        const copyStatus = document.getElementById('copy-status');
+        copyBtn?.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(shareInput.value);
+            copyStatus.textContent = "Link köçürüldü ✔️";
+            setTimeout(() => copyStatus.textContent = "", 2000);
+          } catch (err) {
+            shareInput.select();
+            copyStatus.textContent = "Köçürmə uğursuz oldu";
+          }
+        });
     }
 
     function escapeHTML(s) {

@@ -129,7 +129,11 @@
   .row{ display:grid; gap:12px; grid-template-columns:1fr 160px }
   @media (max-width:520px){ .row{ grid-template-columns:1fr } }
 
-  .label{ position:absolute; left:-9999px }
+  /* Only hide the label in the URL input row */
+  .row > .label { position: absolute; left: -9999px; }
+
+  /* Ensure diagnostics labels render normally */
+  .diag-item .label { position: static; left: auto; }
 
   .input, .btn{
     width:100%; padding:12px 14px; border-radius:10px; border:1px solid var(--border);
