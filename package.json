@@ -7,8 +7,9 @@
     "puppeteer-extra": "latest",
     "puppeteer-extra-plugin-stealth": "latest",
     "puppeteer-extra-plugin-user-data-dir": "latest",
-    "@vercel/kv": "latest"
+    "@vercel/kv": "latest",
     "glob": "latest"
   }
 }
+
 
