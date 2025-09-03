@@ -4,11 +4,15 @@
     return `
       <header>
         <a href="/" class="brand" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit">
-          <img src="/static/logo.svg" alt="LNK loqo" class="logo-img" width="42" height="42" />
+          <picture>
+            <source srcset="/static/logo-dark.svg" media="(prefers-color-scheme: dark)">
+            <source srcset="/static/logo-light.svg" media="(prefers-color-scheme: light)">
+            <img src="/static/logo-light.svg" alt="LNK loqo" class="logo-img" width="42" height="42" />
+          </picture>
         </a>
 
-        <!-- Mobile menu toggle -->
-        <button class="nav-toggle" type="button" aria-label="Menyunu aç" aria-controls="primary-nav" aria-expanded="false">
+        <!-- Mobile menu toggle (hidden on desktop-->
+        <button class="nav-toggle" type="button" aria-label="Menyunu aç" aria-controls="primary-nav" aria-expanded="false" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
@@ -95,17 +99,29 @@
     const toggle = document.querySelector('.nav-toggle');
     const drawer = document.getElementById('primary-nav');
     const backdrop = document.querySelector('.nav-backdrop');
+    const mq = window.matchMedia('(max-width: 768px)');
 
     function openNav(){
       document.body.classList.add('nav-open');
-      toggle.setAttribute('aria-expanded', 'true');
-      backdrop.removeAttribute('hidden');
+      toggle?.setAttribute('aria-expanded', 'true');
+      backdrop?.removeAttribute('hidden');
     }
     function closeNav(){
       document.body.classList.remove('nav-open');
-      toggle.setAttribute('aria-expanded', 'false');
-      backdrop.setAttribute('hidden', '');
+      toggle?.setAttribute('aria-expanded', 'false');
+      backdrop?.setAttribute('hidden', '');
     }
+    function syncToggle(){
+      if (!toggle) return;
+      if (mq.matches) {
+        toggle.style.display = 'inline-flex';
+      } else {
+        toggle.style.display = 'none';
+        // ensure drawer/backdrop are reset on desktop
+        closeNav();
+      }
+    }
+
     toggle?.addEventListener('click', () => {
       const expanded = toggle.getAttribute('aria-expanded') === 'true';
       expanded ? closeNav() : openNav();
@@ -113,6 +129,10 @@
     backdrop?.addEventListener('click', closeNav);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNav(); });
     drawer?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+
+    // Initial + responsive sync
+    syncToggle();
+    mq.addEventListener ? mq.addEventListener('change', syncToggle) : mq.addListener(syncToggle);
   }
 
   function injectFooter() {
