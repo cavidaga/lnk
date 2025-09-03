@@ -45,12 +45,30 @@ export default async function handler(req, res) {
         let articleText = await page.evaluate(() => document.body.innerText);
         
         const blockKeywords = ['cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'];
+        
+        // --- Archive.org fallback logic ---
         if (blockKeywords.some(keyword => articleText.toLowerCase().includes(keyword))) {
-            const blockError = new Error('This website is protected by advanced bot detection.');
-            blockError.isBlockError = true;
-            throw blockError;
-        }
+            console.log(`Initial fetch for ${url} was blocked. Checking Archive.org...`);
+            
+            const archiveApiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(url)}`;
+            const archiveResponse = await fetch(archiveApiUrl);
+            const archiveData = await archiveResponse.json();
 
+            if (archiveData.archived_snapshots?.closest?.url) {
+                const snapshotUrl = archiveData.archived_snapshots.closest.url;
+                console.log(`Archive found. Fetching from: ${snapshotUrl}`);
+                // Inform the user that we are using an archived version
+                res.setHeader('X-Content-Source', 'Archive.org'); 
+                await page.goto(snapshotUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+                articleText = await page.evaluate(() => document.body.innerText);
+            } else {
+                 // If no archive is found, then we throw the error
+                const blockError = new Error('This website is protected by advanced bot detection.');
+                blockError.isBlockError = true;
+                throw blockError;
+            }
+        }
+        
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
         
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -61,7 +79,7 @@ export default async function handler(req, res) {
             ## ARTICLE TEXT TO ANALYZE ##
             ${articleText}
             ## JSON SCHEMA & METHODOLOGY INSTRUCTIONS ##
-            Your entire output must be a single, valid JSON object. All free-text values (rationales, summaries, etc.) must be in Azerbaijani. In the 'human_summary' and 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
+            Your entire output must be a single, valid JSON object. All free-text rationales and summaries must be in Azerbaijani. In the 'human_summary' and 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
             The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", and "human_summary".
             "meta": { "article_type": "..." },
             "scores": { "reliability": { "value": 0-100, "rationale": "..." }, "socio_cultural_bias": { "value": -5.0 to +5.0, "rationale": "..." }, "political_establishment_bias": { "value": -5.0 to +5.0, "rationale": "..." } },
@@ -88,13 +106,9 @@ export default async function handler(req, res) {
         const finalData = JSON.parse(analysisText);
 
         finalData.hash = cacheKey;
-
-        // --- THIS IS THE CRITICAL FIX ---
-        // Save the completed analysis to the database before sending it.
-        await kv.set(cacheKey, finalData, { ex: 2592000 }); // Expires in 30 days
+        await kv.set(cacheKey, finalData, { ex: 2592000 });
         console.log(`SAVED TO CACHE for URL: ${url}`);
-        // --- END OF FIX ---
-
+        
         res.status(200).json(finalData);
 
     } catch (error) {
@@ -103,7 +117,8 @@ export default async function handler(req, res) {
         let errorMessage;
         if (error.isBlockError) {
             const geminiPrompt = `Analyze this article for media bias in Azerbaijani: ${url}`;
-            errorMessage = 'Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və avtomatik təhlil edilə bilmir.';
+            // Updated error message for clarity
+            errorMessage = 'Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və heç bir arxiv nüsxəsi tapılmadı.';
             return res.status(500).json({ error: true, isBlockError: true, message: errorMessage, prompt: geminiPrompt });
         }
         
