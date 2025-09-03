@@ -67,6 +67,8 @@
     details { margin-top: 20px; }
     summary { cursor: pointer; color: var(--muted); font-size: 14px; }
     pre { background-color: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 15px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto; }
+    .share-section {            margin-top: 20px;            padding: 15px;            background-color: var(--panel);            border-radius: 8px;            text-align: center;        }
+    .share-section input {            width: 100%;            background-color: var(--bg);            border: 1px solid var(--border);            color: var(--muted);            text-align: center;            padding: 8px;            border-radius: 5px;        }
   </style>
 </head>
 <body>
@@ -93,8 +95,37 @@
     const urlInput = document.getElementById('urlInput');
     const analyseBtn = document.getElementById('btn-analyse');
     const resultDiv = document.getElementById('result');
+    const appContainer = document.getElementById('app-container');
 
-    // --- MAIN DISPLAY FUNCTION (Corrected Version 2.0) ---
+    // --- ON PAGE LOAD ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const path = window.location.pathname;
+        const parts = path.split('/').filter(Boolean); // filter(Boolean) removes empty strings
+
+        // Check if we are in "viewer mode" (e.g., lnk.az/analysis/some_id)
+        if (parts[0] === 'analysis' && parts[1]) {
+            const analysisId = parts[1];
+            appContainer.style.display = 'none'; // Hide the input form
+            loadSharedAnalysis(analysisId);
+        }
+    });
+
+    async function loadSharedAnalysis(id) {
+        resultDiv.innerHTML = `<div class="loading"><span class="spinner"></span> <span>Saxlanmış analiz yüklənir…</span></div>`;
+        resultDiv.classList.add('show');
+        try {
+            const response = await fetch(`/api/get-analysis?id=${id}`);
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.error || 'Analiz tapılmadı.');
+            }
+            displayResult(data, false); // 'false' indicates it's not a new analysis
+        } catch (error) {
+            resultDiv.innerHTML = `<div class="error">${error.message}</div>`;
+        }
+    }
+    
+    // --- MAIN DISPLAY FUNCTION ---
     function displayResult(data) {
         const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = "Xülasə təqdim edilmədi." } = data;
         
@@ -167,6 +198,22 @@
                 </div>
             </div>
         `;
+
+      // --- NEW: Add the Shareable Link section if it's a new analysis ---
+        if (isNewAnalysis) {
+            const originalUrl = urlInput.value.trim();
+            const shareId = "your_md5_hash_logic"; // We'll compute this properly
+            // NOTE: Since the hash is computed on the server, we'll construct the link simply.
+            // A more advanced version might return the hash from the API.
+            const shareableLink = `${window.location.origin}/analysis/${data.hash}`; // Assuming API returns the hash
+
+            resultHTML += `
+                <div class="share-section">
+                    <h4>Bu Analizi Paylaşın</h4>
+                    <input type="text" readonly value="${shareableLink}" onclick="this.select()" />
+                </div>
+            `;
+        }
         resultDiv.innerHTML = resultHTML;
     }
     
