@@ -2,7 +2,8 @@
   "functions": {
     "api/analyze.js": {
       "maxDuration": 60,
-      "includeFiles": "node_modules/{puppeteer-extra*,fs-extra}/**"
+      "includeFiles": "node_modules/{puppeteer-extra*,fs-extra,universalify}/**"
     }
   }
 }
+
