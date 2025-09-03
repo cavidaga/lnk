@@ -73,7 +73,7 @@
   function modalHTML() {
     const FORM_ENDPOINT = 'https://formspree.io/f/xgvlpegn';
     return `
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contact-title" aria-describedby="contact-desc">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contact-title" aria-describedby="contact-desc" hidden>
         <div class="modal-card">
           <div class="modal-head">
             <h3 id="contact-title">Bizə yazın</h3>
@@ -93,19 +93,16 @@
             <label class="modal-label">Məktubunuz
               <textarea class="modal-input" name="message" rows="5" required></textarea>
             </label>
-
             <input type="text" name="_gotcha" style="display:none">
-
             <div class="modal-actions">
               <button type="submit" class="btn">Göndər</button>
               <button type="button" class="btn btn-ghost modal-close">Bağla</button>
             </div>
-
             <p class="small muted" id="contact-status" role="status" aria-live="polite" style="min-height:1.2em;margin-top:8px"></p>
           </form>
         </div>
       </div>
-      <div class="modal-backdrop" aria-hidden="true"></div>
+      <div class="modal-backdrop" aria-hidden="true" hidden></div>
     `;
   }
 
@@ -165,10 +162,14 @@
     function openModal(){
       lastFocus = document.activeElement;
       document.body.classList.add('modal-open');
+      modal.removeAttribute('hidden');
+      modalBackdrop.removeAttribute('hidden');
       (modal.querySelector('input, textarea, button') || modal).focus();
     }
     function closeModal(){
       document.body.classList.remove('modal-open');
+      modal.setAttribute('hidden', '');
+      modalBackdrop.setAttribute('hidden', '');
       lastFocus && lastFocus.focus();
       if (statusEl) statusEl.textContent = '';
       form?.reset();
