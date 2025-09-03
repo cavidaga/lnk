@@ -100,7 +100,9 @@
     border-radius:10px;
     box-shadow:var(--shadow);
     display:block;
-    background:#fff; /* ensures red nodes pop on dark bg */
+  }
+  @media (prefers-color-scheme: light){
+  .logo-img { color: #001F3F; }
   }
   h1{ font-size:26px; margin:0; letter-spacing:.2px }
   .sub{ color:var(--muted); margin-top:-4px }
