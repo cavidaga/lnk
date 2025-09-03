@@ -1,5 +1,10 @@
+import { kv } from '@vercel/kv';
+import crypto from 'crypto';
 import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+
+puppeteer.use(StealthPlugin());
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -10,7 +15,21 @@ export default async function handler(req, res) {
     if (!url) {
         return res.status(400).json({ error: 'URL daxil edilməyib.' });
     }
-
+    // --- CACHING LOGIC: Create a key and check for a cached result ---
+    const cacheKey = crypto.createHash('md5').update(url).digest('hex');
+    try {
+        const cachedResult = await kv.get(cacheKey);
+        if (cachedResult) {
+            console.log(`CACHE HIT for URL: ${url}`);
+            res.setHeader('X-Vercel-Cache', 'HIT');
+            return res.status(200).json(cachedResult);
+        }
+        console.log(`CACHE MISS for URL: ${url}`);
+        res.setHeader('X-Vercel-Cache', 'MISS');
+    } catch (error) {
+        console.error("KV Error:", error);
+    }
+    
     let browser = null;
     try {
         browser = await puppeteer.launch({
