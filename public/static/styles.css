@@ -320,4 +320,33 @@ body.nav-open{ overflow:hidden }
   border-bottom:2px solid var(--accent);
   padding-bottom:2px;
 }
+/* Default: hide burger (desktop-first) */
+.nav-toggle{ display:none }
+
+/* Desktop: keep inline nav, ensure drawer/backdrop are off */
+@media (min-width: 769px){
+  .site-nav{
+    position:static; transform:none; height:auto; width:auto;
+    background:transparent; border:0; box-shadow:none; padding:0;
+    display:flex; flex-direction:row; gap:20px;
+  }
+  .nav-backdrop{ display:none !important; }
+}
+
+/* Mobile: show burger & use drawer */
+@media (max-width: 768px){
+  .nav-toggle{ display:inline-flex }
+  .site-nav{
+    position:fixed; top:0; right:0; height:100vh; width:min(78vw,320px);
+    background:var(--panel); border-left:1px solid var(--border); box-shadow:var(--shadow);
+    padding:18px; flex-direction:column; gap:8px; transform:translateX(100%);
+    transition:transform .25s ease; z-index:70;
+  }
+  body.nav-open .site-nav{ transform:translateX(0) }
+  .nav-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.35);
+    opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:60;
+  }
+  body.nav-open .nav-backdrop{ opacity:1; pointer-events:auto }
+}
 }
