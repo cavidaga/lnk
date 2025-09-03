@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="az" class="no-js">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Metodologiya — LNK.az</title>
+    <meta name="description" content="LNK.az — media qərəzi və etibarlılıq qiymətləndirilməsi üçün istifadə olunan metodologiya. Bal sistemləri, göstəricilər, JSON sxemi və məhdudiyyətlər." />
+    <meta name="theme-color" content="#0c0d12">
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Canonical & Open Graph -->
+    <link rel="canonical" href="https://lnk.az/methodology.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Metodologiya — LNK.az" />
+    <meta property="og:description" content="Media qərəzi və etibarlılıq qiymətləndirilməsi üçün LNK.az metodologiyası: meyarlar, göstəricilər və JSON çıxışı." />
+    <meta property="og:url" content="https://lnk.az/methodology.html" />
+    <meta property="og:image" content="https://lnk.az/static/og-cover.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Metodologiya — LNK.az" />
+    <meta name="twitter:description" content="Media qərəzi və etibarlılıq qiymətləndirilməsi üçün LNK.az metodologiyası." />
+    <meta name="twitter:image" content="https://lnk.az/static/og-cover.png" />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Metodologiya",
+            "url": "https://lnk.az/methodology.html",
+            "isPartOf": {
+                "@id": "https://lnk.az/#website"
+            },
+            "description": "LNK.az metodologiyası: media qərəzi və etibarlılıq qiymətləndirilməsi üçün meyarlar, göstəricilər və JSON çıxışı."
+        }
+    </script>
+
+    <!-- Reuse the site CSS -->
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        /* page-local enhancements (small only) */
+        .toc {
+            margin: 16px 0 24px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--panel)
+        }
+
+        .toc a {
+            text-decoration: none
+        }
+
+        .toc ul {
+            margin: 0;
+            padding-left: 18px
+        }
+
+        .toc li {
+            margin: 6px 0
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px
+        }
+
+        .kpi {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px
+        }
+
+        code.inline {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        }
+
+        pre.schema {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            overflow: auto
+        }
+
+        .note {
+            font-size: 13px;
+            color: var(--muted)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <a href="/" class="brand" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit">
+                <img src="/static/logo.svg" alt="LNK loqo" class="logo-img" width="42" height="42" />
+                <h1 style="font-size:22px;margin:0;">LNK.az</h1>
+            </a>
+            <nav class="site-nav" aria-label="Əsas menyu">
+                <a href="/">Əsas səhifə</a>
+                <a href="/about.html">Haqqımızda</a>
+                <a href="/methodology.html" class="active">Metodologiya</a>
+            </nav>
+        </header>
+
+        <main id="methodology" role="main">
+            <article>
+                <h1>Metodologiya</h1>
+                <p class="sub" style="margin-top:8px">
+                    LNK.az məqalələrin etibarlılığını və qərəz meyllərini qiymətləndirmək üçün süni zəka və təbii dil emalı yanaşmasından istifadə edir.
+                    Aşağıda çıxışın strukturu, istifadə olunan ballar, diaqnostik göstəricilər və məhdudiyyətlər göstərilir.
+                </p>
+
+                <nav class="toc" aria-label="Mündəricat">
+                    <strong>Mündəricat</strong>
+                    <ul>
+                        <li><a href="#overview">Ümumi baxış və məna xəritəsi</a></li>
+                        <li><a href="#scores">Ballar və şkalalar</a></li>
+                        <li><a href="#diagnostics">Diaqnostik göstəricilər</a></li>
+                        <li><a href="#meta-article-type">Məqalə növü (meta)</a></li>
+                        <li><a href="#json-schema">JSON çıxış sxemi</a></li>
+                        <li><a href="#pipeline">Analiz prosesi</a></li>
+                        <li><a href="#interpretation">Qrafiki necə şərh etməli</a></li>
+                        <li><a href="#limits">Məhdudiyyətlər və məsuliyyət qeydi</a></li>
+                        <li><a href="#ethics">Etika və ədalət prinsipləri</a></li>
+                        <li><a href="#versioning">Versiyalaşdırma</a></li>
+                    </ul>
+                </nav>
+
+                <section id="overview" aria-labelledby="overview">
+                    <h2>Ümumi baxış və terminlər</h2>
+                    <p>
+                        Sistem məqalə mətnini analiz edir, konteksti nəzərə alır və nəticəni iki əsas ox üzərində vizuallaşdırır:
+                        <strong>etibarlılıq (y oxu, 0–100)</strong> və <strong>siyasi hakimiyyət meyli (x oxu, −5.0…+5.0)</strong>.
+                        Əlavə olaraq <strong>sosial-mədəni meyl</strong> ayrıca bal kimi təqdim edilir.
+                    </p>
+                    <div class="kpi-grid">
+                        <div class="kpi">
+                            <strong>Etibarlılıq</strong><br />
+                            Mətnin faktlara söykənmə dərəcəsi, mənbə istifadəsi, başlıq–mətn uyğunluğu və səhvlik ehtimalı.
+                        </div>
+                        <div class="kpi">
+                            <strong>Siyasi hakimiyyət meyli</strong><br />
+                            Hakimiyyət institutlarına yaxınlıq/uzaqlıq siqnalları, çərçivələmə və söz seçimi.
+                        </div>
+                        <div class="kpi">
+                            <strong>Sosial-mədəni meyl</strong><br />
+                            Dəyərlər, kimlik və mədəni mövzularda meyllilik göstəricisi.
+                        </div>
+                    </div>
+                </section>
+
+                <section id="scores">
+                    <h2>Ballar və şkalalar</h2>
+                    <ul>
+                        <li><strong>Etibarlılıq (0–100):</strong>
+                            <em>0–39</em> zəif, <em>40–59</em> orta, <em>60–79</em> güclü, <em>80–100</em> yüksək etibarlılıq.
+                        </li>
+                        <li><strong>Siyasi hakimiyyət meyli (−5.0…+5.0):</strong>
+                            <em>−5</em> kəskin müxalif çərçivə, <em>0</em> neytral, <em>+5</em> güclü hökumətyönümlü çərçivə.
+                        </li>
+                        <li><strong>Sosial-mədəni meyl (−5.0…+5.0):</strong>
+                            Mənfi/pozitiv dəyərlər çərçivəsi və vurğular.
+                        </li>
+                    </ul>
+                    <p class="note">Qeyd: Ballar məqalənin daxilindəki siqnalların yığcam təsviridir; bu, müəllifin “tam siyasi mövqeyi” deyil.</p>
+                </section>
+
+                <section id="diagnostics">
+                    <h2>Diaqnostik göstəricilər</h2>
+                    <ul>
+                        <li><strong>Dilin yüklülüyü (0–100):</strong> emosional sözlər, hiperbola, təhqiramiz dil siqnalları.</li>
+                        <li><strong>Mənbə şəffaflığı (0–100):</strong> istinadların sayı, tipi, linklənməsi və şəffaflığı.</li>
+                        <li><strong>Başlığın dəqiqliyi (0–100):</strong> başlıq-məzmun uyğunluğu, klikbeyt ehtimalı.</li>
+                        <li><strong>Dil siqnalları:</strong> <code class="inline">language_flags</code> — ilə işarələnir, aşkar edilmiş konkret terminlər və kateqoriyaları göstərir.</li>
+                    </ul>
+                </section>
+
+                <section id="meta-article-type">
+                    <h2>Məqalə növü (meta)</h2>
+                    <p>
+                        <code class="inline">meta.article_type</code> sahəsi məzmunu “xəbər”, “rəy”, “analitika”, “reportaj” və s. kimi təsnif edir.
+                        Bu, nəticələrin interpretasiyasında mühüm kontekstdir (məsələn, rəy yazılarında dil yüklülüyü təbii olaraq daha yüksək ola bilər).
+                    </p>
+                </section>
+
+                <section id="json-schema">
+                    <h2>JSON çıxarış sxemi</h2>
+                    <h3>Niyə JSON?</h2>
+                    <p>
+                      <strong>JSON (JavaScript Object Notation)</strong> — verilənlərin strukturlaşdırılması üçün geniş istifadə olunan formatdır.
+                      Sadə və yüngül sintaksisə malikdir, həm insanlar, həm də kompüterlər tərəfindən rahat oxunur.
+                    </p>
+                    <p>
+                      LNK.az nəticələri JSON formatında bu səbəblərdən təqdim edir:
+                    </p>
+                    <ul>
+                      <li><strong>Şəffaflıq:</strong> Bütün göstəricilər açıq və standartlaşdırılmış quruluşda göstərilir.</li>
+                      <li><strong>Avtomatlaşdırma:</strong> JSON digər sistemlər tərəfindən asanlıqla oxunur və emal olunur.</li>
+                      <li><strong>Uyğunluq:</strong> JSON formatı istənilən proqramlaşdırma dili və platforma ilə inteqrasiya oluna bilər.</li>
+                    </ul>
+                    <p>
+                      Beləliklə, JSON çıxarışı yalnız vizual nəticəni göstərmir, həm də 
+                      <em>araşdırmaçılar, jurnalistlər və tədqiqatçılar</em> üçün təhlil nəticələrini digər vasitələrə daşımağa imkan verir.
+                    </p>
+                    <p>Nümunə sxem (Azərbaycanca mətn tələbi ilə):</p>
+                    <pre class="schema"><code>{
+  "meta": {
+    "article_type": "xəbər | rəy | analitika | ... "
+  },
+  "scores": {
+    "reliability": {
+      "value": 0-100,
+      "rationale": "Aydın, axıcı Azərbaycan dilində paraqraf. Vergüllərlə cümlələri ayırma."
+    },
+    "socio_cultural_bias": {
+      "value": -5.0 ... 5.0,
+      "rationale": "Aydın, axıcı Azərbaycan dilində paraqraf."
+    },
+    "political_establishment_bias": {
+      "value": -5.0 ... 5.0,
+      "rationale": "Aydın, axıcı Azərbaycan dilində paraqraf."
+    }
+  },
+  "diagnostics": {
+    "language_loadedness": 0-100,
+    "sourcing_transparency": 0-100,
+    "headline_accuracy": 0-100,
+    "language_flags": [
+      { "term": "…", "category": "…"}
+    ]
+  },
+  "cited_sources": [
+    { "name": "…", "role": "…", "stance": "…"}
+  ],
+  "human_summary": "Aydın, axıcı Azərbaycan dilində xülasə."
+}</code></pre>                   
+                </section>
+
+                <section id="pipeline">
+                    <h2>Analiz prosesi</h2>
+                    <ol>
+                        <li><strong>Məlumatın toplanması:</strong> İstifadəçi URL daxil edir; sistem məzmunu götürür və təmizləyir.</li>
+                        <li><strong>Analiz:</strong> Model mətni qiymətləndirir, balları və əsaslandırmaları çıxarır.</li>
+                        <li><strong>Strukturlaşdırma:</strong> Nəticələr JSON obyektində qaydaya salınır.</li>
+                        <li><strong>Vizualizasiya:</strong> Nəticə xəritə (koordinat oxları) və diaqnostika kartları ilə təqdim edilir.</li>
+                        <li><strong>Arxivləşdirmə:</strong> Ətrafınızla paylaşım üçün link yaradılır (əgər aktivdirsə).</li>
+                    </ol>
+                </section>
+
+                <section id="interpretation">
+                    <h2>Qrafiki necə şərh etməli</h2>
+                    <p>
+                      LNK.az-da istifadə olunan koordinat oxları sistemi <strong>Ad Fontes Media Bias Chart</strong> modelindən ilhamlanmışdır.
+                      ABŞ-da yaradılan bu model media mənbələrinin <em>etibarlılıq</em> və <em>ideoloji meyl</em> oxları üzərində yerləşdirilməsi ilə tanınır.
+                    </p>
+                    <p>
+                      Biz bu yanaşmanı <strong>Azərbaycan mediasının reallıqlarına</strong> uyğunlaşdıraraq,
+                      xüsusi olaraq <em>siyasi hakimiyyət meyli</em> və <em>sosial-mədəni meyl</em> kimi parametrlərlə genişləndirdik.
+                      Məqsədimiz beynəlxalq praktikadan faydalanaraq, yerli kontekstdə daha dəqiq və faydalı qiymətləndirmə təqdim etməkdir.
+                    </p>
+                    <ul>
+                        <li><strong>Yuxarı</strong> daha yüksək etibarlılıq, <strong>aşağı</strong> daha zəif etibarlılıq.</li>
+                        <li><strong>Sol</strong> müxalif çərçivə siqnalları, <strong>sağ</strong> hökumətyönümlü siqnallar.</li>
+                        <li>Tək bir nöqtə <em>bütün mətni</em> ümumiləşdirən siqnalın ortalamasıdır; içindəki müxtəlif səslər “dil siqnalları” bölməsində görünə bilər.</li>
+                    </ul>
+                </section>
+
+                <section id="limits">
+                    <h2>Məhdudiyyətlər və məsuliyyət qeydi</h2>
+                    <ul>
+                        <li>Nəticələr <em>proqnoz xarakterlidir</em> və məqalənin versiyasından asılıdır.</li>
+                        <li>Parça-parça sitatlarla zəngin, ironiyalı və ya kontekstdən asılı mətnlərdə səhv dərəcəsi arta bilər.</li>
+                        <li>Məqalələri oxuduqdan sonra bu alətlə kifayətlənməmək və bir neçə mənbə ilə yoxlamaq tövsiyə olunur.</li>
+                    </ul>
+                </section>
+
+                <section id="ethics">
+                    <h2>Etika və ədalət prinsipləri</h2>
+                    <ul>
+                        <li><strong>Şəffaflıq:</strong> sxem, meyarlar və əsaslandırmalar göstərilir.</li>
+                        <li><strong>Müstəqillik:</strong> siyasi və ya maliyyə asılılığımız yoxdur. Lakin layihə <a href="https://www.buymeacoffee.com/cavidaga">ianələr</a> üçün açıqdır. </li>
+                        <li><strong>Məlumat məxfiliyi:</strong> toplanmış məlumat yalnız təhlil və təkmilləşdirmə üçündür.</li>
+                    </ul>
+                </section>
+
+                <section id="versioning">
+                    <h2>Versiyalar</h2>
+                    <p>Metodologiya dövri olaraq yenilənir. Dəyişikliklər <em>versiya qeydlərində</em> qeyd edilir.</p>
+                    <p class="note">Hazırkı metodologiya versiyası: <strong>v1.0</strong></p>
+                </section>
+            </article>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-row footer-brand">
+                <span class="small">LNK.AZ bir</span>
+                <a class="small" href="https://cavid.info" target="_blank" rel="noopener">Cavid Ağa</a>
+                <span class="small">layihəsidir</span>
+            </div>
+
+            <div class="footer-row footer-icons" aria-label="Sosial bağlantılar">
+                <a href="https://cavid.info" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 3l9 4.5v9L12 21 3 16.5v-9L12 3z" stroke="currentColor" stroke-width="1.5" />
+                    </svg>
+                    Sayt
+                </a>
+                <a href="https://x.com/cavidaga" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M18.244 2H21l-6.59 7.523L22 22h-6.828l-5.34-6.508L3.338 22H1l7.093-8.106L2 2h6.828l4.89 5.972L18.244 2Zm-2.393 18h1.89L7.247 3.98H5.27L15.85 20Z" />
+                    </svg>
+                    X (Twitter)
+                </a>
+                <a href="https://github.com/cavidaga" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 .5a11.5 11.5 0 0 0-3.637 22.428c.575.108.785-.25.785-.556 0-.274-.01-1-.016-1.963-3.194.694-3.87-1.54-3.87-1.54-.523-1.33-1.277-1.684-1.277-1.684-1.043-.713.08-.699.08-.699 1.152.081 1.759 1.184 1.759 1.184 1.025 1.757 2.69 1.25 3.345.956.104-.743.401-1.25.728-1.538-2.55-.29-5.232-1.275-5.232-5.67 0-1.253.45-2.278 1.187-3.082-.12-.29-.515-1.46.112-3.046 0 0 .967-.31 3.17 1.177a10.98 10.98 0 0 1 5.774 0c2.203-1.486 3.169-1.177 3.169-1.177.628 1.586.233 2.756.114 3.046.739.804 1.186 1.83 1.186 3.082 0 4.406-2.686 5.377-5.247 5.662.41.356.78 1.058.78 2.134 0 1.54-.014 2.78-.014 3.158 0 .309.207.671.792.555A11.5 11.5 0 0 0 12 .5Z" />
+                    </svg>
+                    GitHub
+                </a>
+                <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M6.2 13h9.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    Layihəyə dəstək ol
+                </a>
+                <a href="mailto:hello@cavid.info">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5" />
+                        <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                    Əlaqə
+                </a>
+            </div>
+
+            <div class="small muted">© <span id="y"></span> LNK.AZ — Made by <a class="muted" href="https://cavid.info" target="_blank" rel="noopener">cavid.info</a></div>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('y').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>
