@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     if (!url) {
         return res.status(400).json({ error: 'URL daxil edilməyib.' });
     }
-    // --- CACHING LOGIC: Create a key and check for a cached result ---
+    
     const cacheKey = crypto.createHash('md5').update(url).digest('hex');
     try {
         const cachedResult = await kv.get(cacheKey);
@@ -54,42 +54,20 @@ export default async function handler(req, res) {
         articleText = articleText.replace(/\s\s+/g, ' ').substring(0, 30000);
         
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-        // --- THE ULTIMATE PROMPT ---
         const prompt = `
             You are "MediaBiasEvaluator", a sophisticated, neutral analyst AI. Analyze the provided ARTICLE TEXT and generate a single, valid JSON object with a comprehensive media bias and reliability report.
-
             ## CONTEXT ##
             Original URL: ${url}
-
             ## ARTICLE TEXT TO ANALYZE ##
             ${articleText}
-
             ## JSON SCHEMA & METHODOLOGY INSTRUCTIONS ##
             Your entire output must be a single, valid JSON object. All free-text values (rationales, summaries, etc.) must be in Azerbaijani. In the 'human_summary' and 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
-
-            The JSON object must contain the following top-level keys: "meta", "scores", "diagnostics", "cited_sources", and "human_summary".
-
-            1.  "meta": An object containing:
-                - "article_type": Classify the article as one of: "Xəbər" (News), "Rəy" (Opinion), "Analiz" (Analysis), "İstintaq Jurnalistikası" (Investigative), "Müsahibə" (Interview), or "Press-reliz" (Press Release).
-
-            2.  "scores": An object for the main two-axis scores. Each key must map to an object with a "value" (number, decimals allowed) and a "rationale" (string, Azerbaijani):
-                - "reliability" (Score: 0-100): 100 for original, factual reporting; 0 for fabricated propaganda.
-                - "socio_cultural_bias" (Score: -5.0 to +5.0): -5.0 for Strongly Conservative; +5.0 for Strongly Liberal.
-                - "political_establishment_bias" (Score: -5.0 to +5.0): -5.0 for Strongly Critical/Opposition; +5.0 for Strongly Pro-Government.
-
-            3.  "diagnostics": An object for granular scores (0-100, integers only):
-                - "language_loadedness": How much it relies on emotionally charged language.
-                - "sourcing_transparency": How clearly it identifies and cites its sources.
-                - "headline_accuracy": How well the headline reflects the article's content.
-                - "language_flags": A list of specific examples of problematic language. Each item should be an object with "term" and "category" (e.g., "Yüklü dil", "Spekulyativ dil").
-
-            4.  "cited_sources": An array of objects for key people/organizations quoted. Each object must have:
-                - "name": The name of the person or organization.
-                - "role": Their title or role (e.g., "Aktivist", "Siyasətçi").
-                - "stance": Their apparent stance within the article: "Dəstəkləyici" (Supportive), "Tənqidi" (Critical), or "Neytral" (Neutral).
-
-            5.  "human_summary": A concise 4-5 line summary of your findings in Azerbaijani.
+            The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", and "human_summary".
+            "meta": { "article_type": "..." },
+            "scores": { "reliability": { "value": 0-100, "rationale": "..." }, "socio_cultural_bias": { "value": -5.0 to +5.0, "rationale": "..." }, "political_establishment_bias": { "value": -5.0 to +5.0, "rationale": "..." } },
+            "diagnostics": { "language_loadedness": 0-100, "sourcing_transparency": 0-100, "headline_accuracy": 0-100, "language_flags": [{ "term": "...", "category": "..." }] },
+            "cited_sources": [{ "name": "...", "role": "...", "stance": "..." }],
+            "human_summary": "..."
         `;
 
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
@@ -109,7 +87,14 @@ export default async function handler(req, res) {
         const analysisText = geminiData.candidates[0].content.parts[0].text;
         const finalData = JSON.parse(analysisText);
 
-        finalData.hash = cacheKey; // Add the hash to the object
+        finalData.hash = cacheKey;
+
+        // --- THIS IS THE CRITICAL FIX ---
+        // Save the completed analysis to the database before sending it.
+        await kv.set(cacheKey, finalData, { ex: 2592000 }); // Expires in 30 days
+        console.log(`SAVED TO CACHE for URL: ${url}`);
+        // --- END OF FIX ---
+
         res.status(200).json(finalData);
 
     } catch (error) {
