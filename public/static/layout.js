@@ -11,14 +11,12 @@
           </picture>
         </a>
 
-        <!-- Mobile menu toggle (hidden on desktop-->
         <button class="nav-toggle" type="button" aria-label="Menyunu aç" aria-controls="primary-nav" aria-expanded="false" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
         </button>
 
-        <!-- Backdrop for drawer -->
         <div class="nav-backdrop" hidden></div>
 
         <nav id="primary-nav" class="site-nav" aria-label="Əsas menyu">
@@ -59,10 +57,10 @@
             </svg>
             Layihəyə dəstək ol
           </a>
-          <a href="mailto:hello@cavid.info">
+          <button id="contact-open" type="button">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             Əlaqə
-          </a>
+          </button>
         </div>
 
         <div class="small muted">© <span id="y"></span> LNK.AZ — Made by <a class="muted" href="https://cavid.info" target="_blank" rel="noopener">cavid.info</a></div>
@@ -70,97 +68,150 @@
     `;
   }
 
-  function injectHeader() {
-    const container =
-      document.getElementById('site-header') ||
-      document.querySelector('.wrap') ||
-      document.body;
+  function modalHTML() {
+    // NOTE: replace FORM_ENDPOINT if you change Formspree ID.
+    const FORM_ENDPOINT = 'https://formspree.io/f/xgvlpegn';
+    return `
+      <div class="modal-backdrop" data-modal-backdrop hidden></div>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contact-title" aria-describedby="contact-desc" hidden>
+        <div class="modal-card">
+          <div class="modal-head">
+            <h3 id="contact-title">Bizə yazın</h3>
+            <button class="modal-close" type="button" aria-label="Pəncərəni bağla">×</button>
+          </div>
+          <p id="contact-desc" class="muted small" style="margin:0 0 10px">
+            Mesajınız birbaşa LNK komandası tərəfindən oxunacaq. E-poçt ünvanınızı doğru yazın ki, cavab göndərə bilək.
+          </p>
 
+          <form id="contact-form" action="${FORM_ENDPOINT}" method="POST" novalidate>
+            <label class="modal-label">Adınız
+              <input class="modal-input" type="text" name="name" autocomplete="name" required>
+            </label>
+            <label class="modal-label">E-poçt
+              <input class="modal-input" type="email" name="email" autocomplete="email" required>
+            </label>
+            <label class="modal-label">Məktubunuz
+              <textarea class="modal-input" name="message" rows="5" required></textarea>
+            </label>
+
+            <!-- honeypot -->
+            <input type="text" name="_gotcha" style="display:none">
+
+            <div class="modal-actions">
+              <button type="submit" class="btn">Göndər</button>
+              <button type="button" class="btn btn-ghost modal-close">Bağla</button>
+            </div>
+
+            <p class="small muted" id="contact-status" role="status" aria-live="polite" style="min-height:1.2em;margin-top:8px"></p>
+          </form>
+        </div>
+      </div>
+    `;
+  }
+
+  function injectHeader() {
+    const container = document.getElementById('site-header') || document.querySelector('.wrap') || document.body;
     const html = headerHTML();
-    if (container.id === 'site-header') {
-      container.innerHTML = html;
-    } else {
-      const tmp = document.createElement('div');
-      tmp.innerHTML = html.trim();
-      container.insertBefore(tmp.firstElementChild, container.firstChild);
-    }
+    if (container.id === 'site-header') container.innerHTML = html;
+    else { const tmp = document.createElement('div'); tmp.innerHTML = html.trim(); container.insertBefore(tmp.firstElementChild, container.firstChild); }
 
     // Active link highlight
     const path = location.pathname.replace(/\/+$/, '') || '/';
     document.querySelectorAll('.site-nav a').forEach(a => {
       const href = (a.getAttribute('href') || '').replace(/\/+$/, '') || '/';
-      if (href === path) {
-        a.classList.add('active');
-        a.setAttribute('aria-current', 'page');
-      }
+      if (href === path) { a.classList.add('active'); a.setAttribute('aria-current', 'page'); }
     });
 
-    // Toggle logic
+    // Mobile drawer
     const toggle = document.querySelector('.nav-toggle');
     const drawer = document.getElementById('primary-nav');
     const backdrop = document.querySelector('.nav-backdrop');
     const mq = window.matchMedia('(max-width: 768px)');
-
-    function openNav(){
-      document.body.classList.add('nav-open');
-      toggle?.setAttribute('aria-expanded', 'true');
-      backdrop?.removeAttribute('hidden');
-    }
-    function closeNav(){
-      document.body.classList.remove('nav-open');
-      toggle?.setAttribute('aria-expanded', 'false');
-      backdrop?.setAttribute('hidden', '');
-    }
-    function syncToggle(){
-      if (!toggle) return;
-      if (mq.matches) {
-        toggle.style.display = 'inline-flex';
-      } else {
-        toggle.style.display = 'none';
-        // ensure drawer/backdrop are reset on desktop
-        closeNav();
-      }
-    }
-
-    toggle?.addEventListener('click', () => {
-      const expanded = toggle.getAttribute('aria-expanded') === 'true';
-      expanded ? closeNav() : openNav();
-    });
+    function openNav(){ document.body.classList.add('nav-open'); toggle?.setAttribute('aria-expanded','true'); backdrop?.removeAttribute('hidden'); }
+    function closeNav(){ document.body.classList.remove('nav-open'); toggle?.setAttribute('aria-expanded','false'); backdrop?.setAttribute('hidden',''); }
+    function syncToggle(){ if (!toggle) return; if (mq.matches){ toggle.style.display='inline-flex'; } else { toggle.style.display='none'; closeNav(); } }
+    toggle?.addEventListener('click', () => (toggle.getAttribute('aria-expanded') === 'true' ? closeNav() : openNav()));
     backdrop?.addEventListener('click', closeNav);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNav(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
     drawer?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
-
-    // Initial + responsive sync
     syncToggle();
     mq.addEventListener ? mq.addEventListener('change', syncToggle) : mq.addListener(syncToggle);
   }
 
   function injectFooter() {
-    const container =
-      document.getElementById('site-footer') ||
-      document.querySelector('.wrap') ||
-      document.body;
-
+    const container = document.getElementById('site-footer') || document.querySelector('.wrap') || document.body;
     const html = footerHTML();
-    if (container.id === 'site-footer') {
-      container.innerHTML = html;
-    } else {
-      const tmp = document.createElement('div');
-      tmp.innerHTML = html.trim();
-      container.appendChild(tmp.firstElementChild);
+    if (container.id === 'site-footer') container.innerHTML = html;
+    else { const tmp = document.createElement('div'); tmp.innerHTML = html.trim(); container.appendChild(tmp.firstElementChild); }
+    const yearEl = document.getElementById('y'); if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // Inject modal markup once (after footer)
+    if (!document.querySelector('.modal')) {
+      const wrap = document.querySelector('.wrap') || document.body;
+      const tmp = document.createElement('div'); tmp.innerHTML = modalHTML();
+      wrap.appendChild(tmp);
     }
 
-    const yearEl = document.getElementById('y');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
+    // Modal wiring
+    const openBtn = document.getElementById('contact-open');
+    const modal = document.querySelector('.modal');
+    const modalBackdrop = document.querySelector('[data-modal-backdrop]');
+    const closeBtns = document.querySelectorAll('.modal-close');
+    const form = document.getElementById('contact-form');
+    const statusEl = document.getElementById('contact-status');
+    let lastFocus = null;
+
+    function openModal(){
+      lastFocus = document.activeElement;
+      modal.removeAttribute('hidden');
+      modalBackdrop.removeAttribute('hidden');
+      document.body.style.overflow = 'hidden';
+      // focus first input
+      const first = modal.querySelector('input, textarea, button'); first && first.focus();
+    }
+    function closeModal(){
+      modal.setAttribute('hidden','');
+      modalBackdrop.setAttribute('hidden','');
+      document.body.style.overflow = '';
+      lastFocus && lastFocus.focus();
+      if (statusEl) statusEl.textContent = '';
+      form?.reset();
+    }
+
+    openBtn?.addEventListener('click', openModal);
+    modalBackdrop?.addEventListener('click', closeModal);
+    closeBtns.forEach(b => b.addEventListener('click', closeModal));
+    document.addEventListener('keydown', e => { if (!modal.hasAttribute('hidden') && e.key === 'Escape') closeModal(); });
+
+    // Basic focus trap
+    modal?.addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      const focusables = modal.querySelectorAll('a,button,input,textarea,select,[tabindex]:not([tabindex="-1"])');
+      const list = Array.from(focusables).filter(el => !el.hasAttribute('disabled'));
+      const first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    });
+
+    // AJAX submit to Formspree
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      statusEl.textContent = 'Göndərilir…';
+      const data = new FormData(form);
+      try{
+        const res = await fetch(form.action, { method:'POST', body: data, headers: { 'Accept':'application/json' } });
+        if (res.ok){
+          statusEl.textContent = 'Təşəkkür edirik! Mesajınız göndərildi.';
+          setTimeout(closeModal, 1200);
+        } else {
+          statusEl.textContent = 'Xəta baş verdi. Bir az sonra yenidən cəhd edin.';
+        }
+      }catch(err){
+        statusEl.textContent = 'Şəbəkə xətası. Yenidən cəhd edin.';
+      }
+    });
   }
 
-  function ready(fn){
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
-    else fn();
-  }
-
-  ready(() => {
-    injectHeader();
-    injectFooter();
-  });
+  function ready(fn){ if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn); else fn(); }
+  ready(() => { injectHeader(); injectFooter(); });
 })();

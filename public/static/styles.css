@@ -365,4 +365,45 @@ body.nav-open{ overflow:hidden }
   }
   body.nav-open .nav-backdrop{ opacity:1; pointer-events:auto }
 }
+/* --- Modal --- */
+.modal-backdrop{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.45);
+  opacity:0; pointer-events:none;
+  transition:opacity .2s ease;
+  z-index:90;
+}
+.modal{
+  position:fixed; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  z-index:100;
+}
+.modal[hidden] + .modal-backdrop,
+.modal-backdrop[hidden]{ display:block } /* keep in DOM for JS; hidden attr toggles */
+
+.modal:not([hidden]) + .modal-backdrop{ opacity:1; pointer-events:auto }
+
+.modal-card{
+  width:min(560px, 92vw);
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:var(--shadow);
+  padding:18px;
+}
+.modal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px }
+.modal-head h3{ margin:0; font-size:18px }
+.modal-close{
+  background:transparent; border:1px solid var(--border);
+  width:36px; height:36px; border-radius:8px; cursor:pointer; color:var(--text);
+}
+.modal-label{ display:block; font-size:14px; margin:10px 0 6px }
+.modal-input{
+  width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--border);
+  background:var(--panel); color:var(--text);
+}
+.modal-input:focus{ outline:none; box-shadow: var(--ring); border-color: var(--accent) }
+.modal-actions{ display:flex; gap:10px; margin-top:12px }
+.btn-ghost{ background:transparent; border:1px solid var(--border); color:var(--text) }
+
 }
