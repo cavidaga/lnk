@@ -11,6 +11,7 @@
   <meta name="color-scheme" content="light dark" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <meta property="fb:app_id" content="1493746861646864" />
+
   <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,7 +28,8 @@
   <meta name="twitter:title" content="Haqqımızda — LNK.az" />
   <meta name="twitter:description" content="LNK.az — Azərbaycanın ilk süni intellektə əsaslanan media qərəzi analizatoru haqqında məlumat." />
   <meta name="twitter:image" content="https://lnk.az/static/og-cover.png" />
-  <!-- Explicit icons so the browser doesn’t guess (and accidentally hit http://) -->
+
+  <!-- Icons -->
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="/static/favicon.ico">
   <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
@@ -49,37 +51,38 @@
   }
   </script>
 
-  <!-- === Reuse same CSS branding from index.html === -->
   <link rel="stylesheet" href="/static/styles.css">
-  <!-- If you don’t have a separate CSS file, copy the <style> block from index.html here -->
 </head>
 <body>
   <div class="wrap">
     <div id="site-header"></div>
-    <main id="about" role="main">
-      <article>
+
+    <main id="about" role="main" class="page">
+      <article class="prose">
         <h1>Haqqımızda</h1>
         <p>
           <strong>LNK.az</strong> — Azərbaycanın ilk süni intellektə əsaslanan media qərəzi analizatorudur.
-          Məqsədimiz oxuculara təqdim edilən xəbərlərin etibarlılığını və meylini göstərmək, 
-          ictimaiyyətin obyektiv informasiya əldə etməsinə kömək etməkdir. 
+          Məqsədimiz oxuculara təqdim edilən xəbərlərin etibarlılığını və meylini göstərmək,
+          ictimaiyyətin obyektiv informasiya əldə etməsinə kömək etməkdir.
         </p>
 
         <h2>Necə işləyir?</h2>
         <ul>
           <li>İstənilən xəbər linkini daxil edirsiniz.</li>
-          <li>Sistem məqaləni təhlil edir və <strong>etibarlılıq</strong>, <strong>siyasi meyl</strong>, 
+          <li>Sistem məqaləni təhlil edir və <strong>etibarlılıq</strong>, <strong>siyasi meyl</strong>,
               <strong>sosial-mədəni meyl</strong> kimi göstəriciləri hesablayır.</li>
           <li>Nəticələr qrafik üzərində göstərilir; əlavə diaqnostika ilə birlikdə təqdim olunur.</li>
         </ul>
         <p>
-          Metodologiyamız ilə daha ətraflı tanış olmaq üçün <a href=/methodology.html>Metodologiya</a> səhifəsinə baxın.
+          Metodologiyamız ilə daha ətraflı tanış olmaq üçün
+          <a href="/methodology.html">Metodologiya</a> səhifəsinə baxın.
         </p>
+
         <h2>Niyə LNK.az?</h2>
         <ul>
           <li><strong>Şəffaflıq:</strong> Balların arxasındakı əsaslandırmalar açıq göstərilir.</li>
           <li><strong>Müstəqillik:</strong> Layihə heç bir media qurumuna və ya siyasi təşkilata bağlı deyil.</li>
-          <li><strong>Texnoloji üstünlük:</strong> Beynəlxalq metodologiyalardan ilhamlanmış, 
+          <li><strong>Texnoloji üstünlük:</strong> Beynəlxalq metodologiyalardan ilhamlanmış,
               yerli informasiya mühitinə uyğunlaşdırılmış alqoritm.</li>
         </ul>
 
@@ -87,26 +90,60 @@
         <p>
           Biz inanırıq ki, <strong>obyektiv informasiya azad cəmiyyətin təməlidir</strong>.
           LNK.az oxuculara düzgün məlumat seçməkdə dəstək olmaqla, medianın keyfiyyətinin artmasına
-          və sağlam ictimai müzakirələrin formalaşmasına töhfə verir. Məqsədimiz hər hansı bir məqaləyə "yaxşı" və ya "pis" damğası vurmaq deyil. Əksinə, bu alət oxucuların daha tənqidi və məlumatlı media istehlakçısı olmasına yardım etmək üçün güclü bir köməkçi kimi hazırlanmışdır.
+          və sağlam ictimai müzakirələrin formalaşmasına töhfə verir. Məqsədimiz hər hansı bir məqaləyə “yaxşı”
+          və ya “pis” damğası vurmaq deyil. Əksinə, bu alət oxucuların daha tənqidi və məlumatlı media
+          istehlakçısı olmasına yardım etmək üçün güclü bir köməkçi kimi hazırlanmışdır.
         </p>
 
-        <h2>Əlaqə</h2>
-        <p>Təklif və suallar üçün bu formanı doldura bilərsiniz:</p>
-        <form action="https://formspree.io/f/xgvlpegn" method="POST" class="card" style="padding:20px;max-width:500px;">
-          <label style="display:block;margin-bottom:12px;">
-            E-poçt:
-            <input type="email" name="email" required class="input" placeholder="E-poçt ünvanınız">
-          </label>
-          <label style="display:block;margin-bottom:12px;">
-            Məktubunuz:
-            <textarea name="message" required class="input" rows="5" placeholder="Mesajınızı yazın..."></textarea>
-          </label>
-          <button type="submit" class="btn">Göndər</button>
-        </form>
+        <!-- Contact -->
+        <section id="contact" aria-labelledby="contact-title" style="margin-top:22px">
+          <h2 id="contact-title">Əlaqə</h2>
+          <p>Təklif və suallar üçün bu formanı doldura bilərsiniz:</p>
+
+          <div class="card">
+            <div class="bd">
+              <form action="https://formspree.io/f/xgvlpegn" method="POST" id="contact-form" aria-describedby="contact-note">
+                <p id="contact-note" class="small muted" style="margin-top:0">
+                  E-poçt ünvanınızı düzgün yazın ki, cavab göndərə bilək.
+                </p>
+
+                <label for="cf-email" class="label">E-poçt</label>
+                <input id="cf-email" class="input" type="email" name="email" required autocomplete="email" placeholder="E-poçt ünvanınız">
+
+                <label for="cf-message" class="label" style="margin-top:12px">Məktubunuz</label>
+                <textarea id="cf-message" class="input" name="message" rows="5" required placeholder="Mesajınızı yazın..."></textarea>
+
+                <!-- Honeypot (spam protection) -->
+                <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="position:absolute;left:-10000px;opacity:0" aria-hidden="true">
+
+                <!-- Optional: success redirect -->
+                <input type="hidden" name="_subject" value="LNK.az: Əlaqə formu">
+                <input type="hidden" name="_next" value="https://lnk.az/about.html#contact-success">
+
+                <div style="margin-top:12px">
+                  <button type="submit" class="btn">Göndər</button>
+                </div>
+
+                <p id="contact-success" class="small muted" style="display:none;margin-top:10px">
+                  Təşəkkür edirik! Mesajınız göndərildi.
+                </p>
+              </form>
+            </div>
+          </div>
+        </section>
       </article>
     </main>
+
     <div id="site-footer"></div>
   </div>
+
   <script src="/static/layout.js" defer></script>
+  <script>
+    // Show success message if redirected back by Formspree (#contact-success)
+    if (location.hash === '#contact-success') {
+      const el = document.getElementById('contact-success');
+      if (el) el.style.display = 'block';
+    }
+  </script>
 </body>
 </html>

@@ -58,51 +58,14 @@
             </svg>
             Layihəyə dəstək ol
           </a>
-          <button id="contact-open" type="button">
+          <a id="contact-link" href="/about.html#contact">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             Əlaqə
-          </button>
+          </a>
         </div>
 
         <div class="small muted">© <span id="y"></span> LNK.AZ — Made by <a class="muted" href="https://cavid.info" target="_blank" rel="noopener">cavid.info</a></div>
       </footer>
-    `;
-  }
-
-  // Backdrop AFTER modal (correct order for layering)
-  function modalHTML() {
-    const FORM_ENDPOINT = 'https://formspree.io/f/xgvlpegn';
-    return `
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="contact-title" aria-describedby="contact-desc" hidden>
-        <div class="modal-card">
-          <div class="modal-head">
-            <h3 id="contact-title">Bizə yazın</h3>
-            <button class="modal-close" type="button" aria-label="Pəncərəni bağla">×</button>
-          </div>
-          <p id="contact-desc" class="muted small" style="margin:0 0 10px">
-            Mesajınız birbaşa LNK komandası tərəfindən oxunacaq. E-poçt ünvanınızı doğru yazın ki, cavab göndərə bilək.
-          </p>
-
-          <form id="contact-form" action="${FORM_ENDPOINT}" method="POST" novalidate>
-            <label class="modal-label">Adınız
-              <input class="modal-input" type="text" name="name" autocomplete="name" required>
-            </label>
-            <label class="modal-label">E-poçt
-              <input class="modal-input" type="email" name="email" autocomplete="email" required>
-            </label>
-            <label class="modal-label">Məktubunuz
-              <textarea class="modal-input" name="message" rows="5" required></textarea>
-            </label>
-            <input type="text" name="_gotcha" style="display:none">
-            <div class="modal-actions">
-              <button type="submit" class="btn">Göndər</button>
-              <button type="button" class="btn btn-ghost modal-close">Bağla</button>
-            </div>
-            <p class="small muted" id="contact-status" role="status" aria-live="polite" style="min-height:1.2em;margin-top:8px"></p>
-          </form>
-        </div>
-      </div>
-      <div class="modal-backdrop" aria-hidden="true" hidden></div>
     `;
   }
 
@@ -141,72 +104,8 @@
     if (container.id === 'site-footer') container.innerHTML = html;
     else { const tmp = document.createElement('div'); tmp.innerHTML = html.trim(); container.appendChild(tmp.firstElementChild); }
 
-    const yearEl = document.getElementById('y'); if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-    // Inject modal markup once (after footer) — correct order: modal then backdrop
-    if (!document.querySelector('.modal')) {
-      const wrap = document.querySelector('.wrap') || document.body;
-      const tmp = document.createElement('div'); tmp.innerHTML = modalHTML();
-      wrap.appendChild(tmp);
-    }
-
-    // Modal wiring
-    const openBtn = document.getElementById('contact-open');
-    const modal = document.querySelector('.modal');
-    const modalBackdrop = document.querySelector('.modal-backdrop');
-    const closeBtns = document.querySelectorAll('.modal-close');
-    const form = document.getElementById('contact-form');
-    const statusEl = document.getElementById('contact-status');
-    let lastFocus = null;
-
-    function openModal(){
-      lastFocus = document.activeElement;
-      document.body.classList.add('modal-open');
-      modal.removeAttribute('hidden');
-      modalBackdrop.removeAttribute('hidden');
-      (modal.querySelector('input, textarea, button') || modal).focus();
-    }
-    function closeModal(){
-      document.body.classList.remove('modal-open');
-      modal.setAttribute('hidden', '');
-      modalBackdrop.setAttribute('hidden', '');
-      lastFocus && lastFocus.focus();
-      if (statusEl) statusEl.textContent = '';
-      form?.reset();
-    }
-
-    openBtn?.addEventListener('click', openModal);
-    modalBackdrop?.addEventListener('click', closeModal);
-    closeBtns.forEach(b => b.addEventListener('click', closeModal));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.body.classList.contains('modal-open')) closeModal(); });
-
-    // Basic focus trap inside modal
-    modal?.addEventListener('keydown', e => {
-      if (!document.body.classList.contains('modal-open') || e.key !== 'Tab') return;
-      const focusables = modal.querySelectorAll('a,button,input,textarea,select,[tabindex]:not([tabindex="-1"])');
-      const list = Array.from(focusables).filter(el => !el.hasAttribute('disabled'));
-      const first = list[0], last = list[list.length - 1];
-      if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
-    });
-
-    // AJAX submit to Formspree
-    form?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      statusEl.textContent = 'Göndərilir…';
-      const data = new FormData(form);
-      try{
-        const res = await fetch(form.action, { method:'POST', body: data, headers: { 'Accept':'application/json' } });
-        if (res.ok){
-          statusEl.textContent = 'Təşəkkür edirik! Mesajınız göndərildi.';
-          setTimeout(closeModal, 1200);
-        } else {
-          statusEl.textContent = 'Xəta baş verdi. Bir az sonra yenidən cəhd edin.';
-        }
-      }catch(err){
-        statusEl.textContent = 'Şəbəkə xətası. Yenidən cəhd edin.';
-      }
-    });
+    const yearEl = document.getElementById('y');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
   }
 
   function ready(fn){ if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn); else fn(); }
