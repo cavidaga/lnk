@@ -367,24 +367,17 @@ body.nav-open{ overflow:hidden }
 }
 /* --- Modal (fixed) --- */
 .modal-backdrop{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.45);
-  opacity:0; visibility:hidden; pointer-events:none;
-  transition:opacity .2s ease;
-  z-index:90;
+  position:fixed; inset:0; background:rgba(0,0,0,.45);
+  opacity:0; visibility:hidden; pointer-events:none; z-index:90; transition:opacity .2s ease;
 }
 .modal{
-  position:fixed; inset:0;
-  display:flex; align-items:center; justify-content:center;
-  opacity:0; visibility:hidden; pointer-events:none;
-  z-index:100; transform:scale(.98);
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  opacity:0; visibility:hidden; pointer-events:none; z-index:100; transform:scale(.98);
   transition:opacity .2s ease, transform .2s ease, visibility 0s linear .2s;
 }
-body.modal-open .modal-backdrop,
-body.modal-open .modal{
-  opacity:1; visibility:visible; pointer-events:auto;
-  transform:scale(1); transition-delay:0s;
-}
+/* When visible, they use the animated overlay styles */
+body.modal-open .modal{ opacity:1; visibility:visible; pointer-events:auto; transform:scale(1); transition-delay:0s; }
+body.modal-open .modal-backdrop{ opacity:1; visibility:visible; pointer-events:auto; }
 .modal-card{
   width:min(560px, 92vw);
   background:var(--panel);
@@ -409,18 +402,4 @@ body.modal-open .modal{
 .btn-ghost{ background:transparent; border:1px solid var(--border); color:var(--text) }
 /* Ensure modal/backdrop are truly hidden unless JS opens them */
 .modal[hidden], .modal-backdrop[hidden] { display: none !important; }
-
-/* When visible, they use the animated overlay styles */
-.modal{
-  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-  opacity:0; visibility:hidden; pointer-events:none; z-index:100; transform:scale(.98);
-  transition:opacity .2s ease, transform .2s ease, visibility 0s linear .2s;
-}
-.modal-backdrop{
-  position:fixed; inset:0; background:rgba(0,0,0,.45);
-  opacity:0; visibility:hidden; pointer-events:none; z-index:90; transition:opacity .2s ease;
-}
-body.modal-open .modal{ opacity:1; visibility:visible; pointer-events:auto; transform:scale(1); transition-delay:0s; }
-body.modal-open .modal-backdrop{ opacity:1; visibility:visible; pointer-events:auto; }
-
 }
