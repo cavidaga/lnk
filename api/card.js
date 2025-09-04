@@ -1,7 +1,10 @@
-// api/card.js — Node function (plain puppeteer-core, no puppeteer-extra)
+// api/card.js — Node function that generates & caches PNG share cards in KV
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 import { kv } from '@vercel/kv';
+
+const FALLBACK = '/static/card-fallback.png';
+const CACHE_TTL = 3600; // seconds
 
 function escapeHtml(s = '') {
   return String(s)
@@ -22,17 +25,46 @@ const mapDot = (v) => {
 };
 
 export default async function handler(req, res) {
+  const url = new URL(req.url, 'http://localhost');
+  const hash = url.searchParams.get('hash');
+  const theme = (url.searchParams.get('theme') || 'dark').toLowerCase();
+  const width = Number(url.searchParams.get('w') || 1200);
+  const height = Number(url.searchParams.get('h') || 630);
+  const refresh = url.searchParams.get('refresh') === '1';
+  const cacheKey = `cardpng:${hash}:${theme}:${width}x${height}`;
+
+  // HEAD: tell scrapers they'll get an image
+  if (req.method === 'HEAD') {
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Disposition', 'inline; filename="lnk-card.png"');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    return res.status(200).end();
+  }
+
+  if (!hash) {
+    res.setHeader('Location', FALLBACK);
+    return res.status(302).end();
+  }
+
   try {
-    const url = new URL(req.url, 'http://localhost');
-    const hash = url.searchParams.get('hash');
-    const theme = (url.searchParams.get('theme') || 'dark').toLowerCase();
-    const width = Number(url.searchParams.get('w') || 1200);
-    const height = Number(url.searchParams.get('h') || 630);
+    // 0) Serve from PNG cache if present (unless refresh=1)
+    if (!refresh) {
+      const cachedB64 = await kv.get(cacheKey); // stored as base64 string
+      if (cachedB64 && typeof cachedB64 === 'string') {
+        const buf = Buffer.from(cachedB64, 'base64');
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Content-Disposition', 'inline; filename="lnk-card.png"');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        return res.status(200).end(buf);
+      }
+    }
 
-    if (!hash) return res.status(400).send('Missing hash');
-
+    // 1) Load analysis JSON (required)
     const data = await kv.get(hash);
-    if (!data) return res.status(404).send('Not found');
+    if (!data) {
+      res.setHeader('Location', FALLBACK);
+      return res.status(302).end();
+    }
 
     const { meta = {}, scores = {}, human_summary = '', modelUsed, contentSource } = data;
     const title = meta.title || 'LNK.az — Media Təhlili';
@@ -52,13 +84,15 @@ export default async function handler(req, res) {
     const dotX = mapDot(scores?.political_establishment_bias?.value);
     const dotY = -mapDot(scores?.socio_cultural_bias?.value);
 
+    // 2) HTML for rendering
     const html = `
 <!doctype html>
 <html><head><meta charset="utf-8" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:;">
 <meta name="viewport" content="width=${width}, initial-scale=1.0" />
 <style>
-  *{box-sizing:border-box} body{margin:0;width:${width}px;height:${height}px;background:${bg};color:${fg};font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;width:${width}px;height:${height}px;background:${bg};color:${fg};font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
   .wrap{display:flex;height:100%;padding:40px}
   .left{flex:1.4;display:flex;flex-direction:column}
   .brand{display:flex;gap:12px;align-items:center}
@@ -100,16 +134,12 @@ export default async function handler(req, res) {
       </div>
     </div>
     <div class="right">
-      <div class="axes">
-        <div class="v"></div><div class="h"></div>
-        <div class="dot"></div>
-        <div class="lblx">Siyasi</div>
-        <div class="lbly">Sosial</div>
-      </div>
+      <div class="axes"><div class="v"></div><div class="h"></div><div class="dot"></div><div class="lblx">Siyasi</div><div class="lbly">Sosial</div></div>
     </div>
   </div>
 </body></html>`;
 
+    // 3) Render to PNG
     let browser;
     try {
       browser = await puppeteer.launch({
@@ -123,14 +153,26 @@ export default async function handler(req, res) {
       await page.setContent(html, { waitUntil: 'load' });
       const buf = await page.screenshot({ type: 'png' });
 
+      // 4) Store in KV as Base64
+      try {
+        const b64 = buf.toString('base64');
+        await kv.set(cacheKey, b64, { ex: CACHE_TTL });
+      } catch (err) {
+        // caching failure shouldn't break response
+        console.warn('KV cache set failed:', err);
+      }
+
       res.setHeader('Content-Type', 'image/png');
+      res.setHeader('Content-Disposition', 'inline; filename="lnk-card.png"');
       res.setHeader('Cache-Control', 'public, max-age=3600');
-      res.status(200).send(buf);
+      return res.status(200).end(buf);
     } finally {
       if (browser) try { await browser.close(); } catch {}
     }
   } catch (e) {
     console.error('Card error:', e);
-    res.status(500).send('Card error');
+    // Fallback to a static PNG so scrapers always see a valid image content-type.
+    res.setHeader('Location', FALLBACK);
+    return res.status(302).end();
   }
 }
