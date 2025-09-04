@@ -1,6 +1,7 @@
 {
   "name": "vercel-media-analyzer-final",
   "version": "1.0.0",
+  "type": "module",
   "dependencies": {
     "@sparticuz/chromium": "latest",
     "puppeteer-core": "latest",
@@ -8,6 +9,7 @@
     "puppeteer-extra-plugin-stealth": "latest",
     "puppeteer-extra-plugin-user-data-dir": "latest",
     "@vercel/kv": "latest",
+    "@vercel/og": "latest",
     "glob": "latest"
   }
 }
