@@ -3,7 +3,7 @@
     "jsx": "react-jsx",
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "nodenext",
     "strict": false,
     "skipLibCheck": true
   }
