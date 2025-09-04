@@ -136,7 +136,7 @@ export default async function handler(req, res) {
   <div class="wrap">
     <div class="left">
       <div class="brand">
-        <img src="/static/logo.svg" alt="LNK.az" class="logo-img" />
+        <img src="https://lnk.az/static/logo.svg" alt="LNK.az" class="logo-img" />
         <div style="font-size:24px;font-weight:600">LNK.az</div>
       </div>
 
@@ -151,7 +151,7 @@ export default async function handler(req, res) {
           <div class="val">${rel}</div>
         </div>
         <div class="stat">
-          <div class="lbl">Siyasi meyl (Müxalif ⟷ Hökumətyönlü)</div>
+          <div class="lbl">Siyasi meyl (Müxalif <-> Hökumətyönlü)</div>
           <div class="val">${escapeHtml(pol)}</div>
         </div>
       </div>
