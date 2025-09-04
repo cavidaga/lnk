@@ -1,4 +1,4 @@
-// api/card.js  — Node function (NOT Edge)
+// api/card.js
 import chromium from '@sparticuz/chromium';
 import { addExtra } from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
@@ -8,6 +8,24 @@ import { kv } from '@vercel/kv';
 const puppeteer = addExtra(puppeteerCore);
 puppeteer.use(StealthPlugin());
 
+function escapeHtml(s = '') {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+function fmtBias(v) {
+  const val = clamp(Number(v) || 0, -5, 5);
+  return (val > 0 ? '+' : '') + val.toFixed(1);
+}
+function trunc(s = '', max = 220) { return s.length <= max ? s : s.slice(0, max - 1).trimEnd() + '…'; }
+function mapDot(v) {
+  v = Number(v) || 0;
+  if (v < -5) v = -5;
+  if (v > 5) v = 5;
+  return v * 22;
+}
+
 export default async function handler(req, res) {
   try {
     const url = new URL(req.url, 'http://localhost');
@@ -16,32 +34,12 @@ export default async function handler(req, res) {
     const width = Number(url.searchParams.get('w') || 1200);
     const height = Number(url.searchParams.get('h') || 630);
 
-    if (!hash) {
-      res.status(400).send('Missing hash');
-      return;
-    }
+    if (!hash) return res.status(400).send('Missing hash');
 
     const data = await kv.get(hash);
-    if (!data) {
-      res.status(404).send('Not found');
-      return;
-    }
+    if (!data) return res.status(404).send('Not found');
 
-    const {
-      meta = {},
-      scores = {},
-      human_summary = '',
-      modelUsed,
-      contentSource
-    } = data;
-
-    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-    const fmtBias = (v) => {
-      const val = clamp(Number(v) || 0, -5, 5);
-      return (val > 0 ? '+' : '') + val.toFixed(1);
-    };
-    const trunc = (s = '', max = 220) => (s.length <= max ? s : s.slice(0, max - 1).trimEnd() + '…');
-
+    const { meta = {}, scores = {}, human_summary = '', modelUsed, contentSource } = data;
     const title = meta.title || 'LNK.az — Media Təhlili';
     const publication = meta.publication || '';
     const rel = clamp(scores?.reliability?.value ?? 0, 0, 100);
@@ -56,37 +54,37 @@ export default async function handler(req, res) {
     const card   = isLight ? '#f5f6f8' : '#141723';
     const border = isLight ? '#e6e8ee' : '#23273a';
 
+    const dotX = mapDot(scores?.political_establishment_bias?.value);
+    const dotY = -mapDot(scores?.socio_cultural_bias?.value);
+
     const html = `
 <!doctype html>
 <html>
 <head>
 <meta charset="utf-8" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src data:;">
-<meta name="viewport" content="width=${width}, initial-scale=1.0" />
 <style>
-  :root { --bg:${bg}; --fg:${fg}; --sub:${sub}; --accent:${accent}; --card:${card}; --border:${border}; }
+  body { margin:0; width:${width}px; height:${height}px; background:${bg}; color:${fg}; font-family: system-ui, sans-serif; }
   * { box-sizing:border-box; }
-  body { margin:0; width:${width}px; height:${height}px; background:var(--bg); color:var(--fg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
   .wrap { display:flex; height:100%; padding:40px; }
   .left { flex:1.4; display:flex; flex-direction:column; }
   .brand { display:flex; gap:12px; align-items:center; }
-  .logo { width:36px; height:36px; border-radius:8px; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:24px; }
+  .logo { width:36px; height:36px; border-radius:8px; background:${accent}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:24px; }
   .title { margin-top:16px; }
   .title h1 { margin:0; font-size:34px; line-height:1.2; font-weight:800; }
-  .title .pub { color:var(--sub); margin-top:6px; font-size:20px; }
+  .title .pub { color:${sub}; margin-top:6px; font-size:20px; }
   .stats { display:flex; gap:14px; margin-top:16px; }
-  .stat { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px 16px; width:210px; }
-  .stat .lbl { color:var(--sub); font-size:14px; }
+  .stat { background:${card}; border:1px solid ${border}; border-radius:14px; padding:14px 16px; width:210px; }
+  .stat .lbl { color:${sub}; font-size:14px; }
   .stat .val { font-size:36px; font-weight:800; margin-top:2px; }
-  .sum { margin-top:18px; color:var(--sub); font-size:20px; line-height:1.35; max-width:700px; white-space:pre-wrap; }
-  .foot { display:flex; gap:16px; margin-top:auto; align-items:center; color:var(--sub); font-size:16px; }
+  .sum { margin-top:18px; color:${sub}; font-size:20px; line-height:1.35; max-width:700px; white-space:pre-wrap; }
+  .foot { display:flex; gap:16px; margin-top:auto; align-items:center; color:${sub}; font-size:16px; }
   .right { width:360px; margin-left:28px; display:flex; align-items:center; justify-content:center; }
-  .axes { width:320px; height:320px; background:var(--card); border:1px solid var(--border); border-radius:20px; position:relative; display:flex; align-items:center; justify-content:center; }
-  .v { position:absolute; width:2px; height:260px; background:var(--border); }
-  .h { position:absolute; height:2px; width:260px; background:var(--border); }
-  .dot { position:absolute; width:14px; height:14px; border-radius:999px; background:var(--accent); box-shadow:0 0 0 6px rgba(225,6,0,0.125); }
-  .axes .lblx { position:absolute; bottom:10px; font-size:14px; color:var(--sub); }
-  .axes .lbly { position:absolute; right:10px; top:10px; font-size:14px; color:var(--sub); }
+  .axes { width:320px; height:320px; background:${card}; border:1px solid ${border}; border-radius:20px; position:relative; display:flex; align-items:center; justify-content:center; }
+  .v { position:absolute; width:2px; height:260px; background:${border}; }
+  .h { position:absolute; height:2px; width:260px; background:${border}; }
+  .dot { position:absolute; width:14px; height:14px; border-radius:999px; background:${accent}; box-shadow:0 0 0 6px rgba(225,6,0,0.125); transform:translate(${dotX}px, ${dotY}px); }
+  .axes .lblx { position:absolute; bottom:10px; font-size:14px; color:${sub}; }
+  .axes .lbly { position:absolute; right:10px; top:10px; font-size:14px; color:${sub}; }
 </style>
 </head>
 <body>
@@ -104,22 +102,19 @@ export default async function handler(req, res) {
       </div>
       <div class="sum">${escapeHtml(trunc(human_summary))}</div>
       <div class="foot">
-        <div>Model: <span style="color:var(--fg)">${escapeHtml(modelUsed || '—')}</span> • Mənbə: <span style="color:var(--fg)">${escapeHtml(contentSource || '—')}</span></div>
+        <div>Model: <span style="color:${fg}">${escapeHtml(modelUsed || '—')}</span> • Mənbə: <span style="color:${fg}">${escapeHtml(contentSource || '—')}</span></div>
         <div style="margin-left:auto">lnk.az</div>
       </div>
     </div>
     <div class="right">
       <div class="axes">
         <div class="v"></div><div class="h"></div>
-        <div class="dot" style="transform: translate(${mapDot(scores?.political_establishment_bias?.value)}px, ${-mapDot(scores?.socio_cultural_bias?.value)}px)"></div>
+        <div class="dot"></div>
         <div class="lblx">Siyasi</div>
         <div class="lbly">Sosial</div>
       </div>
     </div>
   </div>
-  <script>
-    function mapDot(v){ v=Number(v)||0; if(v<-5)v=-5; if(v>5)v=5; return v*22; }
-  </script>
 </body>
 </html>`;
 
@@ -147,10 +142,4 @@ export default async function handler(req, res) {
     console.error('Card error:', e);
     res.status(500).send('Card error');
   }
-}
-
-function escapeHtml(s = '') {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
