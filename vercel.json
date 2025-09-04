@@ -1,24 +1,6 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs20.x",
-      "maxDuration": 60,
-      "memory": 1024,
-      "includeFiles": "node_modules/**",
-      "excludeFiles": "node_modules/@sparticuz/chromium/bin/{mac,mac-arm,win,win-x64}/**"
-    },
-    "api/card.tsx": {
-      "runtime": "edge"
-    },
-    "api/analysis-html.js": {
-      "runtime": "edge"
-    }
-  },
   "rewrites": [
-    {
-      "source": "/analysis/:hash",
-      "destination": "/api/analysis-html?hash=:hash"
-    }
+    { "source": "/analysis/:hash", "destination": "/api/analysis-html?hash=:hash" }
   ]
 }
