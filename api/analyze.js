@@ -2,7 +2,6 @@ import { kv } from '@vercel/kv';
 import crypto from 'crypto';
 import chromium from '@sparticuz/chromium';
 import { addExtra } from 'puppeteer-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import puppeteerCore from 'puppeteer-core';
 
 const puppeteer = addExtra(puppeteerCore);
