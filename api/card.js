@@ -82,62 +82,101 @@ export default async function handler(req, res) {
     const border = isLight ? '#e6e8ee' : '#23273a';
 
     const dotX = mapDot(scores?.political_establishment_bias?.value);
-    const dotY = -mapDot(scores?.socio_cultural_bias?.value);
+    const dotY = 110 - (rel / 100) * 220;
 
     // 2) HTML for rendering
     const html = `
 <!doctype html>
-<html><head><meta charset="utf-8" />
+<html>
+<head>
+<meta charset="utf-8" />
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:;">
 <meta name="viewport" content="width=${width}, initial-scale=1.0" />
 <style>
   *{box-sizing:border-box}
-  body{margin:0;width:${width}px;height:${height}px;background:${bg};color:${fg};font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
+  body{
+    margin:0;width:${width}px;height:${height}px;
+    background:${bg};color:${fg};
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif
+  }
   .wrap{display:flex;height:100%;padding:40px}
   .left{flex:1.4;display:flex;flex-direction:column}
   .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:36px;height:36px;border-radius:8px;background:${accent};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px}
+  .logo-img{height:36px;width:auto;display:block}
   .title{margin-top:16px}
   .title h1{margin:0;font-size:34px;line-height:1.2;font-weight:800}
   .title .pub{color:${sub};margin-top:6px;font-size:20px}
-  .stats{display:flex;gap:14px;margin-top:16px}
-  .stat{background:${card};border:1px solid ${border};border-radius:14px;padding:14px 16px;width:210px}
+  .stats{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap}
+  .stat{background:${card};border:1px solid ${border};border-radius:14px;padding:14px 16px;min-width:210px}
   .stat .lbl{color:${sub};font-size:14px}
   .stat .val{font-size:36px;font-weight:800;margin-top:2px}
   .sum{margin-top:18px;color:${sub};font-size:20px;line-height:1.35;max-width:700px;white-space:pre-wrap}
   .foot{display:flex;gap:16px;margin-top:auto;align-items:center;color:${sub};font-size:16px}
+  .badge{background:${card};border:1px solid ${border};border-radius:999px;padding:6px 10px;font-size:14px}
   .right{width:360px;margin-left:28px;display:flex;align-items:center;justify-content:center}
-  .axes{width:320px;height:320px;background:${card};border:1px solid ${border};border-radius:20px;position:relative;display:flex;align-items:center;justify-content:center}
+  .axes{
+    width:320px;height:320px;background:${card};border:1px solid ${border};border-radius:20px;
+    position:relative;display:flex;align-items:center;justify-content:center
+  }
   .v{position:absolute;width:2px;height:260px;background:${border}}
   .h{position:absolute;height:2px;width:260px;background:${border}}
-  .dot{position:absolute;width:14px;height:14px;border-radius:999px;background:${accent};box-shadow:0 0 0 6px rgba(225,6,0,0.125);transform:translate(${dotX}px,${dotY}px)}
-  .axes .lblx{position:absolute;bottom:10px;font-size:14px;color:${sub}}
-  .axes .lbly{position:absolute;right:10px;top:10px;font-size:14px;color:${sub}}
-</style></head>
+  .dot{
+    position:absolute;width:14px;height:14px;border-radius:999px;background:${accent};
+    box-shadow:0 0 0 6px rgba(225,6,0,0.125);
+    transform:translate(${dotX}px,${dotY}px)
+  }
+  /* Axis labels */
+  .lbl-top{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:14px;color:${sub}}
+  .lbl-bottom{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:14px;color:${sub}}
+  .lbl-left{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:14px;color:${sub}}
+  .lbl-right{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:14px;color:${sub}}
+</style>
+</head>
 <body>
   <div class="wrap">
     <div class="left">
-      <div class="brand"><div class="logo">L</div><div style="font-size:24px;font-weight:600">LNK.az</div></div>
+      <div class="brand">
+        <img src="/static/logo.svg" alt="LNK.az" class="logo-img" />
+        <div style="font-size:24px;font-weight:600">LNK.az</div>
+      </div>
+
       <div class="title">
         <h1>${escapeHtml(title)}</h1>
         ${publication ? `<div class="pub">${escapeHtml(publication)}</div>` : ''}
       </div>
+
       <div class="stats">
-        <div class="stat"><div class="lbl">Etibarlılıq</div><div class="val">${rel}</div></div>
-        <div class="stat"><div class="lbl">Siyasi quruluşa meyl</div><div class="val">${escapeHtml(pol)}</div></div>
-        <div class="stat"><div class="lbl">Sosial-mədəni meyl</div><div class="val">${escapeHtml(soc)}</div></div>
+        <div class="stat">
+          <div class="lbl">Etibarlılıq</div>
+          <div class="val">${rel}</div>
+        </div>
+        <div class="stat">
+          <div class="lbl">Siyasi meyl (Müxalif ⟷ Hökumətyönlü)</div>
+          <div class="val">${escapeHtml(pol)}</div>
+        </div>
       </div>
+
       <div class="sum">${escapeHtml(trunc(human_summary))}</div>
+
       <div class="foot">
-        <div>Model: <span style="color:${fg}">${escapeHtml(modelUsed || '—')}</span> • Mənbə: <span style="color:${fg}">${escapeHtml(contentSource || '—')}</span></div>
+        <div class="badge">✅ LNK tərəfindən təhlil edildi</div>
         <div style="margin-left:auto">lnk.az</div>
       </div>
     </div>
+
     <div class="right">
-      <div class="axes"><div class="v"></div><div class="h"></div><div class="dot"></div><div class="lblx">Siyasi</div><div class="lbly">Sosial</div></div>
+      <div class="axes">
+        <div class="v"></div><div class="h"></div>
+        <div class="dot"></div>
+        <div class="lbl-top">Etibarlı</div>
+        <div class="lbl-bottom">Etibarsız</div>
+        <div class="lbl-left">Müxalif</div>
+        <div class="lbl-right">Hökumətyönlü</div>
+      </div>
     </div>
   </div>
-</body></html>`;
+</body>
+</html>`;
 
     // 3) Render to PNG
     let browser;
