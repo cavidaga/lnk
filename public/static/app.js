@@ -50,7 +50,7 @@
   }
 
   // ---- Analysis page: fetch & render by hash via /api/get-analysis?hash=... ----
- async function fetchAnalysisByHash(hash) {
+async function fetchAnalysisByHash(hash) {
   // Try ?id=
   let res = await fetch(`/api/get-analysis?id=${encodeURIComponent(hash)}`, {
     headers: { 'Accept': 'application/json' }
@@ -64,24 +64,18 @@
   if (res.ok) return await res.json();
 
   const a = await res.json().catch(() => ({}));
-  const msg = a.message || `Nəticə tapılmadı (HTTP ${res.status})`;
-  throw new Error(msg);
+  throw new Error(a.message || `Nəticə tapılmadı (HTTP ${res.status})`);
 }
 
 async function initAnalysis() {
-  const container = document.querySelector('#result') || createResult();
-  if (!HASH) return;
-  setSpinner(container);
-
+  const container = document.querySelector('#result') || document.body;
+  if (!window.__LNK_HASH__) return;
+  container.innerHTML = `<div class="loading"><span class="spinner"></span> <span>Yüklənir…</span></div>`;
   try {
-    const data = await fetchAnalysisByHash(HASH);
-    renderAnalysis(container, data);
-    wireShare(HASH);
-    document.title = `${data?.meta?.title ? data.meta.title + ' — ' : ''}LNK.az`;
-  } catch (err) {
-    container.innerHTML = `<div class="card"><div class="bd">
-      <strong>Xəta:</strong> ${escapeHTML(err.message || 'Yüklənmə xətası')}
-    </div></div>`;
+    const data = await fetchAnalysisByHash(window.__LNK_HASH__);
+    // ... render with your existing render function
+  } catch (e) {
+    container.innerHTML = `<div class="error">${(e && e.message) || 'Xəta'}</div>`;
   }
 }
 

@@ -1,55 +1,70 @@
-// api/analysis-html.js (Edge)
+// api/analysis-html.js — Edge
 export const config = { runtime: 'edge' };
 
 const SITE = 'https://lnk.az';
 const CARD_VERSION = '2';
 
-function esc(s=''){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+const esc = (s = '') =>
+  String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+           .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 export default async function handler(req) {
   const url = new URL(req.url);
   const hash = url.searchParams.get('hash') || url.pathname.split('/').pop() || '';
-  if (!hash) {
-    return new Response('Missing hash', { status: 400 });
-  }
+  if (!hash) return new Response('Missing hash', { status: 400 });
 
   const pageUrl = `${SITE}/analysis/${encodeURIComponent(hash)}`;
   const cardUrl = `${SITE}/api/card?hash=${encodeURIComponent(hash)}&theme=dark&v=${CARD_VERSION}`;
-  const ogDesc = 'Media qərəzi və etibarlılıq təhlili.';
+  const ogTitle = 'LNK - Media qərəzi qiymətləndiricisi';
+  const ogDesc  = 'Media qərəzi və etibarlılıq təhlili.';
 
   const html = `<!DOCTYPE html>
-<html lang="az">
+<html lang="az" class="no-js">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<title>LNK.az — Media Təhlili</title>
-<meta name="description" content="${esc(ogDesc)}">
+  <title>${esc(ogTitle)}</title>
+  <meta name="description" content="${esc(ogDesc)}" />
+  <meta name="theme-color" content="#0c0d12">
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <meta property="fb:app_id" content="1493746861646864" />
 
-<link rel="canonical" href="${esc(pageUrl)}"/>
+  <!-- Google Fonts: Poppins (match index.html) -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<meta property="og:type" content="article">
-<meta property="og:title" content="LNK.az — Media Təhlili">
-<meta property="og:description" content="${esc(ogDesc)}">
-<meta property="og:url" content="${esc(pageUrl)}">
-<meta property="og:image" content="${esc(cardUrl)}">
+  <!-- Canonical & Open Graph -->
+  <link rel="canonical" href="${esc(pageUrl)}" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="${esc(ogTitle)}" />
+  <meta property="og:description" content="${esc(ogDesc)}" />
+  <meta property="og:url" content="${esc(pageUrl)}" />
+  <meta property="og:image" content="${esc(cardUrl)}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${esc(ogTitle)}" />
+  <meta name="twitter:description" content="${esc(ogDesc)}" />
+  <meta name="twitter:image" content="${esc(cardUrl)}" />
 
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="LNK.az — Media Təhlili">
-<meta name="twitter:description" content="${esc(ogDesc)}">
-<meta name="twitter:image" content="${esc(cardUrl)}">
+  <!-- Icons (match index.html) -->
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="/static/favicon-dark.svg"  media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#e10600">
 
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="https://lnk.az/static/styles.css">
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#main">Mündəricata keç</a>
   <div class="wrap">
     <div id="site-header"></div>
     <main id="main" role="main">
+      <!-- container expected by app.js -->
       <div id="result" class="result" aria-live="polite"></div>
     </main>
     <div id="site-footer"></div>
@@ -63,6 +78,9 @@ export default async function handler(req) {
 
   return new Response(html, {
     status: 200,
-    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=300' }
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'public, max-age=300'
+    }
   });
 }
