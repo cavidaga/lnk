@@ -1,9 +1,11 @@
 import { kv } from '@vercel/kv';
 import crypto from 'crypto';
 import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-extra';
+import { addExtra } from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import puppeteerCore from 'puppeteer-core';
 
+const puppeteer = addExtra(puppeteerCore);
 puppeteer.use(StealthPlugin());
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -198,7 +200,7 @@ export default async function handler(req, res) {
     let browser = null;
     let contentSource = 'Live';
     try {
-      browser = await puppeteer.launch({
+      const browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath(),
@@ -214,7 +216,7 @@ export default async function handler(req, res) {
       await page.setRequestInterception(false);
 
       await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
-      await page.waitForTimeout(500); // small settle
+      await new Promise(r => setTimeout(r, 500));
 
       let articleText = await page.evaluate(() => document.body.innerText || '');
       const lower = articleText.toLowerCase();
@@ -231,7 +233,7 @@ export default async function handler(req, res) {
           console.log(`Archive found. Fetching from: ${snapshotUrl}`);
           contentSource = 'Archive.org';
           await page.goto(snapshotUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-          await page.waitForTimeout(500);
+          await new Promise(r => setTimeout(r, 500));
           articleText = await page.evaluate(() => document.body.innerText || '');
         } else {
           const blockError = new Error('This website is protected by advanced bot detection.');
@@ -274,7 +276,9 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: true, message: `Təhlil zamanı xəta baş verdi: ${error.message}` });
     } finally {
       // Close browser if open
-      try { await (await puppeteer.connect()).close(); } catch (_) { /* noop */ }
+      if (browser) {
+            try { await browser.close(); } catch (e) { /* noop */ }
+        }
       // Prefer the instance we launched:
       // (guard in case it wasn't created)
       // eslint-disable-next-line no-unsafe-finally
