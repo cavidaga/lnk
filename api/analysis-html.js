@@ -33,7 +33,7 @@ export default async function handler(req) {
   const ogDesc = human ? (human.length > 180 ? human.slice(0,177).trimEnd() + '…' : human) : 'Media qərəzi və etibarlılıq təhlili.';
 
   const pageUrl = `${SITE}/analysis/${encodeURIComponent(hash)}`;
-  const cardUrl = `${SITE}/api/card?hash=${encodeURIComponent(hash)}&theme=dark`;
+  const cardUrl = `${SITE}/api/card?id=${encodeURIComponent(hash)}&theme=dark`;
 
   const html = `<!DOCTYPE html>
 <html lang="az">

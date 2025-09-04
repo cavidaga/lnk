@@ -57,7 +57,7 @@
     setSpinner(container);
 
     try {
-      const res = await fetch(`/api/get-analysis?hash=${encodeURIComponent(HASH)}`, {
+      const res = await fetch(`/api/get-analysis?id=${encodeURIComponent(HASH)}`, {
         headers: { 'Accept': 'application/json' }
       });
       const data = await res.json();
@@ -201,7 +201,7 @@
   // ---- Share buttons ----
   function wireShare(hash) {
     const pageUrl = location.origin + `/analysis/${encodeURIComponent(hash)}`;
-    const cardUrl = `${location.origin}/api/card?hash=${encodeURIComponent(hash)}&theme=dark`;
+    const cardUrl = `${location.origin}/api/card?id=${encodeURIComponent(hash)}&theme=dark`;
 
     const x  = $('#btn-x');
     const fb = $('#btn-fb');
