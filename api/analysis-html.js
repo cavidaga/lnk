@@ -44,7 +44,7 @@ export default async function handler(req) {
 <meta name="twitter:image" content="${esc(cardUrl)}">
 
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="https://lnk.az/static/styles.css">
 </head>
 <body>
   <div class="wrap">
