@@ -81,7 +81,13 @@ export default async function handler(req, res) {
             ## JSON SCHEMA & METHODOLOGY INSTRUCTIONS ##
             Your entire output must be a single, valid JSON object. All free-text rationales and summaries must be in Azerbaijani. In the 'human_summary' and 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
             The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", and "human_summary".
-            "meta": { "article_type": "..." },
+            "meta": { 
+                "article_type": "...",
+                "title": "<if missing in the text, infer a concise Azerbaijani title>",
+                "original_url": "<the original canonical/primary URL of the article (absolute URL)>",
+                "publication": "<domain or outlet name, e.g., abzas.org>",
+                "published_at": "<ISO date or human-readable date if detectable, else omit>" 
+                },
             "scores": { "reliability": { "value": 0-100, "rationale": "..." }, "socio_cultural_bias": { "value": -5.0 to +5.0, "rationale": "..." }, "political_establishment_bias": { "value": -5.0 to +5.0, "rationale": "..." } },
             "diagnostics": { "language_loadedness": 0-100, "sourcing_transparency": 0-100, "headline_accuracy": 0-100, "language_flags": [{ "term": "...", "category": "..." }] },
             "cited_sources": [{ "name": "...", "role": "...", "stance": "..." }],

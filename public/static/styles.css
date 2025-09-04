@@ -404,4 +404,21 @@ body.nav-open{ overflow:hidden }
   }
   body.nav-open .nav-backdrop{ opacity:1; pointer-events:auto }
 }
+/* Article header info in result */
+.article-header {
+  display: grid; gap: 6px; margin-bottom: 14px;
+}
+.article-link {
+  display: grid; gap: 2px; text-decoration: none; background: var(--panel);
+  border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+}
+.article-link:hover { border-color: var(--accent); }
+.article-source {
+  font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em;
+}
+.article-title {
+  font-weight: 600; color: var(--text); line-height: 1.4;
+}
+.article-date { color: var(--muted); }
+
 }
