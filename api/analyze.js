@@ -142,7 +142,7 @@ Original URL: ${url}
 ${articleText}
 ## JSON SCHEMA & METHODOLOGY INSTRUCTIONS ##
 Your entire output must be a single, valid JSON object. All free-text rationales and summaries must be in Azerbaijani. In the 'human_summary' and 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
-The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", and "human_summary".
+The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", and "human_summary". In all string fields—including meta.title, scores.*.rationale, cited_sources[*].name, cited_sources[*].role, cited_sources[*].stance, and diagnostics.language_flags[*].category—use Azerbaijani.
 "meta": { 
   "article_type": "...",
   "title": "<if missing in the text, infer a concise Azerbaijani title>",
