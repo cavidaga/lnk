@@ -1,5 +1,15 @@
 {
   "version": 2,
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "api/analysis-html.js": {
+      "runtime": "edge"
+    }
+  },
   "rewrites": [
     { "source": "/analysis/:hash", "destination": "/api/analysis-html?hash=:hash" }
   ]
