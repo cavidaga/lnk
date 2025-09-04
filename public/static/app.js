@@ -50,30 +50,40 @@
   }
 
   // ---- Analysis page: fetch & render by hash via /api/get-analysis?hash=... ----
-  async function initAnalysis() {
-    const container = $('#result') || createResult();
-    if (!HASH) return;
+ async function fetchAnalysisByHash(hash) {
+  // Try ?id=
+  let res = await fetch(`/api/get-analysis?id=${encodeURIComponent(hash)}`, {
+    headers: { 'Accept': 'application/json' }
+  });
+  if (res.ok) return await res.json();
 
-    setSpinner(container);
+  // Fallback to ?hash=
+  res = await fetch(`/api/get-analysis?hash=${encodeURIComponent(hash)}`, {
+    headers: { 'Accept': 'application/json' }
+  });
+  if (res.ok) return await res.json();
 
-    try {
-      const res = await fetch(`/api/get-analysis?id=${encodeURIComponent(HASH)}`, {
-        headers: { 'Accept': 'application/json' }
-      });
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        throw new Error(data.message || 'Nəticə tapılmadı.');
-      }
+  const a = await res.json().catch(() => ({}));
+  const msg = a.message || `Nəticə tapılmadı (HTTP ${res.status})`;
+  throw new Error(msg);
+}
 
-      renderAnalysis(container, data);
-      wireShare(HASH);
-      document.title = `${data?.meta?.title ? data.meta.title + ' — ' : ''}LNK.az`;
-    } catch (err) {
-      container.innerHTML = `<div class="card"><div class="bd">
-        <strong>Xəta:</strong> ${escapeHTML(err.message || 'Yüklənmə xətası')}
-      </div></div>`;
-    }
+async function initAnalysis() {
+  const container = document.querySelector('#result') || createResult();
+  if (!HASH) return;
+  setSpinner(container);
+
+  try {
+    const data = await fetchAnalysisByHash(HASH);
+    renderAnalysis(container, data);
+    wireShare(HASH);
+    document.title = `${data?.meta?.title ? data.meta.title + ' — ' : ''}LNK.az`;
+  } catch (err) {
+    container.innerHTML = `<div class="card"><div class="bd">
+      <strong>Xəta:</strong> ${escapeHTML(err.message || 'Yüklənmə xətası')}
+    </div></div>`;
   }
+}
 
   // ---- Rendering ----
   function renderAnalysis(root, data) {
