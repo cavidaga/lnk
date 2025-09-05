@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="az" class="no-js">
-
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -12,6 +11,7 @@
     <meta name="color-scheme" content="light dark" />
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <meta property="fb:app_id" content="1493746861646864" />
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +28,8 @@
     <meta name="twitter:title" content="Metodologiya — LNK.az" />
     <meta name="twitter:description" content="Media qərəzi və etibarlılıq qiymətləndirilməsi üçün LNK.az metodologiyası." />
     <meta name="twitter:image" content="https://lnk.az/static/og-cover.png" />
-    <!-- Explicit icons so the browser doesn’t guess (and accidentally hit http://) -->
+
+    <!-- Icons -->
     <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="/static/favicon.ico">
     <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
@@ -38,186 +39,176 @@
 
     <!-- Structured data -->
     <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "Metodologiya",
-            "url": "https://lnk.az/methodology.html",
-            "isPartOf": {
-                "@id": "https://lnk.az/#website"
-            },
-            "description": "LNK.az metodologiyası: media qərəzi və etibarlılıq qiymətləndirilməsi üçün meyarlar, göstəricilər və JSON çıxışı."
-        }
+      {
+        "@context":"https://schema.org",
+        "@type":"WebPage",
+        "name":"Metodologiya",
+        "url":"https://lnk.az/methodology.html",
+        "isPartOf":{"@id":"https://lnk.az/#website"},
+        "description":"LNK.az metodologiyası: media qərəzi və etibarlılıq qiymətləndirilməsi üçün meyarlar, göstəricilər və JSON çıxışı."
+      }
     </script>
 
-    <!-- Reuse the site CSS -->
+    <!-- Site CSS -->
     <link rel="stylesheet" href="/static/styles.css">
     <style>
-        /* page-local enhancements (small only) */
-        .toc {
-            margin: 16px 0 24px;
-            padding: 14px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--panel)
-        }
-
-        .toc a {
-            text-decoration: none
-        }
-
-        .toc ul {
-            margin: 0;
-            padding-left: 18px
-        }
-
-        .toc li {
-            margin: 6px 0
-        }
-
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 12px
-        }
-
-        .kpi {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px
-        }
-
-        code.inline {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 2px 6px;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-        }
-
-        pre.schema {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 16px;
-            overflow: auto
-        }
-
-        .note {
-            font-size: 13px;
-            color: var(--muted)
-        }
+      /* page-local enhancements (small only) */
+      .toc { margin:16px 0 24px; padding:14px; border:1px solid var(--border); border-radius:10px; background:var(--panel) }
+      .toc a { text-decoration:none }
+      .toc ul { margin:0; padding-left:18px }
+      .toc li { margin:6px 0 }
+      .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px }
+      .kpi { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px }
+      code.inline { background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:2px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace }
+      pre.schema { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; overflow:auto }
+      .note { font-size:13px; color:var(--muted) }
     </style>
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
-    <div class="wrap">
-        <div id="site-header"></div>
-        <main id="methodology" role="main">
-            <article>
-                <h1>Metodologiya</h1>
-                <p class="sub" style="margin-top:8px">
-                    LNK.az məqalələrin etibarlılığını və qərəz meyllərini qiymətləndirmək üçün süni zəka və təbii dil emalı yanaşmasından istifadə edir.
-                    Aşağıda çıxışın strukturu, istifadə olunan ballar, diaqnostik göstəricilər və məhdudiyyətlər göstərilir.
-                </p>
+  <div class="wrap">
+    <div id="site-header"></div>
+    <main id="methodology" role="main">
+      <article>
+        <h1>Metodologiya</h1>
+        <p class="sub" style="margin-top:8px">
+          LNK.az məqalələrin etibarlılığını və qərəz meyllərini qiymətləndirmək üçün süni zəka və təbii dil emalı yanaşmasından istifadə edir.
+          Aşağıda əsas anlayışlar, ballar, diaqnostik göstəricilər, analiz prosesi və məhdudiyyətlər sadə izah və nümunələrlə təqdim olunur.
+        </p>
 
-                <nav class="toc" aria-label="Mündəricat">
-                    <strong>Mündəricat</strong>
-                    <ul>
-                        <li><a href="#overview">Ümumi baxış və məna xəritəsi</a></li>
-                        <li><a href="#scores">Ballar və şkalalar</a></li>
-                        <li><a href="#diagnostics">Diaqnostik göstəricilər</a></li>
-                        <li><a href="#meta-article-type">Məqalə növü (meta)</a></li>
-                        <li><a href="#json-schema">JSON çıxış sxemi</a></li>
-                        <li><a href="#pipeline">Analiz prosesi</a></li>
-                        <li><a href="#interpretation">Qrafiki necə şərh etməli</a></li>
-                        <li><a href="#limits">Məhdudiyyətlər və məsuliyyət qeydi</a></li>
-                        <li><a href="#ethics">Etika və ədalət prinsipləri</a></li>
-                        <li><a href="#versioning">Versiyalaşdırma</a></li>
-                    </ul>
-                </nav>
+        <nav class="toc" aria-label="Mündəricat">
+          <strong>Mündəricat</strong>
+          <ul>
+            <li><a href="#overview">Ümumi baxış və terminlər</a></li>
+            <li><a href="#scores">Ballar və şkalalar</a></li>
+            <li><a href="#diagnostics">Diaqnostik göstəricilər</a></li>
+            <li><a href="#meta-article-type">Məqalə növü (meta)</a></li>
+            <li><a href="#json-schema">JSON çıxış sxemi</a></li>
+            <li><a href="#pipeline">Analiz prosesi</a></li>
+            <li><a href="#examples">Praktiki nümunələr</a></li>
+            <li><a href="#interpretation">Qrafiki necə şərh etməli</a></li>
+            <li><a href="#limits">Məhdudiyyətlər</a></li>
+            <li><a href="#ethics">Etika prinsipləri</a></li>
+            <li><a href="#versioning">Versiyalar və yenilənmə</a></li>
+          </ul>
+        </nav>
 
-                <section id="overview" aria-labelledby="overview">
-                    <h2>Ümumi baxış və terminlər</h2>
-                    <p>
-                        Sistem məqalə mətnini analiz edir, konteksti nəzərə alır və nəticəni iki əsas ox üzərində vizuallaşdırır:
-                        <strong>etibarlılıq (y oxu, 0–100)</strong> və <strong>siyasi hakimiyyət meyli (x oxu, −5.0…+5.0)</strong>.
-                        Əlavə olaraq <strong>sosial-mədəni meyl</strong> ayrıca bal kimi təqdim edilir.
-                    </p>
-                    <div class="kpi-grid">
-                        <div class="kpi">
-                            <strong>Etibarlılıq</strong><br />
-                            Mətnin faktlara söykənmə dərəcəsi, mənbə istifadəsi, başlıq–mətn uyğunluğu və səhvlik ehtimalı.
-                        </div>
-                        <div class="kpi">
-                            <strong>Siyasi hakimiyyət meyli</strong><br />
-                            Hakimiyyət institutlarına yaxınlıq/uzaqlıq siqnalları, çərçivələmə və söz seçimi.
-                        </div>
-                        <div class="kpi">
-                            <strong>Sosial-mədəni meyl</strong><br />
-                            Dəyərlər, kimlik və mədəni mövzularda meyllilik göstəricisi.
-                        </div>
-                    </div>
-                </section>
+        <!-- OVERVIEW -->
+        <section id="overview" aria-labelledby="overview">
+          <h2>Ümumi baxış və terminlər</h2>
+          <p>
+            Sistem məqalə mətnini analiz edir, konteksti nəzərə alır və nəticəni iki əsas ox üzərində vizuallaşdırır:
+            <strong>Etibarlılıq (y oxu, 0–100)</strong> və <strong>Siyasi hakimiyyət meyli (x oxu, −5.0…+5.0)</strong>.
+            <strong>Sosial-mədəni meyl</strong> ayrıca bal kimi təqdim edilir.
+          </p>
 
-                <section id="scores">
-                    <h2>Ballar və şkalalar</h2>
-                    <ul>
-                        <li><strong>Etibarlılıq (0–100):</strong>
-                            <em>0–39</em> zəif, <em>40–59</em> orta, <em>60–79</em> güclü, <em>80–100</em> yüksək etibarlılıq.
-                        </li>
-                        <li><strong>Siyasi hakimiyyət meyli (−5.0…+5.0):</strong>
-                            <em>−5</em> kəskin müxalif çərçivə, <em>0</em> neytral, <em>+5</em> güclü hökumətyönümlü çərçivə.
-                        </li>
-                        <li><strong>Sosial-mədəni meyl (−5.0…+5.0):</strong>
-                            Mənfi/pozitiv dəyərlər çərçivəsi və vurğular.
-                        </li>
-                    </ul>
-                    <p class="note">Qeyd: Ballar məqalənin daxilindəki siqnalların yığcam təsviridir; bu, müəllifin “tam siyasi mövqeyi” deyil.</p>
-                </section>
+          <div class="kpi-grid">
+            <div class="kpi">
+              <strong>Etibarlılıq</strong><br />
+              <em>Sadə sual:</em> Bu məqalənin məlumatlarına əsaslanaraq vacib qərar verə bilərəmmi?<br/>
+              Etibarlılıq — faktlara söykənmə, yoxlanıla bilən mənbələr və obyektiv dilin ümumi nəticəsidir.
+              <div class="note" style="margin-top:8px">
+                Qeyd: <strong>Mənbə şəffaflığı</strong> (istinadın açıq göstərilməsi) və <strong>mənbə keyfiyyəti</strong> (mənbənin etibarlılığı) fərqli anlayışlardır; etibarlılıq onların cəm təsiridir.
+                Mövqe/esse yazılarında istinad az ola bilər — bu “pis yazı” demək deyil, sadəcə yoxlana bilən faktlar azdır.
+              </div>
+            </div>
 
-                <section id="diagnostics">
-                    <h2>Diaqnostik göstəricilər</h2>
-                    <ul>
-                        <li><strong>Dilin yüklülüyü (0–100):</strong> emosional sözlər, hiperbola, təhqiramiz dil siqnalları.</li>
-                        <li><strong>Mənbə şəffaflığı (0–100):</strong> istinadların sayı, tipi, linklənməsi və şəffaflığı.</li>
-                        <li><strong>Başlığın dəqiqliyi (0–100):</strong> başlıq-məzmun uyğunluğu, klikbeyt ehtimalı.</li>
-                        <li><strong>Dil siqnalları:</strong> <code class="inline">language_flags</code> — ilə işarələnir, aşkar edilmiş konkret terminlər və kateqoriyaları göstərir.</li>
-                    </ul>
-                </section>
+            <div class="kpi">
+              <strong>Siyasi hakimiyyət meyli</strong><br />
+              <em>Sadə sual:</em> Məqalə hakimiyyəti necə təqdim edir — müsbət, mənfi, yoxsa neytral?<br/>
+              −5.0 kəskin müxalif çərçivə, 0 neytral, +5.0 güclü hökumətyönümlü çərçivə.
+              <div class="note" style="margin-top:8px">
+                Bu, müəllifin “ümumi siyasi baxışı” deyil — konkret məqalədə görünən meyldir.
+              </div>
+            </div>
 
-                <section id="meta-article-type">
-                    <h2>Məqalə növü (meta)</h2>
-                    <p>
-                        <code class="inline">meta.article_type</code> sahəsi məzmunu “xəbər”, “rəy”, “analitika”, “reportaj” və s. kimi təsnif edir.
-                        Bu, nəticələrin interpretasiyasında mühüm kontekstdir (məsələn, rəy yazılarında dil yüklülüyü təbii olaraq daha yüksək ola bilər).
-                    </p>
-                </section>
+            <div class="kpi">
+              <strong>Sosial-mədəni meyl</strong><br />
+              <em>Sadə sual:</em> Məqalə sosial qrupları və dəyərləri necə təqdim edir?<br/>
+              Kimlik, dəyərlər və həyat tərzi mövzularında tərəfkeş dil/məzmun siqnalları.
+            </div>
+          </div>
 
-                <section id="json-schema">
-                    <h2>JSON çıxarış sxemi</h2>
-                    <h3>Niyə JSON?</h2>
-                    <p>
-                      <strong>JSON (JavaScript Object Notation)</strong> — verilənlərin strukturlaşdırılması üçün geniş istifadə olunan formatdır.
-                      Sadə və yüngül sintaksisə malikdir, həm insanlar, həm də kompüterlər tərəfindən rahat oxunur.
-                    </p>
-                    <p>
-                      LNK.az nəticələri JSON formatında bu səbəblərdən təqdim edir:
-                    </p>
-                    <ul>
-                      <li><strong>Şəffaflıq:</strong> Bütün göstəricilər açıq və standartlaşdırılmış quruluşda göstərilir.</li>
-                      <li><strong>Avtomatlaşdırma:</strong> JSON digər sistemlər tərəfindən asanlıqla oxunur və emal olunur.</li>
-                      <li><strong>Uyğunluq:</strong> JSON formatı istənilən proqramlaşdırma dili və platforma ilə inteqrasiya oluna bilər.</li>
-                    </ul>
-                    <p>
-                      Beləliklə, JSON çıxarışı yalnız vizual nəticəni göstərmir, həm də 
-                      <em>araşdırmaçılar, jurnalistlər və tədqiqatçılar</em> üçün təhlil nəticələrini digər vasitələrə daşımağa imkan verir.
-                    </p>
-                    <p>Nümunə sxem (Azərbaycanca mətn tələbi ilə):</p>
-                    <pre class="schema"><code>{
+          <h3 style="margin-top:18px">Çərçivələmə (Framing)</h3>
+          <p>
+            <em>Sadə sual:</em> Hadisə necə təqdim olunur — problem, həll, məsuliyyət, ya qəhrəmanlıq çərçivəsində?<br/>
+            Çərçivələmə eyni faktın müxtəlif söz seçimi və vurğularla fərqli “baxış bucağı”ndan təqdim edilməsidir.
+          </p>
+          <p class="note">
+            Məsələn: “Polis etirazçıları çökdürdü” (repressiv çərçivə) vs. “Polis qayda pozuntularının qarşısını aldı” (qanun-qayda çərçivəsi).
+          </p>
+        </section>
+
+        <!-- SCORES -->
+        <section id="scores">
+          <h2>Ballar və şkalalar</h2>
+          <ul>
+            <li><strong>Etibarlılıq (0–100):</strong> <em>0–19</em> çox aşağı, <em>20–39</em> zəif, <em>40–59</em> orta, <em>60–79</em> güclü, <em>80–100</em> yüksək.</li>
+            <li><strong>Siyasi hakimiyyət meyli (−5.0…+5.0):</strong> <em>−5</em> kəskin müxalif, <em>0</em> neytral, <em>+5</em> güclü hökumətyönlü.</li>
+            <li><strong>Sosial-mədəni meyl (−5.0…+5.0):</strong> Mənfi/pozitiv dəyər çərçivəsi və vurğular.</li>
+          </ul>
+          <p class="note">
+            Qeyd: Ballar mətn daxilindəki siqnalların yığcam təsviridir; bu, müəllifin “tam siyasi mövqeyi” deyil.
+          </p>
+        </section>
+
+        <!-- DIAGNOSTICS -->
+        <section id="diagnostics">
+          <h2>Diaqnostik göstəricilər</h2>
+
+          <h3>Dilin yüklülüyü (0–100)</h3>
+          <p><em>Sadə sual:</em> Məqalə sizi məlumatlandırır, yoxsa daha çox emosiya oyadır?</p>
+          <p>Dilin yüklülüyü — neytral sözlər əvəzinə güclü emosional assosiasiyalı terminlərin istifadəsidir. <strong>Emosional dil</strong> təkbaşına manipulyasiya demək deyil; manipulyasiya faktlar gizlədildikdə və ya təhrif edildikdə yaranır.</p>
+          <ul>
+            <li><em>0–25:</em> Neytral.</li>
+            <li><em>26–50:</em> Mülayim emosional ton (qəbul edilə bilən).</li>
+            <li><em>51–75:</em> Güclü emosional dil (faktları kölgədə qoya bilər).</li>
+            <li><em>76–100:</em> Çox yüklü/manipulyativ.</li>
+          </ul>
+
+          <h3>Mənbə şəffaflığı (0–100)</h3>
+          <p><em>Sadə sual:</em> İddiaların mənbələri açıq göstərilibmi və yoxlana bilərmi?</p>
+          <p><strong>Şəffaflıq</strong> (istinadın görünməsi) və <strong>keyfiyyət</strong> (mənbənin etibarlılığı) fərqlidir. Paywall altındakı akademik məqalə yüksək keyfiyyətli, lakin məhdud şəffaf ola bilər; açıq xəbər agentliyi linki şəffafdır, lakin keyfiyyət ayrıca qiymətləndirilir.</p>
+
+          <h3>Başlığın dəqiqliyi (0–100)</h3>
+          <p><em>Sadə sual:</em> Başlıq məzmunu düzgün əks etdirir, yoxsa klik üçün şişirdilib?</p>
+          <p>“Klikbeyt” sensasiyalı və yayındırıcı başlıq dilidir; informasiyadan çox emosiyaya fokuslanır.</p>
+
+          <h3>Dil siqnalları</h3>
+          <p><em>Sadə sual:</em> Məqalədə hansı dil kateqoriyaları öndədir?</p>
+          <ul>
+            <li><strong>Yüklü sözlər:</strong> “faciə”, “xəyanət”, “möcüzə”.</li>
+            <li><strong>Qeyri-müəyyən:</strong> “deyilir ki”, “bəziləri hesab edir”.</li>
+            <li><strong>Mütləq:</strong> “həmişə”, “heç vaxt” — yalnız kontekstdən asılı olaraq problemli; məsələn, “Bütün insanlar həmişə ölür” elmi faktdır.</li>
+            <li><strong>Spekulyativ:</strong> “ola bilər”, “ehtimal ki” — proqnozlarda normaldır; həddindən artıq istifadəsi zəiflik əlaməti ola bilər.</li>
+            <li><strong>Yüklü sinonimlər:</strong> “rəhbər” vs “prezident” — bəzən birincisi müsbət assosiasiya yaradır; kontekstə diqqət yetirilir.</li>
+          </ul>
+
+          <p class="note">
+            Qeyd: Bu göstəricilər istifadəçiyə şəffaflıq üçün ayrıca göstərilir və <em>bal hesablanmasına daxil edilə</em> bilər; hər birinin çəkisi model versiyasından asılıdır.
+          </p>
+        </section>
+
+        <!-- META ARTICLE TYPE -->
+        <section id="meta-article-type">
+          <h2>Məqalə növü (meta)</h2>
+          <p>
+            <code class="inline">meta.article_type</code> sahəsi məzmunu “xəbər”, “rəy”, “analitika”, “reportaj” və s. kimi təsnif edir.
+            Rəy və şəxsi esselərdə istinad az ola bilər; bu, etibarlılıq balını texniki olaraq aşağı göstərə bilər, amma yazının dəyərini avtomatik azaltmır.
+          </p>
+        </section>
+
+        <!-- JSON SCHEMA -->
+        <section id="json-schema">
+          <h2>JSON çıxarış sxemi</h2>
+          <h3>Niyə JSON?</h3>
+          <p>
+            <strong>JSON</strong> — struktur, şəffaflıq və avtomatlaşdırma üçün standart formatdır. Nəticələr digər sistemlərə rahat inteqrasiya olunur.
+          </p>
+          <p>Nümunə sxem (Azərbaycanca mətn tələbi ilə):</p>
+          <pre class="schema"><code>{
   "meta": {
-    "article_type": "xəbər | rəy | analitika | ... "
+    "article_type": "xəbər | rəy | analitika | reportaj | ... "
   },
   "scores": {
     "reliability": {
@@ -238,73 +229,100 @@
     "sourcing_transparency": 0-100,
     "headline_accuracy": 0-100,
     "language_flags": [
-      { "term": "…", "category": "…"}
+      { "term": "…", "category": "…" }
     ]
   },
   "cited_sources": [
-    { "name": "…", "role": "…", "stance": "…"}
+    { "name": "…", "role": "…", "stance": "…" }
   ],
   "human_summary": "Aydın, axıcı Azərbaycan dilində xülasə."
-}</code></pre>                   
-                </section>
+}</code></pre>
+        </section>
 
-                <section id="pipeline">
-                    <h2>Analiz prosesi</h2>
-                    <ol>
-                        <li><strong>Məlumatın toplanması:</strong> İstifadəçi URL daxil edir; sistem məzmunu götürür və təmizləyir.</li>
-                        <li><strong>Analiz:</strong> Model mətni qiymətləndirir, balları və əsaslandırmaları çıxarır.</li>
-                        <li><strong>Strukturlaşdırma:</strong> Nəticələr JSON obyektində qaydaya salınır.</li>
-                        <li><strong>Vizualizasiya:</strong> Nəticə xəritə (koordinat oxları) və diaqnostika kartları ilə təqdim edilir.</li>
-                        <li><strong>Arxivləşdirmə:</strong> Ətrafınızla paylaşım üçün link yaradılır (əgər aktivdirsə).</li>
-                    </ol>
-                </section>
+        <!-- PIPELINE -->
+        <section id="pipeline">
+          <h2>Analiz prosesi</h2>
+          <p>Aşağıdakı ardıcıllıq əsas iş üslubunu göstərir. Diaqnostik göstəricilər həm şəffaflıq üçün ayrıca göstərilir, həm də bal hesablanmasına daxil edilə bilər.</p>
+<pre class="schema"><code>Mətn təmizləmə → Struktur analizi → Dil təhlili → Mənbə yoxlanması → Çərçivə təhlili
+                                ↓
+                      [Diaqnostik göstəricilər]
+                          • Dilin yüklülüyü
+                          • Mənbə şəffaflığı
+                          • Başlığın dəqiqliyi
+                          • Dil siqnalları
+                                ↓
+                        Bal hesablanması
+                                ↓
+                           JSON çıxarış</code></pre>
+        </section>
 
-                <section id="interpretation">
-                    <h2>Qrafiki necə şərh etməli</h2>
-                    <p>
-                      LNK.az-da istifadə olunan koordinat oxları sistemi <strong>Ad Fontes Media Bias Chart</strong> modelindən ilhamlanmışdır.
-                      ABŞ-da yaradılan bu model media mənbələrinin <em>etibarlılıq</em> və <em>ideoloji meyl</em> oxları üzərində yerləşdirilməsi ilə tanınır.
-                    </p>
-                    <p>
-                      Biz bu yanaşmanı Azərbaycan mediasının reallıqlarına uyğunlaşdıraraq,
-                      xüsusi olaraq <em>siyasi hakimiyyət meyli</em> və <em>sosial-mədəni meyl</em> kimi parametrlərlə genişləndirdik.
-                      Məqsədimiz beynəlxalq praktikadan faydalanaraq, yerli kontekstdə daha dəqiq və faydalı qiymətləndirmə təqdim etməkdir.
-                    </p>
-                    <ul>
-                        <li><strong>Yuxarı</strong> daha yüksək etibarlılıq, <strong>aşağı</strong> daha zəif etibarlılıq.</li>
-                        <li><strong>Sol</strong> müxalif çərçivə siqnalları, <strong>sağ</strong> hökumətyönümlü siqnallar.</li>
-                        <li>Tək bir nöqtə <em>bütün mətni</em> ümumiləşdirən siqnalın ortalamasıdır; içindəki müxtəlif səslər “dil siqnalları” bölməsində görünə bilər.</li>
-                    </ul>
-                </section>
+        <!-- EXAMPLES -->
+        <section id="examples">
+          <h2>Praktiki nümunələr</h2>
 
-                <section id="limits">
-                    <h2>Məhdudiyyətlər və məsuliyyət qeydi</h2>
-                    <ul>
-                        <li>Nəticələr <em>proqnoz xarakterlidir</em> və məqalənin versiyasından asılıdır.</li>
-                        <li>Parça-parça sitatlarla zəngin, ironiyalı və ya kontekstdən asılı mətnlərdə səhv dərəcəsi arta bilər.</li>
-                        <li>Məqalələri oxuduqdan sonra bu alətlə kifayətlənməmək və bir neçə mənbə ilə yoxlamaq tövsiyə olunur.</li>
-                    </ul>
-                </section>
+          <h3>Nümunə 1: Yüksək etibarlılıq</h3>
+          <p><em>Başlıq:</em> “Maliyyə Nazirliyinin son hesabatına görə dövlət büdcəsinin kəsiri 2% artıb”.</p>
+          <p><em>Mətn:</em> “... rüblük hesabat ... gəlirlər planlaşdırılandan 1.5% aşağı ...”</p>
+          <p><em>Qiymətləndirmə:</em> Etibarlılıq 85/100; Mənbə şəffaflığı 90/100; Başlığın dəqiqliyi 90/100; Dilin yüklülüyü 15/100.</p>
 
-                <section id="ethics">
-                    <h2>Etika və ədalət prinsipləri</h2>
-                    <ul>
-                        <li><strong>Şəffaflıq:</strong> sxem, meyarlar və əsaslandırmalar göstərilir.</li>
-                        <li><strong>Müstəqillik:</strong> siyasi və ya maliyyə asılılığımız yoxdur. Lakin layihə <a href="https://www.buymeacoffee.com/cavidaga">ianələr</a> üçün açıqdır. </li>
-                        <li><strong>Məlumat məxfiliyi:</strong> toplanmış məlumat yalnız təhlil və təkmilləşdirmə üçündür.</li>
-                    </ul>
-                </section>
+          <h3>Nümunə 2: Qərəzli təqdimat</h3>
+          <p><em>Başlıq:</em> “Müxalifət yenə də xəyanətə davam edir!”</p>
+          <p><em>Mətn:</em> “... Deyilənə görə ... Ekspertlər bildirirlər ki ...”</p>
+          <p><em>Qiymətləndirmə:</em> Etibarlılıq 25/100; Siyasi meyl +4.0; Mənbə şəffaflığı 20/100; Dilin yüklülüyü 85/100; Başlığın dəqiqliyi 30/100.</p>
 
-                <section id="versioning">
-                    <h2>Versiyalar</h2>
-                    <p>Metodologiya dövri olaraq yenilənir. Dəyişikliklər <em>versiya qeydlərində</em> qeyd edilir.</p>
-                    <p class="note">Hazırkı metodologiya versiyası: <strong>v1.0</strong></p>
-                </section>
-            </article>
-        </main>
-        <div id="site-footer"></div>
-    </div>
-    <script src="/static/layout.js" defer></script>
+          <h3>Nümunə 3: Balanslaşdırılmış rəy</h3>
+          <p><em>Başlıq:</em> “Şərh: Yeni vergi siyasətinin müsbətləri və mənfiləri”.</p>
+          <p><em>Mətn:</em> “... müxtəlif reaksiyalar ... hər iki tərəfin arqumentləri ...”</p>
+          <p><em>Qiymətləndirmə:</em> Etibarlılıq 75/100; Siyasi meyl +0.5; Mənbə şəffaflığı 80/100; Dilin yüklülüyü 30/100.</p>
+        </section>
+
+        <!-- INTERPRETATION -->
+        <section id="interpretation">
+          <h2>Qrafiki necə şərh etməli</h2>
+          <p>
+            LNK.az-da istifadə olunan koordinat oxları yanaşması beynəlxalq praktikadan, əsasən də Ad Fontes Mediadan ilhamlanır, lakin yerli kontekstə uyğunlaşdırılıb.
+            <strong>Yuxarı</strong> daha yüksək etibarlılıq, <strong>aşağı</strong> daha zəif; <strong>sol</strong> müxalif çərçivə siqnalları, <strong>sağ</strong> hökumətyönümlü siqnallar.
+          </p>
+          <p class="note">
+            Tək nöqtə bütün mətnin ortalamasıdır; içindəki müxtəlif səslər və ton fərqləri “dil siqnalları” bölməsində görünə bilər.
+          </p>
+        </section>
+
+        <!-- LIMITS -->
+        <section id="limits">
+          <h2>Məhdudiyyətlər</h2>
+          <ul>
+            <li><strong>Kontekst:</strong> İroniya, sarkazm və mədəni istinadlar səhv şərh edilə bilər.</li>
+            <li><strong>Dil mürəkkəbliyi:</strong> Atalar sözləri və bədii ifadələr düzgün qiymətləndirilməyə bilər.</li>
+            <li><strong>Aktuallıq:</strong> Model ən son xəbərləri dərhal bilmir.</li>
+            <li><strong>Subyektivlik:</strong> Bəzi göstəricilər kontekstdən asılıdır.</li>
+            <li><strong>Məqalə növü:</strong> Rəy/şəxsi esselərdə istinad az ola bilər; bu, etibarlılıq balını texniki olaraq aşağı göstərə bilər.</li>
+          </ul>
+        </section>
+
+        <!-- ETHICS -->
+        <section id="ethics">
+          <h2>Etika prinsipləri</h2>
+          <ul>
+            <li><strong>Şəffaflıq:</strong> metod, meyar və əsaslandırmalar açıqdır.</li>
+            <li><strong>Müstəqillik:</strong> siyasi/korporativ asılılıq yoxdur.</li>
+            <li><strong>Ədalət:</strong> bütün mənbələrə eyni standart tətbiq olunur.</li>
+            <li><strong>Məxfilik:</strong> istifadəçi məlumatları qorunur, üçüncü tərəflərə ötürülmür.</li>
+            <li><strong>Məsuliyyət:</strong> səhvlər etiraf olunur, düzəlişlərə açığıq.</li>
+          </ul>
+        </section>
+
+        <!-- VERSIONING -->
+        <section id="versioning">
+          <h2>Versiyalar və yenilənmə</h2>
+          <p><strong>Canlı sənəd:</strong> metodologiya dövri olaraq yenilənir; ictimai rəy, ekspert rəyləri və tədqiqatlar nəzərə alınır. Dəyişikliklər versiya qeydlərində göstərilir.</p>
+          <p class="note">Hazırkı versiya: <strong>v1.0</strong> (5 sentyabr 2025).</p>
+        </section>
+
+      </article>
+    </main>
+    <div id="site-footer"></div>
+  </div>
+  <script src="/static/layout.js" defer></script>
 </body>
-
 </html>

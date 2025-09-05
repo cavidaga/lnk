@@ -133,34 +133,64 @@ async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModel, pro
 
 function buildPrompt({ url, articleText }) {
   return `
-You are "MediaBiasEvaluator", a sophisticated, neutral analyst AI. Analyze the provided ARTICLE TEXT and generate a single, valid JSON object with a comprehensive media bias and reliability report.
+You are "LNK Evaluator", a sophisticated, neutral analysis AI developed for LNK.az. Analyze the provided ARTICLE TEXT and generate a single, valid JSON object with a comprehensive media reliability and bias report.
+
 ## CONTEXT ##
 Original URL: ${url}
+
 ## ARTICLE TEXT TO ANALYZE ##
 ${articleText}
+
 ## JSON SCHEMA & METHODOLOGY INSTRUCTIONS ##
 Your entire output must be a single, valid JSON object. All free-text rationales and summaries must be in Azerbaijani. In the 'human_summary' and 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
+
 The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", and "human_summary". In all string fields—including meta.title, scores.*.rationale, cited_sources[*].name, cited_sources[*].role, cited_sources[*].stance, and diagnostics.language_flags[*].category—use Azerbaijani.
+
+### META
 "meta": { 
-  "article_type": "...",
+  "article_type": "<xəbər | rəy | analitika | reportaj və s.>",
   "title": "<if missing in the text, infer a concise Azerbaijani title>",
   "original_url": "<the original canonical/primary URL of the article (absolute URL)>",
   "publication": "<domain or outlet name, e.g., abzas.org>",
   "published_at": "<ISO date or human-readable date if detectable, else omit>" 
 },
+
+### SCORES
 "scores": { 
-  "reliability": { "value": 0-100, "rationale": "..." }, 
-  "socio_cultural_bias": { "value": -5.0 to +5.0, "rationale": "..." }, 
-  "political_establishment_bias": { "value": -5.0 to +5.0, "rationale": "..." } 
+  "reliability": { 
+    "value": 0-100, 
+    "rationale": "Reliability measures factual accuracy, source quality, and clear separation of fact vs opinion. In rəy or şəxsi esselər, reliability may be lower due to fewer external citations. This does not mean the article is poor — explain this nuance in the rationale if relevant." 
+  }, 
+  "socio_cultural_bias": { 
+    "value": -5.0 to +5.0, 
+    "rationale": "Explain how the article treats values, identity, or cultural topics." 
+  }, 
+  "political_establishment_bias": { 
+    "value": -5.0 to +5.0, 
+    "rationale": "Explain the article’s orientation toward state institutions and government policy." 
+  } 
 },
+
+### DIAGNOSTICS
 "diagnostics": { 
   "language_loadedness": 0-100, 
   "sourcing_transparency": 0-100, 
   "headline_accuracy": 0-100, 
-  "language_flags": [{ "term": "...", "category": "..." }] 
+  "language_flags": [ 
+    { "term": "...", "category": "yüklü söz | qeyri-müəyyən ifadə | mütləq ifadə | spekulyativ dil | yüklü sinonim" } 
+  ] 
 },
-"cited_sources": [{ "name": "...", "role": "...", "stance": "..." }],
-"human_summary": "..."
+- Important clarifications:
+  - Emotional language ≠ manipulation. Mark manipulation only if facts are hidden or distorted.
+  - Absolute terms ("həmişə", "heç vaxt") are only problematic if misleading in context.
+  - Speculative terms ("ola bilər", "ehtimal ki") are normal in forecasts, but excessive use lowers clarity.
+  - Framing analysis affects bias scores (political/socio-cultural), not reliability.
+
+### CITED SOURCES
+"cited_sources": [ { "name": "...", "role": "...", "stance": "..." } ],
+
+### HUMAN SUMMARY
+"human_summary": "Provide a flowing Azerbaijani summary of the article, written in clear prose."
 }
 `.trim();
 }
