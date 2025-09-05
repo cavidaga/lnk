@@ -283,12 +283,48 @@
     .share-section .share-row { flex-direction: column; align-items: stretch; }
     .share-section .btn { width: 100%; }
   }
-  #share-card .share-buttons{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
-  #share-card .share-buttons a,
-  #share-card .share-buttons button{ width:38px; height:38px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border); background:var(--panel); }
-  #share-card .share-buttons svg{ width:20px; height:20px; display:block; fill:currentColor }
-  #share-card .share-btn.copy.ok { background: #16a34a; color: #fff; border-color: transparent }
-  #share-card .share-btn.copy.err { background: #dc2626; color: #fff; border-color: transparent }
+/* Base share button look (you likely have this already) */
+.share-buttons{ display:flex; gap:10px; flex-wrap:wrap; margin-top:8px }
+.share-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:38px; border-radius:50%;
+  background:var(--panel); border:1px solid var(--border);
+  color:var(--text); transition:background .2s, color .2s, border-color .2s;
+}
+.share-btn svg{ width:20px; height:20px; fill:currentColor; display:block }
+
+/* ---------- Light mode: brand colours ---------- */
+@media (prefers-color-scheme: light){
+  .share-btn.x  { color:#000 }          /* X (Twitter) */
+  .share-btn.fb { color:#1877f2 }       /* Facebook */
+  .share-btn.li { color:#0a66c2 }       /* LinkedIn */
+  .share-btn.tg { color:#229ED9 }       /* Telegram */
+  .share-btn.wa { color:#25D366 }       /* WhatsApp */
+
+  /* Hover: fill with the brand colour, icon becomes white */
+  .share-btn.x:hover  { background:#000;    color:#fff; border-color:transparent }
+  .share-btn.fb:hover { background:#1877f2; color:#fff; border-color:transparent }
+  .share-btn.li:hover { background:#0a66c2; color:#fff; border-color:transparent }
+  .share-btn.tg:hover { background:#229ED9; color:#fff; border-color:transparent }
+  .share-btn.wa:hover { background:#25D366; color:#fff; border-color:transparent }
+}
+
+/* ---------- Dark mode: all white ---------- */
+@media (prefers-color-scheme: dark){
+  .share-btn.x,
+  .share-btn.fb,
+  .share-btn.li,
+  .share-btn.tg,
+  .share-btn.wa { color:#fff }
+
+  /* Subtle hover with white tint, keep icons white */
+  .share-btn:hover{
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    border-color:transparent;
+  }
+}
+
 
   /* Footer */
   footer.site-footer{

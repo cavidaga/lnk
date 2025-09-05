@@ -408,7 +408,7 @@
       const old = btn.innerHTML;
       btn.classList.add(ok ? 'ok' : 'err');
       btn.setAttribute('aria-live','polite');
-      btn.innerHTML = ok ? 'Kopyalandı' : 'Kopyalanmadı';
+      btn.innerHTML = ok ? '✅' : '❎';
       setTimeout(() => {
         btn.innerHTML = old;
         btn.classList.remove('ok','err');
