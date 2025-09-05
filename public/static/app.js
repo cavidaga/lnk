@@ -436,7 +436,7 @@
         </div>
         <div class="hdr-row">
           <div class="hdr-label">Tarix</div>
-          <div class="hdr-value">${esc(fmtAzDate(published_at) || '—')}</div>
+          <div class="hdr-value">${esc(formatAzDate(published_at) || '—')}</div>
         </div>
         <div class="hdr-row">
           <div class="hdr-label">Orijinal link</div>
