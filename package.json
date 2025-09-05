@@ -9,7 +9,7 @@
     "puppeteer-extra-plugin-stealth": "latest",
     "puppeteer-extra-plugin-user-data-dir": "latest",
     "@vercel/kv": "latest",
-    "@vercel/og": "latest",
+    "@vercel/og": "0.8.5",
     "react": "^18.2.0",
     "glob": "latest"
   }
