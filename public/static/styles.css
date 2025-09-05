@@ -510,8 +510,9 @@ body.nav-open{ overflow:hidden }
   position: fixed;
   bottom: 22px;
   right: 22px;
-  background: var(--c-bg, #fff);
-  border: 1.5px solid currentColor;
+  background: var(--to-top-bg);
+  color: var(--to-top-fg);
+  border: 1.5px solid var(--to-top-border);
   border-radius: 999px;
   width: 42px;
   height: 42px;
@@ -521,7 +522,7 @@ body.nav-open{ overflow:hidden }
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
-  transition: opacity .3s ease;
+  transition: opacity .3s ease, background .3s ease;
   z-index: 1000;
 }
 #to-top.visible {
@@ -530,3 +531,21 @@ body.nav-open{ overflow:hidden }
 }
 #to-top:hover { opacity: 1; }
 #to-top .icon { width: 20px; height: 20px; }
+
+/* Light mode */
+@media (prefers-color-scheme: light) {
+  :root {
+    --to-top-bg: #fff;
+    --to-top-fg: #111;
+    --to-top-border: #ccc;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --to-top-bg: #1a1b20;
+    --to-top-fg: #f5f5f5;
+    --to-top-border: #333;
+  }
+}
