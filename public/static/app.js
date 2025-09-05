@@ -125,15 +125,13 @@
           <section class="card">
             <div class="bd">
               <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
-                ${metric('Etibarlılıq', reliability, '/100')}
-                ${metric('Siyasi meyl', polBias, ' (Müxalif ⟷ Hökumətyönlü)')}
-                ${metric('Sosial-mədəni meyl', socBias, '')}
+                ${metric('Etibarlılıq', fmt100(reliabilityNum), '')}
+                ${metric('Siyasi meyl', fmtBias(polBiasNum), ' (Müxalif ⟷ Hökumətyönlü)')}
+                ${metric('Sosial-mədəni meyl', fmtBias(socBiasNum), '')}
               </div>
               <!-- Axis chart -->
               <div class="bias-chart" role="img" aria-label="Etibarlılıq və siyasi meyl qrafiki" style="margin-top:12px">
-                <div class="chart-point" 
-                    style="top:${100 - (reliability || 0)}%;left:${((polBias + 5) / 10) * 100}%;">
-                </div>
+                <div class="chart-point" style="top:${topPos}%;left:${leftPos}%;"></div>
                 <span class="axis-label y-axis-top">Etibarlı</span>
                 <span class="axis-label y-axis-bottom">Etibarsız</span>
                 <span class="axis-label x-axis-left">Müxalif</span>
@@ -306,11 +304,6 @@
     const cardUrl = `${location.origin}/api/card?hash=${encodeURIComponent(hash)}&theme=dark`;
 
     const set = (id, href) => { const a = $(`#${id}`); if (a) a.href = href; };
-
-    set('btn-x',  `https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent('LNK.az təhlili')}`);
-    set('btn-fb', `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`);
-    set('btn-tg', `https://t.me/share/url?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent('LNK.az təhlili')}`);
-    set('btn-wa', `https://api.whatsapp.com/send?text=${encodeURIComponent('LNK.az təhlili ' + pageUrl)}`);
 
     const dl = $('#btn-dl');
     if (dl) { dl.href = cardUrl; dl.download = `lnk-${hash}.png`; }
