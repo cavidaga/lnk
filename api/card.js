@@ -1,217 +1,203 @@
-// api/card.js — Node function that generates & caches PNG share cards in KV
-import chromium from '@sparticuz/chromium';
-import puppeteer from 'puppeteer-core';
-import { kv } from '@vercel/kv';
+// card.js — self-contained renderer for OG/card image
+// Works with satori + resvg or any HTML-to-image renderer.
+// No external network/fonts required.
 
-const FALLBACK = '/static/card-fallback.png';
-const CACHE_TTL = 3600; // seconds
+const LOGO_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="32" viewBox="0 0 120 32" aria-hidden="true">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6EE7F9"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+  <!-- Simple LNK.az wordmark -->
+  <g fill="url(#g)" font-family="Inter, ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial" font-weight="700" font-size="24">
+    <text x="0" y="24">LNK.az</text>
+  </g>
+</svg>
+`;
 
-function escapeHtml(s = '') {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// Inline check icon (instead of ✅ emoji, which some renderers drop)
+const CHECK_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+  <path fill="currentColor" d="M20.285 6.708a1 1 0 0 1 0 1.414l-9.9 9.9a1 1 0 0 1-1.414 0l-5.256-5.256a1 1 0 1 1 1.414-1.414l4.55 4.55 9.193-9.193a1 1 0 0 1 1.414 0z"/>
+</svg>
+`;
+
+// Small helper to render a metric card
+function metricCard({ label, value }) {
+  return `
+    <div class="metric">
+      <div class="metric-label">${label}</div>
+      <div class="metric-value">${value}</div>
+    </div>
+  `;
 }
-const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-const fmtBias = (v) => {
-  const val = clamp(Number(v) || 0, -5, 5);
-  return (val > 0 ? '+' : '') + val.toFixed(1);
-};
-const trunc = (s = '', max = 220) => (s.length <= max ? s : s.slice(0, max - 1).trimEnd() + '…');
-const mapDot = (v) => {
-  v = Number(v) || 0;
-  if (v < -5) v = -5;
-  if (v > 5) v = 5;
-  return v * 22;
-};
 
-export default async function handler(req, res) {
-  const url = new URL(req.url, 'http://localhost');
-  const hash = url.searchParams.get('hash');
-  const theme = (url.searchParams.get('theme') || 'dark').toLowerCase();
-  const width = Number(url.searchParams.get('w') || 1200);
-  const height = Number(url.searchParams.get('h') || 630);
-  const refresh = url.searchParams.get('refresh') === '1';
-  const cacheKey = `cardpng:${hash}:${theme}:${width}x${height}`;
+function dot(x, y) {
+  // x in [-5,+5] horizontally (Müxalif <-> Hakimiyyət), y in [0,100] vertically (Etibarsız <-> Etibarlı)
+  const cx = 40 + (x + 5) * (1 / 10) * 420;   // 40..460
+  const cy = 40 + (1 - (y / 100)) * 420;      // 40..460 inverted
+  return `<circle cx="${cx}" cy="${cy}" r="9" class="chart-dot"/>`;
+}
 
-  // HEAD: tell scrapers they'll get an image
-  if (req.method === 'HEAD') {
-    res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Content-Disposition', 'inline; filename="lnk-card.png"');
-    res.setHeader('Cache-Control', 'public, max-age=3600');
-    return res.status(200).end();
-  }
+module.exports = async function renderCard(data) {
+  // Expected data shape (fallbacks are provided)
+  const {
+    title = "Ukrayna sülhü və Azərbaycan üçün potensial təhlükələr",
+    platform = "Facebook",
+    reliability = 45,
+    political_bias = -3.5,           // Müşxalif <-> Hökumətyönlü
+    socio_cultural_bias = 0.0,       // Sosial-Mədəni meyl (-5..+5)
+    summary = "Tarixçi və analitik ...",
+    footer = "LNK tərəfindən təhlil edilib"
+  } = data || {};
 
-  if (!hash) {
-    res.setHeader('Location', FALLBACK);
-    return res.status(302).end();
-  }
-
-  try {
-    // 0) Serve from PNG cache if present (unless refresh=1)
-    if (!refresh) {
-      const cachedB64 = await kv.get(cacheKey); // stored as base64 string
-      if (cachedB64 && typeof cachedB64 === 'string') {
-        const buf = Buffer.from(cachedB64, 'base64');
-        res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Content-Disposition', 'inline; filename="lnk-card.png"');
-        res.setHeader('Cache-Control', 'public, max-age=3600');
-        return res.status(200).end(buf);
+  // Build HTML (works for satori/html-to-image)
+  const html = `
+  <html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin:0; padding:0; width:1200px; height:630px; }
+      body {
+        font-family: Inter, ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial, "Noto Color Emoji";
+        background: #0B0E14;
+        color: #E5E7EB;
       }
-    }
+      .wrap { position:relative; display:flex; height:100%; padding:40px 48px; gap:32px; }
+      .left { flex: 1.15; display:flex; flex-direction:column; }
+      .right { width:520px; position:relative; }
 
-    // 1) Load analysis JSON (required)
-    const data = await kv.get(hash);
-    if (!data) {
-      res.setHeader('Location', FALLBACK);
-      return res.status(302).end();
-    }
+      .brand { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+      .brand-logo { display:inline-flex; width:120px; height:32px; }
+      .brand-title {
+        font-size:36px; font-weight:800; letter-spacing:.2px; color:#E5E7EB;
+      }
 
-    const { meta = {}, scores = {}, human_summary = '', modelUsed, contentSource } = data;
-    const title = meta.title || 'LNK.az — Media Təhlili';
-    const publication = meta.publication || '';
-    const rel = clamp(scores?.reliability?.value ?? 0, 0, 100);
-    const pol = fmtBias(scores?.political_establishment_bias?.value);
-    const soc = fmtBias(scores?.socio_cultural_bias?.value);
+      .title {
+        font-size:56px; line-height:1.06; font-weight:800; margin:6px 0 10px;
+        color:#F3F4F6;
+      }
+      .platform {
+        font-size:22px; color:#9CA3AF; margin-bottom:22px; display:flex; align-items:center; gap:8px;
+      }
+      .platform .check { display:inline-flex; width:18px; height:18px; color:#34D399; }
 
-    const isLight = theme === 'light';
-    const bg     = isLight ? '#ffffff' : '#0b0c11';
-    const fg     = isLight ? '#0b0c11' : '#f6f7fb';
-    const sub    = isLight ? '#3a3d45' : '#c7c9d3';
-    const accent = '#e10600';
-    const card   = isLight ? '#f5f6f8' : '#141723';
-    const border = isLight ? '#e6e8ee' : '#23273a';
+      .metrics {
+        display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:16px;
+        margin: 10px 0 20px;
+      }
+      .metric {
+        background:#121622; border:1px solid #1F2433; border-radius:16px; padding:18px 20px;
+      }
+      .metric-label { font-size:16px; color:#9CA3AF; }
+      .metric-value { font-size:44px; font-weight:800; margin-top:6px; color:#E5E7EB; }
 
-    const dotX = mapDot(scores?.political_establishment_bias?.value);
-    const dotY = 110 - (rel / 100) * 220;
+      .summary {
+        margin-top:2px; font-size:24px; line-height:1.4; color:#D1D5DB;
+        display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;
+      }
 
-    // 2) HTML for rendering
-    const html = `
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:;">
-<meta name="viewport" content="width=${width}, initial-scale=1.0" />
-<style>
-  *{box-sizing:border-box}
-  body{
-    margin:0;width:${width}px;height:${height}px;
-    background:${bg};color:${fg};
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif
-  }
-  .wrap{display:flex;height:100%;padding:40px}
-  .left{flex:1.4;display:flex;flex-direction:column}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo-img{height:36px;width:auto;display:block}
-  .title{margin-top:16px}
-  .title h1{margin:0;font-size:34px;line-height:1.2;font-weight:800}
-  .title .pub{color:${sub};margin-top:6px;font-size:20px}
-  .stats{display:flex;gap:14px;margin-top:16px;flex-wrap:wrap}
-  .stat{background:${card};border:1px solid ${border};border-radius:14px;padding:14px 16px;min-width:210px}
-  .stat .lbl{color:${sub};font-size:14px}
-  .stat .val{font-size:36px;font-weight:800;margin-top:2px}
-  .sum{margin-top:18px;color:${sub};font-size:20px;line-height:1.35;max-width:700px;white-space:pre-wrap}
-  .foot{display:flex;gap:16px;margin-top:auto;align-items:center;color:${sub};font-size:16px}
-  .badge{background:${card};border:1px solid ${border};border-radius:999px;padding:6px 10px;font-size:14px}
-  .right{width:360px;margin-left:28px;display:flex;align-items:center;justify-content:center}
-  .axes{
-    width:320px;height:320px;background:${card};border:1px solid ${border};border-radius:20px;
-    position:relative;display:flex;align-items:center;justify-content:center
-  }
-  .v{position:absolute;width:2px;height:260px;background:${border}}
-  .h{position:absolute;height:2px;width:260px;background:${border}}
-  .dot{
-    position:absolute;width:14px;height:14px;border-radius:999px;background:${accent};
-    box-shadow:0 0 0 6px rgba(225,6,0,0.125);
-    transform:translate(${dotX}px,${dotY}px)
-  }
-  /* Axis labels */
-  .lbl-top{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:14px;color:${sub}}
-  .lbl-bottom{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:14px;color:${sub}}
-  .lbl-left{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:14px;color:${sub}}
-  .lbl-right{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:14px;color:${sub}}
-</style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="left">
-      <div class="brand">
-        <img src="https://lnk.az/static/logo.svg" alt="LNK.az" class="logo-img" />
-        <div style="font-size:24px;font-weight:600">LNK.az</div>
-      </div>
+      .footer {
+        margin-top:auto; font-size:18px; color:#9CA3AF; display:flex; align-items:center; gap:8px;
+      }
+      .footer .check { width:16px; height:16px; color:#34D399; }
 
-      <div class="title">
-        <h1>${escapeHtml(title)}</h1>
-        ${publication ? `<div class="pub">${escapeHtml(publication)}</div>` : ''}
-      </div>
+      /* Right side: quadrant */
+      .panel {
+        position:absolute; inset:0; background:#0E1220; border:1px solid #1F2433; border-radius:20px; padding:24px;
+        display:flex; flex-direction:column; gap:12px;
+      }
+      .quad {
+        position:relative; flex:1; border:1px solid #2A3146; border-radius:14px; overflow:hidden;
+        background:linear-gradient( to bottom, rgba(255,255,255,0.02), rgba(255,255,255,0.00) );
+      }
+      .axis-x, .axis-y {
+        position:absolute; background:#2A3146;
+      }
+      .axis-x { left:40px; right:40px; top:50%; height:1px; }
+      .axis-y { top:40px; bottom:40px; left:50%; width:1px; }
 
-      <div class="stats">
-        <div class="stat">
-          <div class="lbl">Etibarlılıq</div>
-          <div class="val">${rel}</div>
+      .axis-labels {
+        position:absolute; inset:0; pointer-events:none; font-size:16px; color:#9CA3AF;
+      }
+      .axis-labels .top { position:absolute; top:6px; left:50%; transform:translateX(-50%); }
+      .axis-labels .bottom { position:absolute; bottom:6px; left:50%; transform:translateX(-50%); }
+      .axis-labels .left { position:absolute; top:50%; left:6px; transform:translateY(-50%); }
+      .axis-labels .right { position:absolute; top:50%; right:6px; transform:translateY(-50%); }
+
+      .chart-dot { fill:#EF4444; filter: drop-shadow(0 0 10px rgba(239,68,68,.35)); }
+
+      /* Watermark (fix for "lnk.az text in the middle") */
+      .wm {
+        position:absolute; right:24px; bottom:18px; font-weight:700; letter-spacing:.5px;
+        color:#6B7280; opacity:.35; font-size:18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="left">
+        <div class="brand">
+          <div class="brand-logo">${LOGO_SVG}</div>
+          <!-- keep title empty here to avoid duplicate stray text -->
         </div>
-        <div class="stat">
-          <div class="lbl">Siyasi meyl (Müxalif <-> Hökumətyönlü)</div>
-          <div class="val">${escapeHtml(pol)}</div>
+
+        <div class="title">${escapeHtml(title)}</div>
+
+        <div class="platform">
+          <span class="check">${CHECK_SVG}</span>
+          <span>${escapeHtml(platform)}</span>
+        </div>
+
+        <div class="metrics">
+          ${metricCard({ label: "Etibarlılıq", value: String(reliability) })}
+          ${metricCard({ label: "Siyasi meyl (Müxalif ↔ Hökumətyönlü)", value: String(political_bias) })}
+          ${metricCard({ label: "Sosial-Mədəni meyl", value: String(socio_cultural_bias) })}
+        </div>
+
+        <div class="summary">${escapeHtml(summary)}</div>
+
+        <div class="footer">
+          <span class="check">${CHECK_SVG}</span>
+          <span>${escapeHtml(footer)}</span>
         </div>
       </div>
 
-      <div class="sum">${escapeHtml(trunc(human_summary))}</div>
-
-      <div class="foot">
-        <div class="badge">✅ LNK tərəfindən təhlil edildi</div>
-        <div style="margin-left:auto">lnk.az</div>
+      <div class="right">
+        <div class="panel">
+          <div class="quad">
+            <div class="axis-x"></div>
+            <div class="axis-y"></div>
+            <svg viewBox="0 0 500 500" width="100%" height="100%" style="position:absolute; inset:0;">
+              ${dot(political_bias, reliability)}
+            </svg>
+            <div class="axis-labels">
+              <div class="top">Etibarlı</div>
+              <div class="bottom">Etibarsız</div>
+              <div class="left">Müxalif</div>
+              <div class="right">Hökumətyönlü</div>
+            </div>
+          </div>
+        </div>
+        <div class="wm">lnk.az</div>
       </div>
     </div>
+  </body>
+  </html>
+  `;
 
-    <div class="right">
-      <div class="axes">
-        <div class="v"></div><div class="h"></div>
-        <div class="dot"></div>
-        <div class="lbl-top">Etibarlı</div>
-        <div class="lbl-bottom">Etibarsız</div>
-        <div class="lbl-left">Müxalif</div>
-        <div class="lbl-right">Hökumətyönlü</div>
-      </div>
-    </div>
-  </div>
-</body>
-</html>`;
+  return {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+    body: html
+  };
+};
 
-    // 3) Render to PNG
-    let browser;
-    try {
-      browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: { width, height, deviceScaleFactor: 2 },
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-        ignoreHTTPSErrors: true
-      });
-      const page = await browser.newPage();
-      await page.setContent(html, { waitUntil: 'load' });
-      const buf = await page.screenshot({ type: 'png' });
-
-      // 4) Store in KV as Base64
-      try {
-        const b64 = buf.toString('base64');
-        await kv.set(cacheKey, b64, { ex: CACHE_TTL });
-      } catch (err) {
-        // caching failure shouldn't break response
-        console.warn('KV cache set failed:', err);
-      }
-
-      res.setHeader('Content-Type', 'image/png');
-      res.setHeader('Content-Disposition', 'inline; filename="lnk-card.png"');
-      res.setHeader('Cache-Control', 'public, max-age=3600');
-      return res.status(200).end(buf);
-    } finally {
-      if (browser) try { await browser.close(); } catch {}
-    }
-  } catch (e) {
-    console.error('Card error:', e);
-    // Fallback to a static PNG so scrapers always see a valid image content-type.
-    res.setHeader('Location', FALLBACK);
-    return res.status(302).end();
-  }
+// --- helpers ---
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
