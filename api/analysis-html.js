@@ -1,7 +1,7 @@
 // api/analysis-html.js — Edge
 export const config = { runtime: 'edge' };
 
-// inline, so we don't import anything
+// inline esc() so we don't import anything
 function esc(str = "") {
   return String(str)
     .replace(/&/g, "&amp;")
