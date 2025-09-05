@@ -1,12 +1,10 @@
 // api/analysis-html.js — Edge
 export const config = { runtime: 'edge' };
 
+import { esc } from '../lib/render-helpers.js';
+
 const SITE = 'https://lnk.az';
 const CARD_VERSION = '2';
-
-const esc = (s = '') =>
-  String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
-           .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 export default async function handler(req) {
   const url = new URL(req.url);
@@ -14,6 +12,7 @@ export default async function handler(req) {
   if (!hash) return new Response('Missing hash', { status: 400 });
 
   const pageUrl = `${SITE}/analysis/${encodeURIComponent(hash)}`;
+  // switched to PNG endpoint, keeps versioning param
   const cardPngUrl = `${SITE}/api/card.png?hash=${encodeURIComponent(hash)}&v=${CARD_VERSION}`;
   const ogTitle = 'LNK - Media qərəzi qiymətləndiricisi';
   const ogDesc  = 'Media qərəzi və etibarlılıq təhlili.';
