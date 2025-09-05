@@ -76,14 +76,12 @@ function renderHtml(data) {
     .footer .check{width:16px;height:16px;color:#34D399}
     .panel{position:absolute;inset:0;background:#0E1220;border:1px solid #1F2433;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:12px}
     .quad{position:relative;flex:1;border:1px solid #2A3146;border-radius:14px;overflow:hidden;background:linear-gradient(to bottom,rgba(255,255,255,.02),rgba(255,255,255,0))}
-    .axis-x,.axis-y{position:absolute;background:#2A3146}
-    .axis-x{left:40px;right:40px;top:50%;height:1px}
-    .axis-y{top:40px;bottom:40px;left:50%;width:1px}
-    .axis-labels{position:absolute;inset:0;pointer-events:none;font-size:16px;color:#9CA3AF}
-    .axis-labels .top{position:absolute;top:6px;left:50%;transform:translateX(-50%)}
-    .axis-labels .bottom{position:absolute;bottom:6px;left:50%;transform:translateX(-50%)}
-    .axis-labels .left{position:absolute;top:50%;left:6px;transform:translateY(-50%)}
-    .axis-labels .right{position:absolute;top:50%;right:6px;transform:translateY(-50%)}
+    /* replace the old .axis-labels .top/.bottom/.left/.right rules */
+    .axis-labels { position:absolute; inset:0; pointer-events:none; font-size:16px; color:#9CA3AF; }
+    .axis-labels .lab-top    { position:absolute; top:6px;    left:50%; transform:translateX(-50%); }
+    .axis-labels .lab-bottom { position:absolute; bottom:6px; left:50%; transform:translateX(-50%); }
+    .axis-labels .lab-left   { position:absolute; top:50%;    left:6px;  transform:translateY(-50%); }
+    .axis-labels .lab-right  { position:absolute; top:50%;    right:6px; transform:translateY(-50%); }
     .chart-dot{fill:#EF4444;filter:drop-shadow(0 0 10px rgba(239,68,68,.35))}
     .wm{position:absolute;right:24px;bottom:18px;font-weight:700;letter-spacing:.5px;color:#6B7280;opacity:.35;font-size:18px}
   </style></head>
@@ -95,7 +93,7 @@ function renderHtml(data) {
         <div class="platform"><span class="check">${CHECK_SVG}</span><span>${escapeHtml(platform)}</span></div>
         <div class="metrics">
           ${metricCard({label:"Etibarlılıq", value:String(reliability)})}
-          ${metricCard({label:"Siyasi meyl (Müxalif ↔ Hökumətyönlü)", value:String(political_bias)})}
+          ${metricCard({label:"Siyasi meyl", value:String(political_bias)})}
           ${metricCard({label:"Sosial-Mədəni meyl", value:String(socio_cultural_bias)})}
         </div>
         <div class="summary">${escapeHtml(summary)}</div>
@@ -108,10 +106,12 @@ function renderHtml(data) {
             <svg viewBox="0 0 500 500" width="100%" height="100%" style="position:absolute;inset:0;">
               ${dot(political_bias, reliability)}
             </svg>
-            <div class="axis-labels">
-              <div class="top">Etibarlı</div><div class="bottom">Etibarsız</div>
-              <div class="left">Müxalif</div><div class="right">Hökumətyönlü</div>
-            </div>
+              <div class="axis-labels">
+                <div class="lab-top">Etibarlı</div>
+                <div class="lab-bottom">Etibarsız</div>
+                <div class="lab-left">Müxalif</div>
+                <div class="lab-right">İqtidar</div>
+              </div>
           </div>
         </div>
         <div class="wm">lnk.az</div>
