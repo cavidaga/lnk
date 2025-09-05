@@ -1,9 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/card.png.js": { "runtime": "edge" },
-    "api/analysis-html.js": { "runtime": "edge" }
-  },
   "rewrites": [
     { "source": "/analysis/:hash", "destination": "/api/analysis-html?hash=:hash" }
   ]
