@@ -101,9 +101,12 @@
     const published_at = meta.published_at || '';
     const url = meta.original_url || '';
 
-    const reliability = num(scores?.reliability?.value, 0);
-    const polBias = bias(scores?.political_establishment_bias?.value);
-    const socBias = bias(scores?.socio_cultural_bias?.value);
+    const reliabilityNum = clamp(data?.scores?.reliability?.value ?? 0, 0, 100);
+    const polBiasNum     = clamp(data?.scores?.political_establishment_bias?.value ?? 0, -5, 5);
+    const socBiasNum     = clamp(data?.scores?.socio_cultural_bias?.value ?? 0, -5, 5);
+
+    const leftPos = clamp(((polBiasNum + 5) / 10) * 100, 0, 100);     // -5..+5  →  0..100
+    const topPos  = clamp(100 - reliabilityNum, 0, 100);              // 0..100  →  100..0
 
     root.innerHTML = `
       <article class="card">
@@ -126,22 +129,6 @@
                 ${metric('Siyasi meyl', polBias, ' (Müxalif ⟷ Hökumətyönlü)')}
                 ${metric('Sosial-mədəni meyl', socBias, '')}
               </div>
-              <!-- Score pills -->
-              <div class="score-pills" style="margin-top:10px">
-                <div class="pill">
-                  <div class="k">Etibarlılıq</div>
-                  <div class="v">${reliability ? reliability + '/100' : 'N/A'}</div>
-                </div>
-                <div class="pill">
-                  <div class="k">Siyasi meyl</div>
-                  <div class="v">${polBias ? (polBias>0? '+'+polBias:polBias) : '0'} <span class="muted small">(-5 → +5)</span></div>
-                </div>
-                <div class="pill">
-                  <div class="k">Sosial-mədəni</div>
-                  <div class="v">${socBias ? (socBias>0? '+'+socBias:socBias) : '0'} <span class="muted small">(-5 → +5)</span></div>
-                </div>
-              </div>
-
               <!-- Axis chart -->
               <div class="bias-chart" role="img" aria-label="Etibarlılıq və siyasi meyl qrafiki" style="margin-top:12px">
                 <div class="chart-point" 
@@ -155,9 +142,9 @@
 
               <!-- Coordinate values -->
               <div class="coord-values small">
-                Koordinatlar: Etibarlılıq <strong>${reliability ? reliability + '/100' : 'N/A'}</strong> · 
-                Siyasi meyl <strong>${polBias ? (polBias>0? '+'+polBias:polBias) : '0'}</strong> · 
-                Sosial-mədəni <strong>${socBias ? (socBias>0? '+'+socBias:socBias) : '0'}</strong>
+                Koordinatlar: Etibarlılıq <strong>${fmt100(reliabilityNum)}</strong> ·
+                Siyasi meyl <strong>${fmtBias(polBiasNum)}</strong> ·
+                Sosial-mədəni <strong>${fmtBias(socBiasNum)}</strong>
               </div>
               <div class="small muted" style="margin-top:8px">
                 ✅ LNK tərəfindən təhlil edildi
@@ -171,14 +158,48 @@
               <p style="margin:0;white-space:pre-wrap">${esc(human_summary || '—')}</p>
             </div>
           </section>
+          <section class="card">
+            <div class="bd">
+              <h3 style="margin:0 0 8px">Əsas oxlar üzrə izah</h3>
+              <dl class="explain">
+                <dt>Etibarlılıq: <span class="value">${fmt100(reliabilityNum)}</span></dt>
+                <dd>${esc(data?.scores?.reliability?.rationale || '—')}</dd>
 
+                <dt>Siyasi hakimiyyət meyli: <span class="value">${fmtBias(polBiasNum)}</span></dt>
+                <dd>${esc(data?.scores?.political_establishment_bias?.rationale || '—')}</dd>
+
+                <dt>Sosial-mədəni meyl: <span class="value">${fmtBias(socBiasNum)}</span></dt>
+                <dd>${esc(data?.scores?.socio_cultural_bias?.rationale || '—')}</dd>
+              </dl>
+            </div>
+          </section>
+          <section class="card">
+            <div class="bd">
+              <h3 style="margin:0 0 8px">Konkret dil siqnalları</h3>
+              ${
+                Array.isArray(data?.diagnostics?.language_flags) && data.diagnostics.language_flags.length
+                ? `<ul class="flags">` + data.diagnostics.language_flags
+                    .map(f => `<li><strong>${esc(f.term)}</strong>: ${esc(f.category)}</li>`)
+                    .join('') + `</ul>`
+                : `<div class="small muted">—</div>`
+              }
+            </div>
+          </section>
           <section class="card">
             <div class="bd">
               <h3 style="margin:0 0 8px">İstinad olunan mənbələr</h3>
               ${Array.isArray(cited_sources) && cited_sources.length ? tableSources(cited_sources) : `<div class="small muted">—</div>`}
             </div>
           </section>
-
+          <section class="card">
+            <div class="bd">
+              <details>
+                <summary>Xam JSON datanı göstər</summary>
+                <pre class="json">${esc(JSON.stringify(data, null, 2))}</pre>
+              </details>
+            </div>
+          </section>
+    
           <section class="card" id="share-card">
             <div class="bd">
               <h3 style="margin:0 0 8px">Paylaş</h3>
@@ -187,7 +208,7 @@
                 <a class="share-btn x"
                   href="https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(title || '')}"
                   target="_blank" rel="noopener" aria-label="X-də paylaş">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                     <path d="M18.244 2H21l-6.59 7.523L22 22h-6.828l-5.34-6.508L3.338 22H1l7.093-8.106L2 2h6.828l4.89 5.972L18.244 2Zm-2.393 18h1.89L7.247 3.98H5.27L15.85 20Z"/>
                   </svg>
                 </a>
@@ -196,7 +217,7 @@
                 <a class="share-btn fb"
                   href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}"
                   target="_blank" rel="noopener" aria-label="Facebook-da paylaş">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                     <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5 3.657 9.127 8.438 9.878v-6.988h-2.54v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.242 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.988C18.343 21.127 22 17 22 12z"/>
                   </svg>
                 </a>
@@ -205,7 +226,7 @@
                 <a class="share-btn li"
                   href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}"
                   target="_blank" rel="noopener" aria-label="LinkedIn-də paylaş">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                     <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.784 1.764-1.75 1.764zm13.5 11.268h-3v-5.604c0-1.337-.027-3.06-1.865-3.06-1.868 0-2.155 1.459-2.155 2.965v5.699h-3v-10h2.881v1.367h.041c.402-.761 1.381-1.562 2.842-1.562 3.039 0 3.6 2.001 3.6 4.601v5.594z"/>
                   </svg>
                 </a>
@@ -214,7 +235,7 @@
                 <a class="share-btn tg"
                   href="https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(title || '')}"
                   target="_blank" rel="noopener" aria-label="Telegram-da paylaş">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                     <path d="M9.04 15.47 8.87 19c.36 0 .52-.16.7-.35l1.68-1.6 3.48 2.56c.64.35 1.1.17 1.28-.6l2.33-10.93c.24-1.1-.4-1.53-1.1-1.26L3.9 9.5C2.84 9.92 2.85 10.54 3.7 10.8l3.7 1.15 8.6-5.42c.4-.27.77-.12.47.15"/>
                   </svg>
                 </a>
@@ -223,7 +244,7 @@
                 <a class="share-btn wa"
                   href="https://wa.me/?text=${encodeURIComponent((title || '') + ' ' + window.location.href)}"
                   target="_blank" rel="noopener" aria-label="WhatsApp-da paylaş">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                     <path d="M20.52 3.48A11.86 11.86 0 0 0 12.03 0C5.46 0 .11 5.35.11 11.92c0 2.1.55 4.16 1.6 5.97L0 24l6.28-1.65a11.86 11.86 0 0 0 5.75 1.47h.01c6.57 0 11.92-5.35 11.92-11.92 0-3.18-1.24-6.18-3.44-8.39zM12.04 21.3h-.01a9.38 9.38 0 0 1-4.78-1.31l-.34-.2-3.73.98 1-3.64-.22-.37a9.38 9.38 0 0 1-1.43-4.97c0-5.17 4.21-9.38 9.39-9.38 2.5 0 4.85.97 6.62 2.74a9.32 9.32 0 0 1 2.75 6.64c0 5.17-4.21 9.38-9.39 9.38zm5.45-7.04c-.3-.15-1.78-.88-2.06-.98-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.07-.15-.67-1.6-.92-2.2-.24-.58-.48-.5-.67-.5h-.57c-.2 0-.52.08-.79.38-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.06 2.87 1.2 3.06.15.2 2.09 3.2 5.06 4.48.71.31 1.27.5 1.7.64.71.22 1.36.19 1.87.12.57-.08 1.78-.73 2.03-1.43.25-.7.25-1.3.17-1.43-.07-.13-.27-.2-.57-.35z"/>
                   </svg>
                 </a>
@@ -237,7 +258,7 @@
 
                 <!-- Download image -->
                 <a id="btn-dl" class="share-btn" download aria-label="Şəkli endir (PNG)">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                     <path d="M5 20h14v-2H5v2zm7-18L5.33 8h3.84v6h4.66V8h3.84L12 2z"/>
                   </svg>
                 </a>
@@ -296,6 +317,10 @@
   }
 
   // ---------- HELPERS ----------
+  function clamp(n, min, max){ n = Number(n); if(!Number.isFinite(n)) n = 0; return Math.min(max, Math.max(min, n)); }
+  function fmt100(v){ v = Number(v); return Number.isFinite(v) ? `${v}/100` : 'N/A'; }
+  function fmtBias(v){ v = Number(v); if(!Number.isFinite(v)) v = 0; return (v>0? '+' : '') + v; }
+
   function ensureResult() {
     let el = $('#result');
     if (!el) {
