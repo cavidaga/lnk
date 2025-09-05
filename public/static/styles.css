@@ -505,3 +505,28 @@ body.nav-open{ overflow:hidden }
   .hdr .kv{ grid-template-columns: 1fr 1fr }
   .hdr .item.link{ grid-column: 1 / -1 }  /* span both columns */
 }
+
+#to-top {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  background: var(--c-bg, #fff);
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+  z-index: 1000;
+}
+#to-top.visible {
+  opacity: 0.85;
+  pointer-events: auto;
+}
+#to-top:hover { opacity: 1; }
+#to-top .icon { width: 20px; height: 20px; }

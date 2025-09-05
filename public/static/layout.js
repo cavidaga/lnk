@@ -115,7 +115,24 @@
     const yearEl = document.getElementById('y');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
   }
+  const upBtn = document.createElement('button');
+    upBtn.id = 'to-top';
+    upBtn.setAttribute('aria-label','Yuxarı qayıt');
+    upBtn.innerHTML = `
+      <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 5l-7 7m7-7l7 7m-7-7v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    `;
+    document.body.appendChild(upBtn);
 
+    // Scroll behaviour
+    upBtn.addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
+
+    // Show only after scrolling down a bit
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) upBtn.classList.add('visible');
+      else upBtn.classList.remove('visible');
+    });
   function ready(fn){ if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn); else fn(); }
   ready(() => { injectHeader(); injectFooter(); });
 })();
