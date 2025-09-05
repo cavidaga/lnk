@@ -70,6 +70,7 @@
       const data = await fetchAnalysis(hash);
       renderAnalysis(container, data);
       wireShare(hash);
+      wireCopyButton(location.origin + `/analysis/${encodeURIComponent(hash)}`);
       document.title = `${data?.meta?.title ? data.meta.title + ' — ' : ''}LNK.az`;
     } catch (err) {
       renderError(container, err.message || 'Yüklənmə xətası');
@@ -372,6 +373,47 @@
     if (s.includes('critical')) return 'Tənqidi';
     if (s.includes('supportive') || s.includes('pro-')) return 'Dəstəkləyən';
     return stance || '—';
+  }
+
+  async function copyText(text){
+  // modern API
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (e) {}
+  // fallback for non-secure or denied clipboard
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+  function wireCopyButton(hrefToCopy){
+    const btn = document.getElementById('copy-link');
+    if (!btn) return;
+    btn.addEventListener('click', async () => {
+      const ok = await copyText(hrefToCopy);
+      const old = btn.innerHTML;
+      btn.classList.add(ok ? 'ok' : 'err');
+      btn.setAttribute('aria-live','polite');
+      btn.innerHTML = ok ? 'Kopyalandı' : 'Kopyalanmadı';
+      setTimeout(() => {
+        btn.innerHTML = old;
+        btn.classList.remove('ok','err');
+      }, 1400);
+    });
   }
 
   async function safeJson(res) {

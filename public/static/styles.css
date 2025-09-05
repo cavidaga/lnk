@@ -287,6 +287,9 @@
   #share-card .share-buttons a,
   #share-card .share-buttons button{ width:38px; height:38px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--border); background:var(--panel); }
   #share-card .share-buttons svg{ width:20px; height:20px; display:block; fill:currentColor }
+  #share-card .share-btn.copy.ok { background: #16a34a; color: #fff; border-color: transparent }
+  #share-card .share-btn.copy.err { background: #dc2626; color: #fff; border-color: transparent }
+
   /* Footer */
   footer.site-footer{
     margin-top:36px; padding:22px; border-top:1px solid var(--border);
