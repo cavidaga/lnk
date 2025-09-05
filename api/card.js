@@ -76,6 +76,23 @@ function renderHtml(data) {
     .footer .check{width:16px;height:16px;color:#34D399}
     .panel{position:absolute;inset:0;background:#0E1220;border:1px solid #1F2433;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:12px}
     .quad{position:relative;flex:1;border:1px solid #2A3146;border-radius:14px;overflow:hidden;background:linear-gradient(to bottom,rgba(255,255,255,.02),rgba(255,255,255,0))}
+    /* Axes (the two lines) */
+    .axis-x, .axis-y {
+      position: absolute;
+      background: #2A3146;   /* line color */
+    }
+    .axis-x {                /* horizontal line */
+      left: 40px;
+      right: 40px;
+      top: 50%;
+      height: 1px;
+    }
+    .axis-y {                /* vertical line */
+      top: 40px;
+      bottom: 40px;
+      left: 50%;
+      width: 1px;
+    }
     /* replace the old .axis-labels .top/.bottom/.left/.right rules */
     .axis-labels { position:absolute; inset:0; pointer-events:none; font-size:16px; color:#9CA3AF; }
     .axis-labels .lab-top    { position:absolute; top:6px;    left:50%; transform:translateX(-50%); }
