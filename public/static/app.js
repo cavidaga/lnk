@@ -427,33 +427,33 @@
   }
 
 
-  function headerBlock({ title, publication, published_at, url, title_inferred }){
-    return `
-      <header class="hdr">
-        <div class="kv">
-          <div class="item">
-            <div class="k">Başlıq</div>
-            <div class="v">${escapeHTML(title || '—')}</div>
-          </div>
-          <div class="item">
-            <div class="k">İstinad</div>
-            <div class="v">${escapeHTML(publication || '—')}</div>
-          </div>
-          <div class="item">
-            <div class="k">Tarix</div>
-            <div class="v">${escapeHTML(formatAzDate(published_at) || '—')}</div>
-          </div>
-          <div class="item link">
-            <div class="k">Orijinal link</div>
-            <div class="v anywrap">
-              ${url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener">${escapeHTML(url)}</a>` : '—'}
-            </div>
+function headerBlock({ title, publication, published_at, url, title_inferred }){
+  return `
+    <header class="hdr">
+      <div class="kv">
+        <div class="item">
+          <div class="k">Başlıq</div>
+          <div class="v">${esc(title || '—')}</div>
+        </div>
+        <div class="item">
+          <div class="k">İstinad</div>
+          <div class="v">${esc(publication || '—')}</div>
+        </div>
+        <div class="item">
+          <div class="k">Tarix</div>
+          <div class="v">${esc(formatAzDate(published_at) || '—')}</div>
+        </div>
+        <div class="item link">
+          <div class="k">Orijinal link</div>
+          <div class="v anywrap">
+            ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a>` : '—'}
           </div>
         </div>
-        ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
-      </header>
-    `;
-  }
+      </div>
+      ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
+    </header>
+  `;
+}
 
   async function safeJson(res) {
     try { return await res.json(); } catch { return {}; }
