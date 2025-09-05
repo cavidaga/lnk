@@ -436,29 +436,36 @@ body.nav-open{ overflow:hidden }
   .row .btn{ width:100% }
 
 
-/* Analysis header (mobile-first) */
-.hdr{ margin-bottom:10px }
-.hdr-row{
+/* --- Analysis header (mobile-first) --- */
+.hdr{ margin-bottom:12px }
+
+.hdr .kv{
   display:grid;
-  grid-template-columns: 120px 1fr;
+  grid-template-columns: 1fr;    /* STACKED by default */
   gap:12px;
-  padding:6px 0;
+  align-items:start;
+}
+
+.hdr .item{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:8px 0;
   border-top:1px dashed var(--border);
 }
-.hdr-row:first-child{ border-top:0 }
-.hdr-label{
+.hdr .item:first-child{ border-top:0 }
+
+.hdr .k{
   color:var(--muted);
   font-size:12px;
   text-transform:uppercase;
   letter-spacing:.06em;
 }
-.hdr-value a{ color:var(--link,#4f7cff); text-decoration:underline }
-.anywrap{ overflow-wrap:anywhere }
-.micro{ font-size:12px }
-.micro.muted{ color:var(--muted) }
+.hdr .v a{ color:var(--link,#4f7cff); text-decoration:underline }
+.hdr .v.anywrap{ overflow-wrap:anywhere; word-break:break-word }
 
-/* Mobile */
-@media (max-width: 640px){
-  .hdr-row{ grid-template-columns: 1fr }
-  .hdr-label{ margin-bottom:2px }
+/* On wider screens, use two columns; keep link full-width */
+@media (min-width: 720px){
+  .hdr .kv{ grid-template-columns: 1fr 1fr }
+  .hdr .item.link{ grid-column: 1 / -1 }  /* span both columns */
 }

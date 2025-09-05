@@ -142,22 +142,24 @@ function formatAzDate(dateLike){
 function headerBlock({ title, publication, published_at, url, title_inferred }){
   return `
     <header class="hdr">
-      <div class="hdr-row">
-        <div class="hdr-label">Başlıq</div>
-        <div class="hdr-value">${escapeHTML(title || '—')}</div>
-      </div>
-      <div class="hdr-row">
-        <div class="hdr-label">İstinad</div>
-        <div class="hdr-value">${escapeHTML(publication || '—')}</div>
-      </div>
-      <div class="hdr-row">
-        <div class="hdr-label">Tarix</div>
-        <div class="hdr-value">${escapeHTML(formatAzDate(published_at) || '—')}</div>
-      </div>
-      <div class="hdr-row">
-        <div class="hdr-label">Orijinal link</div>
-        <div class="hdr-value anywrap">
-          ${url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener">${escapeHTML(url)}</a>` : '—'}
+      <div class="kv">
+        <div class="item">
+          <div class="k">Başlıq</div>
+          <div class="v">${escapeHTML(title || '—')}</div>
+        </div>
+        <div class="item">
+          <div class="k">İstinad</div>
+          <div class="v">${escapeHTML(publication || '—')}</div>
+        </div>
+        <div class="item">
+          <div class="k">Tarix</div>
+          <div class="v">${escapeHTML(formatAzDate(published_at) || '—')}</div>
+        </div>
+        <div class="item link">
+          <div class="k">Orijinal link</div>
+          <div class="v anywrap">
+            ${url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener">${escapeHTML(url)}</a>` : '—'}
+          </div>
         </div>
       </div>
       ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
@@ -190,19 +192,16 @@ function displayResult(data, isNewAnalysis = true) {
             <div class="analysis-grid">
               <div>
                 <div>
-                  ${
-                    headerBlock({
-                      title: meta.title || 'Məqalə',
-                      publication: meta.publication || (() => {
-                        try {
-                          return new URL(meta.original_url || '').hostname.replace(/^www\./, '');
-                        } catch { return ''; }
-                      })(),
-                      published_at: meta.published_at || '',
-                      url: meta.original_url || '',
-                      title_inferred: meta?.title_inferred || false
-                    })
-                  }
+                  ${headerBlock({
+                    title: meta.title || 'Məqalə',
+                    publication: meta.publication || (() => {
+                      try { return new URL(meta.original_url || '').hostname.replace(/^www\./,''); }
+                      catch { return ''; }
+                    })(),
+                    published_at: meta.published_at || '',
+                    url: meta.original_url || '',
+                    title_inferred: meta?.title_inferred || false
+                  })}
                 </div>
                 <div class="bias-chart" role="img" aria-label="Etibarlılıq və siyasi meyl qrafiki">
                   <div class="chart-point" style="top:${topPos}%;left:${leftPos}%;"></div>

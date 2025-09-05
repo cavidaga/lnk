@@ -113,12 +113,16 @@
       <article class="card">
         <div class="bd">
           ${headerBlock({
-              title,
-              publication,
-              published_at,
-              url,
-              title_inferred: meta?.title_inferred || false
-            })}
+            title: meta.title || 'Məqalə',
+            publication: meta.publication || (() => {
+              try { return new URL(meta.original_url || '').hostname.replace(/^www\./,''); }
+              catch { return ''; }
+            })(),
+            published_at: meta.published_at || '',
+            url: meta.original_url || '',
+            title_inferred: meta?.title_inferred || false
+          })}
+
           <section class="card">
             <div class="bd">
               <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
@@ -426,22 +430,24 @@
   function headerBlock({ title, publication, published_at, url, title_inferred }){
     return `
       <header class="hdr">
-        <div class="hdr-row">
-          <div class="hdr-label">Başlıq</div>
-          <div class="hdr-value">${esc(title || '—')}</div>
-        </div>
-        <div class="hdr-row">
-          <div class="hdr-label">İstinad</div>
-          <div class="hdr-value">${publication ? esc(publication) : '—'}</div>
-        </div>
-        <div class="hdr-row">
-          <div class="hdr-label">Tarix</div>
-          <div class="hdr-value">${esc(formatAzDate(published_at) || '—')}</div>
-        </div>
-        <div class="hdr-row">
-          <div class="hdr-label">Orijinal link</div>
-          <div class="hdr-value anywrap">
-            ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a>` : '—'}
+        <div class="kv">
+          <div class="item">
+            <div class="k">Başlıq</div>
+            <div class="v">${escapeHTML(title || '—')}</div>
+          </div>
+          <div class="item">
+            <div class="k">İstinad</div>
+            <div class="v">${escapeHTML(publication || '—')}</div>
+          </div>
+          <div class="item">
+            <div class="k">Tarix</div>
+            <div class="v">${escapeHTML(formatAzDate(published_at) || '—')}</div>
+          </div>
+          <div class="item link">
+            <div class="k">Orijinal link</div>
+            <div class="v anywrap">
+              ${url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener">${escapeHTML(url)}</a>` : '—'}
+            </div>
           </div>
         </div>
         ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
