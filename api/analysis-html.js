@@ -18,7 +18,7 @@ export default async function handler(req) {
   const hash = url.searchParams.get('hash') || url.pathname.split('/').pop() || '';
   if (!hash) return new Response('Missing hash', { status: 400 });
 
-  const pageUrl = `${SITE}/analysis/${encodeURIComponent(hash)}`;
+  const pageUrl   = `${SITE}/analysis/${encodeURIComponent(hash)}`;
   const cardPngUrl = `${SITE}/api/card.png?hash=${encodeURIComponent(hash)}&v=${CARD_VERSION}`;
   const ogTitle = 'LNK - Media qərəzi qiymətləndiricisi';
   const ogDesc  = 'Media qərəzi və etibarlılıq təhlili.';

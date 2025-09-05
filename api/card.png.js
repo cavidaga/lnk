@@ -1,6 +1,5 @@
 // /api/card.png.js
 import { ImageResponse } from "@vercel/og";
-import { defaultData } from "../lib/render-helpers.js";
 
 export const config = { runtime: "edge" };
 
