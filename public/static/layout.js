@@ -24,6 +24,7 @@
           <a href="/">Əsas səhifə</a>
           <a href="/about.html">Haqqımızda</a>
           <a href="/methodology.html">Metodologiya</a>
+          <a href="/privacy.html">Məxfilik</a>
         </nav>
       </header>
     `;
@@ -61,6 +62,13 @@
           <a id="contact-link" href="/about.html#contact">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             Əlaqə
+          </a>
+          <a href="/privacy.html">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Məxfilik
           </a>
         </div>
 
