@@ -159,7 +159,26 @@
           </section>
           <section class="card">
             <div class="bd">
-              <h3 style="margin:0 0 8px">Əsas oxlar üzrə izah</h3>
+              <h3 style="margin:0 0 8px">Diaqnostik göstəricilər</h3>
+              <div class="diagnostics-grid">
+                <div class="diag-item">
+                  <div class="label">Dilin yüklülüyü</div>
+                  <div class="value">${fmt100(data?.diagnostics?.language_loadedness)}</div>
+                </div>
+                <div class="diag-item">
+                  <div class="label">Mənbə şəffaflığı</div>
+                  <div class="value">${fmt100(data?.diagnostics?.sourcing_transparency)}</div>
+                </div>
+                <div class="diag-item">
+                  <div class="label">Başlığın dəqiqliyi</div>
+                  <div class="value">${fmt100(data?.diagnostics?.headline_accuracy)}</div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="card">
+            <div class="bd">
+              <h3 style="margin:0 0 8px">Koordinat oxları üzrə izah</h3>
               <dl class="explain">
                 <dt>Etibarlılıq: <span class="value">${fmt100(reliabilityNum)}</span></dt>
                 <dd>${esc(data?.scores?.reliability?.rationale || '—')}</dd>
