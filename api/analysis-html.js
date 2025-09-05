@@ -19,7 +19,7 @@ export default async function handler(req) {
   if (!hash) return new Response('Missing hash', { status: 400 });
 
   const pageUrl   = `${SITE}/analysis/${encodeURIComponent(hash)}`;
-  const cardPngUrl = `${SITE}/api/card.png?hash=${encodeURIComponent(hash)}&v=${CARD_VERSION}`;
+  const cardPngUrl = `${SITE}/static/og-cover.png?v=${CARD_VERSION}`;
   const ogTitle = 'LNK - Media qərəzi qiymətləndiricisi';
   const ogDesc  = 'Media qərəzi və etibarlılıq təhlili.';
 
@@ -48,13 +48,13 @@ export default async function handler(req) {
   <meta property="og:title" content="${esc(ogTitle)}" />
   <meta property="og:description" content="${esc(ogDesc)}" />
   <meta property="og:url" content="${esc(pageUrl)}" />
-  <meta property="og:image" content="${esc(cardPngUrl)}" />
+  <meta property="og:image" content="https://lnk.az/static/og-cover.png?v=2" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://lnk.az/static/og-cover.png?v=2" />
   <meta name="twitter:title" content="${esc(ogTitle)}" />
   <meta name="twitter:description" content="${esc(ogDesc)}" />
-  <meta name="twitter:image" content="${esc(cardPngUrl)}" />
   
   <!-- Icons (match index.html) -->
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
