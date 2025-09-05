@@ -127,7 +127,7 @@
             <div class="bd">
               <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
                 ${metric('Etibarlılıq', fmt100(reliabilityNum), '')}
-                ${metric('Siyasi meyl', fmtBias(polBiasNum), ' (Müxalif ⟷ Hökumətyönlü)')}
+                ${metric('Siyasi meyl', fmtBias(polBiasNum), ' (Müxalif ⟷ İqtidar)')}
                 ${metric('Sosial-mədəni meyl', fmtBias(socBiasNum), '')}
               </div>
               <!-- Axis chart -->
@@ -136,7 +136,7 @@
                 <span class="axis-label y-axis-top">Etibarlı</span>
                 <span class="axis-label y-axis-bottom">Etibarsız</span>
                 <span class="axis-label x-axis-left">Müxalif</span>
-                <span class="axis-label x-axis-right">Hökumətyönümlü</span>
+                <span class="axis-label x-axis-right">İqtidar</span>
               </div>
 
               <!-- Coordinate values -->
