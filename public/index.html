@@ -129,6 +129,41 @@ function formatBias(val){
   if (!Number.isFinite(n)) return 'N/A';
   return (n>0?'+':'') + n.toString();
 }
+const AZ_MONTHS = ['Yanvar','Fevral','Mart','Aprel','May','İyun','İyul','Avqust','Sentyabr','Oktyabr','Noyabr','Dekabr'];
+function formatAzDate(dateLike){
+  if (!dateLike) return '';
+  const d = new Date(dateLike);
+  if (isNaN(d)) return String(dateLike);
+  const now = new Date();
+  const base = `${AZ_MONTHS[d.getMonth()]} ${d.getDate()}`;
+  return d.getFullYear() === now.getFullYear() ? base : `${base}, ${d.getFullYear()}`;
+}
+
+function headerBlock({ title, publication, published_at, url, title_inferred }){
+  return `
+    <header class="hdr">
+      <div class="hdr-row">
+        <div class="hdr-label">Başlıq</div>
+        <div class="hdr-value">${escapeHTML(title || '—')}</div>
+      </div>
+      <div class="hdr-row">
+        <div class="hdr-label">İstinad</div>
+        <div class="hdr-value">${escapeHTML(publication || '—')}</div>
+      </div>
+      <div class="hdr-row">
+        <div class="hdr-label">Tarix</div>
+        <div class="hdr-value">${escapeHTML(formatAzDate(published_at) || '—')}</div>
+      </div>
+      <div class="hdr-row">
+        <div class="hdr-label">Orijinal link</div>
+        <div class="hdr-value anywrap">
+          ${url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener">${escapeHTML(url)}</a>` : '—'}
+        </div>
+      </div>
+      ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
+    </header>
+  `;
+}
 function displayResult(data, isNewAnalysis = true) {
         const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = "Xülasə təqdim edilmədi." } = data;
         const reliability = scores.reliability?.value ?? 50;
@@ -155,15 +190,20 @@ function displayResult(data, isNewAnalysis = true) {
             <div class="analysis-grid">
               <div>
                 <div>
-                ${meta.original_url || meta.title ? `
-                  <div class="article-header">
-                    <a href="${escapeHTML(meta.original_url || '#')}" target="_blank" rel="noopener" class="article-link">
-                      ${originHost ? `<span class="article-source">${escapeHTML(originHost)}</span>` : ''}
-                      <span class="article-title">${escapeHTML(meta.title || 'Məqalə')}</span>
-                    </a>
-                    ${meta.published_at ? `<div class="article-date small muted">${escapeHTML(meta.published_at)}</div>` : ''}
-                  </div>
-                ` : ''}
+                  ${
+                    headerBlock({
+                      title: meta.title || 'Məqalə',
+                      publication: meta.publication || (() => {
+                        try {
+                          return new URL(meta.original_url || '').hostname.replace(/^www\./, '');
+                        } catch { return ''; }
+                      })(),
+                      published_at: meta.published_at || '',
+                      url: meta.original_url || '',
+                      title_inferred: meta?.title_inferred || false
+                    })
+                  }
+                </div>
                 <div class="bias-chart" role="img" aria-label="Etibarlılıq və siyasi meyl qrafiki">
                   <div class="chart-point" style="top:${topPos}%;left:${leftPos}%;"></div>
                   <span class="axis-label y-axis-top">Etibarlı</span><span class="axis-label y-axis-bottom">Etibarsız</span>

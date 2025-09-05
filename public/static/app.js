@@ -112,17 +112,13 @@
     root.innerHTML = `
       <article class="card">
         <div class="bd">
-          <header style="margin-bottom:10px">
-            <h1 style="margin:0 0 6px">${esc(title)}</h1>
-            <div class="small muted">
-              ${publication ? `<span>${esc(publication)}</span>` : ''}
-              ${published_at ? ` • <time datetime="${esc(published_at)}">${esc(published_at)}</time>` : ''}
-            </div>
-            ${url ? `<div class="small" style="margin-top:6px;overflow-wrap:anywhere">
-              Orijinal link: <a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a>
-            </div>` : ''}
-          </header>
-
+          ${headerBlock({
+              title,
+              publication,
+              published_at,
+              url,
+              title_inferred: meta?.title_inferred || false
+            })}
           <section class="card">
             <div class="bd">
               <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
@@ -414,6 +410,43 @@
         btn.classList.remove('ok','err');
       }, 1400);
     });
+  }
+
+  const AZ_MONTHS = ['Yanvar','Fevral','Mart','Aprel','May','İyun','İyul','Avqust','Sentyabr','Oktyabr','Noyabr','Dekabr'];
+  function formatAzDate(dateLike){
+    if (!dateLike) return '';
+    const d = new Date(dateLike);
+    if (isNaN(d)) return String(dateLike);
+    const now = new Date();
+    const base = `${AZ_MONTHS[d.getMonth()]} ${d.getDate()}`;
+    return d.getFullYear() === now.getFullYear() ? base : `${base}, ${d.getFullYear()}`;
+  }
+
+
+  function headerBlock({ title, publication, published_at, url, title_inferred }){
+    return `
+      <header class="hdr">
+        <div class="hdr-row">
+          <div class="hdr-label">Başlıq</div>
+          <div class="hdr-value">${esc(title || '—')}</div>
+        </div>
+        <div class="hdr-row">
+          <div class="hdr-label">İstinad</div>
+          <div class="hdr-value">${publication ? esc(publication) : '—'}</div>
+        </div>
+        <div class="hdr-row">
+          <div class="hdr-label">Tarix</div>
+          <div class="hdr-value">${esc(fmtAzDate(published_at) || '—')}</div>
+        </div>
+        <div class="hdr-row">
+          <div class="hdr-label">Orijinal link</div>
+          <div class="hdr-value anywrap">
+            ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a>` : '—'}
+          </div>
+        </div>
+        ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
+      </header>
+    `;
   }
 
   async function safeJson(res) {
