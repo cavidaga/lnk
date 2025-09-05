@@ -118,7 +118,18 @@
     }
 
     // --- MAIN DISPLAY FUNCTION: Renders the analysis report ---
-    function displayResult(data, isNewAnalysis = true) {
+    
+function format100(val){
+  const n = Number(val);
+  if (!Number.isFinite(n)) return 'N/A';
+  return `${n}/100`;
+}
+function formatBias(val){
+  const n = Number(val);
+  if (!Number.isFinite(n)) return 'N/A';
+  return (n>0?'+':'') + n.toString();
+}
+function displayResult(data, isNewAnalysis = true) {
         const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = "Xülasə təqdim edilmədi." } = data;
         const reliability = scores.reliability?.value ?? 50;
         const politicalBias = scores.political_establishment_bias?.value ?? 0;
@@ -158,6 +169,12 @@
                   <span class="axis-label y-axis-top">Etibarlı</span><span class="axis-label y-axis-bottom">Etibarsız</span>
                   <span class="axis-label x-axis-left">Müxalif</span><span class="axis-label x-axis-right">Hökumətyönümlü</span>
                 </div>
+                <div class="coord-values small">Koordinatlar: Etibarlılıq <strong>${format100(reliability)}</strong> · Siyasi meyl <strong>${formatBias(politicalBias)}</strong> · Sosial-mədəni <strong>${formatBias(scores.socio_cultural_bias?.value ?? 0)}</strong></div>
+              <div class="score-pills">
+                  <div class="pill"><div class="k">Etibarlılıq</div><div class="v">${format100(reliability)}</div></div>
+                  <div class="pill"><div class="k">Siyasi meyl</div><div class="v">${formatBias(politicalBias)} <span class="muted small">(-5 → +5)</span></div></div>
+                  <div class="pill"><div class="k">Sosial-mədəni</div><div class="v">${formatBias(scores.socio_cultural_bias?.value ?? 0)} <span class="muted small">(-5 → +5)</span></div></div>
+                </div>
               </div>
               <div class="summary-card">
                 ${meta.article_type ? `<div class="article-type-tag">${escapeHTML(meta.article_type)}</div>` : ''}
@@ -169,9 +186,9 @@
               <div class="bd">
                 <h3 class="sec-title">Diaqnostik Göstəricilər</h3>
                 <div class="diagnostics-grid">
-                  <div class="diag-item"><div class="label">Dilin yüklülüyü</div><div class="value">${diagnostics.language_loadedness ?? 'N/A'}</div></div>
-                  <div class="diag-item"><div class="label">Mənbə şəffaflığı</div><div class="value">${diagnostics.sourcing_transparency ?? 'N/A'}</div></div>
-                  <div class="diag-item"><div class="label">Başlığın dəqiqliyi</div><div class="value">${diagnostics.headline_accuracy ?? 'N/A'}</div></div>
+                  <div class="diag-item"><div class="label">Dilin yüklülüyü</div><div class="value">${format100(diagnostics.language_loadedness)}</div></div>
+                  <div class="diag-item"><div class="label">Mənbə şəffaflığı</div><div class="value">${format100(diagnostics.sourcing_transparency)}</div></div>
+                  <div class="diag-item"><div class="label">Başlığın dəqiqliyi</div><div class="value">${format100(diagnostics.headline_accuracy)}</div></div>
                 </div>
                 <h4 style="margin-top:20px;">Konkret dil siqnalları</h4>
                 <div class="language-flags">${languageFlagsHTML}</div>
@@ -179,7 +196,7 @@
                 ${sourcesTableHTML}
                 <h3 class="sec-title">Əsas oxlar üzrə izah</h3>
                 <dl class="score-details">
-                  <dt>Etibarlılıq: <span class="value">${scores.reliability?.value ?? 'N/A'}</span></dt>
+                  <dt>Etibarlılıq: <span class="value">${format100(scores.reliability?.value)}</span></dt>
                   <dd>${escapeHTML(scores.reliability?.rationale || '')}</dd>
                   <dt>Siyasi hakimiyyət meyli: <span class="value">${scores.political_establishment_bias?.value ?? 'N/A'}</span></dt>
                   <dd>${escapeHTML(scores.political_establishment_bias?.rationale || '')}</dd>
