@@ -63,6 +63,7 @@
   // ---------- ANALYSIS FLOW ----------
   async function initAnalysis(hash) {
     const container = ensureResult();
+    container.classList.add('show');
     setSpinner(container);
 
     try {
@@ -225,6 +226,7 @@
   }
 
   function renderError(where, msg) {
+    if (where) where.classList.add('show');
     const html = `<div class="card"><div class="bd"><strong>Xəta:</strong> ${esc(msg)}</div></div>`;
     if (where) where.innerHTML = html;
     else showFatal(msg);
