@@ -41,17 +41,42 @@
 
         <div class="footer-row footer-icons" aria-label="Sosial bağlantılar">
           <a href="https://cavid.info" target="_blank" rel="noopener">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l9 4.5v9L12 21 3 16.5v-9L12 3z" stroke="currentColor" stroke-width="1.5"/></svg>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 3l9 4.5v9L12 21 3 16.5v-9L12 3z" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
             Sayt
           </a>
+
           <a href="https://x.com/cavidaga" target="_blank" rel="noopener">
-            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2H21l-6.59 7.523L22 22h-6.828l-5.34-6.508L3.338 22H1l7.093-8.106L2 2h6.828l4.89 5.972L18.244 2Zm-2.393 18h1.89L7.247 3.98H5.27L15.85 20Z"/></svg>
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.244 2H21l-6.59 7.523L22 22h-6.828l-5.34-6.508L3.338 22H1l7.093-8.106L2 2h6.828l4.89 5.972L18.244 2Zm-2.393 18h1.89L7.247 3.98H5.27L15.85 20Z"/>
+            </svg>
             X (Twitter)
           </a>
-          <a href="https://github.com/cavidaga" target="_blank" rel="noopener">
-            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.637 22.428c.575.108.785-.25.785-.556 0-.274-.01-1-.016-1.963-3.194.694-3.87-1.54-3.87-1.54-.523-1.33-1.277-1.684-1.277-1.684-1.043-.713.08-.699.08-.699 1.152.081 1.759 1.184 1.759 1.184 1.025 1.757 2.69 1.25 3.345.956.104-.743.401-1.25.728-1.538-2.55-.29-5.232-1.275-5.232-5.67 0-1.253.45-2.278 1.187-3.082-.12-.29-.515-1.46.112-3.046 0 0 .967-.31 3.17 1.177a10.98 10.98 0 0 1 5.774 0c2.203-1.486 3.169-1.177 3.169-1.177.628 1.586.233 2.756.114 3.046.739.804 1.186 1.83 1.186 3.082 0 4.406-2.686 5.377-5.247 5.662.41.356.78 1.058.78 2.134 0 1.54-.014 2.78-.014 3.158 0 .309.207.671.792.555A11.5 11.5 0 0 0 12 .5Z"/></svg>
+
+          <a href="https://www.facebook.com/lnk.page" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M13.5 9H15V6h-2c-2.2 0-3.5 1.3-3.5 3.5V12H7v3h2.5v7h3v-7H15l.5-3h-3v-2c0-.6.2-1 1-1Z"/>
+            </svg>
+            Facebook
+          </a>
+
+          <a href="https://www.instagram.com/lnk.az" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="4" ry="4"/>
+              <circle cx="12" cy="12" r="4.5"/>
+              <circle cx="17.5" cy="6.5" r="1.5"/>
+            </svg>
+            Instagram
+          </a>
+
+          <a href="https://github.com/cavidaga/lnk" target="_blank" rel="noopener">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 .5a11.5 11.5 0 0 0-3.637 22.428c.575.108.785-.25.785-.556 0-.274-.01-1-.016-1.963-3.194.694-3.87-1.54-3.87-1.54-.523-1.33-1.277-1.684-1.277-1.684-1.043-.713.08-.699.08-.699 1.152.081 1.759 1.184 1.759 1.184 1.025 1.757 2.69 1.25 3.345.956.104-.743.401-1.25.728-1.538-2.55-.29-5.232-1.275-5.232-5.67 0-1.253.45-2.278 1.187-3.082-.12-.29-.515-1.46.112-3.046 0 0 .967-.31 3.17 1.177a10.98 10.98 0 0 1 5.774 0c2.203-1.486 3.169-1.177 3.169-1.177.628 1.586.233 2.756.114 3.046.739.804 1.186 1.83 1.186 3.082 0 4.406-2.686 5.377-5.247 5.662.41.356.78 1.058.78 2.134 0 1.54-.014 2.78-.014 3.158 0 .309.207.671.792.555A11.5 11.5 0 0 0 12 .5Z"/>
+            </svg>
             GitHub
           </a>
+
           <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -59,10 +84,15 @@
             </svg>
             Layihəyə dəstək ol
           </a>
+
           <a id="contact-link" href="/about.html#contact">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5"/>
+              <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
             Əlaqə
           </a>
+
           <a href="/privacy.html">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
