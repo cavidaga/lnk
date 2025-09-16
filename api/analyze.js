@@ -36,11 +36,11 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 // --- Config ---
 const MAX_ARTICLE_CHARS = 30000;
 const BLOCK_KEYWORDS = ['cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'];
-const PRIMARY_MODEL = 'gemini-2.5-pro';
-const FALLBACK_MODEL = 'gemini-2.5-flash';
+const PRIMARY_MODEL = 'gemini-2.5-flash';
+const FALLBACK_MODEL = 'gemini-2.5-pro';
 const RETRY_ATTEMPTS = 1;          // single attempt per model
 const INITIAL_BACKOFF_MS = 600;    // starting backoff for retries
-const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 12000); // 12s default
+const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 20000); // 20s default
 
 // --- Helpers ---
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
@@ -524,7 +524,7 @@ export default async function handler(req, res) {
           // Even if thin, try safe prompt immediately to avoid Chromium unless necessary.
           if (articleTextFast && articleTextFast.length >= 400) {
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
-            const SHRINKS = [1.0, 0.6];
+            const SHRINKS = [0.7, 0.4];
             let parsedQuick = null, modelUsedQuick = null, lastErrQuick = null;
             for (let i = 0; i < SHRINKS.length; i++) {
               const cut = Math.floor(MAX_ARTICLE_CHARS * SHRINKS[i]);
@@ -730,7 +730,7 @@ export default async function handler(req, res) {
 
           // If content is very short/blocked, jump straight to safe prompt to save tokens.
           const tooThin = !articleText || articleText.length < 400;
-          const SHRINKS = [1.0, 0.6, 0.4];
+          const SHRINKS = [0.7, 0.4];
           let parsed, modelUsed, lastErr;
 
           if (!tooThin) {
