@@ -5,11 +5,7 @@
   ],
   "functions": {
     "api/analysis-html.js": {
-      "runtime": "vercel-edge@2.0.0",
       "excludeFiles": "api/card-image.js"
-    },
-    "api/card-image.js": {
-      "runtime": "vercel-edge@2.0.0"
     }
   }
 }
