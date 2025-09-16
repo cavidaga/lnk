@@ -471,3 +471,5 @@ export default async function handler(req, res) {
     if (result?.modelUsed) res.setHeader('X-Model-Used', result.modelUsed);
     if (result?.contentSource) res.setHeader('X-Content-Source', result.contentSource);
     return res.status(200).json(result);
+  }
+}
