@@ -522,6 +522,22 @@ export default async function handler(req, res) {
 
           // If fast path is acceptable, proceed directly to LLM without Chromium.
           // Even if thin, try safe prompt immediately to avoid Chromium unless necessary.
+          try {
+            const hostQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
+            if (hostQuick.endsWith('jam-news.net')) {
+              const siteQuick = hostQuick;
+              const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
+              const r2 = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt: safePrompt });
+              const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
+              normalized.hash = cacheKey;
+              normalized.modelUsed = r2.modelUsed;
+              normalized.contentSource = contentSource;
+              await kv.set(cacheKey, normalized, { ex: 2592000 });
+              console.log(`SAVED TO CACHE (jam-news safe) for URL: ${effectiveUrl}`);
+              try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+              return normalized;
+            }
+          } catch {}
           if (articleTextFast && articleTextFast.length >= 400) {
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
             const SHRINKS = [0.7, 0.4];
@@ -679,6 +695,21 @@ export default async function handler(req, res) {
             } catch (fetchFallbackErr) {
               console.warn('Fetch-fallback failed:', fetchFallbackErr?.message || fetchFallbackErr);
             }
+          }
+
+          // If still thin and host is jam-news.net, skip deeper waits and proceed to safe prompt to meet 60s budget
+          if ((!articleText || articleText.length < 400) && originUrl.hostname.endsWith('jam-news.net')) {
+            const siteQuick = originUrl.hostname.replace(/^www\./,'');
+            const safePrompt = buildSafePrompt({ url: effectiveUrl, title: (await page.title()).slice(0, 180), site: siteQuick });
+            const r2 = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt: safePrompt });
+            const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
+            normalized.hash = cacheKey;
+            normalized.modelUsed = r2.modelUsed;
+            normalized.contentSource = contentSource;
+            await kv.set(cacheKey, normalized, { ex: 2592000 });
+            console.log(`SAVED TO CACHE (jam-news chromium-safe) for URL: ${effectiveUrl}`);
+            try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+            return normalized;
           }
 
           articleText = articleText.substring(0, MAX_ARTICLE_CHARS);
