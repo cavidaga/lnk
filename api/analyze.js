@@ -2,6 +2,7 @@ import { kv } from '@vercel/kv';
 import crypto from 'crypto';
 import chromium from '@sparticuz/chromium';
 import { addExtra } from 'puppeteer-extra';
+import dns from 'node:dns/promises';
 import puppeteerCore from 'puppeteer-core';
 
 // 🔒 policy helpers
@@ -195,8 +196,24 @@ async function preflightPolicy(targetUrl) {
   try {
     const head = await fetch(targetUrl, { method: 'HEAD', redirect: 'follow' });
     if (head?.url) finalUrl = head.url;
-
-    // Host & path blocks (final URL)
+// Host & path + scheme/port/credentials + DNS/IP blocks (final URL)
+    const u = new URL(finalUrl);
+    // scheme
+    if (!/^https?:$/.test(u.protocol)) {
+      const err = new Error('Only HTTP/HTTPS are allowed');
+      err.code = 'BAD_SCHEME'; throw err;
+    }
+    // auth in URL
+    if (u.username || u.password) {
+      const err = new Error('Credentials in URL are not allowed');
+      err.code = 'BAD_AUTH'; throw err;
+    }
+    // ports (limit surface)
+    if (u.port && !['80','443'].includes(u.port)) {
+      const err = new Error('Port not allowed');
+      err.code = 'BAD_PORT'; throw err;
+    }
+    // quick string-level guards
     if (isBlockedHost(finalUrl)) {
       const err = new Error('Hosted/large document source blocked');
       err.code = 'BLOCKED_HOST'; throw err;
@@ -204,6 +221,38 @@ async function preflightPolicy(targetUrl) {
     if (isBlockedPath(finalUrl)) {
       const err = new Error('Document path indicates hosted/large file');
       err.code = 'BLOCKED_PATH'; throw err;
+    }
+
+    // DNS resolution → block private/link-local/loopback/CGNAT
+    try {
+      const addrs = await dns.lookup(u.hostname, { all: true, verbatim: true });
+      const isPrivate = (addr) => {
+        const ip = addr.address.toLowerCase();
+        // v4
+        if (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) {
+          if (ip.startsWith('10.') || ip.startsWith('192.168.') || ip.startsWith('127.') || ip.startsWith('169.254.')) return true;
+          if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(ip)) return true;
+          if (/^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(ip)) return true; // CGNAT
+          if (ip === '169.254.169.254') return true; // metadata
+          return false;
+        }
+        // v6
+        if (ip === '::1') return true;
+        if (ip.startsWith('fe80:')) return true;   // link-local
+        if (ip.startsWith('fc') || ip.startsWith('fd')) return true; // ULA
+        if (ip.startsWith('::ffff:')) {
+          const last = ip.split(':').pop() || '';
+          if (/^\d{1,3}(\.\d{1,3}){3}$/.test(last)) return isPrivate({ address: last });
+        }
+        return false;
+      };
+      if (Array.isArray(addrs) && addrs.some(isPrivate)) {
+        const err = new Error('Target resolves to a private or link-local address');
+        err.code = 'PRIVATE_IP'; throw err;
+      }
+    } catch (dnsErr) {
+      // If DNS fails completely, keep going (some hosts block lookups),
+      // we’ll still rely on other guards and platform egress rules.
     }
 
     // Headers check
@@ -225,8 +274,17 @@ async function preflightPolicy(targetUrl) {
   } catch (e) {
     // If HEAD fails (some hosts), still enforce host/path blocks on the original URL
     try {
+      const u0 = new URL(targetUrl);
+      if (!/^https?:$/.test(u0.protocol)) { const err = new Error('Only HTTP/HTTPS are allowed'); err.code='BAD_SCHEME'; throw err; }
+      if (u0.username || u0.password) { const err = new Error('Credentials in URL are not allowed'); err.code='BAD_AUTH'; throw err; }
+      if (u0.port && !['80','443'].includes(u0.port)) { const err = new Error('Port not allowed'); err.code='BAD_PORT'; throw err; }
       if (isBlockedHost(targetUrl)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
       if (isBlockedPath(targetUrl)) { const err = new Error('Document path indicates hosted/large file'); err.code='BLOCKED_PATH'; throw err; }
+      // Also block obvious private IP literals quickly
+      // (DNS not attempted in this fallback)
+      if (u0.hostname && isIpLiteral(u0.hostname) && isPrivateIpLiteral(u0.hostname)) {
+        const err = new Error('Target is private-network address'); err.code='PRIVATE_IP'; throw err;
+      }
     } catch (inner) {
       throw inner;
     }
@@ -373,6 +431,10 @@ export default async function handler(req, res) {
         ALLOWLIST_ONLY:  'Hazırda yalnız təsdiqlənmiş saytların linkləri qəbul olunur.',
         NON_ARTICLE:     'Bu link məqalə kimi görünmür. Xahiş edirik məqalənin konkret səhifəsini göndərin.',
         BAD_URL:         'Keçid düzgün deyil. Zəhmət olmasa tam URL göndərin (https:// ilə).'
+        BAD_SCHEME:      'Yalnız HTTP/HTTPS linkləri qəbul edilir.',
+        BAD_PORT:        'Bu port icazəli deyil.',
+        BAD_AUTH:        'URL daxilində istifadəçi adı/parol qəbul edilmir.',
+        PRIVATE_IP:      'Daxili və ya məxfi şəbəkə ünvanlarına keçidlər bloklanır.',
       };
       return res.status(400).json({ error: true, code: polErr.code || 'POLICY', message: messages[polErr.code] || polErr.message });
     }
