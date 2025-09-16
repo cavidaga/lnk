@@ -23,10 +23,9 @@ const puppeteer = addExtra(puppeteerCore);
 // Configure stealth to avoid requiring deprecated/removed evasions in some versions
 const stealth = StealthPlugin();
 try {
-  if (stealth?.enabledEvasions) {
-    stealth.enabledEvasions.delete('chrome.app');
-    stealth.enabledEvasions.delete('chrome.csi');
-    stealth.enabledEvasions.delete('chrome.loadTimes');
+  if (stealth?.enabledEvasions?.clear) {
+    // Disable all evasions to avoid requiring deprecated/missing modules in serverless
+    stealth.enabledEvasions.clear();
   }
 } catch {}
 puppeteer.use(stealth); // ✅ important for CF/anti-bot
