@@ -207,6 +207,11 @@ async function preflightPolicy(targetUrl) {
   try {
     const head = await fetch(targetUrl, { method: 'HEAD', redirect: 'follow' });
     if (head?.url) finalUrl = head.url;
+        // If the server clearly says "gone/not found", stop right here
+    if (head && (head.status === 404 || head.status === 410)) {
+      const err = new Error(`Target returned ${head.status}`);
+      err.code = 'NOT_FOUND'; throw err;
+    }
 // Host & path + scheme/port/credentials + DNS/IP blocks (final URL)
     const u = new URL(finalUrl);
     // scheme
@@ -446,7 +451,9 @@ export default async function handler(req, res) {
       "BAD_PORT":        "Bu port icazəli deyil.",
       "BAD_AUTH":        "URL daxilində istifadəçi adı/parol qəbul edilmir.",
       "PRIVATE_IP":      "Daxili və ya məxfi şəbəkə ünvanlarına keçidlər bloklanır.",
-      "PRIVATE_HOST":    "Lokal/intranet host adlarına keçidlər bloklanır."
+      "PRIVATE_HOST":    "Lokal/intranet host adlarına keçidlər bloklanır.",
+      "NOT_FOUND":      "Keçid mövcud deyil (404/410). Zəhmət olmasa düzgün məqalə linki göndərin.",
+      "BAD_STATUS":     "Hədəf səhifə hazırda əlçatmazdır."
     };
       return res.status(400).json({ error: true, code: polErr.code || 'POLICY', message: messages[polErr.code] || polErr.message });
     }
@@ -521,7 +528,15 @@ export default async function handler(req, res) {
           }
           articleText = articleText.substring(0, MAX_ARTICLE_CHARS);
           const lower = articleText.toLowerCase();
-
+          // Soft-404 & non-article heuristics (Azeri + EN)
+          const SOFT_404 = [
+            /səhifə tapılmadı/i, /sehife tapilmadi/i, /tapılmadı/i, /mövcud deyil/i,
+            /page not found/i, /\b404\b/, /not found/i, /content not available/i
+          ];
+          if (articleText.length < 400 || SOFT_404.some(rx => rx.test(articleText))) {
+            const err = new Error('This does not look like an article (soft 404 / placeholder).');
+            err.code = 'NON_ARTICLE'; throw err;
+          }
           // Anti-bot fallback → Archive.org
           if (BLOCK_KEYWORDS.some((kw) => lower.includes(kw))) {
             console.log(`Initial fetch for ${effectiveUrl} was blocked. Checking Archive.org...`);
