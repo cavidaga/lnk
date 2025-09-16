@@ -17,7 +17,6 @@ import {
 } from '../lib/url-policy.js';
 
 const puppeteer = addExtra(puppeteerCore);
-puppeteer.use(StealthPlugin());
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // --- Config ---
