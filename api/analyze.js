@@ -1,3 +1,6 @@
+// api/analyze.js — 2025-09-16 LNK.az
+export const config = { runtime: 'nodejs', maxDuration: 60 };
+
 import { kv } from '@vercel/kv';
 import crypto from 'crypto';
 import chromium from '@sparticuz/chromium';
@@ -17,6 +20,8 @@ import {
 } from '../lib/url-policy.js';
 
 const puppeteer = addExtra(puppeteerCore);
+puppeteer.use(StealthPlugin()); // ✅ important for CF/anti-bot
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // --- Config ---
@@ -30,6 +35,7 @@ const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 70000); // 70s de
 
 // --- Helpers ---
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
 // ultra-light fallback: turn raw HTML into readable text
 function htmlToText(html = "") {
   return String(html)
@@ -40,13 +46,12 @@ function htmlToText(html = "") {
     .replace(/\s+/g, " ")
     .trim();
 }
+
 // Prevent duplicate concurrent work on the same URL/hash
 async function withLock(cacheKey, fn) {
   const lockKey = `lock:${cacheKey}`;
-  // Try to acquire a short lock (30s). Upstash/Vercel KV supports NX + EX.
   const acquired = await kv.set(lockKey, '1', { ex: 30, nx: true });
   if (!acquired) {
-    // Someone else is computing; wait and re-check cache
     await new Promise(r => setTimeout(r, 600));
     const ready = await kv.get(cacheKey);
     if (ready) return ready;
@@ -267,45 +272,22 @@ async function preflightPolicy(targetUrl) {
   try {
     const head = await fetch(targetUrl, { method: 'HEAD', redirect: 'follow' });
     if (head?.url) finalUrl = head.url;
-    // If non-OK, stop early (map 404/410 to NOT_FOUND, others to BAD_STATUS)
     if (head && head.status >= 400) {
       const err = new Error(`Target returned ${head.status}`);
-    err.code = (head.status === 404 || head.status === 410) ? 'NOT_FOUND' : 'BAD_STATUS';
-    throw err;
+      err.code = (head.status === 404 || head.status === 410) ? 'NOT_FOUND' : 'BAD_STATUS';
+      throw err;
     }
-// Host & path + scheme/port/credentials + DNS/IP blocks (final URL)
     const u = new URL(finalUrl);
-    // scheme
-    if (!/^https?:$/.test(u.protocol)) {
-      const err = new Error('Only HTTP/HTTPS are allowed');
-      err.code = 'BAD_SCHEME'; throw err;
-    }
-    // auth in URL
-    if (u.username || u.password) {
-      const err = new Error('Credentials in URL are not allowed');
-      err.code = 'BAD_AUTH'; throw err;
-    }
-    // ports (limit surface)
-    if (u.port && !['80','443'].includes(u.port)) {
-      const err = new Error('Port not allowed');
-      err.code = 'BAD_PORT'; throw err;
-    }
-    // quick string-level guards
-    if (isBlockedHost(finalUrl)) {
-      const err = new Error('Hosted/large document source blocked');
-      err.code = 'BLOCKED_HOST'; throw err;
-    }
-    if (isBlockedPath(finalUrl)) {
-      const err = new Error('Document path indicates hosted/large file');
-      err.code = 'BLOCKED_PATH'; throw err;
-    }
+    if (!/^https?:$/.test(u.protocol)) { const err = new Error('Only HTTP/HTTPS are allowed'); err.code='BAD_SCHEME'; throw err; }
+    if (u.username || u.password) { const err = new Error('Credentials in URL are not allowed'); err.code='BAD_AUTH'; throw err; }
+    if (u.port && !['80','443'].includes(u.port)) { const err = new Error('Port not allowed'); err.code='BAD_PORT'; throw err; }
+    if (isBlockedHost(finalUrl)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
+    if (isBlockedPath(finalUrl)) { const err = new Error('Document path indicates hosted/large file'); err.code='BLOCKED_PATH'; throw err; }
 
-    // DNS resolution → block private/link-local/loopback/CGNAT
     try {
       const addrs = await dns.lookup(u.hostname, { all: true, verbatim: true });
       const isPrivate = (addr) => {
         const ip = addr.address.toLowerCase();
-        // v4
         if (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) {
           if (ip.startsWith('10.') || ip.startsWith('192.168.') || ip.startsWith('127.') || ip.startsWith('169.254.')) return true;
           if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(ip)) return true;
@@ -313,10 +295,9 @@ async function preflightPolicy(targetUrl) {
           if (ip === '169.254.169.254') return true; // metadata
           return false;
         }
-        // v6
         if (ip === '::1') return true;
-        if (ip.startsWith('fe80:')) return true;   // link-local
-        if (ip.startsWith('fc') || ip.startsWith('fd')) return true; // ULA
+        if (ip.startsWith('fe80:')) return true;
+        if (ip.startsWith('fc') || ip.startsWith('fd')) return true;
         if (ip.startsWith('::ffff:')) {
           const last = ip.split(':').pop() || '';
           if (/^\d{1,3}(\.\d{1,3}){3}$/.test(last)) return isPrivate({ address: last });
@@ -327,29 +308,15 @@ async function preflightPolicy(targetUrl) {
         const err = new Error('Target resolves to a private or link-local address');
         err.code = 'PRIVATE_IP'; throw err;
       }
-    } catch (dnsErr) {
-      // If DNS fails completely, keep going (some hosts block lookups),
-      // we’ll still rely on other guards and platform egress rules.
-    }
+    } catch {}
 
-    // Headers check
     const ct = head.headers.get('content-type') || '';
     const cl = Number(head.headers.get('content-length') || 0);
     const cd = (head.headers.get('content-disposition') || '').toLowerCase();
-    if (cd.includes('attachment')) {
-      const err = new Error('Direct attachments are not analyzed');
-      err.code = 'ATTACHMENT'; throw err;
-    }
-    if (ct && !isAllowedMime(ct)) {
-      const err = new Error(`Unsupported content type: ${ct}`);
-      err.code = 'DISALLOWED_MIME'; throw err;
-    }
-    if (cl && cl > MAX_CONTENT_LENGTH_HEAD) {
-      const err = new Error(`Content-Length ${cl} exceeds limit`);
-      err.code = 'TOO_LARGE'; err.contentLength = cl; throw err;
-    }
+    if (cd.includes('attachment')) { const err = new Error('Direct attachments are not analyzed'); err.code='ATTACHMENT'; throw err; }
+    if (ct && !isAllowedMime(ct)) { const err = new Error(`Unsupported content type: ${ct}`); err.code='DISALLOWED_MIME'; throw err; }
+    if (cl && cl > MAX_CONTENT_LENGTH_HEAD) { const err = new Error(`Content-Length ${cl} exceeds limit`); err.code='TOO_LARGE'; err.contentLength = cl; throw err; }
   } catch (e) {
-    // If HEAD fails (some hosts), still enforce host/path blocks on the original URL
     try {
       const u0 = new URL(targetUrl);
       if (!/^https?:$/.test(u0.protocol)) { const err = new Error('Only HTTP/HTTPS are allowed'); err.code='BAD_SCHEME'; throw err; }
@@ -357,15 +324,12 @@ async function preflightPolicy(targetUrl) {
       if (u0.port && !['80','443'].includes(u0.port)) { const err = new Error('Port not allowed'); err.code='BAD_PORT'; throw err; }
       if (isBlockedHost(targetUrl)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
       if (isBlockedPath(targetUrl)) { const err = new Error('Document path indicates hosted/large file'); err.code='BLOCKED_PATH'; throw err; }
-      // Also block obvious private IP literals quickly
-      // (DNS not attempted in this fallback)
       if (u0.hostname && isIpLiteral(u0.hostname) && isPrivateIpLiteral(u0.hostname)) {
         const err = new Error('Target is private-network address'); err.code='PRIVATE_IP'; throw err;
       }
     } catch (inner) {
       throw inner;
     }
-    // If we set a policy code above, bubble it; else allow Chromium to try
     if (e && e.code) throw e;
   }
   return finalUrl;
@@ -373,67 +337,54 @@ async function preflightPolicy(targetUrl) {
 
 function normalizeOutput(o = {}, { url }) {
   const out = { ...o };
-
-  // schema tag
   out.schema_version = '2025-09-16';
 
   // ---- META ----
   out.meta = out.meta && typeof out.meta === 'object' ? out.meta : {};
   const m = out.meta;
   if (!m.original_url) m.original_url = url;
-  // derive publication from URL if missing
   if (!m.publication && m.original_url) {
-    try { m.publication = new URL(m.original_url).hostname.replace(/^www\./,''); } catch (e) {}
+    try { m.publication = new URL(m.original_url).hostname.replace(/^www\./,''); } catch {}
   }
-  // ISO-ify published_at if it's a parseable date
   if (m.published_at) {
     const d = new Date(m.published_at);
     if (!isNaN(d)) m.published_at = d.toISOString();
-    else delete m.published_at; // drop garbage
+    else delete m.published_at;
   }
 
   // ---- SCORES ----
   out.scores = out.scores && typeof out.scores === 'object' ? out.scores : {};
   const s = out.scores;
 
-  // reliability
   if (!s.reliability || typeof s.reliability !== 'object') s.reliability = {};
   if (typeof s.reliability.value !== 'number') s.reliability.value = 0;
   s.reliability.value = Math.max(0, Math.min(100, s.reliability.value));
   if (typeof s.reliability.rationale !== 'string') s.reliability.rationale = '';
 
-  // political_establishment_bias
   if (!s.political_establishment_bias || typeof s.political_establishment_bias !== 'object') s.political_establishment_bias = {};
   if (typeof s.political_establishment_bias.value !== 'number') s.political_establishment_bias.value = 0;
   s.political_establishment_bias.value = Math.max(-5, Math.min(5, s.political_establishment_bias.value));
   if (typeof s.political_establishment_bias.rationale !== 'string') s.political_establishment_bias.rationale = '';
 
-  // purge deprecated field if model still emits it
+  // purge deprecated fields if any model emits them
   if (s.socio_cultural_bias) delete s.socio_cultural_bias;
 
   // ---- DIAGNOSTICS ----
   out.diagnostics = out.diagnostics && typeof out.diagnostics === 'object' ? out.diagnostics : {};
   const dgn = out.diagnostics;
 
-  // NEW arrays
   if (!Array.isArray(dgn.socio_cultural_descriptions)) dgn.socio_cultural_descriptions = [];
   if (!Array.isArray(dgn.language_flags)) dgn.language_flags = [];
 
-  // clamp sizes to keep payload tiny
-  dgn.socio_cultural_descriptions = dgn.socio_cultural_descriptions.slice(0, 12);
-  dgn.language_flags = dgn.language_flags.slice(0, 24);
-
-  // normalize elements
-  dgn.socio_cultural_descriptions = dgn.socio_cultural_descriptions.map(x => ({
+  dgn.socio_cultural_descriptions = dgn.socio_cultural_descriptions.slice(0, 12).map(x => ({
     group: typeof x?.group === 'string' ? x.group : '',
     stance: typeof x?.stance === 'string' ? x.stance : '',
     rationale: typeof x?.rationale === 'string' ? x.rationale : ''
   }));
 
   const ALLOWED_FLAG_CATS = new Set(['yüklü söz','qeyri-müəyyən','spekulyativ']);
-  dgn.language_flags = dgn.language_flags.map(x => {
+  dgn.language_flags = dgn.language_flags.slice(0, 24).map(x => {
     let cat = typeof x?.category === 'string' ? x.category.trim().toLowerCase() : '';
-    // try to coerce common variants to allowed set
     if (cat.includes('yükl')) cat = 'yüklü söz';
     else if (cat.includes('qeyri')) cat = 'qeyri-müəyyən';
     else if (cat.includes('spek')) cat = 'spekulyativ';
@@ -499,23 +450,23 @@ export default async function handler(req, res) {
       effectiveUrl = await preflightPolicy(url);
     } catch (polErr) {
       const messages = {
-      "BLOCKED_HOST":    "Böyük sənədlər (Google Docs/Drive və s.) analiz edilmir.",
-      "BLOCKED_PATH":    "Bu keçid başqa bir hostinqdəki sənədə və ya birbaşa fayl yükləməsinə yönləndirir.",
-      "DISALLOWED_MIME": "Analiz üçün dəstəklənməyən məzmun növü.",
-      "ATTACHMENT":      "Birbaşa fayl əlavələri analiz edilmir.",
-      "TOO_LARGE":       "Sənəd çox böyükdür.",
-      "BLOCKED_FILE_EXT":"Fayl növü dəstəklənmir (video/arayış/fayl).",
-      "ALLOWLIST_ONLY":  "Hazırda yalnız təsdiqlənmiş saytların linkləri qəbul olunur.",
-      "NON_ARTICLE":     "Bu link məqalə kimi görünmür. Xahiş edirik məqalənin konkret səhifəsini göndərin.",
-      "BAD_URL":         "Keçid düzgün deyil. Zəhmət olmasa tam URL göndərin (https:// ilə).",
-      "BAD_SCHEME":      "Yalnız HTTP/HTTPS linkləri qəbul edilir.",
-      "BAD_PORT":        "Bu port icazəli deyil.",
-      "BAD_AUTH":        "URL daxilində istifadəçi adı/parol qəbul edilmir.",
-      "PRIVATE_IP":      "Daxili və ya məxfi şəbəkə ünvanlarına keçidlər bloklanır.",
-      "PRIVATE_HOST":    "Lokal/intranet host adlarına keçidlər bloklanır.",
-      "NOT_FOUND":      "Keçid mövcud deyil (404/410). Zəhmət olmasa düzgün məqalə linki göndərin.",
-      "BAD_STATUS":     "Hədəf səhifə hazırda əlçatmazdır."
-    };
+        "BLOCKED_HOST":    "Böyük sənədlər (Google Docs/Drive və s.) analiz edilmir.",
+        "BLOCKED_PATH":    "Bu keçid başqa bir hostinqdəki sənədə və ya birbaşa fayl yükləməsinə yönləndirir.",
+        "DISALLOWED_MIME": "Analiz üçün dəstəklənməyən məzmun növü.",
+        "ATTACHMENT":      "Birbaşa fayl əlavələri analiz edilmir.",
+        "TOO_LARGE":       "Sənəd çox böyükdür.",
+        "BLOCKED_FILE_EXT":"Fayl növü dəstəklənmir (video/arayış/fayl).",
+        "ALLOWLIST_ONLY":  "Hazırda yalnız təsdiqlənmiş saytların linkləri qəbul olunur.",
+        "NON_ARTICLE":     "Bu link məqalə kimi görünmür. Xahiş edirik məqalənin konkret səhifəsini göndərin.",
+        "BAD_URL":         "Keçid düzgün deyil. Zəhmət olmasa tam URL göndərin (https:// ilə).",
+        "BAD_SCHEME":      "Yalnız HTTP/HTTPS linkləri qəbul edilir.",
+        "BAD_PORT":        "Bu port icazəli deyil.",
+        "BAD_AUTH":        "URL daxilində istifadəçi adı/parol qəbul edilmir.",
+        "PRIVATE_IP":      "Daxili və ya məxfi şəbəkə ünvanlarına keçidlər bloklanır.",
+        "PRIVATE_HOST":    "Lokal/intranet host adlarına keçidlər bloklanır.",
+        "NOT_FOUND":       "Keçid mövcud deyil (404/410). Zəhmət olmasa düzgün məqalə linki göndərin.",
+        "BAD_STATUS":      "Hədəf səhifə hazırda əlçatmazdır."
+      };
       return res.status(400).json({ error: true, code: polErr.code || 'POLICY', message: messages[polErr.code] || polErr.message });
     }
 
@@ -523,7 +474,6 @@ export default async function handler(req, res) {
     let result;
     try {
       result = await withLock(cacheKey, async () => {
-        // Re-check cache in case another instance finished while we waited
         const recheck = await kv.get(cacheKey);
         if (recheck) return recheck;
 
@@ -540,77 +490,113 @@ export default async function handler(req, res) {
 
           const page = await browser.newPage();
           await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
+          await page.setExtraHTTPHeaders({ 'Accept-Language': 'az,en;q=0.9' });
 
-      // Trim heavy resources to speed up/avoid infinite network idles
-      const originUrl = new URL(effectiveUrl);
-      const siteBase = originUrl.hostname.split('.').slice(-2).join('.'); // rough eTLD+1
+          // Trim heavy resources to speed up/avoid infinite network idles
+          const originUrl = new URL(effectiveUrl);
+          const siteBase = originUrl.hostname.split('.').slice(-2).join('.'); // rough eTLD+1
+          const isOxu = originUrl.hostname === 'oxu.az' || originUrl.hostname.endsWith('.oxu.az');
 
-      await page.setRequestInterception(true);
-      page.on('request', (req) => {
-        const type = req.resourceType();
-        const u = new URL(req.url());
-        const sameHost = u.hostname === originUrl.hostname;
-        const sameSite = sameHost || u.hostname.endsWith('.' + siteBase);
+          await page.setRequestInterception(true);
+          page.on('request', (req) => {
+            const type = req.resourceType();
+            const u = new URL(req.url());
+            const sameHost = u.hostname === originUrl.hostname;
+            const sameSite = sameHost || u.hostname.endsWith('.' + siteBase);
 
-        // Drop obvious heavy stuff
-        if (type === 'image' || type === 'media' || type === 'font') return req.abort();
-
-        // Keep styles if same-site (many sites hide content without CSS)
-        if (type === 'stylesheet' && !sameSite) return req.abort();
-
-        // Allow XHR/fetch always; allow WS only if same-site
-        if (type === 'websocket' && !sameSite) return req.abort();
-
-        return req.continue();
-      });
-
-      const DOMAIN_SELECTORS = {
-        'publika.az': ['.news-content','.news_text','.news-detail','.post-content','article']
-      };
-
-      // Be lenient with settle criteria: first try DOM ready, then full load
-      let resp = null;
-        try {
-            resp = await page.goto(effectiveUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
-          } catch (e) {
-            console.warn('First nav attempt (domcontentloaded) failed:', e?.message || e);
-          }
-          if (!resp) {
-            try {
-              resp = await page.goto(effectiveUrl, { waitUntil: 'load', timeout: 35000 });
-            } catch (e2) {
-              console.warn('Second nav attempt (load) failed:', e2?.message || e2);
+            // For oxu.az, be a bit less aggressive (keep images/css from same-site).
+            if (isOxu) {
+              if (type === 'font' || (type === 'image' && !sameSite)) return req.abort();
+              if (type === 'stylesheet' && !sameSite) return req.abort();
+              if (type === 'websocket' && !sameSite) return req.abort();
+              return req.continue();
             }
-          }
-          await new Promise(r => setTimeout(r, 400)); // small settle pause
 
-          // For fallback prompt
-          const site = new URL(effectiveUrl).hostname.replace(/^www\./,'');
-          let headline = '';
-          try { headline = await page.title(); } catch {}
+            // Default behavior for others
+            if (type === 'image' || type === 'media' || type === 'font') return req.abort();
+            if (type === 'stylesheet' && !sameSite) return req.abort();
+            if (type === 'websocket' && !sameSite) return req.abort();
+            return req.continue();
+          });
+
+          const DOMAIN_SELECTORS = {
+            'oxu.az': ['.news-inner', '.news-detail', 'article', '.article', '.content'],
+            'publika.az': ['.news-content','.news_text','.news-detail','.post-content','article']
+          };
+
+          // ---- OXU.AZ OVERRIDE (CF-friendly nav) ----
+          let resp = null;
           try {
-            const ogt = await page.$eval('meta[property="og:title"]', el => el.getAttribute('content'));
-            if (ogt && ogt.length > 5) headline = ogt;
+            // First attempt: DOM ready (fast)
+            resp = await page.goto(effectiveUrl, { waitUntil: 'domcontentloaded', timeout: 25000 });
+          } catch (e) {
+            console.warn('First nav (domcontentloaded) failed:', e?.message || e);
+          }
+
+          // If oxu.az or first nav looked like CF, try networkidle2 and a longer dwell
+          const needsDeepWait = isOxu || !resp;
+          if (needsDeepWait) {
+            try {
+              resp = await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 45000 });
+            } catch (e2) {
+              console.warn('Second nav (networkidle2) failed:', e2?.message || e2);
+            }
+            // Wait a touch for any JS challenge to clear
+            await page.waitForTimeout(1800).catch(()=>{});
+          }
+
+          // If title suggests Cloudflare, wait a bit more and re-load once
+          try {
+            const t = (await page.title()) || '';
+            if (/cloudflare|attention required|checking your browser/i.test(t)) {
+              await page.waitForTimeout(2000);
+              try {
+                await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 45000 });
+                await page.waitForTimeout(1200);
+              } catch {}
+            }
           } catch {}
 
-          // Try DOM text extraction
-          let articleText = await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : '');
-          articleText = articleText.replace(/\s\s+/g, ' ').trim();
+          // Try site-specific content selectors first
+          let articleText = '';
+          try {
+            const sels = DOMAIN_SELECTORS[originUrl.hostname.replace(/^www\./,'')] ||
+                        (isOxu ? DOMAIN_SELECTORS['oxu.az'] : null);
+            if (sels && sels.length) {
+              articleText = await page.evaluate((selectors) => {
+                for (const sel of selectors) {
+                  const el = document.querySelector(sel);
+                  if (el) return (el.innerText || '').replace(/\s\s+/g, ' ').trim();
+                }
+                return '';
+              }, sels);
+            }
+          } catch {}
+
+          // Fallback to whole body if selectors failed/empty
+          if (!articleText || articleText.length < 200) {
+            try {
+              const bodyTxt = await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : '');
+              articleText = String(bodyTxt || '').replace(/\s\s+/g, ' ').trim();
+            } catch {}
+          }
 
           // If DOM is too empty, do a raw GET fallback and strip tags
           if (!articleText || articleText.length < 200) {
             try {
               const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
-              const raw = await fetch(effectiveUrl, { redirect: 'follow', headers: { 'User-Agent': ua, 'Accept': 'text/html,*/*' } });
+              const raw = await fetch(effectiveUrl, { redirect: 'follow', headers: { 'User-Agent': ua, 'Accept': 'text/html,*/*', 'Accept-Language': 'az,en;q=0.9' } });
               const html = await raw.text();
               articleText = htmlToText(html);
             } catch (fetchFallbackErr) {
               console.warn('Fetch-fallback failed:', fetchFallbackErr?.message || fetchFallbackErr);
             }
           }
+
           articleText = articleText.substring(0, MAX_ARTICLE_CHARS);
           const lower = articleText.toLowerCase();
-          // Soft-404 & non-article heuristics (Azeri + EN)
+
+          // Soft-404 & non-article heuristics
           const SOFT_404 = [
             /səhifə tapılmadı/i, /sehife tapilmadi/i, /tapılmadı/i, /mövcud deyil/i,
             /page not found/i, /\b404\b/, /not found/i, /content not available/i
@@ -619,7 +605,8 @@ export default async function handler(req, res) {
             const err = new Error('This does not look like an article (soft 404 / placeholder).');
             err.code = 'NON_ARTICLE'; throw err;
           }
-          // Anti-bot fallback → Archive.org
+
+          // Anti-bot fallback → Archive.org (only if still looks blocked)
           if (BLOCK_KEYWORDS.some((kw) => lower.includes(kw))) {
             console.log(`Initial fetch for ${effectiveUrl} was blocked. Checking Archive.org...`);
             const archiveApiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(effectiveUrl)}`;
@@ -630,19 +617,28 @@ export default async function handler(req, res) {
               console.log(`Archive found. Fetching from: ${snapshotUrl}`);
               contentSource = 'Archive.org';
               try {
-              await page.goto(snapshotUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
-            } catch {}
-            await new Promise(r => setTimeout(r, 400));
-            articleText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
-              .replace(/\s\s+/g, ' ')
-              .trim()
-              .substring(0, MAX_ARTICLE_CHARS);
+                await page.goto(snapshotUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+              } catch {}
+              await new Promise(r => setTimeout(r, 400));
+              articleText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
+                .replace(/\s\s+/g, ' ')
+                .trim()
+                .substring(0, MAX_ARTICLE_CHARS);
             } else {
               const blockError = new Error('This website is protected by advanced bot detection.');
               blockError.isBlockError = true;
               throw blockError;
             }
           }
+
+          // For fallback prompt
+          const site = originUrl.hostname.replace(/^www\./,'');
+          let headline = '';
+          try { headline = await page.title(); } catch {}
+          try {
+            const ogt = await page.$eval('meta[property="og:title"]', el => el.getAttribute('content'));
+            if (ogt && ogt.length > 5) headline = ogt;
+          } catch {}
 
           // If content is very short/blocked, jump straight to safe prompt to save tokens.
           const tooThin = !articleText || articleText.length < 400;
@@ -668,7 +664,6 @@ export default async function handler(req, res) {
                 const msg = String(e?.message || '').toLowerCase();
                 const isTimeoutish = e?.name === 'AbortError' || e?.httpStatus === 504 || /timeout|timed out|network error/.test(msg);
                 if (!isTimeoutish || i === SHRINKS.length - 1) {
-                  // will fall back to headline-only prompt below
                   break;
                 }
               }
@@ -685,6 +680,7 @@ export default async function handler(req, res) {
             });
             parsed = r2.parsed; modelUsed = r2.modelUsed;
           }
+
           const normalized = normalizeOutput(parsed, { url: effectiveUrl });
 
           // Decorate + cache
@@ -695,7 +691,6 @@ export default async function handler(req, res) {
           await kv.set(cacheKey, normalized, { ex: 2592000 });
           console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
 
-          // also push this hash into a rolling "recent_hashes" list for sitemap
           try {
             await kv.lpush('recent_hashes', cacheKey);
             await kv.ltrim('recent_hashes', 0, 499);
