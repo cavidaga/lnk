@@ -424,20 +424,21 @@ export default async function handler(req, res) {
       effectiveUrl = await preflightPolicy(url);
     } catch (polErr) {
       const messages = {
-        BLOCKED_HOST:    'Böyük sənədlər (Google Docs/Drive və s.) analiz edilmir.',
-        BLOCKED_PATH:    'Bu keçid başqa bir hostinqdəki sənədə və ya birbaşa fayl yükləməsinə yönləndirir.',
-        DISALLOWED_MIME: 'Analiz üçün dəstəklənməyən məzmun növü.',
-        ATTACHMENT:      'Birbaşa fayl əlavələri analiz edilmir.',
-        TOO_LARGE:       'Sənəd çox böyükdür.',
-        BLOCKED_FILE_EXT:'Fayl növü dəstəklənmir (video/arayış/fayl).',
-        ALLOWLIST_ONLY:  'Hazırda yalnız təsdiqlənmiş saytların linkləri qəbul olunur.',
-        NON_ARTICLE:     'Bu link məqalə kimi görünmür. Xahiş edirik məqalənin konkret səhifəsini göndərin.',
-        BAD_URL:         'Keçid düzgün deyil. Zəhmət olmasa tam URL göndərin (https:// ilə).'
-        BAD_SCHEME:      'Yalnız HTTP/HTTPS linkləri qəbul edilir.',
-        BAD_PORT:        'Bu port icazəli deyil.',
-        BAD_AUTH:        'URL daxilində istifadəçi adı/parol qəbul edilmir.',
-        PRIVATE_IP:      'Daxili və ya məxfi şəbəkə ünvanlarına keçidlər bloklanır.',
-      };
+      "BLOCKED_HOST":    "Böyük sənədlər (Google Docs/Drive və s.) analiz edilmir.",
+      "BLOCKED_PATH":    "Bu keçid başqa bir hostinqdəki sənədə və ya birbaşa fayl yükləməsinə yönləndirir.",
+      "DISALLOWED_MIME": "Analiz üçün dəstəklənməyən məzmun növü.",
+      "ATTACHMENT":      "Birbaşa fayl əlavələri analiz edilmir.",
+      "TOO_LARGE":       "Sənəd çox böyükdür.",
+      "BLOCKED_FILE_EXT":"Fayl növü dəstəklənmir (video/arayış/fayl).",
+      "ALLOWLIST_ONLY":  "Hazırda yalnız təsdiqlənmiş saytların linkləri qəbul olunur.",
+      "NON_ARTICLE":     "Bu link məqalə kimi görünmür. Xahiş edirik məqalənin konkret səhifəsini göndərin.",
+      "BAD_URL":         "Keçid düzgün deyil. Zəhmət olmasa tam URL göndərin (https:// ilə).",
+      "BAD_SCHEME":      "Yalnız HTTP/HTTPS linkləri qəbul edilir.",
+      "BAD_PORT":        "Bu port icazəli deyil.",
+      "BAD_AUTH":        "URL daxilində istifadəçi adı/parol qəbul edilmir.",
+      "PRIVATE_IP":      "Daxili və ya məxfi şəbəkə ünvanlarına keçidlər bloklanır.",
+      "PRIVATE_HOST":    "Lokal/intranet host adlarına keçidlər bloklanır."
+    };
       return res.status(400).json({ error: true, code: polErr.code || 'POLICY', message: messages[polErr.code] || polErr.message });
     }
 
