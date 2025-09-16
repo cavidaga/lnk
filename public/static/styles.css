@@ -232,8 +232,11 @@ h1{ font-size:26px; margin:0; letter-spacing:.2px }
 .summary-card h4{ margin:6px 0 8px 0 }
 .summary-card p{ margin:0; color:var(--muted); font-size:15.5px }
 
-.score-details dt{ font-weight:600; color:var(--text); margin-top:1.2em }
-.score-details dd{
+/* generic definition list used for score rationales */
+.score-details dt,
+.explain dt{ font-weight:600; color:var(--text); margin-top:1.2em }
+.score-details dd,
+.explain dd{
   margin:.2em 0 0 1em; color:var(--muted); font-size:14px;
   border-left:2px solid var(--border); padding-left:1em
 }
@@ -249,10 +252,23 @@ h1{ font-size:26px; margin:0; letter-spacing:.2px }
 .sources-table th, .sources-table td{ text-align:left; padding:12px 10px; border-bottom:1px solid var(--border) }
 .sources-table th{ color:var(--muted) }
 
-.diagnostics-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:15px }
+/* Diagnostics (new schema) */
+.diagnostics-grid{ display:grid; grid-template-columns:1fr; gap:16px }
 .diag-item{ background-color:var(--panel); padding:15px; border-radius:10px; border:1px solid var(--border) }
 .diag-item .label{ font-size:14px; color:var(--muted) }
-.diag-item .value{ font-size:24px; font-weight:700; color:var(--text) }
+/* optional: numeric cells deprecated; keep style lightweight */
+.diag-item .value{ font-size:16px; font-weight:600; color:var(--text) }
+
+/* Socio-cultural descriptions list */
+.socio-list{ list-style:none; padding:0; margin:0 }
+.socio-list li{ padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--panel); margin-bottom:8px }
+.socio-list li:last-child{ margin-bottom:0 }
+.socio-list .muted{ display:block; margin-top:4px }
+
+/* Language flags list */
+.flags{ list-style:none; padding:0; margin:0 }
+.flags li{ padding:8px 10px; border-bottom:1px dashed var(--border) }
+.flags li:last-child{ border-bottom:0 }
 
 .language-flags{ font-size:14px; color:var(--muted) }
 details{ margin-top:20px }
@@ -261,6 +277,10 @@ pre{
   background-color:var(--panel); border:1px solid var(--border); border-radius:8px;
   padding:15px; font-size:12px; white-space:pre-wrap; word-wrap:break-word; max-height:400px; overflow:auto
 }
+
+/* tiny helpers used by app.js */
+.coord-values{ margin-top:8px; color:var(--muted) }
+.micro{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted) }
 
 /* ====== Share bar ====== */
 .share-section {

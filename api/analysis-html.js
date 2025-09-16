@@ -18,10 +18,10 @@ export default async function handler(req) {
   const hash = url.searchParams.get('hash') || url.pathname.split('/').pop() || '';
   if (!hash) return new Response('Missing hash', { status: 400 });
 
-  const pageUrl   = `${SITE}/analysis/${encodeURIComponent(hash)}`;
-  const cardPngUrl = `${SITE}/static/og-cover.png?v=${CARD_VERSION}`;
-  const ogTitle = 'LNK - Media qərəzi qiymətləndiricisi';
-  const ogDesc  = 'Media qərəzi və etibarlılıq təhlili.';
+  const pageUrl    = `${SITE}/analysis/${encodeURIComponent(hash)}`;
+  const ogImageUrl = `${SITE}/static/og-cover.png?v=${CARD_VERSION}`;
+  const ogTitle    = 'LNK — Media qərəzi qiymətləndiricisi';
+  const ogDesc     = 'Media qərəzi və etibarlılıq təhlili.';
 
   const html = `<!DOCTYPE html>
 <html lang="az" class="no-js">
@@ -37,7 +37,7 @@ export default async function handler(req) {
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <meta property="fb:app_id" content="1493746861646864" />
 
-  <!-- Google Fonts: Poppins (match index.html) -->
+  <!-- Fonts (match index.html) -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -48,14 +48,19 @@ export default async function handler(req) {
   <meta property="og:title" content="${esc(ogTitle)}" />
   <meta property="og:description" content="${esc(ogDesc)}" />
   <meta property="og:url" content="${esc(pageUrl)}" />
-  <meta property="og:image" content="https://lnk.az/static/og-cover.png?v=2" />
+  <meta property="og:image" content="${esc(ogImageUrl)}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="az_AZ" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://lnk.az/static/og-cover.png?v=2" />
+  <meta name="twitter:image" content="${esc(ogImageUrl)}" />
   <meta name="twitter:title" content="${esc(ogTitle)}" />
   <meta name="twitter:description" content="${esc(ogDesc)}" />
-  
+
+  <!-- Optional axis labels for client (read by app.js if desired) -->
+  <meta name="lnk:x-axis" content="Siyasi hakimiyyət meyli (−5…+5)">
+  <meta name="lnk:y-axis" content="Etibarlılıq (0–100)">
+
   <!-- Icons (match index.html) -->
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="/static/favicon.ico">
@@ -78,6 +83,22 @@ export default async function handler(req) {
   </div>
 
   <script>window.__LNK_HASH__ = ${JSON.stringify(hash)};</script>
+  <script>
+    // Minimal client-side schema hint for stability
+    window.__LNK_SCHEMA__ = {
+      meta: ["article_type","title","original_url","publication","published_at"],
+      scores: {
+        reliability: ["value","rationale"],
+        political_establishment_bias: ["value","rationale"]
+      },
+      diagnostics: {
+        socio_cultural_descriptions: true,
+        language_flags: true
+      },
+      cited_sources: true,
+      human_summary: true
+    };
+  </script>
   <script src="/static/layout.js" defer></script>
   <script src="/static/app.js" defer></script>
 </body>
@@ -87,7 +108,8 @@ export default async function handler(req) {
     status: 200,
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'public, max-age=300'
+      // small TTL + SWR, keeps shell fast while allowing background refresh
+      'Cache-Control': 'public, max-age=300, stale-while-revalidate=900'
     }
   });
 }

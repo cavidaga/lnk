@@ -115,56 +115,53 @@ Original URL: ${url}
 ${articleText}
 
 ## JSON SCHEMA & METHODOLOGY INSTRUCTIONS ##
-Your entire output must be a single, valid JSON object. All free-text rationales and summaries must be in Azerbaijani. In the 'human_summary' and 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
+Your entire output must be a single, valid JSON object. All free-text rationales and summaries must be in Azerbaijani. In the 'human_summary' and all 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
 
-The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", and "human_summary". In all string fields—including meta.title, scores.*.rationale, cited_sources[*].name, cited_sources[*].role, cited_sources[*].stance, and diagnostics.language_flags[*].category—use Azerbaijani.
+The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", and "human_summary". In all string fields—including meta.title, scores.*.rationale, cited_sources[*].name, cited_sources[*].role, cited_sources[*].stance, diagnostics.socio_cultural_descriptions[*].*, and diagnostics.language_flags[*].category—use Azerbaijani.
 
 ### META
-"meta": { 
-  "article_type": "<xəbər | rəy | analitika | reportaj və s.>",
-  "title": "<if missing in the text, infer a concise Azerbaijani title>",
-  "original_url": "<the original canonical/primary URL of the article (absolute URL)>",
-  "publication": "<domain or outlet name, e.g., abzas.org>",
-  "published_at": "<ISO date or human-readable date if detectable, else omit>" 
+"meta": {
+  "article_type": "xəbər | rəy | analitika | reportaj | .",
+  "title": "Məqalənin qısa Azərbaycandilli başlığı (mətn yoxdursa, məzmundan çıxar)",
+  "original_url": "https://.. (məqalənin əsas URL-i)",
+  "publication": "saytın və ya nəşrin adı (məs. abzas.org)",
+  "published_at": "YYYY-MM-DDTHH:MM:SSZ (tapıla bilirsə; yoxdursa burax)"
 },
 
 ### SCORES
-"scores": { 
-  "reliability": { 
-    "value": 0-100, 
-    "rationale": "Reliability measures factual accuracy, source quality, and clear separation of fact vs opinion. In rəy or şəxsi esselər, reliability may be lower due to fewer external citations. This does not mean the article is poor — explain this nuance in the rationale if relevant." 
-  }, 
-  "socio_cultural_bias": { 
-    "value": -5.0 to +5.0, 
-    "rationale": "Explain how the article treats values, identity, or cultural topics." 
-  }, 
-  "political_establishment_bias": { 
-    "value": -5.0 to +5.0, 
-    "rationale": "Explain the article’s orientation toward state institutions and government policy." 
-  } 
+"scores": {
+  "reliability": {
+    "value": 0-100,
+    "rationale": "Məqalənin faktlara söykənməsi, mənbələrin göstərilməsi və dilin obyektivliyi barədə aydın izah. Rəy və bioqrafik yazılarda istinadların azlığı səbəbindən bal texniki olaraq aşağı görünə bilər—bunu izah et."
+  },
+  "political_establishment_bias": {
+    "value": -5.0 ... +5.0,
+    "rationale": "Məqalənin hakimiyyət institutlarına (prezident, hökumət, parlament, dövlət qurumları) münasibətini izah et."
+  }
 },
 
 ### DIAGNOSTICS
-"diagnostics": { 
-  "language_loadedness": 0-100, 
-  "sourcing_transparency": 0-100, 
-  "headline_accuracy": 0-100, 
-  "language_flags": [ 
-    { "term": "...", "category": "yüklü söz | qeyri-müəyyən ifadə | mütləq ifadə | spekulyativ dil | yüklü sinonim" } 
-  ] 
+"diagnostics": {
+  "socio_cultural_descriptions": [
+    { "group": "...", "stance": "müsbət | mənfi | neytral | qarışıq", "rationale": "Qısa izah və ya sitat." }
+  ],
+  "language_flags": [
+    { "term": "...", "category": "yüklü söz | qeyri-müəyyən | spekulyativ", "evidence": "Terminin göründüyü cümlədən fraqa." }
+  ]
 },
-- Important clarifications:
-  - Emotional language ≠ manipulation. Mark manipulation only if facts are hidden or distorted.
-  - Absolute terms ("həmişə", "heç vaxt") are only problematic if misleading in context.
-  - Speculative terms ("ola bilər", "ehtimal ki") are normal in forecasts, but excessive use lowers clarity.
-  - Framing analysis affects bias scores (political/socio-cultural), not reliability.
+- Aydınlaşdırmalar:
+  - Emosional dil ≠ manipulyasiya; manipulyasiya yalnız faktlar gizlədiləndə və ya təhrif olunanda qeyd edilir.
+  - “Mütləq” sözlər (“həmişə”, “heç vaxt”) yalnız kontekstə görə problemli ola bilər; ayrıca kateqoriya vermə.
+  - Spekulyativ sözlər (“ola bilər”, “ehtimal ki”) proqnozlarda normaldır, lakin həddən artıq olarsa aydınlığı azalda bilər.
+  - Framing siyasi meylə təsir edir, etibarlılıq isə fakt/mənbə/dil obyektivliyinin ayrılıqda qiymətləndirilməsidir.
 
 ### CITED SOURCES
-"cited_sources": [ { "name": "...", "role": "...", "stance": "..." } ],
+"cited_sources": [
+  { "name": "...", "role": "rəsmi qurum | media | ekspert | QHT | şəxsi blog | ...", "stance": "müsbət | mənfi | neytral | qarışıq" }
+],
 
 ### HUMAN SUMMARY
-"human_summary": "Provide a flowing Azerbaijani summary of the article, written in clear prose."
-}
+"human_summary": "Məqalənin əsas məzmununu və nəticələrini aydın, axıcı Azərbaycan dilində 2–4 cümlə ilə xülasə et."
 `.trim();
 }
 
@@ -211,6 +208,99 @@ async function preflightPolicy(targetUrl) {
     if (e && e.code) throw e;
   }
   return finalUrl;
+}
+
+function normalizeOutput(o = {}, { url }) {
+  const out = { ...o };
+
+  // schema tag
+  out.schema_version = '2025-09-16';
+
+  // ---- META ----
+  out.meta = out.meta && typeof out.meta === 'object' ? out.meta : {};
+  const m = out.meta;
+  if (!m.original_url) m.original_url = url;
+  // derive publication from URL if missing
+  if (!m.publication && m.original_url) {
+    try { m.publication = new URL(m.original_url).hostname.replace(/^www\./,''); } catch {}
+  }
+  // ISO-ify published_at if it's a parseable date
+  if (m.published_at) {
+    const d = new Date(m.published_at);
+    if (!isNaN(d)) m.published_at = d.toISOString();
+    else delete m.published_at; // drop garbage
+  }
+
+  // ---- SCORES ----
+  out.scores = out.scores && typeof out.scores === 'object' ? out.scores : {};
+  const s = out.scores;
+
+  // reliability
+  if (!s.reliability || typeof s.reliability !== 'object') s.reliability = {};
+  if (typeof s.reliability.value !== 'number') s.reliability.value = 0;
+  s.reliability.value = Math.max(0, Math.min(100, s.reliability.value));
+  if (typeof s.reliability.rationale !== 'string') s.reliability.rationale = '';
+
+  // political_establishment_bias
+  if (!s.political_establishment_bias || typeof s.political_establishment_bias !== 'object') s.political_establishment_bias = {};
+  if (typeof s.political_establishment_bias.value !== 'number') s.political_establishment_bias.value = 0;
+  s.political_establishment_bias.value = Math.max(-5, Math.min(5, s.political_establishment_bias.value));
+  if (typeof s.political_establishment_bias.rationale !== 'string') s.political_establishment_bias.rationale = '';
+
+  // purge deprecated field if model still emits it
+  if (s.socio_cultural_bias) delete s.socio_cultural_bias;
+
+  // ---- DIAGNOSTICS ----
+  out.diagnostics = out.diagnostics && typeof out.diagnostics === 'object' ? out.diagnostics : {};
+  const dgn = out.diagnostics;
+
+  // NEW arrays
+  if (!Array.isArray(dgn.socio_cultural_descriptions)) dgn.socio_cultural_descriptions = [];
+  if (!Array.isArray(dgn.language_flags)) dgn.language_flags = [];
+
+  // clamp sizes to keep payload tiny
+  dgn.socio_cultural_descriptions = dgn.socio_cultural_descriptions.slice(0, 12);
+  dgn.language_flags = dgn.language_flags.slice(0, 24);
+
+  // normalize elements
+  dgn.socio_cultural_descriptions = dgn.socio_cultural_descriptions.map(x => ({
+    group: typeof x?.group === 'string' ? x.group : '',
+    stance: typeof x?.stance === 'string' ? x.stance : '',
+    rationale: typeof x?.rationale === 'string' ? x.rationale : ''
+  }));
+
+  const ALLOWED_FLAG_CATS = new Set(['yüklü söz','qeyri-müəyyən','spekulyativ']);
+  dgn.language_flags = dgn.language_flags.map(x => {
+    let cat = typeof x?.category === 'string' ? x.category.trim().toLowerCase() : '';
+    // try to coerce common variants to allowed set
+    if (cat.includes('yükl')) cat = 'yüklü söz';
+    else if (cat.includes('qeyri')) cat = 'qeyri-müəyyən';
+    else if (cat.includes('spek')) cat = 'spekulyativ';
+    if (!ALLOWED_FLAG_CATS.has(cat)) cat = 'qeyri-müəyyən';
+    return {
+      term: typeof x?.term === 'string' ? x.term : '',
+      category: cat,
+      evidence: typeof x?.evidence === 'string' ? x.evidence : ''
+    };
+  });
+
+  // drop old numeric diagnostics if present (no longer public)
+  delete dgn.language_loadedness;
+  delete dgn.sourcing_transparency;
+  delete dgn.headline_accuracy;
+
+  // ---- CITED SOURCES ----
+  out.cited_sources = Array.isArray(out.cited_sources) ? out.cited_sources.slice(0, 50) : [];
+  out.cited_sources = out.cited_sources.map(x => ({
+    name: typeof x?.name === 'string' ? x.name : '',
+    role: typeof x?.role === 'string' ? x.role : '',
+    stance: typeof x?.stance === 'string' ? x.stance : ''
+  }));
+
+  // ---- SUMMARY ----
+  if (typeof out.human_summary !== 'string') out.human_summary = '';
+
+  return out;
 }
 
 export default async function handler(req, res) {
@@ -278,6 +368,7 @@ export default async function handler(req, res) {
       await new Promise(r => setTimeout(r, 500));
 
       let articleText = await page.evaluate(() => document.body.innerText || '');
+      articleText = articleText.replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
       const lower = articleText.toLowerCase();
 
       // Blocked by anti-bot? Try Archive.org snapshot
@@ -309,18 +400,19 @@ export default async function handler(req, res) {
         fallbackModel: FALLBACK_MODEL,
         prompt
       });
+      const normalized = normalizeOutput(parsed, { url: effectiveUrl });
 
       // Decorate + cache
-      parsed.hash = cacheKey;
-      parsed.modelUsed = modelUsed;
-      parsed.contentSource = contentSource;
+      normalized.hash = cacheKey;
+      normalized.modelUsed = modelUsed;
+      normalized.contentSource = contentSource;
 
-      await kv.set(cacheKey, parsed, { ex: 2592000 });
+      await kv.set(cacheKey, normalized, { ex: 2592000 });
       console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
 
       res.setHeader('X-Model-Used', modelUsed);
       res.setHeader('X-Content-Source', contentSource);
-      return res.status(200).json(parsed);
+      return res.status(200).json(normalized);
     } catch (error) {
       console.error('Analyze error:', error);
       if (error.isBlockError) {

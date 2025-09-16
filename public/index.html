@@ -6,11 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>LNK - Media qərəzi qiymətləndiricisi</title>
-  <meta name="description" content="LNK.az - Azərbaycanın ilk süni intellektə əsaslanan media qərəzi analizatoru. İstənilən xəbər linkini daxil edin və məqalənin etibarlılığını, siyasi meylini və tərəfsizliyini anında qiymətləndirin." />
+  <meta name="description" content="LNK.az — süni intellektlə media qərəzini və etibarlılığı təhlil edin. Xəbər linkini daxil edin: məqalənin etibarlılıq səviyyəsi (0–100) və siyasi hakimiyyət meyli (−5…+5) anında qiymətləndirilsin." />
   <meta name="theme-color" content="#0c0d12">
   <meta name="color-scheme" content="light dark" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <meta property="fb:app_id" content="1493746861646864" />
+
   <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,14 +21,16 @@
   <link rel="canonical" href="https://lnk.az/" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="LNK - Media qərəzi qiymətləndiricisi" />
-  <meta property="og:description" content="Süni intellekt ilə media qərəzini yoxlayın. Xəbərləri və məqalələri bir kliklə analiz edin. Obyektiv məlumat üçün LNK.az." />
+  <meta property="og:description" content="Süni intellektlə media qərəzi və etibarlılığı yoxlayın. Etibarlılıq (0–100) və siyasi hakimiyyət meyli (−5…+5) üzrə qiymətləndirmə." />
   <meta property="og:url" content="https://lnk.az/" />
   <meta property="og:image" content="https://lnk.az/static/og-cover.png" />
+  <meta property="og:locale" content="az_AZ" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="LNK - Media qərəzi qiymətləndiricisi" />
-  <meta name="twitter:description" content="Süni intellekt ilə media qərəzini yoxlayın. Xəbərləri və məqalələri bir kliklə analiz edin. Obyektiv məlumat üçün LNK.az." />
+  <meta name="twitter:description" content="Süni intellektlə media qərəzi və etibarlılığı yoxlayın. Etibarlılıq (0–100) və siyasi hakimiyyət meyli (−5…+5) üzrə qiymətləndirmə." />
   <meta name="twitter:image" content="https://lnk.az/static/og-cover.png" />
-  <!-- Explicit icons so the browser doesn’t guess (and accidentally hit http://) -->
+
+  <!-- Icons -->
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="alternate icon" href="/static/favicon.ico">
   <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
@@ -48,298 +51,52 @@
   }
   </script>
 
-<link rel="stylesheet" href="/static/styles.css">
-<script defer src="/_vercel/insights/script.js"></script>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Mündəricata keç</a>
   <div class="wrap">
     <div id="site-header"></div>
+
     <main id="main" aria-labelledby="app-title">
       <section class="intro">
-      <h2>LNK nədir?</h2>
-      <p>
-        <strong>LNK.az</strong> Azərbaycanın ilk süni intellektə əsaslanan media qərəzi qiymətləndiricisidir. 
-        İstənilən xəbər linkini daxil edin və məqalənin <em>etibarlılıq səviyyəsini</em>, 
-        <em>siyasi meylini</em> və <em>sosial-mədəni tendensiyalarını</em> dərhal görün.
-      </p>
-      <p class="muted small">
-        Bu layihə beynəlxalq təcrübələrdən, o cümlədən Ad Fontes Media Bias Chart metodologiyasından ilhamlanmışdır 
-        və media savadlılığını artırmaq məqsədi daşıyır.
-      </p>
-    </section>
+        <h2 id="app-title">LNK nədir?</h2>
+        <p>
+          <strong>LNK.az</strong> — süni intellektə əsaslanan media qərəzi qiymətləndiricisidir.
+          Xəbər linkini daxil edin və məqalənin <em>etibarlılıq səviyyəsini</em> (0–100) və
+          <em>siyasi hakimiyyət meylini</em> (−5…+5) dərhal görün.
+        </p>
+        <p class="muted small">
+          Layihə beynəlxalq praktikadan (məs., Ad Fontes yanaşması) ilhamlanır və media savadlılığını artırmağı hədəfləyir.
+        </p>
+      </section>
+
+      <!-- Home form expected by /static/app.js (initHome looks for #analyze-form) -->
       <div id="app-container">
         <div class="card" role="region" aria-label="Məqalə təhlili formu">
           <div class="bd">
-            <div class="row">
-              <label class="label" for="urlInput">Məqalə linki</label>
-              <input class="input" id="urlInput" type="url" inputmode="url" placeholder="Məqalə linkini yapışdırın..." autocomplete="url" aria-describedby="helper" />
-              <button class="btn" id="btn-analyse" type="button" aria-label="Məqaləni təhlil et">Təhlil et</button>
+            <form id="analyze-form" class="row" autocomplete="on">
+              <label class="label" for="url">Məqalə linki</label>
+              <input class="input" id="url" name="url" type="url" inputmode="url"
+                     placeholder="Məqalə linkini yapışdırın..." aria-describedby="helper" required />
+              <button class="btn" type="submit" aria-label="Məqaləni təhlil et">Təhlil et</button>
+            </form>
+            <div id="helper" class="small muted" style="margin-top:8px">
+              Nümunə: https://abzas.org/az/2025/09/nufuzlu-exemple-məqalə/
             </div>
-            <div id="helper" class="small muted" style="margin-top:8px">Nümunə: https://abzas.org/az/2025/9/mhkmlrin-boksunda-donn1b5e8f6e-3/</div>
           </div>
         </div>
       </div>
 
+      <!-- Results container (app.js fills this) -->
       <div id="result" class="result" aria-live="polite"></div>
     </main>
+
     <div id="site-footer"></div>
   </div>
 
-  <script>
-    const urlInput = document.getElementById('urlInput');
-    const analyseBtn = document.getElementById('btn-analyse');
-    const resultDiv = document.getElementById('result');
-    const appContainer = document.getElementById('app-container');
-
-    // --- ON PAGE LOAD: Checks for a shared analysis link ---
-    document.addEventListener('DOMContentLoaded', () => {
-        const path = window.location.pathname;
-        const parts = path.split('/').filter(Boolean);
-        if (parts[0] === 'analysis' && parts[1]) {
-            const analysisId = parts[1];
-            if (appContainer) appContainer.style.display = 'none';
-            loadSharedAnalysis(analysisId);
-        }
-    });
-
-    // --- Fetches a saved analysis from the database ---
-    async function loadSharedAnalysis(id) {
-        resultDiv.innerHTML = `<div class="loading"><span class="spinner"></span> <span>Saxlanmış analiz yüklənir…</span></div>`;
-        resultDiv.classList.add('show');
-        try {
-            const response = await fetch(`/api/get-analysis?id=${id}`);
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Analiz tapılmadı.');
-            displayResult(data, false);
-        } catch (error) {
-            resultDiv.innerHTML = `<div class="error">${error.message}</div>`;
-        }
-    }
-
-    // --- MAIN DISPLAY FUNCTION: Renders the analysis report ---
-    
-function format100(val){
-  const n = Number(val);
-  if (!Number.isFinite(n)) return 'N/A';
-  return `${n}/100`;
-}
-function formatBias(val){
-  const n = Number(val);
-  if (!Number.isFinite(n)) return 'N/A';
-  return (n>0?'+':'') + n.toString();
-}
-const AZ_MONTHS = ['Yanvar','Fevral','Mart','Aprel','May','İyun','İyul','Avqust','Sentyabr','Oktyabr','Noyabr','Dekabr'];
-function formatAzDate(dateLike){
-  if (!dateLike) return '';
-  const d = new Date(dateLike);
-  if (isNaN(d)) return String(dateLike);
-  const now = new Date();
-  const base = `${AZ_MONTHS[d.getMonth()]} ${d.getDate()}`;
-  return d.getFullYear() === now.getFullYear() ? base : `${base}, ${d.getFullYear()}`;
-}
-
-function headerBlock({ title, publication, published_at, url, title_inferred }){
-  return `
-    <header class="hdr">
-      <div class="kv">
-        <div class="item">
-          <div class="k">Başlıq</div>
-          <div class="v">${escapeHTML(title || '—')}</div>
-        </div>
-        <div class="item">
-          <div class="k">İstinad</div>
-          <div class="v">${escapeHTML(publication || '—')}</div>
-        </div>
-        <div class="item">
-          <div class="k">Tarix</div>
-          <div class="v">${escapeHTML(formatAzDate(published_at) || '—')}</div>
-        </div>
-        <div class="item link">
-          <div class="k">Orijinal link</div>
-          <div class="v anywrap">
-            ${url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener">${escapeHTML(url)}</a>` : '—'}
-          </div>
-        </div>
-      </div>
-      ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
-    </header>
-  `;
-}
-function displayResult(data, isNewAnalysis = true) {
-        const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = "Xülasə təqdim edilmədi." } = data;
-        const reliability = scores.reliability?.value ?? 50;
-        const politicalBias = scores.political_establishment_bias?.value ?? 0;
-        const topPos = 100 - reliability;
-        const leftPos = (politicalBias + 5) / 10 * 100;
-        const originHost = (() => {
-          try {
-            const u = new URL(meta.original_url || '');
-            return u.hostname.replace(/^www\./,'');
-          } catch { return meta.publication || ''; }
-        })();
-        const sourcesTableHTML = cited_sources.length > 0 ? `
-            <table class="sources-table">
-              <thead><tr><th>Ad</th><th>Rol</th><th>Mövqe</th></tr></thead>
-              <tbody>${cited_sources.map(s => `<tr><td>${escapeHTML(s.name)}</td><td>${escapeHTML(s.role)}</td><td>${escapeHTML(s.stance)}</td></tr>`).join('')}</tbody>
-            </table>` : '<p class="muted small">Məqalədə birbaşa mənbə göstərilməyib.</p>';
-
-        const languageFlagsHTML = diagnostics.language_flags?.length > 0
-            ? `<ul>${diagnostics.language_flags.map(f => `<li><strong>${escapeHTML(f.term)}:</strong> <span class="muted">${escapeHTML(f.category)}</span></li>`).join('')}</ul>`
-            : '<p class="muted small">Mənfi dil siqnalları aşkar edilmədi.</p>';
-
-        let resultHTML = `
-            <div class="analysis-grid">
-              <div>
-                <div>
-                  ${headerBlock({
-                    title: meta.title || 'Məqalə',
-                    publication: meta.publication || (() => {
-                      try { return new URL(meta.original_url || '').hostname.replace(/^www\./,''); }
-                      catch { return ''; }
-                    })(),
-                    published_at: meta.published_at || '',
-                    url: meta.original_url || '',
-                    title_inferred: meta?.title_inferred || false
-                  })}
-                </div>
-                <div class="bias-chart" role="img" aria-label="Etibarlılıq və siyasi meyl qrafiki">
-                  <div class="chart-point" style="top:${topPos}%;left:${leftPos}%;"></div>
-                  <span class="axis-label y-axis-top">Etibarlı</span><span class="axis-label y-axis-bottom">Etibarsız</span>
-                  <span class="axis-label x-axis-left">Müxalif</span><span class="axis-label x-axis-right">İqtidar</span>
-                </div>
-                <div class="coord-values small">Koordinatlar: Etibarlılıq <strong>${format100(reliability)}</strong> · Siyasi meyl <strong>${formatBias(politicalBias)}</strong> · Sosial-mədəni <strong>${formatBias(scores.socio_cultural_bias?.value ?? 0)}</strong></div>
-              <div class="score-pills">
-                  <div class="pill"><div class="k">Etibarlılıq</div><div class="v">${format100(reliability)}</div></div>
-                  <div class="pill"><div class="k">Siyasi meyl</div><div class="v">${formatBias(politicalBias)} <span class="muted small">(-5 → +5)</span></div></div>
-                  <div class="pill"><div class="k">Sosial-mədəni</div><div class="v">${formatBias(scores.socio_cultural_bias?.value ?? 0)} <span class="muted small">(-5 → +5)</span></div></div>
-                </div>
-              </div>
-              <div class="summary-card">
-                ${meta.article_type ? `<div class="article-type-tag">${escapeHTML(meta.article_type)}</div>` : ''}
-                <h4>Xülasə</h4>
-                <p>${escapeHTML(human_summary).replace(/\n/g, '<br>')}</p>
-              </div>
-            </div>
-            <div class="card" style="margin-top:20px;">
-              <div class="bd">
-                <h3 class="sec-title">Diaqnostik Göstəricilər</h3>
-                <div class="diagnostics-grid">
-                  <div class="diag-item"><div class="label">Dilin yüklülüyü</div><div class="value">${format100(diagnostics.language_loadedness)}</div></div>
-                  <div class="diag-item"><div class="label">Mənbə şəffaflığı</div><div class="value">${format100(diagnostics.sourcing_transparency)}</div></div>
-                  <div class="diag-item"><div class="label">Başlığın dəqiqliyi</div><div class="value">${format100(diagnostics.headline_accuracy)}</div></div>
-                </div>
-                <h4 style="margin-top:20px;">Konkret dil siqnalları</h4>
-                <div class="language-flags">${languageFlagsHTML}</div>
-                <h3 class="sec-title">Mənbələr</h3>
-                ${sourcesTableHTML}
-                <h3 class="sec-title">Əsas oxlar üzrə izah</h3>
-                <dl class="score-details">
-                  <dt>Etibarlılıq: <span class="value">${format100(scores.reliability?.value)}</span></dt>
-                  <dd>${escapeHTML(scores.reliability?.rationale || '')}</dd>
-                  <dt>Siyasi hakimiyyət meyli: <span class="value">${scores.political_establishment_bias?.value ?? 'N/A'}</span></dt>
-                  <dd>${escapeHTML(scores.political_establishment_bias?.rationale || '')}</dd>
-                  <dt>Sosial-mədəni meyl: <span class="value">${scores.socio_cultural_bias?.value ?? 'N/A'}</span></dt>
-                  <dd>${escapeHTML(scores.socio_cultural_bias?.rationale || '')}</dd>
-                </dl>
-                <details>
-                  <summary>Xam JSON datanı göstər</summary>
-                  <pre>${escapeHTML(JSON.stringify(data, null, 2))}</pre>
-                </details>
-              </div>
-            </div>`;
-
-        if (isNewAnalysis && data.hash) {
-            const shareableLink = `${window.location.origin}/analysis/${data.hash}`;
-            resultHTML += `
-            <div class="share-section">
-              <h4>Bu analizi paylaşın</h4>
-              <div class="share-row">
-                <input id="share-link" class="share-input" type="text" readonly value="${shareableLink}" aria-label="Paylaşım linki" />
-                <button class="btn" type="button" id="copy-btn">Köçür</button>
-              </div>
-              <p id="copy-status" class="small muted status"></p>
-            </div>`;
-        }
-        resultDiv.innerHTML = resultHTML;
-        const copyBtn = document.getElementById('copy-btn');
-        const shareInput = document.getElementById('share-link');
-        const copyStatus = document.getElementById('copy-status');
-
-        copyBtn?.addEventListener('click', async () => {
-          const txt = shareInput.value;
-          try {
-            if (navigator.clipboard?.writeText) {
-              await navigator.clipboard.writeText(txt);
-            } else {
-              shareInput.select();
-              document.execCommand('copy'); // fallback
-            }
-            copyBtn.disabled = true;
-            const old = copyBtn.textContent;
-            copyBtn.textContent = 'Köçürüldü ✔️';
-            copyStatus.textContent = 'Link köçürüldü.';
-            setTimeout(() => {
-              copyBtn.disabled = false;
-              copyBtn.textContent = old;
-              copyStatus.textContent = '';
-            }, 2000);
-          } catch {
-            copyStatus.textContent = 'Köçürülmə alınmadı. Əl ilə seçib köçürün.';
-          }
-        });
-    }
-
-    function escapeHTML(s) {
-        return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    }
-
-    // --- MAIN NETWORK FUNCTION: Called when the user clicks the button ---
-    async function analyzeUrl() {
-        const url = urlInput.value.trim();
-        if (!url || !url.startsWith('http')) {
-            resultDiv.innerHTML = `<div class="error">Zəhmət olmasa, düzgün bir URL daxil edin.</div>`;
-            resultDiv.classList.add('show');
-            return;
-        }
-
-        analyseBtn.disabled = true;
-        analyseBtn.textContent = 'Gözləyin...';
-        resultDiv.innerHTML = `<div class="loading"><span class="spinner"></span> <span>Məqalə təhlil olunur… Bu, 45 saniyəyə qədər çəkə bilər.</span></div>`;
-        resultDiv.classList.add('show');
-
-        try {
-            const response = await fetch('/api/analyze', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: url })
-            });
-            const data = await response.json();
-
-            if (!response.ok) {
-                if (data.isBlockError) {
-                    // This logic is for the "Click to Copy" prompt when a site is blocked
-                    const errorHtml = `...`; // Your existing block error logic here
-                    resultDiv.innerHTML = errorHtml;
-                } else {
-                    throw new Error(data.message || `Server error ${response.status}`);
-                }
-            } else {
-                displayResult(data, true); // true = this is a new analysis
-            }
-        } catch (error) {
-            console.error('Error details:', error);
-            resultDiv.innerHTML = `<div class="error">${error.message}</div>`;
-        } finally {
-            resultDiv.classList.add('show');
-            analyseBtn.disabled = false;
-            analyseBtn.textContent = 'Təhlil et';
-        }
-    }
-
-    analyseBtn.addEventListener('click', analyzeUrl);
-    urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') analyzeUrl(); });
-  </script>
+  <!-- No inline analyze/render logic: delegate to /static/app.js -->
   <script src="/static/layout.js" defer></script>
   <script src="/static/app.js" defer></script>
 </body>
