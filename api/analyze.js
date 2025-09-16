@@ -308,9 +308,13 @@ async function preflightPolicy(targetUrl) {
   if (isBlockedHost(finalUrl)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
   if (isBlockedPath(finalUrl)) { const err = new Error('Document path indicates hosted/large file'); err.code='BLOCKED_PATH'; throw err; }
 
-  // DNS check to avoid private/link-local targets (best-effort)
+  // DNS check to avoid private/link-local targets (best-effort, with timeout)
   try {
-    const addrs = await dns.lookup(u.hostname, { all: true, verbatim: true });
+    const dnsTimeoutMs = 2000;
+    const addrs = await Promise.race([
+      dns.lookup(u.hostname, { all: true, verbatim: true }),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('DNS_TIMEOUT')), dnsTimeoutMs))
+    ]);
     const isPrivate = (addr) => {
       const ip = addr.address.toLowerCase();
       // v4 ranges
