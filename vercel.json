@@ -5,7 +5,7 @@
   ],
   "functions": {
     "api/analysis-html.js": {
-      "excludeFiles": "api/card-image.js"
+      "excludeFiles": "api/**"
     }
   }
 }
