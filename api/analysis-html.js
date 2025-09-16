@@ -48,13 +48,13 @@ export default async function handler(req) {
   <meta property="og:title" content="${esc(ogTitle)}" />
   <meta property="og:description" content="${esc(ogDesc)}" />
   <meta property="og:url" content="${esc(pageUrl)}" />
-  <meta property="og:image" content="https://lnk.az/api/card-image?hash=${esc(hash)}" />
+  <meta property="og:image" content="https://lnk.az/static/og-cover.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="az_AZ" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://lnk.az/api/card-image?hash=${esc(hash)}" />
+  <meta name="twitter:image" content="https://lnk.az/static/og-cover.png" />
   <meta name="twitter:title" content="${esc(ogTitle)}" />
   <meta name="twitter:description" content="${esc(ogDesc)}" />
 
