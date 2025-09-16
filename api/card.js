@@ -1,211 +1,360 @@
-// /api/card.js  (ESM, Edge runtime)
-export const config = { runtime: "edge" };
+// pages/api/card.js
+// LNK.az social card — real PNG with @vercel/og
+// Features: KV fetch by ?hash=, brand header, title, badges, and a mini bias chart.
 
-// --- assets (inline SVGs) ---
-const LOGO_SVG = `
-<svg xmlns="http://www.w3.org/2000/svg" width="120" height="32" viewBox="0 0 120 32" aria-hidden="true">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#6EE7F9"/>
-      <stop offset="100%" stop-color="#3B82F6"/>
-    </linearGradient>
-  </defs>
-  <g fill="url(#g)" font-family="Inter, ui-sans-serif, -apple-system, Segoe UI, Roboto, Arial" font-weight="700" font-size="24">
-    <text x="0" y="24">LNK.az</text>
-  </g>
-</svg>
-`;
+import { ImageResponse } from '@vercel/og';
+import { kv } from '@vercel/kv';
 
-const CHECK_SVG = `
-<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-  <path fill="currentColor" d="M20.285 6.708a1 1 0 0 1 0 1.414l-9.9 9.9a1 1 0 0 1-1.414 0l-5.256-5.256a1 1 0 1 1 1.414-1.414l4.55 4.55 9.193-9.193a1 1 0 0 1 1.414 0z"/>
-</svg>
-`;
+export const config = { runtime: 'edge' };
 
-// --- helpers ---
-function esc(str) {
-  return String(str)
-    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
-const clamp = (n, a, b) => Math.min(b, Math.max(a, Number(n)));
-const fmt100 = (v) => (Number.isFinite(+v) ? `${+v}/100` : "—");
-const fmtBias = (v) => {
-  const n = Number(v);
-  if (!Number.isFinite(n)) return "0";
-  return (n > 0 ? "+" : "") + n;
-};
+// Optional: edge-cached fonts (safe to remove if not needed)
+const interBold = fetch('https://fonts.cdnfonts.com/s/19795/Inter-Bold.woff').then(r => r.arrayBuffer());
+const interSemi = fetch('https://fonts.cdnfonts.com/s/19795/Inter-SemiBold.woff').then(r => r.arrayBuffer());
+const interReg  = fetch('https://fonts.cdnfonts.com/s/19795/Inter-Regular.woff').then(r => r.arrayBuffer());
 
-function metricCard({ label, value }) {
-  return `
-    <div class="metric">
-      <div class="metric-label">${label}</div>
-      <div class="metric-value">${value}</div>
-    </div>
-  `;
-}
-function dot(x, y) {
-  const cx = 40 + (x + 5) * 0.1 * 420;   // [-5..+5] -> [40..460]
-  const cy = 40 + (1 - (y / 100)) * 420; // [0..100] -> [460..40]
-  return `<circle cx="${cx}" cy="${cy}" r="9" class="chart-dot"/>`;
-}
+// ---- Helpers ----
+function mapFromAnalysis(a) {
+  if (!a || typeof a !== 'object') return null;
 
-function themeVars(theme = "dark") {
-  const dark = {
-    bg: "#0B0E14", text: "#E5E7EB", title: "#F3F4F6", sub: "#9CA3AF",
-    cardBg: "#121622", cardBorder: "#1F2433", axis: "#2A3146",
-    dot: "#EF4444", dotShadow: "rgba(239,68,68,.35)", watermark: "#6B7280"
+  const title =
+    a.meta?.title ||
+    a.meta?.article_title ||
+    a.meta?.url ||
+    'LNK.az — Media Bias & Reliability';
+
+  const site =
+    a.meta?.site ||
+    a.meta?.source ||
+    (a.meta?.url ? new URL(a.meta.url).host : 'lnk.az');
+
+  const rel = a.scores?.reliability?.value ?? null;
+  const scb = a.scores?.socio_cultural_bias?.value ?? null;          // -5..+5
+  const peb = a.scores?.political_establishment_bias?.value ?? null; // -5..+5
+
+  return {
+    title: String(title).slice(0, 140),
+    site: String(site).slice(0, 60),
+    reliability: isFinite(rel) ? Number(rel) : null,
+    socioCulturalBias: isFinite(scb) ? Number(scb) : null,
+    politicalEstablishmentBias: isFinite(peb) ? Number(peb) : null,
   };
-  const light = {
-    bg: "#FAFBFF", text: "#111827", title: "#0F172A", sub: "#4B5563",
-    cardBg: "#FFFFFF", cardBorder: "#E5E7EB", axis: "#CBD5E1",
-    dot: "#DC2626", dotShadow: "rgba(220,38,38,.35)", watermark: "#6B7280"
-  };
-  return theme === "light" ? light : dark;
 }
 
-function renderHtml(data, theme = "dark") {
-  const T = themeVars(theme);
+function fmtBias(val) {
+  if (val === null || val === undefined || Number.isNaN(val)) return 'n/a';
+  const v = Math.round(Number(val) * 10) / 10;
+  return v > 0 ? `+${v}` : `${v}`;
+}
+const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-  const {
-    title = "Analiz",
-    platform = "Paylaşım üçün kart",
-    reliability = 0,                           // 0..100
-    political_establishment_bias = 0,          // -5..+5
-    summary = "",
-    footer = "LNK tərəfindən təhlil edilib"
-  } = data || {};
+// Map bias value (-5..+5) to px within chart box
+function mapBiasToPx(val, minVal, maxVal, pxMin, pxMax) {
+  const v = clamp(val ?? 0, minVal, maxVal);
+  const t = (v - minVal) / (maxVal - minVal);
+  return pxMin + t * (pxMax - pxMin);
+}
 
-  const relNum = clamp(reliability, 0, 100);
-  const polNum = clamp(political_establishment_bias, -5, 5);
+export default async function handler(req) {
+  const { searchParams } = new URL(req.url);
+  const hash = searchParams.get('hash') || '';
 
-  return `<!doctype html>
-  <html><head><meta charset="utf-8"/>
-  <style>
-    *{box-sizing:border-box} html,body{margin:0;padding:0;width:1200px;height:630px}
-    body{
-      font-family:Inter,ui-sans-serif,-apple-system,Segoe UI,Roboto,Arial,"Noto Color Emoji";
-      background:${T.bg}; color:${T.text}
+  // Brand tokens (match your site)
+  const color = {
+    bg: '#0c0d12',
+    panel: '#11131a',
+    text: '#e9edf3',
+    muted: '#8e97ab',
+    accent: '#FF0000',
+    border: '#1c2230',
+    panelSubtle: 'rgba(255,255,255,0.02)',
+  };
+
+  // Pull analysis from KV
+  let model = null;
+  try {
+    if (hash) {
+      const raw = await kv.get(`analysis:${hash}`);       // adjust key if needed
+      model = mapFromAnalysis(raw);
     }
-    .wrap{position:relative;display:flex;height:100%;padding:40px 48px;gap:32px}
-    .left{flex:1.15;display:flex;flex-direction:column}
-    .right{width:520px;position:relative}
-    .brand{display:flex;align-items:center;gap:14px;margin-bottom:20px}
-    .brand-logo{display:inline-flex;width:120px;height:32px}
-    .title{font-size:56px;line-height:1.06;font-weight:800;margin:6px 0 10px;color:${T.title}}
-    .platform{font-size:22px;color:${T.sub};margin-bottom:22px;display:flex;align-items:center;gap:8px}
-    .platform .check{display:inline-flex;width:18px;height:18px;color:#34D399}
-    .metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:10px 0 20px}
-    .metric{background:${T.cardBg};border:1px solid ${T.cardBorder};border-radius:16px;padding:18px 20px}
-    .metric-label{font-size:16px;color:${T.sub}}
-    .metric-value{font-size:44px;font-weight:800;margin-top:6px;color:${T.text}}
-    .summary{margin-top:2px;font-size:24px;line-height:1.4;color:${T.text};opacity:.9;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
-    .footer{margin-top:auto;font-size:18px;color:${T.sub};display:flex;align-items:center;gap:8px}
-    .footer .check{width:16px;height:16px;color:#34D399}
-    .panel{position:absolute;inset:0;background:${T.cardBg};border:1px solid ${T.cardBorder};border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:12px}
-    .quad{position:relative;flex:1;border:1px solid ${T.axis};border-radius:14px;overflow:hidden;background:linear-gradient(to bottom,rgba(0,0,0,.02),rgba(0,0,0,0))}
-    .axis-x, .axis-y { position:absolute; background:${T.axis}; }
-    .axis-x { left:40px; right:40px; top:50%; height:1px; }
-    .axis-y { top:40px; bottom:40px; left:50%; width:1px; }
-    .axis-labels { position:absolute; inset:0; pointer-events:none; font-size:16px; color:${T.sub}; }
-    .axis-labels .lab-top    { position:absolute; top:6px;    left:50%; transform:translateX(-50%); }
-    .axis-labels .lab-bottom { position:absolute; bottom:6px; left:50%; transform:translateX(-50%); }
-    .axis-labels .lab-left   { position:absolute; top:50%;    left:6px;  transform:translateY(-50%); }
-    .axis-labels .lab-right  { position:absolute; top:50%;    right:6px; transform:translateY(-50%); }
-    .chart-dot{fill:${T.dot};filter:drop-shadow(0 0 10px ${T.dotShadow})}
-    .wm{position:absolute;right:24px;bottom:18px;font-weight:700;letter-spacing:.5px;color:${T.watermark};opacity:.35;font-size:18px}
-  </style></head>
-  <body>
-    <div class="wrap">
-      <div class="left">
-        <div class="brand"><div class="brand-logo">${LOGO_SVG}</div></div>
-        <div class="title">${esc(title)}</div>
-        <div class="platform"><span class="check">${CHECK_SVG}</span><span>${esc(platform)}</span></div>
-        <div class="metrics">
-          ${metricCard({label:"Etibarlılıq", value: esc(fmt100(relNum))})}
-          ${metricCard({label:"Siyasi hakimiyyət meyli", value: esc(fmtBias(polNum))})}
+  } catch {
+    // ignore KV errors; we’ll fall back below
+  }
+
+  // Fallback: allow quick manual testing via query params
+  if (!model) {
+    model = {
+      title: searchParams.get('title') || 'Media Bias & Reliability Analysis',
+      site: searchParams.get('site') || 'lnk.az',
+      reliability: searchParams.get('rel') ? Number(searchParams.get('rel')) : null,
+      socioCulturalBias: searchParams.get('scb') ? Number(searchParams.get('scb')) : null,
+      politicalEstablishmentBias: searchParams.get('peb') ? Number(searchParams.get('peb')) : null,
+    };
+  }
+
+  // Chart geometry
+  const width = 1200;
+  const height = 630;
+
+  // Chart box area
+  const chart = {
+    x: 120,    // left
+    y: 300,    // top
+    w: 460,    // width
+    h: 260,    // height
+  };
+  const gridGap = 52; // roughly 5x5 grid inside chart
+
+  // Map biases to dot position
+  // X: Socio-Cultural Bias (-5 left, +5 right)
+  // Y: Political-Establishment Bias (-5 bottom, +5 top) — invert Y for screen coords
+  const dotX = mapBiasToPx(model.socioCulturalBias ?? 0, -5, 5, chart.x + 20, chart.x + chart.w - 20);
+  const dotY_data = mapBiasToPx(model.politicalEstablishmentBias ?? 0, -5, 5, -1, 1);
+  const dotY = chart.y + chart.h / 2 - (dotY_data * (chart.h - 40)) / 2; // invert so + is up
+
+  const [fontBold, fontSemi, fontReg] = await Promise.allSettled([
+    interBold, interSemi, interReg,
+  ]).then(parts => parts.map(p => (p.status === 'fulfilled' ? p.value : undefined)));
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width,
+          height,
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: color.bg,
+          color: color.text,
+          padding: 48,
+          fontFamily: 'Inter, system-ui, Segoe UI, Roboto',
+        }}
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28 }}>
+          {/* Brand mark: red dot in ring */}
+          <div style={{ position: 'relative', width: 28, height: 28 }}>
+            <div style={{
+              position: 'absolute', inset: 0, borderRadius: 9999,
+              border: `2px solid ${color.accent}`,
+            }}/>
+            <div style={{
+              position: 'absolute', top: 6, left: 6, width: 16, height: 16,
+              borderRadius: 9999, backgroundColor: color.accent,
+              boxShadow: '0 0 20px rgba(255,0,0,.35)',
+            }}/>
+          </div>
+
+          <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: 0.2 }}>
+            LNK.az • Media Bias Evaluator
+          </div>
+
+          <div style={{ marginLeft: 'auto', fontSize: 22, color: color.muted }}>
+            {model.site}
+          </div>
         </div>
-        <div class="summary">${esc(summary)}</div>
-        <div class="footer"><span class="check">${CHECK_SVG}</span><span>${esc(footer)}</span></div>
-      </div>
-      <div class="right">
-        <div class="panel">
-          <div class="quad">
-            <div class="axis-x"></div><div class="axis-y"></div>
-            <svg viewBox="0 0 500 500" width="100%" height="100%" style="position:absolute;inset:0;">
-              ${dot(polNum, relNum)}
-            </svg>
-            <div class="axis-labels">
-              <div class="lab-top">Etibarlı</div>
-              <div class="lab-bottom">Etibarsız</div>
-              <div class="lab-left">Müxalif</div>
-              <div class="lab-right">İqtidar</div>
+
+        {/* Title + badges row */}
+        <div style={{ display: 'flex', gap: 24 }}>
+          <div
+            style={{
+              flex: 1,
+              backgroundColor: color.panel,
+              border: `1px solid ${color.border}`,
+              borderRadius: 24,
+              padding: 32,
+              minHeight: 200,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div style={{ fontSize: 44, lineHeight: 1.2, fontWeight: 800 }}>
+              {model.title}
+            </div>
+
+            <div style={{ display: 'flex', gap: 14, marginTop: 22, flexWrap: 'wrap' }}>
+              {/* Reliability */}
+              <div style={{
+                display: 'flex', alignItems: 'center',
+                padding: '10px 16px',
+                borderRadius: 999,
+                border: `1px solid ${color.border}`,
+                background: color.panelSubtle,
+                fontSize: 24, fontWeight: 600,
+              }}>
+                <span style={{ opacity: 0.85, marginRight: 10 }}>Reliability</span>
+                <span style={{
+                  padding: '2px 10px',
+                  borderRadius: 8,
+                  backgroundColor: color.accent,
+                  color: '#fff',
+                  fontWeight: 800,
+                }}>
+                  {model.reliability ?? 'n/a'}
+                </span>
+              </div>
+
+              {/* SC Bias */}
+              <div style={{
+                display: 'flex', alignItems: 'center',
+                padding: '10px 16px',
+                borderRadius: 999,
+                border: `1px solid ${color.border}`,
+                background: color.panelSubtle,
+                fontSize: 24, fontWeight: 600,
+              }}>
+                <span style={{ opacity: 0.85, marginRight: 10 }}>SC Bias</span>
+                <span style={{
+                  padding: '2px 10px',
+                  borderRadius: 8,
+                  backgroundColor: '#1c2230',
+                  color: color.text,
+                  fontWeight: 800,
+                  border: `1px solid ${color.border}`,
+                }}>
+                  {fmtBias(model.socioCulturalBias)}
+                </span>
+              </div>
+
+              {/* PE Bias */}
+              <div style={{
+                display: 'flex', alignItems: 'center',
+                padding: '10px 16px',
+                borderRadius: 999,
+                border: `1px solid ${color.border}`,
+                background: color.panelSubtle,
+                fontSize: 24, fontWeight: 600,
+              }}>
+                <span style={{ opacity: 0.85, marginRight: 10 }}>PE Bias</span>
+                <span style={{
+                  padding: '2px 10px',
+                  borderRadius: 8,
+                  backgroundColor: '#1c2230',
+                  color: color.text,
+                  fontWeight: 800,
+                  border: `1px solid ${color.border}`,
+                }}>
+                  {fmtBias(model.politicalEstablishmentBias)}
+                </span>
+              </div>
+            </div>
+
+            {/* Hash/footer */}
+            <div style={{
+              marginTop: 18,
+              fontSize: 20,
+              color: color.muted,
+              borderTop: `1px dashed ${color.border}`,
+              paddingTop: 14,
+            }}>
+              Generated by AI · {hash ? `#${hash.slice(0, 8)}` : 'no-hash'}
+            </div>
+          </div>
+
+          {/* Bias chart card */}
+          <div
+            style={{
+              width: chart.w + 40,
+              backgroundColor: color.panel,
+              border: `1px solid ${color.border}`,
+              borderRadius: 24,
+              padding: 20,
+              position: 'relative',
+            }}
+          >
+            <div style={{ fontSize: 20, opacity: 0.9, marginBottom: 10 }}>Bias Map</div>
+
+            {/* Chart box */}
+            <div
+              style={{
+                position: 'relative',
+                left: 0,
+                top: 0,
+                width: chart.w,
+                height: chart.h,
+                borderRadius: 16,
+                border: `1px solid ${color.border}`,
+                backgroundImage: `
+                  repeating-linear-gradient(
+                    to right,
+                    transparent 0, transparent ${gridGap - 1}px, ${color.border} ${gridGap - 1}px, ${color.border} ${gridGap}px
+                  ),
+                  repeating-linear-gradient(
+                    to bottom,
+                    transparent 0, transparent ${gridGap - 1}px, ${color.border} ${gridGap - 1}px, ${color.border} ${gridGap}px
+                  )
+                `,
+                backgroundColor: '#0e1118',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Axis labels */}
+              <div style={{
+                position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)',
+                fontSize: 16, color: color.muted,
+              }}>PE Bias (+ up)</div>
+              <div style={{
+                position: 'absolute', bottom: 8, left: '50%', transform: 'translateX(-50%)',
+                fontSize: 16, color: color.muted,
+              }}>PE Bias (− down)</div>
+              <div style={{
+                position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%) rotate(-90deg)',
+                transformOrigin: 'left top',
+                fontSize: 16, color: color.muted,
+              }}>SC Bias (− left)</div>
+              <div style={{
+                position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%) rotate(90deg)',
+                transformOrigin: 'right top',
+                fontSize: 16, color: color.muted,
+              }}>SC Bias (+ right)</div>
+
+              {/* Center crosshair */}
+              <div style={{
+                position: 'absolute', left: '50%', top: 0, bottom: 0,
+                width: 1, backgroundColor: color.border,
+              }}/>
+              <div style={{
+                position: 'absolute', top: '50%', left: 0, right: 0,
+                height: 1, backgroundColor: color.border,
+              }}/>
+
+              {/* Red dot */}
+              <div style={{
+                position: 'absolute',
+                width: 18, height: 18,
+                borderRadius: 9999,
+                left: dotX - (chart.x + 0) - 9 + 20, // compensate card padding (20)
+                top: dotY - chart.y - 9 + 0,        // this chart is self-contained
+                backgroundColor: color.accent,
+                boxShadow: '0 0 22px rgba(255,0,0,.45)',
+                border: '2px solid rgba(255,255,255,.12)',
+              }}/>
+
+              {/* Legend chip */}
+              <div style={{
+                position: 'absolute', right: 8, top: 8,
+                padding: '4px 8px', borderRadius: 999,
+                border: `1px solid ${color.border}`, background: color.panelSubtle,
+                fontSize: 16, color: color.text,
+              }}>
+                {`SC ${fmtBias(model.socioCulturalBias)} · PE ${fmtBias(model.politicalEstablishmentBias)}`}
+              </div>
             </div>
           </div>
         </div>
-        <div class="wm">lnk.az</div>
       </div>
-    </div>
-  </body></html>`;
-}
-
-// Map API analysis JSON → card data
-function mapFromAnalysis(json) {
-  const title = json?.meta?.title || "Analiz";
-  const reliability = clamp(json?.scores?.reliability?.value ?? 0, 0, 100);
-  const political_establishment_bias = clamp(json?.scores?.political_establishment_bias?.value ?? 0, -5, 5);
-  const summary = typeof json?.human_summary === "string" ? json.human_summary : "";
-  return { title, reliability, political_establishment_bias, summary };
-}
-
-// Edge handler
-export default async function handler(req) {
-  try {
-    const url = new URL(req.url);
-    const theme = (url.searchParams.get("theme") || "dark").toLowerCase();
-    const hash = url.searchParams.get("hash");
-    const dataParam = url.searchParams.get("data");
-
-    let data = null;
-
-    if (hash) {
-      // Fetch your stored analysis and map
-      const origin = url.origin; // same host
-      const r = await fetch(`${origin}/api/get-analysis?id=${encodeURIComponent(hash)}`, {
-        headers: { "Accept": "application/json" }
-      });
-      if (r.ok) {
-        const json = await r.json();
-        data = mapFromAnalysis(json);
-        // Optional extra: platform/footer hints from headers
-        data.platform = "Analiz kartı";
-        data.footer = json?.publication ? `Mənbə: ${json.publication}` : "LNK tərəfindən təhlil edilib";
-      } else {
-        // fall through to demo/fallback below
-      }
-    } else if (dataParam) {
-      try { data = JSON.parse(dataParam); } catch {}
+    ),
+    {
+      width,
+      height,
+      fonts: [
+        fontBold && { name: 'Inter', data: fontBold, style: 'normal', weight: 700 },
+        fontSemi && { name: 'Inter', data: fontSemi, style: 'normal', weight: 600 },
+        fontReg &&  { name: 'Inter', data: fontReg,  style: 'normal', weight: 400 },
+      ].filter(Boolean),
+      headers: {
+        'Cache-Control': 'public, max-age=600, s-maxage=600, stale-while-revalidate=86400',
+      },
     }
-
-    if (!data) {
-      // Demo defaults (nice looking numbers)
-      data = {
-        title: "Məqalə analizi",
-        reliability: 72,
-        political_establishment_bias: -1.5,
-        summary: "Məqalə mövzuya dair əsas faktları təqdim edir, lakin bəzi açıqlanmayan mənbələrə istinadlar var. Hakimiyyət siyasətinə tənqidi çalar hiss olunur.",
-        platform: "Paylaşım üçün kart",
-        footer: "LNK tərəfindən təhlil edilib"
-      };
-    }
-
-    const html = renderHtml(data, theme);
-    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-  } catch (e) {
-    const msg = e?.message || "Internal error";
-    return new Response(
-      `<!doctype html><meta charset="utf-8"><pre>Card error: ${esc(msg)}</pre>`,
-      { status: 500, headers: { "Content-Type": "text/html; charset=utf-8" } }
-    );
-  }
+  );
 }
