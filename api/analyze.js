@@ -150,14 +150,6 @@ async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModel, pro
   }
   throw lastError || new Error('Model call failed without a specific error');
 }
-const pageMeta = await page.evaluate(() => {
-  const sel = s => document.querySelector(s);
-  const ogTitle = sel('meta[property="og:title"]')?.content || '';
-  const ttl = document.title || '';
-  const pubTime = sel('meta[property="article:published_time"],meta[name="pubdate"],time[datetime]')?.getAttribute('content') || '';
-  const site = location.hostname.replace(/^www\./,'');
-  return { title: ogTitle || ttl, published_at: pubTime, site };
-});
 
 function buildPrompt({ url, articleText }) {
   return `
@@ -275,10 +267,11 @@ async function preflightPolicy(targetUrl) {
   try {
     const head = await fetch(targetUrl, { method: 'HEAD', redirect: 'follow' });
     if (head?.url) finalUrl = head.url;
-        // If the server clearly says "gone/not found", stop right here
-    if (head && (head.status === 404 || head.status === 410)) {
+    // If non-OK, stop early (map 404/410 to NOT_FOUND, others to BAD_STATUS)
+    if (head && head.status >= 400) {
       const err = new Error(`Target returned ${head.status}`);
-      err.code = 'NOT_FOUND'; throw err;
+    err.code = (head.status === 404 || head.status === 410) ? 'NOT_FOUND' : 'BAD_STATUS';
+    throw err;
     }
 // Host & path + scheme/port/credentials + DNS/IP blocks (final URL)
     const u = new URL(finalUrl);
