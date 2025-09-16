@@ -36,9 +36,12 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 // --- Config ---
 const MAX_ARTICLE_CHARS = 30000;
 const BLOCK_KEYWORDS = ['cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'];
-const PRIMARY_MODEL = 'gemini-2.5-flash';
-const FALLBACK_MODEL = 'gemini-2.5-pro';
-const RETRY_ATTEMPTS = 1;          // single attempt per model
+
+// ⬇️ Models: primary + tiered fallbacks
+const PRIMARY_MODEL = 'gemini-2.5-flash-lite';
+const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.5-pro'];
+
+const RETRY_ATTEMPTS = 1;          // single attempt per model (kept conservative)
 const INITIAL_BACKOFF_MS = 600;    // starting backoff for retries
 const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 20000); // 20s default
 
@@ -130,17 +133,24 @@ async function callGeminiOnce({ model, prompt, signal }) {
   return { text, finishReason, promptFeedback, raw: data };
 }
 
+// Treat 429/rate/quota and 503/unavailable as transient so we roll through tiers
 function isUnavailableError(e) {
+  const msg = String(e?.message || '');
+  const statusText = String(e?.statusText || '');
   return (
     e?.httpStatus === 503 ||
+    e?.httpStatus === 429 ||
     e?.code === 503 ||
-    e?.statusText === 'UNAVAILABLE' ||
-    /unavailable/i.test(e?.message || '')
+    e?.code === 429 ||
+    statusText === 'UNAVAILABLE' ||
+    statusText === 'RESOURCE_EXHAUSTED' ||
+    /unavailable|exceeded|rate|quota|RESOURCE_EXHAUSTED/i.test(msg)
   );
 }
 
-async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModel, prompt }) {
-  const models = [primaryModel, fallbackModel];
+// Multi-tier fallback: primary → fallbacks[]
+async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModels = [], prompt }) {
+  const models = [primaryModel, ...fallbackModels];
   let lastError = null;
   for (const model of models) {
     for (let attempt = 1; attempt <= RETRY_ATTEMPTS; attempt++) {
@@ -155,7 +165,7 @@ async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModel, pro
         const transient = isUnavailableError(err) || err.name === 'AbortError';
         if (attempt < RETRY_ATTEMPTS && transient) {
           const backoff = INITIAL_BACKOFF_MS * Math.pow(2, attempt - 1);
-          await sleep(backoff);
+          await sleep(backoff + Math.floor(Math.random() * 150)); // jitter
           continue;
         }
         break;
@@ -531,7 +541,11 @@ export default async function handler(req, res) {
             if (hostQuick.endsWith('jam-news.net')) {
               const siteQuick = hostQuick;
               const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
-              const r2 = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt: safePrompt });
+              const r2 = await callGeminiWithRetryAndFallback({
+                primaryModel: PRIMARY_MODEL,
+                fallbackModels: FALLBACK_MODELS,
+                prompt: safePrompt
+              });
               const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
               normalized.hash = cacheKey;
               normalized.modelUsed = r2.modelUsed;
@@ -542,6 +556,7 @@ export default async function handler(req, res) {
               return normalized;
             }
           } catch {}
+
           if (articleTextFast && articleTextFast.length >= 400) {
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
             const SHRINKS = [0.7, 0.4];
@@ -551,7 +566,11 @@ export default async function handler(req, res) {
               const slice = articleTextFast.slice(0, cut);
               const prompt = buildPrompt({ url: effectiveUrl, articleText: slice });
               try {
-                const r = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt });
+                const r = await callGeminiWithRetryAndFallback({
+                  primaryModel: PRIMARY_MODEL,
+                  fallbackModels: FALLBACK_MODELS,
+                  prompt
+                });
                 parsedQuick = r.parsed; modelUsedQuick = r.modelUsed; break;
               } catch (e) {
                 lastErrQuick = e;
@@ -559,7 +578,11 @@ export default async function handler(req, res) {
             }
             if (!parsedQuick) {
               const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
-              const r2 = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt: safePrompt });
+              const r2 = await callGeminiWithRetryAndFallback({
+                primaryModel: PRIMARY_MODEL,
+                fallbackModels: FALLBACK_MODELS,
+                prompt: safePrompt
+              });
               parsedQuick = r2.parsed; modelUsedQuick = r2.modelUsed;
             }
             const normalized = normalizeOutput(parsedQuick, { url: effectiveUrl });
@@ -576,7 +599,11 @@ export default async function handler(req, res) {
             // Thin content: skip Chromium and do safe prompt quickly
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
             const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
-            const r2 = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt: safePrompt });
+            const r2 = await callGeminiWithRetryAndFallback({
+              primaryModel: PRIMARY_MODEL,
+              fallbackModels: FALLBACK_MODELS,
+              prompt: safePrompt
+            });
             const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
@@ -587,6 +614,7 @@ export default async function handler(req, res) {
             return normalized;
           }
 
+          // ---------- Chromium path ----------
           browser = await puppeteer.launch({
             args: chromium.args,
             defaultViewport: chromium.defaultViewport,
@@ -704,8 +732,14 @@ export default async function handler(req, res) {
           // If still thin and host is jam-news.net, skip deeper waits and proceed to safe prompt to meet 60s budget
           if ((!articleText || articleText.length < 400) && originUrl.hostname.endsWith('jam-news.net')) {
             const siteQuick = originUrl.hostname.replace(/^www\./,'');
-            const safePrompt = buildSafePrompt({ url: effectiveUrl, title: (await page.title()).slice(0, 180), site: siteQuick });
-            const r2 = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt: safePrompt });
+            let titleForSafe = '';
+            try { titleForSafe = (await page.title()).slice(0, 180); } catch {}
+            const safePrompt = buildSafePrompt({ url: effectiveUrl, title: titleForSafe, site: siteQuick });
+            const r2 = await callGeminiWithRetryAndFallback({
+              primaryModel: PRIMARY_MODEL,
+              fallbackModels: FALLBACK_MODELS,
+              prompt: safePrompt
+            });
             const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
@@ -769,7 +803,7 @@ export default async function handler(req, res) {
           let parsed, modelUsed, lastErr;
 
           if (!tooThin) {
-            // Try full text first; if Gemini times out/aborts, shrink and retry.
+            // Try reduced slices first; lite model is very fast but keep within token budget
             for (let i = 0; i < SHRINKS.length; i++) {
               const cut = Math.floor(MAX_ARTICLE_CHARS * SHRINKS[i]);
               const slice = articleText.slice(0, cut);
@@ -777,7 +811,7 @@ export default async function handler(req, res) {
               try {
                 const r = await callGeminiWithRetryAndFallback({
                   primaryModel: PRIMARY_MODEL,
-                  fallbackModel: FALLBACK_MODEL,
+                  fallbackModels: FALLBACK_MODELS,
                   prompt
                 });
                 parsed = r.parsed; modelUsed = r.modelUsed;
@@ -798,7 +832,7 @@ export default async function handler(req, res) {
             const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headline, site });
             const r2 = await callGeminiWithRetryAndFallback({
               primaryModel: PRIMARY_MODEL,
-              fallbackModel: FALLBACK_MODEL,
+              fallbackModels: FALLBACK_MODELS,
               prompt: safePrompt
             });
             parsed = r2.parsed; modelUsed = r2.modelUsed;
