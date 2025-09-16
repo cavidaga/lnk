@@ -173,7 +173,7 @@ async function preflightPolicy(targetUrl) {
     if (head?.url) finalUrl = head.url;
     // Host & path blocks (final URL)
     const host = new URL(finalUrl).host;
-    if (isBlockedHost(host)) {
+    if (isBlockedHost(finalUrl)) {
       const err = new Error('Hosted/large document source blocked');
       err.code = 'BLOCKED_HOST'; throw err;
     }
@@ -201,7 +201,7 @@ async function preflightPolicy(targetUrl) {
     // If HEAD fails (some hosts), still enforce host/path blocks on the original URL
     try {
       const host0 = new URL(targetUrl).host;
-      if (isBlockedHost(host0)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
+      if (isBlockedHost(targetUrl)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
       if (isBlockedPath(targetUrl)) { const err = new Error('Document path indicates hosted/large file'); err.code='BLOCKED_PATH'; throw err; }
     } catch {}
     // If we set a policy code above, bubble it; else allow Chromium to try
@@ -343,6 +343,10 @@ export default async function handler(req, res) {
         DISALLOWED_MIME: 'Analiz üçün dəstəklənməyən məzmun növü.',
         ATTACHMENT:      'Birbaşa fayl əlavələri analiz edilmir.',
         TOO_LARGE:       'Sənəd çox böyükdür.',
+        BLOCKED_FILE_EXT:'Fayl növü dəstəklənmir (video/arayış/fayl).',
+        ALLOWLIST_ONLY:  'Hazırda yalnız təsdiqlənmiş saytların linkləri qəbul olunur.',
+        NON_ARTICLE:     'Bu link məqalə kimi görünmür. Xahiş edirik məqalənin konkret səhifəsini göndərin.',
+        BAD_URL:         'Keçid düzgün deyil. Zəhmət olmasa tam URL göndərin (https:// ilə).'
       };
       return res.status(400).json({ error: true, code: polErr.code || 'POLICY', message: messages[polErr.code] || polErr.message });
     }
