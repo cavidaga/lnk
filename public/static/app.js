@@ -88,9 +88,6 @@
     try {
       const data = await fetchAnalysis(hash);
       renderAnalysis(container, data);
-      try { window.__LNK_DATA__ = data; } catch (e) {}
-      wireShare(hash);
-      wireCopyButton(location.origin + `/analysis/${encodeURIComponent(hash)}`);
       document.title = `${data?.meta?.title ? data.meta.title + ' — ' : ''}LNK.az`;
     } catch (err) {
       renderError(container, err.message || 'Yüklənmə xətası');
@@ -243,75 +240,7 @@ function renderAnalysis(root, data) {
           </div>
         </section>
 
-        <section class="card" id="share-card">
-          <div class="bd">
-            <h3 style="margin:0 0 8px">Paylaş</h3>
-            <div class="share-buttons">
-              <!-- X / Twitter -->
-              <a class="share-btn x"
-                href="https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(title || '')}"
-                target="_blank" rel="noopener" aria-label="X-də paylaş">
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                  <path d="M18.244 2H21l-6.59 7.523L22 22h-6.828l-5.34-6.508L3.338 22H1l7.093-8.106L2 2h6.828l4.89 5.972L18.244 2Zm-2.393 18h1.89L7.247 3.98H5.27L15.85 20Z"/>
-                </svg>
-              </a>
-
-              <!-- Facebook -->
-              <a class="share-btn fb"
-                href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}"
-                target="_blank" rel="noopener" aria-label="Facebook-da paylaş">
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                  <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 5 3.657 9.127 8.438 9.878v-6.988h-2.54v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.242 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.988C18.343 21.127 22 17 22 12z"/>
-                </svg>
-              </a>
-
-              <!-- LinkedIn -->
-              <a class="share-btn li"
-                href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}"
-                target="_blank" rel="noopener" aria-label="LinkedIn-də paylaş">
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                  <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.784 1.764-1.75 1.764zm13.5 11.268h-3v-5.604c0-1.337-.027-3.06-1.865-3.06-1.868 0-2.155 1.459-2.155 2.965v5.699h-3v-10h2.881v1.367h.041c.402-.761 1.381-1.562 2.842-1.562 3.039 0 3.6 2.001 3.6 4.601v5.594z"/>
-                </svg>
-              </a>
-
-              <!-- Telegram -->
-              <a class="share-btn tg"
-                href="https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(title || '')}"
-                target="_blank" rel="noopener" aria-label="Telegram-da paylaş">
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                  <path d="M9.04 15.47 8.87 19c.36 0 .52-.16.7-.35l1.68-1.6 3.48 2.56c.64.35 1.1.17 1.28-.6l2.33-10.93c.24-1.1-.4-1.53-1.1-1.26L3.9 9.5C2.84 9.92 2.85 10.54 3.7 10.8l3.7 1.15 8.6-5.42c.4-.27.77-.12.47.15"/>
-                </svg>
-              </a>
-
-              <!-- WhatsApp -->
-              <a class="share-btn wa"
-                href="https://wa.me/?text=${encodeURIComponent((title || '') + ' ' + window.location.href)}"
-                target="_blank" rel="noopener" aria-label="WhatsApp-da paylaş">
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                  <path d="M20.52 3.48A11.86 11.86 0 0 0 12.03 0C5.46 0 .11 5.35.11 11.92c0 2.1.55 4.16 1.6 5.97L0 24l6.28-1.65a11.86 11.86 0 0 0 5.75 1.47h.01c6.57 0 11.92-5.35 11.92-11.92 0-3.18-1.24-6.18-3.44-8.39zM12.04 21.3h-.01a9.38 9.38 0 0 1-4.78-1.31l-.34-.2-3.73.98 1-3.64-.22-.37a9.38 9.38 0 0 1-1.43-4.97c0-5.17 4.21-9.38 9.39-9.38 2.5 0 4.85.97 6.62 2.74a9.32 9.32 0 0 1 2.75 6.64c0 5.17-4.21 9.38-9.39 9.38zm5.45-7.04c-.3-.15-1.78-.88-2.06-.98-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.07-.15-.67-1.6-.92-2.2-.24-.58-.48-.5-.67-.5h-.57c-.2 0-.52.08-.79.38-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.06 2.87 1.2 3.06.15.2 2.09 3.2 5.06 4.48.71.31 1.27.5 1.7.64.71.22 1.36.19 1.87.12.57-.08 1.78-.73 2.03-1.43.25-.7.25-1.3.17-1.43-.07-.13-.27-.2-.57-.35z"/>
-                </svg>
-              </a>
-
-              <!-- Copy link -->
-              <button class="share-btn copy" id="copy-link" aria-label="Keçidi kopyala">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 18H8V7h11v16z"/>
-                </svg>
-              </button>
-
-              <!-- Download image -->
-              <a id="btn-dl" class="share-btn" download aria-label="Şəkli endir (PNG)">
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                  <path d="M5 20h14v-2H5v2zm7-18L5.33 8h3.84v6h4.66V8h3.84L12 2z"/>
-                </svg>
-              </a>
-            </div>
-
-            <div class="small muted" style="margin-top:8px">
-              Məsləhət: Linklə yanaşı şəkli də paylaşın ki, önizləmə itəndə vizual qalsın.
-            </div>
-          </div>
-        </section>
+        
       </div>
     </article>
   `;
