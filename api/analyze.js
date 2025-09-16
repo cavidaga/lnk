@@ -5,7 +5,6 @@ import { addExtra } from 'puppeteer-extra';
 import dns from 'node:dns/promises';
 import puppeteerCore from 'puppeteer-core';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-puppeteer.use(StealthPlugin());
 
 // 🔒 policy helpers
 import {
@@ -18,7 +17,7 @@ import {
 } from '../lib/url-policy.js';
 
 const puppeteer = addExtra(puppeteerCore);
-
+puppeteer.use(StealthPlugin());
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // --- Config ---
