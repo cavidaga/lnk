@@ -267,71 +267,89 @@ Constraints:
 }
 
 // --- NEW: light preflight policy before launching Chromium ---
+// --- Relaxed preflight: HEAD is advisory, only 404/410 are hard failures
 async function preflightPolicy(targetUrl) {
   let finalUrl = targetUrl;
+
+  let head = null;
   try {
-    const head = await fetch(targetUrl, { method: 'HEAD', redirect: 'follow' });
+    head = await fetch(targetUrl, { method: 'HEAD', redirect: 'follow' });
     if (head?.url) finalUrl = head.url;
+
+    // Only treat true "not found" as a hard error
     if (head && head.status >= 400) {
-      const err = new Error(`Target returned ${head.status}`);
-      err.code = (head.status === 404 || head.status === 410) ? 'NOT_FOUND' : 'BAD_STATUS';
-      throw err;
-    }
-    const u = new URL(finalUrl);
-    if (!/^https?:$/.test(u.protocol)) { const err = new Error('Only HTTP/HTTPS are allowed'); err.code='BAD_SCHEME'; throw err; }
-    if (u.username || u.password) { const err = new Error('Credentials in URL are not allowed'); err.code='BAD_AUTH'; throw err; }
-    if (u.port && !['80','443'].includes(u.port)) { const err = new Error('Port not allowed'); err.code='BAD_PORT'; throw err; }
-    if (isBlockedHost(finalUrl)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
-    if (isBlockedPath(finalUrl)) { const err = new Error('Document path indicates hosted/large file'); err.code='BLOCKED_PATH'; throw err; }
-
-    try {
-      const addrs = await dns.lookup(u.hostname, { all: true, verbatim: true });
-      const isPrivate = (addr) => {
-        const ip = addr.address.toLowerCase();
-        if (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) {
-          if (ip.startsWith('10.') || ip.startsWith('192.168.') || ip.startsWith('127.') || ip.startsWith('169.254.')) return true;
-          if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(ip)) return true;
-          if (/^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(ip)) return true; // CGNAT
-          if (ip === '169.254.169.254') return true; // metadata
-          return false;
-        }
-        if (ip === '::1') return true;
-        if (ip.startsWith('fe80:')) return true;
-        if (ip.startsWith('fc') || ip.startsWith('fd')) return true;
-        if (ip.startsWith('::ffff:')) {
-          const last = ip.split(':').pop() || '';
-          if (/^\d{1,3}(\.\d{1,3}){3}$/.test(last)) return isPrivate({ address: last });
-        }
-        return false;
-      };
-      if (Array.isArray(addrs) && addrs.some(isPrivate)) {
-        const err = new Error('Target resolves to a private or link-local address');
-        err.code = 'PRIVATE_IP'; throw err;
+      if (head.status === 404 || head.status === 410) {
+        const err = new Error(`Target returned ${head.status}`);
+        err.code = 'NOT_FOUND';
+        throw err;
       }
-    } catch {}
+      // Otherwise (403/405/429/503 etc.) → proceed to GET/Puppeteer
+    }
+  } catch {
+    // If HEAD itself throws (network, CORS-like, CF block), ignore and continue.
+  }
 
+  // URL-level policy checks (always enforced)
+  const u = new URL(finalUrl);
+  if (!/^https?:$/.test(u.protocol)) { const err = new Error('Only HTTP/HTTPS are allowed'); err.code='BAD_SCHEME'; throw err; }
+  if (u.username || u.password)     { const err = new Error('Credentials in URL are not allowed'); err.code='BAD_AUTH'; throw err; }
+  if (u.port && !['80','443'].includes(u.port)) { const err = new Error('Port not allowed'); err.code='BAD_PORT'; throw err; }
+
+  // Host/path policy (string-level)
+  if (isBlockedHost(finalUrl)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
+  if (isBlockedPath(finalUrl)) { const err = new Error('Document path indicates hosted/large file'); err.code='BLOCKED_PATH'; throw err; }
+
+  // DNS check to avoid private/link-local targets (best-effort)
+  try {
+    const addrs = await dns.lookup(u.hostname, { all: true, verbatim: true });
+    const isPrivate = (addr) => {
+      const ip = addr.address.toLowerCase();
+      // v4 ranges
+      if (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) {
+        if (ip.startsWith('10.') || ip.startsWith('192.168.') || ip.startsWith('127.') || ip.startsWith('169.254.')) return true;
+        if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(ip)) return true;
+        if (/^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./.test(ip)) return true; // CGNAT
+        if (ip === '169.254.169.254') return true; // metadata
+        return false;
+      }
+      // v6 ranges
+      if (ip === '::1') return true;
+      if (ip.startsWith('fe80:')) return true; // link-local
+      if (ip.startsWith('fc') || ip.startsWith('fd')) return true; // ULA
+      if (ip.startsWith('::ffff:')) {
+        const last = ip.split(':').pop() || '';
+        if (/^\d{1,3}(\.\d{1,3}){3}$/.test(last)) return isPrivate({ address: last });
+      }
+      return false;
+    };
+    if (Array.isArray(addrs) && addrs.some(isPrivate)) {
+      const err = new Error('Target resolves to a private or link-local address');
+      err.code = 'PRIVATE_IP'; throw err;
+    }
+  } catch {
+    // DNS lookup failures are not fatal; continue.
+  }
+
+  // Header-based checks only if HEAD succeeded with 2xx
+  if (head && head.ok) {
     const ct = head.headers.get('content-type') || '';
     const cl = Number(head.headers.get('content-length') || 0);
     const cd = (head.headers.get('content-disposition') || '').toLowerCase();
-    if (cd.includes('attachment')) { const err = new Error('Direct attachments are not analyzed'); err.code='ATTACHMENT'; throw err; }
-    if (ct && !isAllowedMime(ct)) { const err = new Error(`Unsupported content type: ${ct}`); err.code='DISALLOWED_MIME'; throw err; }
-    if (cl && cl > MAX_CONTENT_LENGTH_HEAD) { const err = new Error(`Content-Length ${cl} exceeds limit`); err.code='TOO_LARGE'; err.contentLength = cl; throw err; }
-  } catch (e) {
-    try {
-      const u0 = new URL(targetUrl);
-      if (!/^https?:$/.test(u0.protocol)) { const err = new Error('Only HTTP/HTTPS are allowed'); err.code='BAD_SCHEME'; throw err; }
-      if (u0.username || u0.password) { const err = new Error('Credentials in URL are not allowed'); err.code='BAD_AUTH'; throw err; }
-      if (u0.port && !['80','443'].includes(u0.port)) { const err = new Error('Port not allowed'); err.code='BAD_PORT'; throw err; }
-      if (isBlockedHost(targetUrl)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
-      if (isBlockedPath(targetUrl)) { const err = new Error('Document path indicates hosted/large file'); err.code='BLOCKED_PATH'; throw err; }
-      if (u0.hostname && isIpLiteral(u0.hostname) && isPrivateIpLiteral(u0.hostname)) {
-        const err = new Error('Target is private-network address'); err.code='PRIVATE_IP'; throw err;
-      }
-    } catch (inner) {
-      throw inner;
+
+    if (cd.includes('attachment')) {
+      const err = new Error('Direct attachments are not analyzed');
+      err.code = 'ATTACHMENT'; throw err;
     }
-    if (e && e.code) throw e;
+    if (ct && !isAllowedMime(ct)) {
+      const err = new Error(`Unsupported content type: ${ct}`);
+      err.code = 'DISALLOWED_MIME'; throw err;
+    }
+    if (cl && cl > MAX_CONTENT_LENGTH_HEAD) {
+      const err = new Error(`Content-Length ${cl} exceeds limit`);
+      err.code = 'TOO_LARGE'; err.contentLength = cl; throw err;
+    }
   }
+
   return finalUrl;
 }
 
