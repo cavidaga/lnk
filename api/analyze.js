@@ -99,9 +99,20 @@ async function callGeminiOnce({ model, prompt, signal }) {
     throw err;
   }
   const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  const finishReason = data?.candidates?.[0]?.finishReason;
+  const candidate = data?.candidates?.[0];
+  const text = candidate?.content?.parts
+    ?.map(p => p?.text)
+    .filter(Boolean)
+    .join('\n') || '';
+  const finishReason = candidate?.finishReason;
   const promptFeedback = data?.promptFeedback;
+  if (!text.trim()) {
+    const err = new Error('Model returned empty content');
+    err.code = 'MODEL_EMPTY';
+    err.finishReason = finishReason;
+    err.promptFeedback = promptFeedback;
+    throw err;
+  }
   return { text, finishReason, promptFeedback, raw: data };
 }
 
@@ -139,6 +150,14 @@ async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModel, pro
   }
   throw lastError || new Error('Model call failed without a specific error');
 }
+const pageMeta = await page.evaluate(() => {
+  const sel = s => document.querySelector(s);
+  const ogTitle = sel('meta[property="og:title"]')?.content || '';
+  const ttl = document.title || '';
+  const pubTime = sel('meta[property="article:published_time"],meta[name="pubdate"],time[datetime]')?.getAttribute('content') || '';
+  const site = location.hostname.replace(/^www\./,'');
+  return { title: ogTitle || ttl, published_at: pubTime, site };
+});
 
 function buildPrompt({ url, articleText }) {
   return `
@@ -198,6 +217,55 @@ The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", a
 
 ### HUMAN SUMMARY
 "human_summary": "Məqalənin əsas məzmununu və nəticələrini aydın, axıcı Azərbaycan dilində 2–4 cümlə ilə xülasə et."
+`.trim();
+}
+
+// --- Safe fallback prompt (English instructions, AZ output) ---
+function buildSafePrompt({ url, title, site }) {
+  return `
+You are "LNK Evaluator" for LNK.az. The linked page may contain sensitive material.
+Goal: assess media framing, sourcing transparency, and stance toward political institutions.
+
+SAFETY RULES (must follow):
+- Do NOT repeat, paraphrase, or describe any graphic, violent, sexual, or personally identifying details.
+- Do NOT invent facts; if uncertain, say so in Azerbaijani.
+- Work only from the headline/context below; do not add specifics from memory.
+
+OUTPUT LANGUAGE: Azerbaijani. All free-text fields must be in Azerbaijani.
+
+INPUT
+- Link: ${url}
+- Headline: ${title || '(no headline)'}
+- Publication: ${site || '(unknown)'}
+
+RESPONSE
+Return a single valid JSON object with these keys:
+
+meta: {
+  article_type,            // "xəbər" | "rəy" | "analitika" | "reportaj" | ...
+  title,                   // a short Azerbaijani title
+  original_url,            // the link above
+  publication,             // site/publication name
+  published_at?            // ISO8601 if known, else omit
+},
+scores: {
+  reliability: { value, rationale },                 // 0..100
+  political_establishment_bias: { value, rationale } // -5 .. +5
+},
+diagnostics: {
+  socio_cultural_descriptions: [
+    { group, stance: "müsbət|mənfi|neytral|qarışıq", rationale }
+  ],
+  language_flags: [
+    { term, category: "yüklü söz|qeyri-müəyyən|spekulyativ", evidence }
+  ]
+},
+cited_sources: [{ name, role, stance }],
+human_summary: "2–4 cümləlik AZ xülasə."
+
+Constraints:
+- Natural paragraphs (no bullet lists inside rationales).
+- Stick to the ranges above (reliability 0–100; political bias –5..+5).
 `.trim();
 }
 
@@ -523,6 +591,15 @@ export default async function handler(req, res) {
           }
           await new Promise(r => setTimeout(r, 400)); // small settle pause
 
+          // For fallback prompt
+          const site = new URL(effectiveUrl).hostname.replace(/^www\./,'');
+          let headline = '';
+          try { headline = await page.title(); } catch {}
+          try {
+            const ogt = await page.$eval('meta[property="og:title"]', el => el.getAttribute('content'));
+            if (ogt && ogt.length > 5) headline = ogt;
+          } catch {}
+
           // Try DOM text extraction
           let articleText = await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : '');
           articleText = articleText.replace(/\s\s+/g, ' ').trim();
@@ -574,28 +651,46 @@ export default async function handler(req, res) {
             }
           }
 
-          // Try full text first; if Gemini times out/aborts, shrink and retry.
-          const SHRINKS = [1.0, 0.6, 0.4]; // 100%, 60%, 40% of MAX_ARTICLE_CHARS
+          // If content is very short/blocked, jump straight to safe prompt to save tokens.
+          const tooThin = !articleText || articleText.length < 400;
+          const SHRINKS = [1.0, 0.6, 0.4];
           let parsed, modelUsed, lastErr;
-          for (let i = 0; i < SHRINKS.length; i++) {
-            const cut = Math.floor(MAX_ARTICLE_CHARS * SHRINKS[i]);
-            const slice = articleText.slice(0, cut);
-            const prompt = buildPrompt({ url: effectiveUrl, articleText: slice });
-            try {
-              const r = await callGeminiWithRetryAndFallback({
-                primaryModel: PRIMARY_MODEL,
-                fallbackModel: FALLBACK_MODEL,
-                prompt
-              });
-              parsed = r.parsed; modelUsed = r.modelUsed;
-              break;
-            } catch (e) {
-              lastErr = e;
-              const msg = String(e?.message || '').toLowerCase();
-              const isTimeoutish = e?.name === 'AbortError' || e?.httpStatus === 504 || /timeout|timed out|network error/.test(msg);
-              if (!isTimeoutish || i === SHRINKS.length - 1) throw e;
-              // otherwise loop and retry with a smaller slice
+
+          if (!tooThin) {
+            // Try full text first; if Gemini times out/aborts, shrink and retry.
+            for (let i = 0; i < SHRINKS.length; i++) {
+              const cut = Math.floor(MAX_ARTICLE_CHARS * SHRINKS[i]);
+              const slice = articleText.slice(0, cut);
+              const prompt = buildPrompt({ url: effectiveUrl, articleText: slice });
+              try {
+                const r = await callGeminiWithRetryAndFallback({
+                  primaryModel: PRIMARY_MODEL,
+                  fallbackModel: FALLBACK_MODEL,
+                  prompt
+                });
+                parsed = r.parsed; modelUsed = r.modelUsed;
+                break;
+              } catch (e) {
+                lastErr = e;
+                const msg = String(e?.message || '').toLowerCase();
+                const isTimeoutish = e?.name === 'AbortError' || e?.httpStatus === 504 || /timeout|timed out|network error/.test(msg);
+                if (!isTimeoutish || i === SHRINKS.length - 1) {
+                  // will fall back to headline-only prompt below
+                  break;
+                }
+              }
             }
+          }
+
+          // Final safety net (also used for thin pages)
+          if (!parsed) {
+            const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headline, site });
+            const r2 = await callGeminiWithRetryAndFallback({
+              primaryModel: PRIMARY_MODEL,
+              fallbackModel: FALLBACK_MODEL,
+              prompt: safePrompt
+            });
+            parsed = r2.parsed; modelUsed = r2.modelUsed;
           }
           const normalized = normalizeOutput(parsed, { url: effectiveUrl });
 
