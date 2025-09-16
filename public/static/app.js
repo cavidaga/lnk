@@ -88,6 +88,7 @@
     try {
       const data = await fetchAnalysis(hash);
       renderAnalysis(container, data);
+      try { window.__LNK_DATA__ = data; } catch (e) {}
       wireShare(hash);
       wireCopyButton(location.origin + `/analysis/${encodeURIComponent(hash)}`);
       document.title = `${data?.meta?.title ? data.meta.title + ' — ' : ''}LNK.az`;
@@ -345,12 +346,129 @@ function renderAnalysis(root, data) {
   // ---------- SHARE ----------
   function wireShare(hash) {
     const pageUrl = location.origin + `/analysis/${encodeURIComponent(hash)}`;
-    const cardUrl = `${location.origin}/static/og-cover.png`;
-
-    const set = (id, href) => { const a = $(`#${id}`); if (a) a.href = href; };
 
     const dl = $('#btn-dl');
-    if (dl) { dl.href = cardUrl; dl.download = `lnk-${hash}.png`; }
+    if (dl) {
+      dl.addEventListener('click', (e) => {
+        try {
+          e.preventDefault();
+          const data = (window && window.__LNK_DATA__) || {};
+          const href = generatePngFromData(data);
+          if (href) {
+            dl.href = href;
+            dl.download = `lnk-${hash}.png`;
+            // trigger download
+            setTimeout(() => dl.click(), 0);
+          }
+        } catch (err) {
+          // fallback to static image
+          dl.href = `${location.origin}/static/og-cover.png`;
+          dl.download = `lnk-${hash}.png`;
+        }
+      });
+    }
+  }
+
+  function generatePngFromData(data){
+    try{
+      const title = String(data?.meta?.title || data?.title || 'Analiz');
+      const rel = clamp(Number(data?.scores?.reliability?.value ?? data?.reliability ?? 0), 0, 100);
+      const pol = clamp(Number(data?.scores?.political_establishment_bias?.value ?? data?.political_establishment_bias ?? 0), -5, 5);
+      const summary = String(data?.human_summary || data?.summary || '');
+
+      const W = 1200, H = 630;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      // theme
+      const bg = '#0B0E14', text = '#E5E7EB', sub = '#9CA3AF', cardBg = '#121622', cardBorder = '#1F2433', axis = '#2A3146', dot = '#EF4444';
+
+      // background
+      ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+      // title
+      ctx.fillStyle = text; ctx.font = '800 56px Poppins, Inter, ui-sans-serif';
+      wrapText(ctx, title, 40, 120, 680, 60);
+
+      // metrics boxes
+      drawMetricBox(ctx, cardBg, cardBorder, sub, text, 'Etibarlılıq', `${rel}/100`, 40, 160, 320, 110);
+      drawMetricBox(ctx, cardBg, cardBorder, sub, text, 'Siyasi hakimiyyət meyli', (pol>0?`+${pol}`:`${pol}`), 380, 160, 320, 110);
+
+      // summary
+      ctx.fillStyle = sub; ctx.font = '22px Poppins, Inter, ui-sans-serif';
+      wrapText(ctx, summary, 40, 320, 660, 32, 4);
+
+      // right panel chart
+      drawChart(ctx, {x: 760, y: 40, w: 400, h: 550}, cardBg, cardBorder, axis, dot, rel, pol);
+
+      // watermark
+      ctx.fillStyle = 'rgba(156,163,175,.7)';
+      ctx.font = '700 18px Inter, ui-sans-serif';
+      ctx.fillText('lnk.az', W - 120, H - 24);
+
+      return canvas.toDataURL('image/png');
+    } catch(e){ return ''; }
+  }
+
+  function drawMetricBox(ctx, cardBg, cardBorder, sub, text, label, value, x, y, w, h){
+    ctx.fillStyle = cardBg; ctx.strokeStyle = cardBorder; ctx.lineWidth = 2;
+    roundRect(ctx, x, y, w, h, 16, true, true);
+    ctx.fillStyle = sub; ctx.font = '16px Poppins, Inter, ui-sans-serif'; ctx.fillText(label, x+16, y+34);
+    ctx.fillStyle = text; ctx.font = '800 44px Poppins, Inter, ui-sans-serif'; ctx.fillText(value, x+16, y+88);
+  }
+
+  function drawChart(ctx, rect, cardBg, cardBorder, axis, dotColor, rel, pol){
+    const {x,y,w,h} = rect;
+    // panel
+    ctx.fillStyle = cardBg; ctx.strokeStyle = cardBorder; ctx.lineWidth = 2;
+    roundRect(ctx, x, y, w, h, 20, true, true);
+    // quad area
+    const pad = 24; const qx = x+pad, qy = y+pad, qw = w-2*pad, qh = h-2*pad;
+    ctx.strokeStyle = axis; ctx.lineWidth = 1;
+    // border
+    roundRect(ctx, qx, qy, qw, qh, 14, false, true);
+    // axes
+    ctx.beginPath(); ctx.moveTo(qx, qy+qh/2); ctx.lineTo(qx+qw, qy+qh/2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(qx+qw/2, qy); ctx.lineTo(qx+qw/2, qy+qh); ctx.stroke();
+    // dot
+    const cx = qx + ((pol + 5) / 10) * qw;
+    const cy = qy + (1 - (rel/100)) * qh;
+    ctx.fillStyle = dotColor; ctx.beginPath(); ctx.arc(cx, cy, 9, 0, Math.PI*2); ctx.fill();
+    // labels
+    ctx.fillStyle = '#9CA3AF'; ctx.font = '16px Inter, ui-sans-serif';
+    ctx.textAlign = 'center'; ctx.fillText('Etibarlı', qx+qw/2, qy+16);
+    ctx.fillText('Etibarsız', qx+qw/2, qy+qh-6);
+    ctx.textAlign = 'left'; ctx.fillText('Müxalif', qx+6, qy+qh/2+6);
+    ctx.textAlign = 'right'; ctx.fillText('İqtidar', qx+qw-6, qy+qh/2+6);
+    ctx.textAlign = 'left';
+  }
+
+  function roundRect(ctx, x, y, w, h, r, fill, stroke){
+    const rr = Math.min(r, w/2, h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+rr, y);
+    ctx.arcTo(x+w, y, x+w, y+h, rr);
+    ctx.arcTo(x+w, y+h, x, y+h, rr);
+    ctx.arcTo(x, y+h, x, y, rr);
+    ctx.arcTo(x, y, x+w, y, rr);
+    if (fill) ctx.fill();
+    if (stroke) ctx.stroke();
+  }
+
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines){
+    const words = String(text||'').split(/\s+/);
+    let line = '', lines = 0;
+    for (let n = 0; n < words.length; n++) {
+      const test = line ? line + ' ' + words[n] : words[n];
+      const m = ctx.measureText(test);
+      if (m.width > maxWidth && n>0) {
+        ctx.fillText(line, x, y); y += lineHeight; lines += 1; line = words[n];
+        if (maxLines && lines >= maxLines) break;
+      } else {
+        line = test;
+      }
+    }
+    if (!maxLines || (maxLines && lines < maxLines)) ctx.fillText(line, x, y);
   }
 
   // ---------- HELPERS ----------
