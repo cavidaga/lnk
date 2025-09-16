@@ -20,7 +20,16 @@ import {
 } from '../lib/url-policy.js';
 
 const puppeteer = addExtra(puppeteerCore);
-puppeteer.use(StealthPlugin()); // ✅ important for CF/anti-bot
+// Configure stealth to avoid requiring deprecated/removed evasions in some versions
+const stealth = StealthPlugin();
+try {
+  if (stealth?.enabledEvasions) {
+    stealth.enabledEvasions.delete('chrome.app');
+    stealth.enabledEvasions.delete('chrome.csi');
+    stealth.enabledEvasions.delete('chrome.loadTimes');
+  }
+} catch {}
+puppeteer.use(stealth); // ✅ important for CF/anti-bot
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
