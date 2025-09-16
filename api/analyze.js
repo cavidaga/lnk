@@ -38,9 +38,9 @@ const MAX_ARTICLE_CHARS = 30000;
 const BLOCK_KEYWORDS = ['cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'];
 const PRIMARY_MODEL = 'gemini-2.5-pro';
 const FALLBACK_MODEL = 'gemini-2.5-flash';
-const RETRY_ATTEMPTS = 2;          // attempts per model (keep fast under 60s)
+const RETRY_ATTEMPTS = 1;          // single attempt per model
 const INITIAL_BACKOFF_MS = 600;    // starting backoff for retries
-const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 18000); // 18s default
+const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 12000); // 12s default
 
 // --- Helpers ---
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
@@ -520,7 +520,8 @@ export default async function handler(req, res) {
             }
           } catch {}
 
-          // If fast path is good enough, proceed directly to LLM without Chromium
+          // If fast path is acceptable, proceed directly to LLM without Chromium.
+          // Even if thin, try safe prompt immediately to avoid Chromium unless necessary.
           if (articleTextFast && articleTextFast.length >= 400) {
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
             const SHRINKS = [1.0, 0.6];
@@ -547,6 +548,21 @@ export default async function handler(req, res) {
             normalized.contentSource = contentSource;
             await kv.set(cacheKey, normalized, { ex: 2592000 });
             console.log(`SAVED TO CACHE (light) for URL: ${effectiveUrl}`);
+            try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+            return normalized;
+          }
+
+          if (articleTextFast && articleTextFast.length > 0) {
+            // Thin content: skip Chromium and do safe prompt quickly
+            const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
+            const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
+            const r2 = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt: safePrompt });
+            const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
+            normalized.hash = cacheKey;
+            normalized.modelUsed = r2.modelUsed;
+            normalized.contentSource = contentSource;
+            await kv.set(cacheKey, normalized, { ex: 2592000 });
+            console.log(`SAVED TO CACHE (light-safe) for URL: ${effectiveUrl}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             return normalized;
           }
@@ -592,14 +608,15 @@ export default async function handler(req, res) {
 
           const DOMAIN_SELECTORS = {
             'oxu.az': ['.news-inner', '.news-detail', 'article', '.article', '.content'],
-            'publika.az': ['.news-content','.news_text','.news-detail','.post-content','article']
+            'publika.az': ['.news-content','.news_text','.news-detail','.post-content','article'],
+            'jam-news.net': ['article#articleContent', '.wi-single-content', 'main article', 'article', '.content']
           };
 
           // ---- OXU.AZ OVERRIDE (CF-friendly nav) ----
           let resp = null;
           try {
-            // First attempt: DOM ready (fast)
-            resp = await page.goto(effectiveUrl, { waitUntil: 'domcontentloaded', timeout: 25000 });
+            // First attempt: DOM ready (short timeout)
+            resp = await page.goto(effectiveUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
           } catch (e) {
             console.warn('First nav (domcontentloaded) failed:', e?.message || e);
           }
@@ -608,22 +625,22 @@ export default async function handler(req, res) {
           const needsDeepWait = isOxu || !resp;
           if (needsDeepWait) {
             try {
-              resp = await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 45000 });
+              resp = await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 20000 });
             } catch (e2) {
               console.warn('Second nav (networkidle2) failed:', e2?.message || e2);
             }
             // Wait a touch for any JS challenge to clear
-            await sleep(1800);
+            await sleep(800);
           }
 
           // If title suggests Cloudflare, wait a bit more and re-load once
           try {
             const t = (await page.title()) || '';
             if (/cloudflare|attention required|checking your browser/i.test(t)) {
-              await sleep(2000);
+              await sleep(800);
               try {
-                await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 45000 });
-                await sleep(1200);
+                await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 15000 });
+                await sleep(600);
               } catch {}
             }
           } catch {}
