@@ -247,7 +247,7 @@ function renderAnalysis(root, data) {
             <div class="share-buttons">
               <!-- X / Twitter -->
               <a class="share-btn x"
-                href="https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(title || '')}"
+                href="https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent('Yeni analiz: ' + (title || ''))}"
                 target="_blank" rel="noopener" aria-label="X-də paylaş">
                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                   <path d="M18.244 2H21l-6.59 7.523L22 22h-6.828l-5.34-6.508L3.338 22H1l7.093-8.106L2 2h6.828l4.89 5.972L18.244 2Zm-2.393 18h1.89L7.247 3.98H5.27L15.85 20Z"/>
@@ -274,7 +274,7 @@ function renderAnalysis(root, data) {
 
               <!-- Telegram -->
               <a class="share-btn tg"
-                href="https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(title || '')}"
+                href="https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent('Yeni analiz: ' + (title || ''))}"
                 target="_blank" rel="noopener" aria-label="Telegram-da paylaş">
                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                   <path d="M9.04 15.47 8.87 19c.36 0 .52-.16.7-.35l1.68-1.6 3.48 2.56c.64.35 1.1.17 1.28-.6l2.33-10.93c.24-1.1-.4-1.53-1.1-1.26L3.9 9.5C2.84 9.92 2.85 10.54 3.7 10.8l3.7 1.15 8.6-5.42c.4-.27.77-.12.47.15"/>
@@ -283,7 +283,7 @@ function renderAnalysis(root, data) {
 
               <!-- WhatsApp -->
               <a class="share-btn wa"
-                href="https://wa.me/?text=${encodeURIComponent((title || '') + ' ' + window.location.href)}"
+                href="https://wa.me/?text=${encodeURIComponent(('Yeni analiz: ' + (title || '')) + ' ' + window.location.href)}"
                 target="_blank" rel="noopener" aria-label="WhatsApp-da paylaş">
                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                   <path d="M20.52 3.48A11.86 11.86 0 0 0 12.03 0C5.46 0 .11 5.35.11 11.92c0 2.1.55 4.16 1.6 5.97L0 24l6.28-1.65a11.86 11.86 0 0 0 5.75 1.47h.01c6.57 0 11.92-5.35 11.92-11.92 0-3.18-1.24-6.18-3.44-8.39zM12.04 21.3h-.01a9.38 9.38 0 0 1-4.78-1.31l-.34-.2-3.73.98 1-3.64-.22-.37a9.38 9.38 0 0 1-1.43-4.97c0-5.17 4.21-9.38 9.39-9.38 2.5 0 4.85.97 6.62 2.74a9.32 9.32 0 0 1 2.75 6.64c0 5.17-4.21 9.38-9.39 9.38zm5.45-7.04c-.3-.15-1.78-.88-2.06-.98-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.07-.15-.67-1.6-.92-2.2-.24-.58-.48-.5-.67-.5h-.57c-.2 0-.52.08-.79.38-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.06 2.87 1.2 3.06.15.2 2.09 3.2 5.06 4.48.71.31 1.27.5 1.7.64.71.22 1.36.19 1.87.12.57-.08 1.78-.73 2.03-1.43.25-.7.25-1.3.17-1.43-.07-.13-.27-.2-.57-.35z"/>
