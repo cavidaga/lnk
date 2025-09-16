@@ -4,6 +4,8 @@ import chromium from '@sparticuz/chromium';
 import { addExtra } from 'puppeteer-extra';
 import dns from 'node:dns/promises';
 import puppeteerCore from 'puppeteer-core';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+puppeteer.use(StealthPlugin());
 
 // 🔒 policy helpers
 import {
@@ -481,19 +483,31 @@ export default async function handler(req, res) {
           await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
 
       // Trim heavy resources to speed up/avoid infinite network idles
-      const origin = new URL(effectiveUrl).origin;
+      const originUrl = new URL(effectiveUrl);
+      const siteBase = originUrl.hostname.split('.').slice(-2).join('.'); // rough eTLD+1
+
       await page.setRequestInterception(true);
       page.on('request', (req) => {
         const type = req.resourceType();
-        const url  = req.url();
-        const sameOrigin = url.startsWith(origin);
-        // Block heavy assets and most third-party noise; keep doc/script/xhr from same origin
-        if (type === 'image' || type === 'media' || type === 'font' || type === 'stylesheet' ||
-            (!sameOrigin && (type === 'websocket' || type === 'fetch' || type === 'xhr'))) {
-          return req.abort();
-        }
+        const u = new URL(req.url());
+        const sameHost = u.hostname === originUrl.hostname;
+        const sameSite = sameHost || u.hostname.endsWith('.' + siteBase);
+
+        // Drop obvious heavy stuff
+        if (type === 'image' || type === 'media' || type === 'font') return req.abort();
+
+        // Keep styles if same-site (many sites hide content without CSS)
+        if (type === 'stylesheet' && !sameSite) return req.abort();
+
+        // Allow XHR/fetch always; allow WS only if same-site
+        if (type === 'websocket' && !sameSite) return req.abort();
+
         return req.continue();
       });
+
+      const DOMAIN_SELECTORS = {
+        'publika.az': ['.news-content','.news_text','.news-detail','.post-content','article']
+      };
 
       // Be lenient with settle criteria: first try DOM ready, then full load
       let resp = null;
@@ -533,7 +547,7 @@ export default async function handler(req, res) {
             /səhifə tapılmadı/i, /sehife tapilmadi/i, /tapılmadı/i, /mövcud deyil/i,
             /page not found/i, /\b404\b/, /not found/i, /content not available/i
           ];
-          if (articleText.length < 400 || SOFT_404.some(rx => rx.test(articleText))) {
+          if (articleText.length < 400 && SOFT_404.some(rx => rx.test(articleText))) {
             const err = new Error('This does not look like an article (soft 404 / placeholder).');
             err.code = 'NON_ARTICLE'; throw err;
           }
