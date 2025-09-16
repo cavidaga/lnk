@@ -36,12 +36,19 @@
     if (!form) return; // not on home
 
     const out = $('#result');
+    let inFlight = false;
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const url = new FormData(form).get('url');
       if (!url) return;
-      setSpinner(out || form);
+      if (inFlight) return;           // prevent double submits
+      inFlight = true;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn?.setAttribute('disabled','');
+      submitBtn?.classList.add('busy');
 
+      setSpinner(out || form);
+      (out || form).classList.add('show');   // <-- make spinner visible
       try {
         const res = await fetch('/api/analyze', {
           method: 'POST',
@@ -49,13 +56,25 @@
           body: JSON.stringify({ url: String(url).trim() })
         });
         const json = await res.json();
-        if (!res.ok || json.error) throw new Error(json.message || 'Təhlil zamanı xəta');
+        if (!res.ok || json.error) {
+          // Blocked-site special case (Cloudflare, etc.)
+          if (json.isBlockError) {
+            renderBlockError(out || form, { message: json.message, prompt: json.prompt, url });
+            return;
+          }
+          throw new Error(json.message || 'Təhlil zamanı xəta baş verdi');
+        }
 
         const hash = json.hash || json?.meta?.hash;
         if (!hash) throw new Error('Hash tapılmadı');
         location.assign(`/analysis/${encodeURIComponent(hash)}`);
       } catch (err) {
         renderError(out || form, err.message || 'Xəta');
+        } finally {
+        inFlight = false;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn?.removeAttribute('disabled');
+        submitBtn?.classList.remove('busy');
       }
     });
   }
