@@ -8,6 +8,7 @@ import { addExtra } from 'puppeteer-extra';
 import dns from 'node:dns/promises';
 import puppeteerCore from 'puppeteer-core';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { gatedFetch } from '../lib/gated-fetch.js';
 
 // 🔒 policy helpers
 import {
@@ -37,9 +38,9 @@ const MAX_ARTICLE_CHARS = 30000;
 const BLOCK_KEYWORDS = ['cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'];
 const PRIMARY_MODEL = 'gemini-2.5-pro';
 const FALLBACK_MODEL = 'gemini-2.5-flash';
-const RETRY_ATTEMPTS = 3;          // attempts per model
+const RETRY_ATTEMPTS = 2;          // attempts per model (keep fast under 60s)
 const INITIAL_BACKOFF_MS = 600;    // starting backoff for retries
-const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 70000); // 70s default
+const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 18000); // 18s default
 
 // --- Helpers ---
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
@@ -505,7 +506,51 @@ export default async function handler(req, res) {
 
         let browser = null;
         let contentSource = 'Live';
+        let articleTextFast = '';
+        let headlineFast = '';
         try {
+          // Fast path: try gatedFetch first to avoid Chromium for simple pages
+          try {
+            const light = await gatedFetch(effectiveUrl);
+            if (light?.text) {
+              articleTextFast = htmlToText(light.text).substring(0, MAX_ARTICLE_CHARS);
+              contentSource = 'LightFetch';
+              const m = light.text.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+              if (m && m[1]) headlineFast = htmlToText(m[1]);
+            }
+          } catch {}
+
+          // If fast path is good enough, proceed directly to LLM without Chromium
+          if (articleTextFast && articleTextFast.length >= 400) {
+            const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
+            const SHRINKS = [1.0, 0.6];
+            let parsedQuick = null, modelUsedQuick = null, lastErrQuick = null;
+            for (let i = 0; i < SHRINKS.length; i++) {
+              const cut = Math.floor(MAX_ARTICLE_CHARS * SHRINKS[i]);
+              const slice = articleTextFast.slice(0, cut);
+              const prompt = buildPrompt({ url: effectiveUrl, articleText: slice });
+              try {
+                const r = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt });
+                parsedQuick = r.parsed; modelUsedQuick = r.modelUsed; break;
+              } catch (e) {
+                lastErrQuick = e;
+              }
+            }
+            if (!parsedQuick) {
+              const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
+              const r2 = await callGeminiWithRetryAndFallback({ primaryModel: PRIMARY_MODEL, fallbackModel: FALLBACK_MODEL, prompt: safePrompt });
+              parsedQuick = r2.parsed; modelUsedQuick = r2.modelUsed;
+            }
+            const normalized = normalizeOutput(parsedQuick, { url: effectiveUrl });
+            normalized.hash = cacheKey;
+            normalized.modelUsed = modelUsedQuick;
+            normalized.contentSource = contentSource;
+            await kv.set(cacheKey, normalized, { ex: 2592000 });
+            console.log(`SAVED TO CACHE (light) for URL: ${effectiveUrl}`);
+            try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+            return normalized;
+          }
+
           browser = await puppeteer.launch({
             args: chromium.args,
             defaultViewport: chromium.defaultViewport,
