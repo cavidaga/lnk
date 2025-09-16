@@ -375,99 +375,99 @@ export default async function handler(req, res) {
     }
 
     // Compute under a KV lock to avoid duplicate token spend
-+    let result;
-+    try {
-+      result = await withLock(cacheKey, async () => {
-+        // Re-check cache in case another instance finished while we waited
-+        const recheck = await kv.get(cacheKey);
-+        if (recheck) return recheck;
-+
-+        let browser = null;
-+        let contentSource = 'Live';
-+        try {
-+          browser = await puppeteer.launch({
-+            args: chromium.args,
-+            defaultViewport: chromium.defaultViewport,
-+            executablePath: await chromium.executablePath(),
-+            headless: chromium.headless,
-+            ignoreHTTPSErrors: true,
-+          });
-+
-+          const page = await browser.newPage();
-+          await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
-+          await page.setRequestInterception(false);
-+
-+          await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-+          await new Promise(r => setTimeout(r, 500));
-+
-+          // Extract text once, clean & cap
-+          let articleText = await page.evaluate(() => document.body.innerText || '');
-+          articleText = articleText.replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
-+          const lower = articleText.toLowerCase();
-+
-+          // Anti-bot fallback → Archive.org
-+          if (BLOCK_KEYWORDS.some((kw) => lower.includes(kw))) {
-+            console.log(`Initial fetch for ${effectiveUrl} was blocked. Checking Archive.org...`);
-+            const archiveApiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(effectiveUrl)}`;
-+            const archiveResponse = await fetch(archiveApiUrl);
-+            const archiveData = await archiveResponse.json();
-+            if (archiveData.archived_snapshots?.closest?.url) {
-+              const snapshotUrl = archiveData.archived_snapshots.closest.url;
-+              console.log(`Archive found. Fetching from: ${snapshotUrl}`);
-+              contentSource = 'Archive.org';
-+              await page.goto(snapshotUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-+              await new Promise(r => setTimeout(r, 500));
-+              articleText = (await page.evaluate(() => document.body.innerText || '')).replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
-+            } else {
-+              const blockError = new Error('This website is protected by advanced bot detection.');
-+              blockError.isBlockError = true;
-+              throw blockError;
-+            }
-+          }
-+
-+          const prompt = buildPrompt({ url: effectiveUrl, articleText });
-+          const { parsed, modelUsed } = await callGeminiWithRetryAndFallback({
-+            primaryModel: PRIMARY_MODEL,
-+            fallbackModel: FALLBACK_MODEL,
-+            prompt
-+          });
-+          const normalized = normalizeOutput(parsed, { url: effectiveUrl });
-+
-+          // Decorate + cache
-+          normalized.hash = cacheKey;
-+          normalized.modelUsed = modelUsed;
-+          normalized.contentSource = contentSource;
-+
-+          await kv.set(cacheKey, normalized, { ex: 2592000 });
-+          console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
-+
-+          // also push this hash into a rolling "recent_hashes" list for sitemap
-+          try {
-+            await kv.lpush('recent_hashes', cacheKey);
-+            await kv.ltrim('recent_hashes', 0, 499);
-+          } catch (e) {
-+            console.error('KV list update error:', e);
-+          }
-+
-+          return normalized;
-+        } finally {
-+          if (browser) { try { await browser.close(); } catch (e) {} }
-+        }
-+      });
-+    } catch (error) {
-+      console.error('Analyze error:', error);
-+      if (error.isBlockError) {
-+        const geminiPrompt = `Analyze this article for media bias in Azerbaijani: ${effectiveUrl || url}`;
-+        const message = 'Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və heç bir arxiv nüsxəsi tapılmadı.';
-+        return res.status(500).json({ error: true, isBlockError: true, message, prompt: geminiPrompt });
-+      }
-+      if (error.code === 'BUSY_TRY_AGAIN') {
-+        return res.status(429).json({ error: true, message: 'Hazırda eyni link işlənir. Bir neçə saniyədən sonra yenidən cəhd edin.' });
-+      }
-+      return res.status(500).json({ error: true, message: `Təhlil zamanı xəta baş verdi: ${error.message}` });
-+    }
-+
-+    // Success: set headers from the result we got (model/content source live in payload)
-+    if (result?.modelUsed) res.setHeader('X-Model-Used', result.modelUsed);
-+    if (result?.contentSource) res.setHeader('X-Content-Source', result.contentSource);
-+    return res.status(200).json(result);
+    let result;
+    try {
+      result = await withLock(cacheKey, async () => {
+        // Re-check cache in case another instance finished while we waited
+        const recheck = await kv.get(cacheKey);
+        if (recheck) return recheck;
+
+        let browser = null;
+        let contentSource = 'Live';
+        try {
+          browser = await puppeteer.launch({
+            args: chromium.args,
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
+            ignoreHTTPSErrors: true,
+          });
+
+          const page = await browser.newPage();
+          await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
+          await page.setRequestInterception(false);
+
+          await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+          await new Promise(r => setTimeout(r, 500));
+
+          // Extract text once, clean & cap
+          let articleText = await page.evaluate(() => document.body.innerText || '');
+          articleText = articleText.replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
+          const lower = articleText.toLowerCase();
+
+          // Anti-bot fallback → Archive.org
+          if (BLOCK_KEYWORDS.some((kw) => lower.includes(kw))) {
+            console.log(`Initial fetch for ${effectiveUrl} was blocked. Checking Archive.org...`);
+            const archiveApiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(effectiveUrl)}`;
+            const archiveResponse = await fetch(archiveApiUrl);
+            const archiveData = await archiveResponse.json();
+            if (archiveData.archived_snapshots?.closest?.url) {
+              const snapshotUrl = archiveData.archived_snapshots.closest.url;
+              console.log(`Archive found. Fetching from: ${snapshotUrl}`);
+              contentSource = 'Archive.org';
+              await page.goto(snapshotUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+              await new Promise(r => setTimeout(r, 500));
+              articleText = (await page.evaluate(() => document.body.innerText || '')).replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
+            } else {
+              const blockError = new Error('This website is protected by advanced bot detection.');
+              blockError.isBlockError = true;
+              throw blockError;
+            }
+          }
+
+          const prompt = buildPrompt({ url: effectiveUrl, articleText });
+          const { parsed, modelUsed } = await callGeminiWithRetryAndFallback({
+            primaryModel: PRIMARY_MODEL,
+            fallbackModel: FALLBACK_MODEL,
+            prompt
+          });
+          const normalized = normalizeOutput(parsed, { url: effectiveUrl });
+
+          // Decorate + cache
+          normalized.hash = cacheKey;
+          normalized.modelUsed = modelUsed;
+          normalized.contentSource = contentSource;
+
+          await kv.set(cacheKey, normalized, { ex: 2592000 });
+          console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
+
+          // also push this hash into a rolling "recent_hashes" list for sitemap
+          try {
+            await kv.lpush('recent_hashes', cacheKey);
+            await kv.ltrim('recent_hashes', 0, 499);
+          } catch (e) {
+            console.error('KV list update error:', e);
+          }
+
+          return normalized;
+        } finally {
+          if (browser) { try { await browser.close(); } catch (e) {} }
+        }
+      });
+    } catch (error) {
+      console.error('Analyze error:', error);
+      if (error.isBlockError) {
+        const geminiPrompt = `Analyze this article for media bias in Azerbaijani: ${effectiveUrl || url}`;
+        const message = 'Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və heç bir arxiv nüsxəsi tapılmadı.';
+        return res.status(500).json({ error: true, isBlockError: true, message, prompt: geminiPrompt });
+      }
+      if (error.code === 'BUSY_TRY_AGAIN') {
+        return res.status(429).json({ error: true, message: 'Hazırda eyni link işlənir. Bir neçə saniyədən sonra yenidən cəhd edin.' });
+      }
+      return res.status(500).json({ error: true, message: `Təhlil zamanı xəta baş verdi: ${error.message}` });
+    }
+
+    // Success: set headers from the result we got (model/content source live in payload)
+    if (result?.modelUsed) res.setHeader('X-Model-Used', result.modelUsed);
+    if (result?.contentSource) res.setHeader('X-Content-Source', result.contentSource);
+    return res.status(200).json(result);
