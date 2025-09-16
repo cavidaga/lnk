@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /api/
+
+Sitemap: https://lnk.az/sitemap.xml
+Sitemap: https://lnk.az/api/sitemap

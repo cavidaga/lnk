@@ -410,9 +410,22 @@ export default async function handler(req, res) {
       await kv.set(cacheKey, normalized, { ex: 2592000 });
       console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
 
+      await kv.set(cacheKey, normalized, { ex: 2592000 });
+
+      // also push this hash into a rolling "recent_hashes" list for sitemap
+      try {
+        await kv.lpush('recent_hashes', cacheKey);
+        await kv.ltrim('recent_hashes', 0, 499); // keep only 500 latest
+      } catch (e) {
+        console.error('KV list update error:', e);
+      }
+
+      console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
+
       res.setHeader('X-Model-Used', modelUsed);
       res.setHeader('X-Content-Source', contentSource);
       return res.status(200).json(normalized);
+
     } catch (error) {
       console.error('Analyze error:', error);
       if (error.isBlockError) {

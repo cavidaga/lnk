@@ -4,13 +4,17 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <meta property="og:locale" content="az_AZ" />
+  <meta property="og:locale:alternate" content="en_GB" />
   <title>Məxfilik və Kukilər — LNK.az</title>
   <meta name="description" content="LNK.az məxfilik və kukilər siyasəti: hansı məlumatları toplayırıq, Vercel-in kukisiz analitikası, saxlanma müddətləri və hüquqlarınız." />
   <meta name="theme-color" content="#0c0d12">
   <meta name="color-scheme" content="light dark" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <meta property="fb:app_id" content="1493746861646864" />
+  <link rel="alternate" href="https://lnk.az/privacy.html" hreflang="az" />
+  <link rel="alternate" href="https://lnk.az/privacy.html#en" hreflang="en" />
+  <link rel="alternate" href="https://lnk.az/privacy.html" hreflang="x-default" />
 
   <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +32,7 @@
   <meta name="twitter:title" content="Məxfilik və Kukilər — LNK.az" />
   <meta name="twitter:description" content="LNK.az məxfilik və kukilər siyasəti: hansı məlumatları toplayırıq, Vercel-in kukisiz analitikası, saxlanma müddətləri və hüquqlarınız." />
   <meta name="twitter:image" content="https://lnk.az/static/og-cover.png" />
+  <meta name="last-modified" content="2025-09-05" />
 
   <!-- Icons -->
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
@@ -36,7 +41,7 @@
   <link rel="icon" href="/static/favicon-dark.svg"  media="(prefers-color-scheme: dark)">
   <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
   <link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#e10600">
-
+  
   <!-- Structured data -->
   <script type="application/ld+json">
   {
@@ -73,10 +78,10 @@
         <section id="policy-az" lang="az" data-lang="az">
           <p class="small muted"><strong>Son yenilənmə:</strong> 5 sentyabr 2025</p>
 
-          <h2>1) Biz kimik</h2>
+          <h2 id="biz-kimik">1) Biz kimik</h2>
           <p><strong>İdarəçi:</strong> Cavid Ağa • <a id="contact-link" href="/about.html#contact">Əlaqə</a></p>
 
-          <h2>2) Topladığımız məlumat və məqsəd</h2>
+          <h2 id="topladigimiz-melumat-ve-meqsed">2) Topladığımız məlumat və məqsəd</h2>
           <ul>
             <li><strong>Texniki məlumatlar:</strong> Hostinq/CDN saytın işləməsi və təhlükəsizliyi üçün IP ünvanı, brauzer agenti, tarix/vaxt və tələb olunan URL-ləri qısa müddətlik server jurnalında emal edə bilər.</li>
             <li><strong>Təhlil (kukisiz):</strong> Trafiki ölçmək üçün <strong>Vercel Web Analytics</strong>-dən istifadə edirik; kukilərdən istifadə etmir, sorğudan törədilmiş qısaömürlü identifikatorlar yaradır və anonimləşdirir. Həmçinin <strong>Vercel Speed Insights</strong> ilə Core Web Vitals metriklərini izləyə bilərik; bu göstəricilər şəxsiyyət və ya IP ilə əlaqələndirilmir.</li>
@@ -84,47 +89,48 @@
             <li><strong>Əlaqə vasitələri:</strong> Bizə email və ya forma ilə yazsanız, verdiyiniz məlumatlar sorğunuza cavab vermək üçün emal olunur. (Hazırda: <em>Formspree</em> inteqrasiyası “Haqqımızda” səhifəsində.)</li>
           </ul>
 
-          <h2>3) Hüquqi əsaslar (GDPR Maddə 6)</h2>
+          <h2 id="huquqi-esaslar-gdpr-6">3) Hüquqi əsaslar (GDPR Maddə 6)</h2>
           <ul>
             <li><strong>Legitim maraqlar (6(1)(f)):</strong> saytın işləməsi, təhlükəsizlik, performansın yaxşılaşdırılması.</li>
             <li><strong>Müqavilə (6(1)(b)):</strong> sorğunuza cavab vermək.</li>
             <li><strong>Razılıq (6(1)(a)):</strong> yalnız açıq şəkildə tələb edilərsə (hazırda analitika üçün tələb olunmur).</li>
           </ul>
 
-          <h2>4) Kukilər və oxşar texnologiyalar</h2>
+          <h2 id="kukiler-ve-oxsar-texnologiyalar">4) Kukilər və oxşar texnologiyalar</h2>
           <p>Ziyarətçilər üçün <strong>qeyri-zəruri kukilər</strong> qoymuruq. Admin/daxil olmuş istifadəçilər üçün <em>zəruri sessiya/auth kukiləri</em> ola bilər. Analitika <strong>kukisiz</strong> olduğundan əvvəlcədən razılıq bannerinə ehtiyac yoxdur. Gələcəkdə qeyri-zəruri kuki istifadə edən alətlər əlavə etsək, əvvəlcədən razılıq alacağıq və bu bölməni yeniləyəcəyik.</p>
 
-          <h2>5) Saxlama müddəti</h2>
+          <h2 id="saxlama-muddeti">5) Saxlama müddəti</h2>
           <ul>
-            <li><strong>Server/CDN jurnalları:</strong> [X gün/həftə], sonra silinir və ya anonimləşdirilir.</li>
+            <li><strong>Server/CDN jurnalları:</strong> <u>30 gün saxlanılır</u>, sonra silinir və ya anonimləşdirilir.</li>
             <li><strong>Analitika:</strong> Vercel tərəfindən aqreqat/anonim formada saxlanılır; Web Analytics-də qısaömürlü identifikatorlar təqr. 24 saatdan sonra silinir.</li>
             <li><strong>Yazışmalar:</strong> sorğunuza cavab vermək və qeydiyyat məqsədi ilə lazım olduğu qədər saxlanılır.</li>
           </ul>
 
-          <h2>6) Paylaşma və işləyən tərəflər</h2>
+          <h2 id="paylasma-ve-isleyen-terefler">6) Paylaşma və işləyən tərəflər</h2>
           <p>Provayderlər (“processor”) yalnız bizim göstərişimizlə emal edir: <strong>Vercel</strong> (hostinq, Web Analytics, Speed Insights), email provayderi və (olarsa) forma xidməti.</p>
 
-          <h2>7) Beynəlxalq ötürmələr</h2>
+          <h2 id="beynelxalq-oturmeler">7) Beynəlxalq ötürmələr</h2>
           <p>EEA xaricinə ötürmələr olduqda müvafiq təminatlar (məs., <em>Standard Contractual Clauses</em>) tətbiq olunur.</p>
 
-          <h2>8) Hüquqlarınız</h2>
+          <h2 id="huquqlariniz">8) Hüquqlarınız</h2>
           <p>Məlumata çıxış, düzəliş, silmə, məhdudlaşdırma, etiraz və daşınma hüququnuz var. Şikayət üçün yerli data mühafizəsi orqanına müraciət edə bilərsiniz. <a id="contact-link" href="/about.html#contact">Əlaqə</a></p>
 
-          <h2>9) Uşaqlar</h2>
+          <h2 id="usaglar">9) Uşaqlar</h2>
           <p>Sayt 16 yaşdan kiçiklər üçün nəzərdə tutulmayıb.</p>
 
-          <h2>10) Yeniləmələr</h2>
+          <h2 id="yenilemeler">10) Yeniləmələr</h2>
           <p>Bu bildiriş vaxtaşırı yenilənə bilər; dəyişikliklər “Son yenilənmə” tarixində əks olunacaq.</p>
         </section>
+
 
         <!-- EN content -->
         <section id="policy-en" lang="en" data-lang="en" hidden>
           <p class="small muted"><strong>Last updated:</strong> 5 September 2025</p>
 
-          <h2>1) Who we are</h2>
+          <h2 id="who-we-are">1) Who we are</h2>
           <p><strong>Controller:</strong> Javid Agha • <a id="contact-link" href="/about.html#contact">Contact</a></p>
 
-          <h2>2) What we collect and why</h2>
+          <h2 id="what-we-collect-and-why">2) What we collect and why</h2>
           <ul>
             <li><strong>Technical data:</strong> Our hosting/CDN may temporarily process your IP address, user agent, timestamp, and requested URLs in server/security logs to operate and secure the site.</li>
             <li><strong>Analytics (cookieless):</strong> We use <strong>Vercel Web Analytics</strong> (no cookies, short-lived request-derived identifiers, anonymised). We may also use <strong>Vercel Speed Insights</strong> for Core Web Vitals; metrics aren’t tied to an individual or IP.</li>
@@ -132,38 +138,39 @@
             <li><strong>Contact channels:</strong> If you email or use a form, we process the data you provide to reply. (Currently: <em>Formspree</em> integration on the About page.)</li>
           </ul>
 
-          <h2>3) Legal bases (GDPR Art. 6)</h2>
+          <h2 id="legal-bases-gdpr">3) Legal bases (GDPR Art. 6)</h2>
           <ul>
             <li><strong>Legitimate interests (6(1)(f)):</strong> running, securing, and improving the site.</li>
             <li><strong>Contract (6(1)(b)):</strong> responding to your request.</li>
             <li><strong>Consent (6(1)(a)):</strong> only if explicitly requested (not used for analytics now).</li>
           </ul>
 
-          <h2>4) Cookies & similar technologies</h2>
+          <h2 id="cookies-and-similar-technologies">4) Cookies & similar technologies</h2>
           <p>We do <strong>not set non-essential cookies</strong> for visitors. Admin/logged-in areas may use <em>strictly necessary</em> session/auth cookies. Because analytics is <strong>cookieless</strong>, a prior-consent banner is not required. If we later add tools that set non-essential cookies, we’ll obtain consent first and update this notice.</p>
 
-          <h2>5) Retention</h2>
+          <h2 id="retention">5) Retention</h2>
           <ul>
-            <li><strong>Server/CDN logs:</strong> [X days/weeks], then deleted or anonymised.</li>
+            <li><strong>Server/CDN logs:</strong> <u>retained for 30 days</u>, then deleted or anonymised.</li>
             <li><strong>Analytics:</strong> aggregate/anonymous with short-lived identifiers (~24h) by Vercel.</li>
             <li><strong>Correspondence:</strong> retained as needed to address your request and for record-keeping.</li>
           </ul>
 
-          <h2>6) Sharing & processors</h2>
+          <h2 id="sharing-and-processors">6) Sharing & processors</h2>
           <p>Trusted providers (“processors”) operate this site on our instructions: <strong>Vercel</strong> (hosting, Web Analytics, Speed Insights), email provider, and (if used) a form service.</p>
 
-          <h2>7) International transfers</h2>
+          <h2 id="international-transfers">7) International transfers</h2>
           <p>Where processing occurs outside the EEA, transfers rely on appropriate safeguards (e.g., Standard Contractual Clauses).</p>
 
-          <h2>8) Your rights</h2>
-          <p>You can request access, rectification, erasure, restriction, objection, and data portability, and you may lodge a complaint with your local data protection authority. <a id="contact-link" href="/about.html#contact">Contact</a>
+          <h2 id="your-rights">8) Your rights</h2>
+          <p>You can request access, rectification, erasure, restriction, objection, and data portability, and you may lodge a complaint with your local data protection authority. <a id="contact-link" href="/about.html#contact">Contact</a></p>
 
-          <h2>9) Children</h2>
+          <h2 id="children">9) Children</h2>
           <p>This site is not intended for children under 16.</p>
 
-          <h2>10) Updates</h2>
+          <h2 id="updates">10) Updates</h2>
           <p>We may update this notice; material changes will appear here with a new “Last updated” date.</p>
         </section>
+
       </article>
     </main>
 
