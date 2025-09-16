@@ -58,7 +58,7 @@
             <span class="sr-only">Sayt</span>
           </a>
 
-          <a href="https://x.com/cavidaga" target="_blank" rel="noopener" data-tooltip="X (Twitter)" aria-label="X (Twitter)">
+          <a href="https://x.com/lnk_az" target="_blank" rel="noopener" data-tooltip="X (Twitter)" aria-label="X (Twitter)">
             <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M18.244 2H21l-6.59 7.523L22 22h-6.828l-5.34-6.508L3.338 22H1l7.093-8.106L2 2h6.828l4.89 5.972L18.244 2Zm-2.393 18h1.89L7.247 3.98H5.27L15.85 20Z"/>
             </svg>
