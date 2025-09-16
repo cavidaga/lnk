@@ -371,7 +371,7 @@ function renderAnalysis(root, data) {
 
   function setSpinner(el) {
     if (!el) return;
-    el.innerHTML = `<div class="card"><div class="bd"><div class="small muted">Yüklənir…</div></div></div>`;
+    el.innerHTML = `<div class="card"><div class="bd"><div class="small muted">Təhlil aparılır… Gözləyin.</div></div></div>`;
   }
 
   function renderError(where, msg) {

@@ -28,6 +28,29 @@ const MAX_TIMEOUT_MS = 45000;      // HTTP timeout per call to Gemini
 // --- Helpers ---
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
+// Prevent duplicate concurrent work on the same URL/hash
+async function withLock(cacheKey, fn) {
+  const lockKey = `lock:${cacheKey}`;
+  // Try to acquire a short lock (30s). Upstash/VerceI KV supports NX + EX.
+  const acquired = await kv.set(lockKey, '1', { ex: 30, nx: true });
+  if (!acquired) {
+    // Someone else is computing; wait and re-check cache
+    await new Promise(r => setTimeout(r, 600));
+    const ready = await kv.get(cacheKey);
+    if (ready) return ready;
+    await new Promise(r => setTimeout(r, 1000));
+    const ready2 = await kv.get(cacheKey);
+    if (ready2) return ready2;
+    const err = new Error('BUSY_TRY_AGAIN');
+    err.code = 'BUSY_TRY_AGAIN';
+    throw err;
+  }
+  try {
+    return await fn();
+  } finally {
+    try { await kv.del(lockKey); } catch {}
+  }
+}
 function extractJsonLoose(text) {
   if (!text) throw new Error('Empty model response');
   const stripped = text.replace(/^```(?:json)?/i, '').replace(/```$/i, '').trim();
@@ -351,98 +374,100 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: true, code: polErr.code || 'POLICY', message: messages[polErr.code] || polErr.message });
     }
 
-    // Browser
-    let browser = null;
-    let contentSource = 'Live';
-    try {
-      // ✅ Fix: assign to outer 'browser' (no shadowing), so we can close it in finally
-      browser = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-        ignoreHTTPSErrors: true,
-      });
-
-      const page = await browser.newPage();
-      await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
-      await page.setRequestInterception(false);
-
-      await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-      await new Promise(r => setTimeout(r, 500));
-
-      let articleText = await page.evaluate(() => document.body.innerText || '');
-      articleText = articleText.replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
-      const lower = articleText.toLowerCase();
-
-      // Blocked by anti-bot? Try Archive.org snapshot
-      if (BLOCK_KEYWORDS.some((kw) => lower.includes(kw))) {
-        console.log(`Initial fetch for ${effectiveUrl} was blocked. Checking Archive.org...`);
-        const archiveApiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(effectiveUrl)}`;
-        const archiveResponse = await fetch(archiveApiUrl);
-        const archiveData = await archiveResponse.json();
-
-        if (archiveData.archived_snapshots?.closest?.url) {
-          const snapshotUrl = archiveData.archived_snapshots.closest.url;
-          console.log(`Archive found. Fetching from: ${snapshotUrl}`);
-          contentSource = 'Archive.org';
-          await page.goto(snapshotUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-          await new Promise(r => setTimeout(r, 500));
-          articleText = await page.evaluate(() => document.body.innerText || '');
-        } else {
-          const blockError = new Error('This website is protected by advanced bot detection.');
-          blockError.isBlockError = true;
-          throw blockError;
-        }
-      }
-
-      articleText = articleText.replace(/\s\s+/g, ' ').substring(0, MAX_ARTICLE_CHARS);
-
-      const prompt = buildPrompt({ url: effectiveUrl, articleText });
-      const { parsed, modelUsed } = await callGeminiWithRetryAndFallback({
-        primaryModel: PRIMARY_MODEL,
-        fallbackModel: FALLBACK_MODEL,
-        prompt
-      });
-      const normalized = normalizeOutput(parsed, { url: effectiveUrl });
-
-      // Decorate + cache
-      normalized.hash = cacheKey;
-      normalized.modelUsed = modelUsed;
-      normalized.contentSource = contentSource;
-
-      await kv.set(cacheKey, normalized, { ex: 2592000 });
-      console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
-
-      await kv.set(cacheKey, normalized, { ex: 2592000 });
-
-      // also push this hash into a rolling "recent_hashes" list for sitemap
-      try {
-        await kv.lpush('recent_hashes', cacheKey);
-        await kv.ltrim('recent_hashes', 0, 499); // keep only 500 latest
-      } catch (e) {
-        console.error('KV list update error:', e);
-      }
-
-      console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
-
-      res.setHeader('X-Model-Used', modelUsed);
-      res.setHeader('X-Content-Source', contentSource);
-      return res.status(200).json(normalized);
-
-    } catch (error) {
-      console.error('Analyze error:', error);
-      if (error.isBlockError) {
-        const geminiPrompt = `Analyze this article for media bias in Azerbaijani: ${effectiveUrl || url}`;
-        const message = 'Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və heç bir arxiv nüsxəsi tapılmadı.';
-        return res.status(500).json({ error: true, isBlockError: true, message, prompt: geminiPrompt });
-      }
-      return res.status(500).json({ error: true, message: `Təhlil zamanı xəta baş verdi: ${error.message}` });
-    } finally {
-      if (browser) { try { await browser.close(); } catch (e) {} }
-    }
-  } catch (e) {
-    console.error('Top-level error:', e);
-    return res.status(500).json({ error: true, message: `Gözlənilməz xəta: ${e.message}` });
-  }
-}
+    // Compute under a KV lock to avoid duplicate token spend
++    let result;
++    try {
++      result = await withLock(cacheKey, async () => {
++        // Re-check cache in case another instance finished while we waited
++        const recheck = await kv.get(cacheKey);
++        if (recheck) return recheck;
++
++        let browser = null;
++        let contentSource = 'Live';
++        try {
++          browser = await puppeteer.launch({
++            args: chromium.args,
++            defaultViewport: chromium.defaultViewport,
++            executablePath: await chromium.executablePath(),
++            headless: chromium.headless,
++            ignoreHTTPSErrors: true,
++          });
++
++          const page = await browser.newPage();
++          await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
++          await page.setRequestInterception(false);
++
++          await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 30000 });
++          await new Promise(r => setTimeout(r, 500));
++
++          // Extract text once, clean & cap
++          let articleText = await page.evaluate(() => document.body.innerText || '');
++          articleText = articleText.replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
++          const lower = articleText.toLowerCase();
++
++          // Anti-bot fallback → Archive.org
++          if (BLOCK_KEYWORDS.some((kw) => lower.includes(kw))) {
++            console.log(`Initial fetch for ${effectiveUrl} was blocked. Checking Archive.org...`);
++            const archiveApiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(effectiveUrl)}`;
++            const archiveResponse = await fetch(archiveApiUrl);
++            const archiveData = await archiveResponse.json();
++            if (archiveData.archived_snapshots?.closest?.url) {
++              const snapshotUrl = archiveData.archived_snapshots.closest.url;
++              console.log(`Archive found. Fetching from: ${snapshotUrl}`);
++              contentSource = 'Archive.org';
++              await page.goto(snapshotUrl, { waitUntil: 'networkidle2', timeout: 30000 });
++              await new Promise(r => setTimeout(r, 500));
++              articleText = (await page.evaluate(() => document.body.innerText || '')).replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
++            } else {
++              const blockError = new Error('This website is protected by advanced bot detection.');
++              blockError.isBlockError = true;
++              throw blockError;
++            }
++          }
++
++          const prompt = buildPrompt({ url: effectiveUrl, articleText });
++          const { parsed, modelUsed } = await callGeminiWithRetryAndFallback({
++            primaryModel: PRIMARY_MODEL,
++            fallbackModel: FALLBACK_MODEL,
++            prompt
++          });
++          const normalized = normalizeOutput(parsed, { url: effectiveUrl });
++
++          // Decorate + cache
++          normalized.hash = cacheKey;
++          normalized.modelUsed = modelUsed;
++          normalized.contentSource = contentSource;
++
++          await kv.set(cacheKey, normalized, { ex: 2592000 });
++          console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
++
++          // also push this hash into a rolling "recent_hashes" list for sitemap
++          try {
++            await kv.lpush('recent_hashes', cacheKey);
++            await kv.ltrim('recent_hashes', 0, 499);
++          } catch (e) {
++            console.error('KV list update error:', e);
++          }
++
++          return normalized;
++        } finally {
++          if (browser) { try { await browser.close(); } catch (e) {} }
++        }
++      });
++    } catch (error) {
++      console.error('Analyze error:', error);
++      if (error.isBlockError) {
++        const geminiPrompt = `Analyze this article for media bias in Azerbaijani: ${effectiveUrl || url}`;
++        const message = 'Bu veb-sayt qabaqcıl bot mühafizəsi ilə qorunur və heç bir arxiv nüsxəsi tapılmadı.';
++        return res.status(500).json({ error: true, isBlockError: true, message, prompt: geminiPrompt });
++      }
++      if (error.code === 'BUSY_TRY_AGAIN') {
++        return res.status(429).json({ error: true, message: 'Hazırda eyni link işlənir. Bir neçə saniyədən sonra yenidən cəhd edin.' });
++      }
++      return res.status(500).json({ error: true, message: `Təhlil zamanı xəta baş verdi: ${error.message}` });
++    }
++
++    // Success: set headers from the result we got (model/content source live in payload)
++    if (result?.modelUsed) res.setHeader('X-Model-Used', result.modelUsed);
++    if (result?.contentSource) res.setHeader('X-Content-Source', result.contentSource);
++    return res.status(200).json(result);
