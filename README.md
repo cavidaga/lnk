@@ -16,7 +16,7 @@ A web app that uses Google's Gemini models and a headless browser to analyze the
 
 -   **Intelligent analysis:** Analyze public news articles by URL with Azerbaijani-language outputs.
 -   **Headless rendering:** Puppeteer Core + `@sparticuz/chromium` to render JS-heavy sites and improve success behind basic bot checks.
--   **AI-powered:** Calls Gemini models (primary: `gemini-2.5-pro`, fallback: `gemini-2.5-flash`) with retries and backoff.
+-   **AI-powered:** Calls Gemini models (primary: `gemini-2.5-flash-lite`, fallbacks: `gemini-2.5-flash`, `gemini-2.5-pro`) with retries and backoff.
 -   **Caching & sharing:** Results are cached in Vercel KV and retrievable by hash; pretty HTML view available at `/analysis/:hash`.
 -   **Resilience:** Heuristics for Cloudflare/anti-bot, Archive.org fallback when live fetch is blocked, and URL/content-type safety policy.
 -   **Serverless-ready:** Deployed on Vercel Functions; no persistent servers to manage.
