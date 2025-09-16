@@ -11,6 +11,8 @@ import {
   isBlockedPath,
   isAllowedMime,
   MAX_CONTENT_LENGTH_HEAD,
+  isIpLiteral,
+  isPrivateIpLiteral,
 } from '../lib/url-policy.js';
 
 const puppeteer = addExtra(puppeteerCore);
