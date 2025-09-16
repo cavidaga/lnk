@@ -568,17 +568,17 @@ export default async function handler(req, res) {
               console.warn('Second nav (networkidle2) failed:', e2?.message || e2);
             }
             // Wait a touch for any JS challenge to clear
-            await page.waitForTimeout(1800).catch(()=>{});
+            await sleep(1800);
           }
 
           // If title suggests Cloudflare, wait a bit more and re-load once
           try {
             const t = (await page.title()) || '';
             if (/cloudflare|attention required|checking your browser/i.test(t)) {
-              await page.waitForTimeout(2000);
+              await sleep(2000);
               try {
                 await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 45000 });
-                await page.waitForTimeout(1200);
+                await sleep(1200);
               } catch {}
             }
           } catch {}
