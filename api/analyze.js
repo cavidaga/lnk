@@ -31,7 +31,7 @@ function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 // Prevent duplicate concurrent work on the same URL/hash
 async function withLock(cacheKey, fn) {
   const lockKey = `lock:${cacheKey}`;
-  // Try to acquire a short lock (30s). Upstash/VerceI KV supports NX + EX.
+  // Try to acquire a short lock (30s). Upstash/Vercel KV supports NX + EX.
   const acquired = await kv.set(lockKey, '1', { ex: 30, nx: true });
   if (!acquired) {
     // Someone else is computing; wait and re-check cache
@@ -48,18 +48,19 @@ async function withLock(cacheKey, fn) {
   try {
     return await fn();
   } finally {
-    try { await kv.del(lockKey); } catch {}
+    try { await kv.del(lockKey); } catch (e) {}
   }
 }
+
 function extractJsonLoose(text) {
   if (!text) throw new Error('Empty model response');
   const stripped = text.replace(/^```(?:json)?/i, '').replace(/```$/i, '').trim();
-  try { return JSON.parse(stripped); } catch {}
+  try { return JSON.parse(stripped); } catch (e) {}
   const first = stripped.indexOf('{'); const last = stripped.lastIndexOf('}');
   if (first === -1 || last === -1 || last <= first) throw new Error('No JSON object found in model response');
   const candidate = stripped.slice(first, last + 1);
   for (let i = candidate.length; i >= 2; i--) {
-    try { return JSON.parse(candidate.slice(0, i)); } catch {}
+    try { return JSON.parse(candidate.slice(0, i)); } catch (e) {}
   }
   throw new Error('Failed to parse JSON from model response');
 }
@@ -77,7 +78,7 @@ async function callGeminiOnce({ model, prompt, signal }) {
   });
   if (!res.ok) {
     let payload = {};
-    try { payload = await res.json(); } catch {}
+    try { payload = await res.json(); } catch (e) {}
     const statusText = payload?.error?.status || res.statusText || 'UNKNOWN_ERROR';
     const code = payload?.error?.code || res.status;
     const message = payload?.error?.message || `HTTP ${res.status}`;
@@ -194,8 +195,8 @@ async function preflightPolicy(targetUrl) {
   try {
     const head = await fetch(targetUrl, { method: 'HEAD', redirect: 'follow' });
     if (head?.url) finalUrl = head.url;
+
     // Host & path blocks (final URL)
-    const host = new URL(finalUrl).host;
     if (isBlockedHost(finalUrl)) {
       const err = new Error('Hosted/large document source blocked');
       err.code = 'BLOCKED_HOST'; throw err;
@@ -204,6 +205,7 @@ async function preflightPolicy(targetUrl) {
       const err = new Error('Document path indicates hosted/large file');
       err.code = 'BLOCKED_PATH'; throw err;
     }
+
     // Headers check
     const ct = head.headers.get('content-type') || '';
     const cl = Number(head.headers.get('content-length') || 0);
@@ -223,10 +225,11 @@ async function preflightPolicy(targetUrl) {
   } catch (e) {
     // If HEAD fails (some hosts), still enforce host/path blocks on the original URL
     try {
-      const host0 = new URL(targetUrl).host;
       if (isBlockedHost(targetUrl)) { const err = new Error('Hosted/large document source blocked'); err.code='BLOCKED_HOST'; throw err; }
       if (isBlockedPath(targetUrl)) { const err = new Error('Document path indicates hosted/large file'); err.code='BLOCKED_PATH'; throw err; }
-    } catch {}
+    } catch (inner) {
+      throw inner;
+    }
     // If we set a policy code above, bubble it; else allow Chromium to try
     if (e && e.code) throw e;
   }
@@ -245,7 +248,7 @@ function normalizeOutput(o = {}, { url }) {
   if (!m.original_url) m.original_url = url;
   // derive publication from URL if missing
   if (!m.publication && m.original_url) {
-    try { m.publication = new URL(m.original_url).hostname.replace(/^www\./,''); } catch {}
+    try { m.publication = new URL(m.original_url).hostname.replace(/^www\./,''); } catch (e) {}
   }
   // ISO-ify published_at if it's a parseable date
   if (m.published_at) {
@@ -471,5 +474,9 @@ export default async function handler(req, res) {
     if (result?.modelUsed) res.setHeader('X-Model-Used', result.modelUsed);
     if (result?.contentSource) res.setHeader('X-Content-Source', result.contentSource);
     return res.status(200).json(result);
+
+  } catch (e) {
+    console.error('Top-level error:', e);
+    return res.status(500).json({ error: true, message: `Gözlənilməz xəta: ${e.message}` });
   }
 }
