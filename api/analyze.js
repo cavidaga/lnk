@@ -26,11 +26,20 @@ const PRIMARY_MODEL = 'gemini-2.5-pro';
 const FALLBACK_MODEL = 'gemini-2.5-flash';
 const RETRY_ATTEMPTS = 3;          // attempts per model
 const INITIAL_BACKOFF_MS = 600;    // starting backoff for retries
-const MAX_TIMEOUT_MS = 45000;      // HTTP timeout per call to Gemini
+const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 70000); // 70s default
 
 // --- Helpers ---
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
-
+// ultra-light fallback: turn raw HTML into readable text
+function htmlToText(html = "") {
+  return String(html)
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 // Prevent duplicate concurrent work on the same URL/hash
 async function withLock(cacheKey, fn) {
   const lockKey = `lock:${cacheKey}`;
@@ -463,14 +472,54 @@ export default async function handler(req, res) {
 
           const page = await browser.newPage();
           await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
-          await page.setRequestInterception(false);
 
-          await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-          await new Promise(r => setTimeout(r, 500));
+      // Trim heavy resources to speed up/avoid infinite network idles
+      const origin = new URL(effectiveUrl).origin;
+      await page.setRequestInterception(true);
+      page.on('request', (req) => {
+        const type = req.resourceType();
+        const url  = req.url();
+        const sameOrigin = url.startsWith(origin);
+        // Block heavy assets and most third-party noise; keep doc/script/xhr from same origin
+        if (type === 'image' || type === 'media' || type === 'font' || type === 'stylesheet' ||
+            (!sameOrigin && (type === 'websocket' || type === 'fetch' || type === 'xhr'))) {
+          return req.abort();
+        }
+        return req.continue();
+      });
 
-          // Extract text once, clean & cap
-          let articleText = await page.evaluate(() => document.body.innerText || '');
-          articleText = articleText.replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
+      // Be lenient with settle criteria: first try DOM ready, then full load
+      let resp = null;
+        try {
+            resp = await page.goto(effectiveUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+          } catch (e) {
+            console.warn('First nav attempt (domcontentloaded) failed:', e?.message || e);
+          }
+          if (!resp) {
+            try {
+              resp = await page.goto(effectiveUrl, { waitUntil: 'load', timeout: 35000 });
+            } catch (e2) {
+              console.warn('Second nav attempt (load) failed:', e2?.message || e2);
+            }
+          }
+          await new Promise(r => setTimeout(r, 400)); // small settle pause
+
+          // Try DOM text extraction
+          let articleText = await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : '');
+          articleText = articleText.replace(/\s\s+/g, ' ').trim();
+
+          // If DOM is too empty, do a raw GET fallback and strip tags
+          if (!articleText || articleText.length < 200) {
+            try {
+              const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+              const raw = await fetch(effectiveUrl, { redirect: 'follow', headers: { 'User-Agent': ua, 'Accept': 'text/html,*/*' } });
+              const html = await raw.text();
+              articleText = htmlToText(html);
+            } catch (fetchFallbackErr) {
+              console.warn('Fetch-fallback failed:', fetchFallbackErr?.message || fetchFallbackErr);
+            }
+          }
+          articleText = articleText.substring(0, MAX_ARTICLE_CHARS);
           const lower = articleText.toLowerCase();
 
           // Anti-bot fallback → Archive.org
@@ -483,9 +532,14 @@ export default async function handler(req, res) {
               const snapshotUrl = archiveData.archived_snapshots.closest.url;
               console.log(`Archive found. Fetching from: ${snapshotUrl}`);
               contentSource = 'Archive.org';
-              await page.goto(snapshotUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-              await new Promise(r => setTimeout(r, 500));
-              articleText = (await page.evaluate(() => document.body.innerText || '')).replace(/\s\s+/g, ' ').trim().substring(0, MAX_ARTICLE_CHARS);
+              try {
+              await page.goto(snapshotUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+            } catch {}
+            await new Promise(r => setTimeout(r, 400));
+            articleText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
+              .replace(/\s\s+/g, ' ')
+              .trim()
+              .substring(0, MAX_ARTICLE_CHARS);
             } else {
               const blockError = new Error('This website is protected by advanced bot detection.');
               blockError.isBlockError = true;
@@ -493,12 +547,29 @@ export default async function handler(req, res) {
             }
           }
 
-          const prompt = buildPrompt({ url: effectiveUrl, articleText });
-          const { parsed, modelUsed } = await callGeminiWithRetryAndFallback({
-            primaryModel: PRIMARY_MODEL,
-            fallbackModel: FALLBACK_MODEL,
-            prompt
-          });
+          // Try full text first; if Gemini times out/aborts, shrink and retry.
+          const SHRINKS = [1.0, 0.6, 0.4]; // 100%, 60%, 40% of MAX_ARTICLE_CHARS
+          let parsed, modelUsed, lastErr;
+          for (let i = 0; i < SHRINKS.length; i++) {
+            const cut = Math.floor(MAX_ARTICLE_CHARS * SHRINKS[i]);
+            const slice = articleText.slice(0, cut);
+            const prompt = buildPrompt({ url: effectiveUrl, articleText: slice });
+            try {
+              const r = await callGeminiWithRetryAndFallback({
+                primaryModel: PRIMARY_MODEL,
+                fallbackModel: FALLBACK_MODEL,
+                prompt
+              });
+              parsed = r.parsed; modelUsed = r.modelUsed;
+              break;
+            } catch (e) {
+              lastErr = e;
+              const msg = String(e?.message || '').toLowerCase();
+              const isTimeoutish = e?.name === 'AbortError' || e?.httpStatus === 504 || /timeout|timed out|network error/.test(msg);
+              if (!isTimeoutish || i === SHRINKS.length - 1) throw e;
+              // otherwise loop and retry with a smaller slice
+            }
+          }
           const normalized = normalizeOutput(parsed, { url: effectiveUrl });
 
           // Decorate + cache
