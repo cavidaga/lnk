@@ -345,7 +345,7 @@ function renderAnalysis(root, data) {
   // ---------- SHARE ----------
   function wireShare(hash) {
     const pageUrl = location.origin + `/analysis/${encodeURIComponent(hash)}`;
-    const cardUrl = `${location.origin}/api/card?hash=${encodeURIComponent(hash)}&theme=dark`;
+    const cardUrl = `${location.origin}/static/og-cover.png`;
 
     const set = (id, href) => { const a = $(`#${id}`); if (a) a.href = href; };
 
