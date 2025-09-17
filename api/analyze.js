@@ -883,8 +883,53 @@ export default async function handler(req, res) {
             contentSource = 'Blocked';
           }
 
-          // If content is blocked, use safe prompt immediately
+          // If content is blocked, try archive.md first before falling back to blocked analysis
           if (contentSource === 'Blocked') {
+            console.log(`Content blocked, trying archive.md fallback...`);
+            let archiveMdSuccess = false;
+            
+            try {
+              const archiveMdUrl = await getArchiveMdUrl(effectiveUrl);
+              if (archiveMdUrl) {
+                console.log(`Archive.md found. Fetching from: ${archiveMdUrl}`);
+                
+                // Use Puppeteer to fetch from archive.md
+                const browser = await puppeteer.launch({
+                  headless: true,
+                  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--no-first-run', '--no-zygote', '--single-process', '--disable-gpu']
+                });
+                const page = await browser.newPage();
+                await page.setUserAgent(USER_AGENT);
+                await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+                
+                await page.goto(archiveMdUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+                await new Promise(r => setTimeout(r, 2000)); // Wait for content to load
+                
+                const rawText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
+                  .replace(/\s\s+/g, ' ')
+                  .trim();
+                articleText = cleanArticleContent(rawText, effectiveUrl).substring(0, MAX_ARTICLE_CHARS);
+                
+                await browser.close();
+                console.log(`Successfully fetched from archive.md: ${articleText.length} chars`);
+                
+                // If we got content from archive.md, proceed with normal analysis
+                if (articleText && articleText.length > 100) {
+                  console.log(`Archive.md content sufficient, proceeding with normal analysis`);
+                  contentSource = 'Archive.md';
+                  archiveMdSuccess = true;
+                } else {
+                  console.log(`Archive.md content insufficient, falling back to blocked analysis`);
+                }
+              } else {
+                console.log(`No archive.md mirror found, staying blocked`);
+              }
+            } catch (e) {
+              console.log(`Archive.md fallback failed: ${e?.message || e}`);
+            }
+            
+            // If archive.md failed, use blocked content analysis
+            if (!archiveMdSuccess) {
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
             const userSelection = getUserModelSelection(modelType);
             let blockedModelSelection;
@@ -923,6 +968,7 @@ export default async function handler(req, res) {
             console.log(`SAVED TO CACHE (blocked-safe) for URL: ${effectiveUrl} with hash: ${cacheKey}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             return normalized;
+            }
           }
 
           // If fast path is acceptable, proceed directly to LLM without Chromium.
