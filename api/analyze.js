@@ -897,32 +897,39 @@ export default async function handler(req, res) {
                 
                 // Use Puppeteer to fetch from archive.md
                 console.log(`Launching Puppeteer for archive.md fetch...`);
-                const browser = await puppeteer.launch({
-                  args: chromium.args,
-                  defaultViewport: chromium.defaultViewport,
-                  executablePath: await chromium.executablePath(),
-                  headless: chromium.headless,
-                  ignoreHTTPSErrors: true,
-                });
-                const page = await browser.newPage();
-                await page.setUserAgent(USER_AGENT);
-                await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
-                
-                console.log(`Navigating to archive.md URL: ${archiveMdUrl}`);
-                await page.goto(archiveMdUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
-                await new Promise(r => setTimeout(r, 2000)); // Wait for content to load
-                
-                console.log(`Extracting content from archive.md...`);
-                const rawText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
-                  .replace(/\s\s+/g, ' ')
-                  .trim();
-                console.log(`Raw text length from archive.md: ${rawText.length}`);
-                
-                articleText = cleanArticleContent(rawText, effectiveUrl).substring(0, MAX_ARTICLE_CHARS);
-                console.log(`Cleaned article text length: ${articleText.length}`);
-                
-                await browser.close();
-                console.log(`Successfully fetched from archive.md: ${articleText.length} chars`);
+                try {
+                  const executablePath = await chromium.executablePath();
+                  console.log(`Chromium executable path: ${executablePath}`);
+                  const browser = await puppeteer.launch({
+                    args: chromium.args,
+                    defaultViewport: chromium.defaultViewport,
+                    executablePath: executablePath,
+                    headless: chromium.headless,
+                    ignoreHTTPSErrors: true,
+                  });
+                  const page = await browser.newPage();
+                  await page.setUserAgent(USER_AGENT);
+                  await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+                  
+                  console.log(`Navigating to archive.md URL: ${archiveMdUrl}`);
+                  await page.goto(archiveMdUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+                  await new Promise(r => setTimeout(r, 2000)); // Wait for content to load
+                  
+                  console.log(`Extracting content from archive.md...`);
+                  const rawText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
+                    .replace(/\s\s+/g, ' ')
+                    .trim();
+                  console.log(`Raw text length from archive.md: ${rawText.length}`);
+                  
+                  articleText = cleanArticleContent(rawText, effectiveUrl).substring(0, MAX_ARTICLE_CHARS);
+                  console.log(`Cleaned article text length: ${articleText.length}`);
+                  
+                  await browser.close();
+                  console.log(`Successfully fetched from archive.md: ${articleText.length} chars`);
+                } catch (puppeteerError) {
+                  console.log(`Puppeteer error for archive.md: ${puppeteerError?.message || puppeteerError}`);
+                  throw puppeteerError;
+                }
                 
                 // If we got content from archive.md, proceed with normal analysis
                 if (articleText && articleText.length > 100) {
