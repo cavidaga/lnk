@@ -211,10 +211,54 @@ header{
     gap: 16px !important;
   }
   
-  /* Hide radial menu elements on desktop */
-  .radial-center-logo,
-  .radial-item{
+  /* Hide radial menu specific elements on desktop */
+  .radial-center-logo{
     display: none !important;
+  }
+  
+  /* Show radial items as normal nav links on desktop */
+  .radial-item{
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    text-decoration: none !important;
+    color: var(--text) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+    transition: color 0.2s ease !important;
+    opacity: 1 !important;
+    transform: none !important;
+    padding: 8px 12px !important;
+    border-radius: 6px !important;
+  }
+  
+  .radial-item:hover{
+    background: var(--hover) !important;
+    color: var(--accent) !important;
+    border-color: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  .radial-item .icon{
+    width: 16px !important;
+    height: 16px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .radial-item .label{
+    font-size: 14px !important;
+    text-align: left !important;
+    line-height: 1.2 !important;
   }
 }
 
