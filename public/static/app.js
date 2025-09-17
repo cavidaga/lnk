@@ -270,7 +270,13 @@ function renderAnalysis(root, data, hash) {
           <div class="bd">
             <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
               ${metric('Etibarlılıq', fmt100(reliabilityNum), '')}
-              ${metric('Siyasi hakimiyyət meyli', fmtBias(polBiasNum), ' (Müxalif ⟷ İqtidar)')}
+              ${metric('Siyasi hakimiyyət meyli', fmtBias(polBiasNum), '')}
+            </div>
+
+            <!-- Speedometer visualization -->
+            <div class="speedometer-container">
+              ${speedometer('Etibarlılıq', reliabilityNum, 'reliability')}
+              ${speedometer('Siyasi meyl', polBiasNum, 'political')}
             </div>
 
             <!-- Axis chart -->
@@ -500,6 +506,44 @@ function renderAnalysis(root, data, hash) {
       <div class="stat" style="background:var(--card-bg,rgba(255,255,255,0.02));border:1px solid var(--border,#222);border-radius:12px;padding:10px 12px;min-width:210px">
         <div class="small muted">${esc(label)}</div>
         <div style="font-size:28px;font-weight:700;line-height:1">${esc(String(v))}${esc(suffix)}</div>
+      </div>`;
+  }
+
+  function speedometer(label, value, type = 'reliability') {
+    let angle, displayValue, colorClass;
+    
+    if (type === 'reliability') {
+      // Reliability: 0-100, needle goes from 180deg (0) to 0deg (100)
+      const reliability = clamp(Number(value), 0, 100);
+      angle = 180 - (reliability / 100) * 180; // 180deg for 0, 0deg for 100
+      displayValue = `${reliability}/100`;
+      
+      if (reliability >= 80) colorClass = 'reliability-excellent';
+      else if (reliability >= 60) colorClass = 'reliability-good';
+      else if (reliability >= 40) colorClass = 'reliability-fair';
+      else if (reliability >= 20) colorClass = 'reliability-poor';
+      else colorClass = 'reliability-very-poor';
+    } else {
+      // Political bias: -5 to +5, needle goes from 180deg (-5) to 0deg (+5)
+      const bias = clamp(Number(value), -5, 5);
+      angle = 180 - ((bias + 5) / 10) * 180; // 180deg for -5, 0deg for +5
+      displayValue = fmtBias(bias);
+      
+      if (bias >= 3) colorClass = 'bias-strong-pro';
+      else if (bias >= 1) colorClass = 'bias-pro';
+      else if (bias === 0) colorClass = 'bias-neutral';
+      else if (bias >= -2) colorClass = 'bias-critical';
+      else colorClass = 'bias-strong-opposition';
+    }
+    
+    return `
+      <div class="speedometer ${type === 'political' ? 'political' : ''}">
+        <div class="speedometer-gauge">
+          <div class="speedometer-needle" style="transform: rotate(${angle}deg);"></div>
+          <div class="speedometer-center"></div>
+        </div>
+        <div class="speedometer-value ${colorClass}">${displayValue}</div>
+        <div class="speedometer-label">${esc(label)}</div>
       </div>`;
   }
 
