@@ -100,8 +100,34 @@ export default async function handler(req) {
       human_summary: true
     };
   </script>
+  
+  <!-- Shortcuts help overlay -->
+  <div id="shortcuts-help" class="shortcuts-overlay" style="display: none;" role="dialog" aria-labelledby="shortcuts-title" aria-hidden="true">
+    <div class="shortcuts-backdrop" onclick="hideShortcuts()"></div>
+    <div class="shortcuts-content">
+      <div class="shortcuts-header">
+        <h3 id="shortcuts-title">Klaviatura Qısayolları</h3>
+        <button class="shortcuts-close" onclick="hideShortcuts()" aria-label="Bağla">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="shortcuts-list">
+        <!-- Shortcuts will be populated by JavaScript -->
+      </div>
+      <div class="shortcuts-footer">
+        <button class="btn" onclick="hideShortcuts()">Bağla</button>
+        <div class="shortcuts-tip">
+          <small>💡 İpucu: Bu köməyi hər zaman <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>?</kbd> ilə açabilərsiniz</small>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <script src="/static/layout.js" defer></script>
   <script src="/static/app.js" defer></script>
+  <script src="/static/shortcuts.js" defer></script>
 </body>
 </html>`;
 
