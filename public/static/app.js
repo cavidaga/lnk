@@ -390,7 +390,7 @@ function renderAnalysis(root, data, hash) {
 
         <section class="card" id="feedback-card">
           <div class="bd">
-            <h3 style="margin:0 0 8px">Bu analizlə razısınız?</h3>
+            <h3 style="margin:0 0 8px">Bu analiz haqqında nə düşünürsünüz?</h3>
             <div class="feedback-buttons" style="display:flex;gap:12px;margin-bottom:12px">
               <button class="feedback-btn thumbs-up" data-hash="${hash || ''}" data-feedback="up" style="
                 background:var(--card-bg,rgba(255,255,255,0.02));
@@ -420,7 +420,7 @@ function renderAnalysis(root, data, hash) {
                 align-items:center;
                 gap:6px;
               ">
-                👎 Razı deyiləm
+                👎 Şikayət et
               </button>
             </div>
             <div class="feedback-status" style="font-size:14px;color:var(--muted);min-height:20px;"></div>
@@ -883,20 +883,31 @@ function headerBlock({ title, publication, published_at, url, title_inferred }){
     const feedback = e.target.dataset.feedback;
     const button = e.target;
     
-    // Store feedback locally
-    storeFeedback(hash, feedback);
+    if (feedback === 'down') {
+      // Redirect to complaint form with prefilled analysis link
+      const analysisUrl = `${window.location.origin}/analysis/${encodeURIComponent(hash)}`;
+      const complaintUrl = `/complaint.html?analysis_url=${encodeURIComponent(analysisUrl)}`;
+      window.open(complaintUrl, '_blank');
+      return;
+    }
     
-    // Send to API
-    sendFeedbackToAPI(hash, feedback);
-    
-    // Update UI
-    markFeedbackAsGiven(feedback);
-    
-    // Show confirmation
-    const statusEl = document.querySelector('.feedback-status');
-    if (statusEl) {
-      statusEl.textContent = 'Təşəkkürlər! Geri bildiriminiz qeydə alındı.';
-      statusEl.style.color = 'var(--accent)';
+    // Handle positive feedback (thumbs up)
+    if (feedback === 'up') {
+      // Store feedback locally
+      storeFeedback(hash, feedback);
+      
+      // Send to API
+      sendFeedbackToAPI(hash, feedback);
+      
+      // Update UI
+      markFeedbackAsGiven(feedback);
+      
+      // Show confirmation
+      const statusEl = document.querySelector('.feedback-status');
+      if (statusEl) {
+        statusEl.textContent = 'Təşəkkürlər! Geri bildiriminiz qeydə alındı.';
+        statusEl.style.color = 'var(--accent)';
+      }
     }
   }
 
@@ -928,6 +939,11 @@ function headerBlock({ title, publication, published_at, url, title_inferred }){
     console.log('Marking feedback as given:', feedback, 'Found buttons:', buttons.length);
     
     buttons.forEach(btn => {
+      if (btn.dataset.feedback === 'down') {
+        // Keep complaint button always enabled
+        return;
+      }
+      
       btn.disabled = true;
       btn.style.cursor = 'not-allowed';
       
