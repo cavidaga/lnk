@@ -73,6 +73,14 @@
         const hash = json.hash || json?.meta?.hash;
         if (!hash) throw new Error('Hash tapılmadı');
         
+        // Add to localStorage history before redirecting
+        if (window.LNKHistory && window.LNKHistory.addAnalysis) {
+          console.log('Adding analysis to localStorage history:', json.hash);
+          window.LNKHistory.addAnalysis(json);
+        } else {
+          console.warn('LNKHistory not available for adding analysis to history');
+        }
+        
         // Refresh recent analyses before redirecting
         loadRecentAnalyses();
         
