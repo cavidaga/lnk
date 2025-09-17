@@ -182,7 +182,7 @@
 
     try {
       const data = await fetchAnalysis(hash);
-      renderAnalysis(container, data);
+      renderAnalysis(container, data, hash);
       wireCopyButton(location.origin + `/analysis/${encodeURIComponent(hash)}`);
       wireFeedbackButtons(hash);
       document.title = `${data?.meta?.title ? data.meta.title + ' — ' : ''}LNK.az`;
@@ -209,7 +209,7 @@
   }
 
   // ---------- RENDERERS ----------
-function renderAnalysis(root, data) {
+function renderAnalysis(root, data, hash) {
   const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = '' } = data || {};
   const title = meta.title || 'Başlıq yoxdur';
 
@@ -341,7 +341,7 @@ function renderAnalysis(root, data) {
           <div class="bd">
             <h3 style="margin:0 0 8px">Bu analiz sizə faydalı oldu?</h3>
             <div class="feedback-buttons" style="display:flex;gap:12px;margin-bottom:12px">
-              <button class="feedback-btn thumbs-up" data-hash="${hash}" data-feedback="up" style="
+              <button class="feedback-btn thumbs-up" data-hash="${hash || ''}" data-feedback="up" style="
                 background:var(--card-bg,rgba(255,255,255,0.02));
                 border:1px solid var(--border,#222);
                 border-radius:8px;
@@ -356,7 +356,7 @@ function renderAnalysis(root, data) {
               ">
                 👍 Razıyam
               </button>
-              <button class="feedback-btn thumbs-down" data-hash="${hash}" data-feedback="down" style="
+              <button class="feedback-btn thumbs-down" data-hash="${hash || ''}" data-feedback="down" style="
                 background:var(--card-bg,rgba(255,255,255,0.02));
                 border:1px solid var(--border,#222);
                 border-radius:8px;
@@ -369,7 +369,7 @@ function renderAnalysis(root, data) {
                 align-items:center;
                 gap:6px;
               ">
-                👎 Razı deyiləm
+                👎 Razı
               </button>
             </div>
             <div class="feedback-status" style="font-size:14px;color:var(--muted);min-height:20px;"></div>
