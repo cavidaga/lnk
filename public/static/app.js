@@ -268,11 +268,6 @@ function renderAnalysis(root, data, hash) {
 
         <section class="card">
           <div class="bd">
-            <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
-              ${metric('Etibarlılıq', fmt100(reliabilityNum), '')}
-              ${metric('Siyasi hakimiyyət meyli', fmtBias(polBiasNum), '')}
-            </div>
-
             <!-- Speedometer visualization -->
             <div class="speedometer-container">
               ${speedometer('Etibarlılıq', reliabilityNum, 'reliability')}
@@ -512,6 +507,8 @@ function renderAnalysis(root, data, hash) {
   function speedometer(label, value, type = 'reliability') {
     let angle, displayValue, colorClass, ticks, scaleNumbers;
     
+    console.log('Creating speedometer:', { label, value, type });
+    
     if (type === 'reliability') {
       // Reliability: 0-100, needle goes from 180deg (0) to 0deg (100)
       const reliability = clamp(Number(value), 0, 100);
@@ -544,6 +541,8 @@ function renderAnalysis(root, data, hash) {
       scaleNumbers = generateScaleNumbers([-5, -3, -1, 0, 1, 3, 5], 180, 0);
     }
     
+    console.log('Speedometer data:', { angle, displayValue, colorClass, ticks: ticks.length, scaleNumbers: scaleNumbers.length });
+    
     return `
       <div class="speedometer ${type === 'political' ? 'political' : ''}">
         <div class="speedometer-gauge">
@@ -569,10 +568,7 @@ function renderAnalysis(root, data, hash) {
       
       ticks.push(`
         <div class="speedometer-tick ${isMajor ? 'major' : ''}" 
-             style="transform: rotate(${angle}deg); 
-                    left: 50%; 
-                    bottom: 0; 
-                    margin-left: -1px;"></div>
+             style="transform: rotate(${angle}deg);"></div>
       `);
     }
     
@@ -586,7 +582,7 @@ function renderAnalysis(root, data, hash) {
     
     values.forEach((value, i) => {
       const angle = startAngle - (i * angleStep);
-      const radius = 45; // Distance from center
+      const radius = 35; // Distance from center (closer to the gauge)
       const x = 50 + Math.cos((angle - 90) * Math.PI / 180) * radius;
       const y = 50 + Math.sin((angle - 90) * Math.PI / 180) * radius;
       
