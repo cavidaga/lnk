@@ -884,10 +884,17 @@ kbd {
 /* Clickable shortcuts bubble */
 .shortcuts-bubble {
   position: fixed;
-  bottom: 20px;
+  top: 20px;
   right: 20px;
   z-index: 100;
   pointer-events: none;
+  display: none; /* Hidden by default, shown only on desktop */
+}
+
+@media (min-width: 769px) {
+  .shortcuts-bubble {
+    display: block; /* Show only on desktop */
+  }
 }
 
 .shortcuts-bubble-btn {
@@ -922,21 +929,7 @@ kbd {
   white-space: nowrap;
 }
 
-@media (max-width: 768px) {
-  .shortcuts-bubble {
-    bottom: 16px;
-    right: 16px;
-  }
-  
-  .shortcuts-bubble-btn {
-    padding: 10px 14px;
-    font-size: 13px;
-  }
-  
-  .shortcuts-bubble-text {
-    display: none; /* Hide text on mobile, show only icon */
-  }
-}
+/* Mobile styles removed - bubble not shown on mobile */
 
 /* Responsive shortcuts */
 @media (max-width: 768px) {

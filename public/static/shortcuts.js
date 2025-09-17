@@ -220,6 +220,11 @@
   }
 
   function addShortcutsBubble() {
+    // Only show bubble on desktop (screen width > 768px)
+    if (window.innerWidth <= 768) {
+      return; // Don't create bubble on mobile
+    }
+    
     // Create a floating bubble for shortcuts
     const bubble = document.createElement('div');
     bubble.id = 'shortcuts-bubble';
@@ -258,6 +263,16 @@
 
     // Add clickable bubble
     addShortcutsBubble();
+
+    // Handle screen size changes
+    window.addEventListener('resize', () => {
+      const bubble = document.getElementById('shortcuts-bubble');
+      if (window.innerWidth <= 768 && bubble) {
+        bubble.remove(); // Remove bubble on mobile
+      } else if (window.innerWidth > 768 && !bubble) {
+        addShortcutsBubble(); // Add bubble on desktop
+      }
+    });
 
     // Render shortcuts help
     renderShortcutsHelp();
