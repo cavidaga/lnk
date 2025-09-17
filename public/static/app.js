@@ -393,7 +393,7 @@ function renderAnalysis(root, data, hash) {
             <p style="margin:0 0 12px;color:var(--muted);font-size:14px">
               Əgər analizimizdə səhv tapmısınızsa və ya təklifiniz varsa, lütfən bizə bildirin.
             </p>
-            <button onclick="window.open('/complaint.html?analysis_url=${encodeURIComponent(window.location.href)}', '_blank')" style="display:inline-flex;align-items:center;gap:6px">
+            <button class="btn" onclick="window.open('/complaint.html?analysis_url=${encodeURIComponent(window.location.href)}', '_blank')" style="display:inline-flex;align-items:center;gap:6px">
               👎 Şikayət et
             </button>
           </div>
