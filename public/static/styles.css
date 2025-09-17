@@ -163,7 +163,7 @@ header{
   color:var(--text);
   font-size:14px;
   transition:all .2s ease;
-  padding:8px 12px;
+  padding:8px;
   border-radius:8px;
   border:1px solid var(--border);
   background:var(--panel);
@@ -171,7 +171,9 @@ header{
   align-items:center;
   justify-content:center;
   white-space:nowrap;
-  gap:6px;
+  width:36px;
+  height:36px;
+  position:relative;
 }
 .nav-link:hover{ 
   color:var(--accent);
@@ -186,9 +188,16 @@ header{
   transform:translateY(-1px);
 }
 .nav-link .icon{
-  width:16px;
-  height:16px;
+  width:18px;
+  height:18px;
   flex-shrink:0;
+}
+.nav-link .sr-only{
+  position:absolute;
+  left:-9999px;
+  width:1px;
+  height:1px;
+  overflow:hidden;
 }
 
 /* Theme toggle button */
@@ -518,7 +527,8 @@ footer.site-footer{
 
 /* Tooltips (footer + header nav when used) */
 .footer-icons a[data-tooltip]::after,
-.site-nav a[data-tooltip]::after{
+.site-nav a[data-tooltip]::after,
+.nav-link[data-tooltip]::after{
   content:attr(data-tooltip);
   position:absolute; left:50%; bottom:calc(100% + 8px);
   transform:translateX(-50%) translateY(4px);
@@ -526,15 +536,19 @@ footer.site-footer{
   color:#fff; font-size:12px; line-height:1; padding:6px 8px; border-radius:6px;
   white-space:nowrap; pointer-events:none; opacity:0;
   transition:opacity .15s ease, transform .15s ease;
+  z-index:1000;
 }
 @media (prefers-color-scheme: light){
   .footer-icons a[data-tooltip]::after,
-  .site-nav a[data-tooltip]::after{ background:rgba(20,20,25,.9) }
+  .site-nav a[data-tooltip]::after,
+  .nav-link[data-tooltip]::after{ background:rgba(20,20,25,.9) }
 }
 .footer-icons a:focus-visible[data-tooltip]::after,
 .footer-icons a:hover[data-tooltip]::after,
 .site-nav a:focus-visible[data-tooltip]::after,
-.site-nav a:hover[data-tooltip]::after{
+.site-nav a:hover[data-tooltip]::after,
+.nav-link:focus-visible[data-tooltip]::after,
+.nav-link:hover[data-tooltip]::after{
   opacity:1; transform:translateX(-50%) translateY(0);
 }
 
@@ -593,12 +607,14 @@ footer.site-footer{
     z-index: 70;
   }
   
-  /* Navigation links on mobile */
+  /* Navigation links on mobile - show text */
   .nav-link{
     padding:12px 10px; border-radius:8px;
     font-size:16px; text-align:left;
     justify-content:flex-start;
     gap:10px;
+    width:auto;
+    height:auto;
   }
   .nav-link:hover{ 
     background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
@@ -606,6 +622,13 @@ footer.site-footer{
   .nav-link .icon{
     width:18px;
     height:18px;
+  }
+  .nav-link .sr-only{
+    position:static;
+    width:auto;
+    height:auto;
+    overflow:visible;
+    clip:auto;
   }
   
   /* Action buttons container */
