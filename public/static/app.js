@@ -94,12 +94,31 @@
   // ---------- RECENT ANALYSES ----------
   async function loadRecentAnalyses() {
     try {
+      console.log('Loading recent analyses...');
       const res = await fetch('/api/recent-analyses');
-      if (!res.ok) return;
+      console.log('Recent analyses response:', res.status, res.ok);
+      
+      if (!res.ok) {
+        console.error('Recent analyses API error:', res.status);
+        return;
+      }
       
       const analyses = await res.json();
+      console.log('Recent analyses data:', analyses);
+      
       if (analyses && analyses.length > 0) {
         renderRecentAnalyses(analyses);
+      } else {
+        console.log('No recent analyses found');
+        // Show section even if empty for debugging
+        const section = $('#recent-analyses');
+        if (section) {
+          section.style.display = 'block';
+          const container = $('#recent-list');
+          if (container) {
+            container.innerHTML = '<div class="small muted">Hələ heç bir təhlil edilməyib.</div>';
+          }
+        }
       }
     } catch (e) {
       console.error('Failed to load recent analyses:', e);
@@ -107,10 +126,17 @@
   }
 
   function renderRecentAnalyses(analyses) {
+    console.log('Rendering recent analyses:', analyses);
     const container = $('#recent-list');
     const section = $('#recent-analyses');
     
-    if (!container || !section) return;
+    console.log('Container found:', !!container);
+    console.log('Section found:', !!section);
+    
+    if (!container || !section) {
+      console.error('Missing container or section elements');
+      return;
+    }
 
     const html = analyses.map(analysis => {
       const title = esc(analysis.title || 'Başlıq yoxdur');
@@ -145,6 +171,7 @@
 
     container.innerHTML = html;
     section.style.display = 'block';
+    console.log('Recent analyses rendered, section shown');
   }
 
   // ---------- ANALYSIS FLOW ----------

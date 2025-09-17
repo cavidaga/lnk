@@ -1,14 +1,20 @@
 // /api/recent-analyses.js
 import { kv } from '@vercel/kv';
 
+export const config = { runtime: 'edge' };
+
 export default async function handler(req, res) {
   try {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     
+    console.log('Recent analyses API called');
+    
     // Get last 5 analysis hashes
     const hashes = await kv.lrange('recent_hashes', 0, 4); // Last 5
+    console.log('Found hashes:', hashes);
     
     if (!hashes || hashes.length === 0) {
+      console.log('No hashes found, returning empty array');
       return res.status(200).json([]);
     }
 
@@ -38,6 +44,7 @@ export default async function handler(req, res) {
 
     // Filter out null results and return
     const validAnalyses = analyses.filter(Boolean);
+    console.log('Valid analyses:', validAnalyses.length);
     
     // Cache for 5 minutes
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
