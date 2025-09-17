@@ -228,17 +228,18 @@ header{
     flex-direction: row !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 6px !important;
+    gap: 8px !important;
     text-decoration: none !important;
     color: var(--text) !important;
-    font-size: 14px !important;
+    font-size: 15px !important;
     font-weight: 500 !important;
     box-shadow: none !important;
-    transition: color 0.2s ease !important;
+    transition: all 0.2s ease !important;
     opacity: 1 !important;
     transform: none !important;
-    padding: 8px 12px !important;
-    border-radius: 6px !important;
+    padding: 10px 16px !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
   }
   
   .radial-item:hover{
@@ -256,9 +257,27 @@ header{
   }
   
   .radial-item .label{
-    font-size: 14px !important;
+    font-size: 15px !important;
     text-align: left !important;
     line-height: 1.2 !important;
+  }
+  
+  /* Special styling for support button on desktop */
+  .radial-item.support-item{
+    background: linear-gradient(135deg, #ffdd00, #ffc107) !important;
+    color: #1a1a1a !important;
+    box-shadow: 0 2px 8px rgba(255,193,7,.3) !important;
+    font-weight: 600 !important;
+  }
+  
+  .radial-item.support-item:hover{
+    background: linear-gradient(135deg, #ffc107, #ffb300) !important;
+    box-shadow: 0 3px 12px rgba(255,193,7,.4) !important;
+    transform: translateY(-1px) !important;
+  }
+  
+  .radial-item.support-item .label{
+    display: inline !important;
   }
 }
 
@@ -341,9 +360,9 @@ header{
 .site-nav a.btn-support .icon{ width:16px; height:16px }
 
 .logo-img{
-  width: clamp(40px, 4vw, 56px);
-  height: clamp(40px, 4vw, 56px);
-  border-radius:10px;
+  width: clamp(48px, 5vw, 64px);
+  height: clamp(48px, 5vw, 64px);
+  border-radius:12px;
   box-shadow:var(--shadow);
   display:block;
 }

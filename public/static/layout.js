@@ -111,6 +111,7 @@
                     stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               <path d="M6.2 13h9.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
+            <span class="label">Dəstək ol</span>
           </a>
 
         </nav>
