@@ -41,6 +41,7 @@
           <div class="radial-center-logo">
             <picture>
               <source srcset="/static/logo-dark.svg" media="(prefers-color-scheme: light)">
+              <source srcset="/static/logo-light.svg" media="(prefers-color-scheme: dark)">
               <img src="/static/logo-light.svg" alt="LNK loqo" width="32" height="32" />
             </picture>
           </div>
