@@ -3,6 +3,19 @@
   function headerHTML() {
     return `
       <header>
+        <!-- Mobile theme toggle (left side on mobile) -->
+        <button class="mobile-theme-toggle" type="button" 
+                data-tooltip="Tema dəyişdir" aria-label="Tema dəyişdir" style="display:none">
+          <svg class="icon theme-icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <svg class="icon theme-icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: none;">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span class="sr-only">Tema dəyişdir</span>
+        </button>
+
         <a href="/" class="brand" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit">
           <picture>
             <source srcset="/static/logo-dark.svg" media="(prefers-color-scheme: dark)">
@@ -11,7 +24,7 @@
           </picture>
         </a>
 
-        <!-- Mobile menu toggle (hidden on desktop) -->
+        <!-- Mobile menu toggle (right side on mobile) -->
         <button class="nav-toggle" type="button" aria-label="Menyunu aç" aria-controls="primary-nav" aria-expanded="false" style="display:none">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -220,7 +233,17 @@
     const mq = window.matchMedia('(max-width: 768px)');
     function openNav(){ document.body.classList.add('nav-open'); toggle?.setAttribute('aria-expanded','true'); backdrop?.removeAttribute('hidden'); }
     function closeNav(){ document.body.classList.remove('nav-open'); toggle?.setAttribute('aria-expanded','false'); backdrop?.setAttribute('hidden',''); }
-    function syncToggle(){ if (!toggle) return; if (mq.matches){ toggle.style.display='inline-flex'; } else { toggle.style.display='none'; closeNav(); } }
+    function syncToggle(){ 
+      if (!toggle) return; 
+      if (mq.matches){ 
+        toggle.style.display='inline-flex'; 
+        if (mobileThemeToggle) mobileThemeToggle.style.display='inline-flex';
+      } else { 
+        toggle.style.display='none'; 
+        if (mobileThemeToggle) mobileThemeToggle.style.display='none';
+        closeNav(); 
+      } 
+    }
     toggle?.addEventListener('click', () => (toggle.getAttribute('aria-expanded') === 'true' ? closeNav() : openNav()));
     backdrop?.addEventListener('click', closeNav);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
@@ -233,6 +256,7 @@
     // Theme toggle functionality
     const themeToggle = document.getElementById('theme-toggle');
     const themeToggleMobile = document.querySelector('.theme-toggle-mobile');
+    const mobileThemeToggle = document.querySelector('.mobile-theme-toggle');
     const themeIconSun = document.querySelectorAll('.theme-icon-sun');
     const themeIconMoon = document.querySelectorAll('.theme-icon-moon');
     
@@ -282,6 +306,10 @@
       if (themeToggle) {
         themeToggle.setAttribute('data-tooltip', isDark ? 'Açıq tema' : 'Qaranlıq tema');
         themeToggle.setAttribute('aria-label', isDark ? 'Açıq tema' : 'Qaranlıq tema');
+      }
+      if (mobileThemeToggle) {
+        mobileThemeToggle.setAttribute('data-tooltip', isDark ? 'Açıq tema' : 'Qaranlıq tema');
+        mobileThemeToggle.setAttribute('aria-label', isDark ? 'Açıq tema' : 'Qaranlıq tema');
       }
     }
     
@@ -345,6 +373,9 @@
     }
     if (themeToggleMobile) {
       themeToggleMobile.addEventListener('click', toggleTheme);
+    }
+    if (mobileThemeToggle) {
+      mobileThemeToggle.addEventListener('click', toggleTheme);
     }
     
     // Listen for system theme changes (only if no manual preference is stored)
