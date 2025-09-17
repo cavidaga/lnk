@@ -550,13 +550,84 @@ function renderAnalysis(root, data, hash) {
     console.log('Speedometer data:', { angle, displayValue, colorClass });
     
     const html = `
-      <div class="speedometer ${type === 'political' ? 'political' : ''}">
-        <div class="speedometer-gauge">
-          <div class="speedometer-needle" style="transform: rotate(${angle}deg);"></div>
-          <div class="speedometer-center"></div>
+      <div class="speedometer ${type === 'political' ? 'political' : ''}" style="
+        position: relative;
+        width: 120px;
+        height: 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 10px;
+      ">
+        <div class="speedometer-gauge" style="
+          position: relative;
+          width: 120px;
+          height: 60px;
+          border-radius: 60px 60px 0 0;
+          background: ${type === 'political' 
+            ? 'conic-gradient(from 180deg, #dc2626 0deg 36deg, #f59e0b 36deg 72deg, #6b7280 72deg 108deg, #3b82f6 108deg 144deg, #1d4ed8 144deg 180deg)'
+            : 'conic-gradient(from 180deg, #dc2626 0deg 36deg, #f97316 36deg 72deg, #f59e0b 72deg 108deg, #10b981 108deg 144deg, #059669 144deg 180deg)'
+          };
+          overflow: hidden;
+          border: 2px solid #333;
+        ">
+          <div class="speedometer-needle" style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            transform-origin: bottom center;
+            transform: rotate(${angle}deg);
+            z-index: 2;
+          ">
+            <div style="
+              position: absolute;
+              bottom: 0;
+              left: -2px;
+              width: 0;
+              height: 0;
+              border-left: 4px solid transparent;
+              border-right: 4px solid transparent;
+              border-bottom: 40px solid #ff0000;
+            "></div>
+          </div>
+          <div class="speedometer-center" style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: #333;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+          "></div>
         </div>
-        <div class="speedometer-value ${colorClass}">${displayValue}</div>
-        <div class="speedometer-label">${esc(label)}</div>
+        <div class="speedometer-value ${colorClass}" style="
+          margin-top: 8px;
+          font-size: 18px;
+          font-weight: 700;
+          color: ${colorClass.includes('excellent') ? '#059669' : 
+                  colorClass.includes('good') ? '#10b981' : 
+                  colorClass.includes('fair') ? '#f59e0b' : 
+                  colorClass.includes('poor') ? '#f97316' : 
+                  colorClass.includes('very-poor') ? '#dc2626' :
+                  colorClass.includes('strong-pro') ? '#1d4ed8' :
+                  colorClass.includes('pro') ? '#3b82f6' :
+                  colorClass.includes('neutral') ? '#6b7280' :
+                  colorClass.includes('critical') ? '#f59e0b' :
+                  colorClass.includes('strong-opposition') ? '#dc2626' : '#333'};
+          text-align: center;
+        ">${displayValue}</div>
+        <div class="speedometer-label" style="
+          font-size: 12px;
+          color: #666;
+          text-align: center;
+          margin-top: 4px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        ">${esc(label)}</div>
       </div>`;
     
     console.log('Generated HTML:', html);
