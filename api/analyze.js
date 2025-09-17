@@ -9,6 +9,7 @@ import dns from 'node:dns/promises';
 import puppeteerCore from 'puppeteer-core';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { gatedFetch } from '../lib/gated-fetch.js';
+import { findArchiveForUrl } from '../lib/known-archives.js';
 
 // 🔒 policy helpers
 import {
@@ -52,6 +53,51 @@ const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 20000); // 20s de
 
 // --- Helpers ---
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+// Check if archive.md has a mirror for the given URL
+async function getArchiveMdUrl(originalUrl) {
+  try {
+    // First, check if we have a known archive for this URL
+    const knownArchive = findArchiveForUrl(originalUrl);
+    if (knownArchive) {
+      console.log(`Using known archive.md for ${originalUrl}: ${knownArchive}`);
+      return knownArchive;
+    }
+    
+    // For other URLs, try to create a new archive using archive.md's API
+    // Note: This is a simplified approach - archive.md's actual API is more complex
+    try {
+      const archiveCreateUrl = `https://archive.md/?run=1&url=${encodeURIComponent(originalUrl)}`;
+      console.log(`Attempting to create archive.md for: ${originalUrl}`);
+      
+      // Make a request to create an archive
+      const response = await fetch(archiveCreateUrl, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+        }
+      });
+      
+      if (response.ok) {
+        const html = await response.text();
+        // Look for archive URL in the response
+        const archiveMatch = html.match(/https:\/\/archive\.md\/[A-Za-z0-9]+/);
+        if (archiveMatch) {
+          console.log(`Created archive.md: ${archiveMatch[0]}`);
+          return archiveMatch[0];
+        }
+      }
+    } catch (createError) {
+      console.warn('Failed to create archive.md:', createError?.message || createError);
+    }
+    
+    return null;
+    
+  } catch (error) {
+    console.warn('Archive.md check failed:', error?.message || error);
+    return null;
+  }
+}
 
 // Map user model selection to actual models and timeouts
 function getUserModelSelection(userModelType) {
@@ -562,6 +608,12 @@ function normalizeOutput(o = {}, { url, contentSource, isBlocked = false }) {
     out.warnings.push({
       type: 'archived_content',
       message: 'Mənbə bloklanıb, lakin arxiv nüsxəsi tapılıb. Təhlil arxiv məlumatı əsasında aparılıb.',
+      severity: 'medium'
+    });
+  } else if (contentSource === 'Archive.md') {
+    out.warnings.push({
+      type: 'archived_content',
+      message: 'Mənbə bloklanıb, lakin archive.md nüsxəsi tapılıb. Təhlil arxiv məlumatı əsasında aparılıb.',
       severity: 'medium'
     });
   } else if (contentSource === 'LightFetch') {
@@ -1169,9 +1221,30 @@ export default async function handler(req, res) {
                 .trim()
                 .substring(0, MAX_ARTICLE_CHARS);
             } else {
-              const blockError = new Error('This website is protected by advanced bot detection.');
-              blockError.isBlockError = true;
-              throw blockError;
+              // Try archive.md as final fallback
+              console.log(`Archive.org not available. Trying archive.md...`);
+              try {
+                const archiveMdUrl = await getArchiveMdUrl(effectiveUrl);
+                if (archiveMdUrl) {
+                  console.log(`Archive.md found. Fetching from: ${archiveMdUrl}`);
+                  contentSource = 'Archive.md';
+                  await page.goto(archiveMdUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+                  await new Promise(r => setTimeout(r, 1000)); // Wait longer for archive.md
+                  articleText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
+                    .replace(/\s\s+/g, ' ')
+                    .trim()
+                    .substring(0, MAX_ARTICLE_CHARS);
+                } else {
+                  const blockError = new Error('This website is protected by advanced bot detection and no archives are available.');
+                  blockError.isBlockError = true;
+                  throw blockError;
+                }
+              } catch (archiveMdError) {
+                console.log(`Archive.md also failed: ${archiveMdError?.message || archiveMdError}`);
+                const blockError = new Error('This website is protected by advanced bot detection and no archives are available.');
+                blockError.isBlockError = true;
+                throw blockError;
+              }
             }
           }
 
