@@ -1563,6 +1563,7 @@ kbd {
     #059669 144deg 180deg  /* Dark Green: 80-100% */
   );
   overflow: hidden;
+  border: 2px solid var(--border);
 }
 
 .speedometer-gauge::before {

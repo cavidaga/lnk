@@ -270,8 +270,22 @@ function renderAnalysis(root, data, hash) {
           <div class="bd">
             <!-- Speedometer visualization -->
             <div class="speedometer-container">
-              ${speedometer('Etibarlılıq', reliabilityNum, 'reliability')}
-              ${speedometer('Siyasi meyl', polBiasNum, 'political')}
+              ${(() => {
+                try {
+                  return speedometer('Etibarlılıq', reliabilityNum, 'reliability');
+                } catch (e) {
+                  console.error('Speedometer error:', e);
+                  return metric('Etibarlılıq', fmt100(reliabilityNum), '');
+                }
+              })()}
+              ${(() => {
+                try {
+                  return speedometer('Siyasi meyl', polBiasNum, 'political');
+                } catch (e) {
+                  console.error('Speedometer error:', e);
+                  return metric('Siyasi hakimiyyət meyli', fmtBias(polBiasNum), '');
+                }
+              })()}
             </div>
 
             <!-- Axis chart -->
@@ -505,9 +519,9 @@ function renderAnalysis(root, data, hash) {
   }
 
   function speedometer(label, value, type = 'reliability') {
-    let angle, displayValue, colorClass, ticks, scaleNumbers;
-    
     console.log('Creating speedometer:', { label, value, type });
+    
+    let angle, displayValue, colorClass;
     
     if (type === 'reliability') {
       // Reliability: 0-100, needle goes from 180deg (0) to 0deg (100)
@@ -520,10 +534,6 @@ function renderAnalysis(root, data, hash) {
       else if (reliability >= 40) colorClass = 'reliability-fair';
       else if (reliability >= 20) colorClass = 'reliability-poor';
       else colorClass = 'reliability-very-poor';
-      
-      // Generate ticks for reliability (0-100)
-      ticks = generateTicks(0, 100, 20, 180, 0);
-      scaleNumbers = generateScaleNumbers([0, 20, 40, 60, 80, 100], 180, 0);
     } else {
       // Political bias: -5 to +5, needle goes from 180deg (-5) to 0deg (+5)
       const bias = clamp(Number(value), -5, 5);
@@ -535,25 +545,22 @@ function renderAnalysis(root, data, hash) {
       else if (bias === 0) colorClass = 'bias-neutral';
       else if (bias >= -2) colorClass = 'bias-critical';
       else colorClass = 'bias-strong-opposition';
-      
-      // Generate ticks for political bias (-5 to +5)
-      ticks = generateTicks(-5, 5, 2, 180, 0);
-      scaleNumbers = generateScaleNumbers([-5, -3, -1, 0, 1, 3, 5], 180, 0);
     }
     
-    console.log('Speedometer data:', { angle, displayValue, colorClass, ticks: ticks.length, scaleNumbers: scaleNumbers.length });
+    console.log('Speedometer data:', { angle, displayValue, colorClass });
     
-    return `
+    const html = `
       <div class="speedometer ${type === 'political' ? 'political' : ''}">
         <div class="speedometer-gauge">
-          <div class="speedometer-ticks">${ticks}</div>
-          <div class="speedometer-scale">${scaleNumbers}</div>
           <div class="speedometer-needle" style="transform: rotate(${angle}deg);"></div>
           <div class="speedometer-center"></div>
         </div>
         <div class="speedometer-value ${colorClass}">${displayValue}</div>
         <div class="speedometer-label">${esc(label)}</div>
       </div>`;
+    
+    console.log('Generated HTML:', html);
+    return html;
   }
 
   function generateTicks(min, max, step, startAngle, endAngle) {
