@@ -1576,28 +1576,85 @@ kbd {
   border-radius: 56px 56px 0 0;
 }
 
+/* Speedometer tick marks */
+.speedometer-ticks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.speedometer-tick {
+  position: absolute;
+  width: 2px;
+  height: 8px;
+  background: var(--text);
+  transform-origin: bottom center;
+  opacity: 0.7;
+}
+
+.speedometer-tick.major {
+  height: 12px;
+  width: 3px;
+  opacity: 1;
+}
+
+/* Speedometer scale numbers */
+.speedometer-scale {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.speedometer-scale-number {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text);
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
 .speedometer-needle {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 2px;
-  height: 45px;
-  background: var(--text);
+  width: 0;
+  height: 0;
   transform-origin: bottom center;
-  border-radius: 1px;
   z-index: 2;
   transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Arrow-shaped needle */
 .speedometer-needle::before {
   content: '';
   position: absolute;
-  bottom: -2px;
-  left: -3px;
-  width: 8px;
-  height: 8px;
-  background: var(--text);
-  border-radius: 50%;
+  bottom: 0;
+  left: -2px;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 40px solid var(--accent);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.speedometer-needle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -1px;
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-bottom: 38px solid var(--text);
 }
 
 .speedometer-center {
@@ -1682,6 +1739,15 @@ kbd {
   );
 }
 
+/* Speedometer glow effect */
+.speedometer-gauge {
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+}
+
+.speedometer-needle::before {
+  box-shadow: 0 0 8px rgba(255,0,0,0.3);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .speedometer-container {
@@ -1704,8 +1770,16 @@ kbd {
     border-radius: 46px 46px 0 0;
   }
   
-  .speedometer-needle {
-    height: 38px;
+  .speedometer-needle::before {
+    border-bottom-width: 32px;
+    border-left-width: 3px;
+    border-right-width: 3px;
+  }
+  
+  .speedometer-needle::after {
+    border-bottom-width: 30px;
+    border-left-width: 2px;
+    border-right-width: 2px;
   }
   
   .speedometer-value {
@@ -1714,6 +1788,10 @@ kbd {
   
   .speedometer-label {
     font-size: 11px;
+  }
+  
+  .speedometer-scale-number {
+    font-size: 9px;
   }
 }
 
