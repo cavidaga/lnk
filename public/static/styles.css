@@ -1142,6 +1142,9 @@ footer.site-footer{
 
 /* Mobile: Simplify layout and remove card layers */
 @media (max-width: 768px) {
+  .wrap {
+    padding: 16px 12px 96px;
+  }
   .hdr {
     padding: 16px;
     margin-bottom: 20px;
@@ -1149,10 +1152,13 @@ footer.site-footer{
     border: 1px solid var(--border);
     border-radius: 14px;
     box-shadow: var(--shadow);
+    width: 100%;
+    max-width: none;
   }
   .hdr .kv{
     gap: 0;
     display: block;
+    width: 100%;
   }
   .hdr .item{
     padding: 16px 0;
@@ -1162,6 +1168,7 @@ footer.site-footer{
     justify-content: space-between;
     align-items: flex-start;
     border-bottom: 1px solid var(--border, #eee);
+    width: 100%;
   }
   .hdr .item:last-child {
     border-bottom: none;
