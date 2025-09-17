@@ -260,6 +260,52 @@ function htmlToText(html = "") {
     .trim();
 }
 
+// Clean article content to remove sidebar and related content
+function cleanArticleContent(text, url) {
+  if (!text) return text;
+  
+  const hostname = new URL(url).hostname.replace(/^www\./, '');
+  
+  // Common sidebar/related content patterns to remove
+  const sidebarPatterns = [
+    // oxu.az specific patterns
+    /(?:Ən çox oxunan|Ən son xəbərlər|Digər xəbərlər|Əlaqəli xəbərlər|Tövsiyə olunan|Populyar|Trend|Son xəbərlər)[\s\S]*?(?=\n\n|\n[A-Z]|$)/gi,
+    /(?:Facebook|Twitter|Instagram|Telegram|WhatsApp|YouTube)[\s\S]*?(?=\n\n|\n[A-Z]|$)/gi,
+    /(?:Bizi izləyin|Sosial şəbəkələrdə|Paylaş|Şərh|Rəy|Təklif)[\s\S]*?(?=\n\n|\n[A-Z]|$)/gi,
+    /(?:Copyright|©|Müəllif hüquqları|Bütün hüquqlar qorunur)[\s\S]*$/gi,
+    /(?:Reklam|Advertisement|Sponsorlu)[\s\S]*?(?=\n\n|\n[A-Z]|$)/gi,
+    /(?:Əlaqə|Contact|Haqqımızda|About|Məqalə|Article)[\s\S]*?(?=\n\n|\n[A-Z]|$)/gi,
+    // Generic patterns
+    /(?:Related|Əlaqəli|Similar|Bənzər|More|Daha çox)[\s\S]*?(?=\n\n|\n[A-Z]|$)/gi,
+    /(?:Share|Paylaş|Comment|Şərh|Like|Bəyən)[\s\S]*?(?=\n\n|\n[A-Z]|$)/gi,
+    /(?:Subscribe|Abunə|Newsletter|Xəbər bülleteni)[\s\S]*?(?=\n\n|\n[A-Z]|$)/gi,
+  ];
+  
+  let cleanedText = text;
+  
+  // Remove sidebar patterns
+  sidebarPatterns.forEach(pattern => {
+    cleanedText = cleanedText.replace(pattern, '');
+  });
+  
+  // Remove very short lines that are likely navigation or metadata
+  cleanedText = cleanedText
+    .split('\n')
+    .filter(line => {
+      const trimmed = line.trim();
+      return trimmed.length > 20 || // Keep longer lines
+             /^[A-ZĞƏÖÇŞÜ][a-zəğıöçşü\s]{10,}$/.test(trimmed) || // Keep proper titles
+             /^\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4}/.test(trimmed) || // Keep dates
+             trimmed.length === 0; // Keep empty lines for spacing
+    })
+    .join('\n');
+  
+  // Clean up multiple newlines
+  cleanedText = cleanedText.replace(/\n\s*\n\s*\n/g, '\n\n');
+  
+  return cleanedText.trim();
+}
+
 // Prevent duplicate concurrent work on the same URL/hash
 async function withLock(cacheKey, fn) {
   const lockKey = `lock:${cacheKey}`;
@@ -777,6 +823,48 @@ export default async function handler(req, res) {
             contentSource = 'Blocked';
           }
 
+          // If content is blocked, use safe prompt immediately
+          if (contentSource === 'Blocked') {
+            const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
+            const userSelection = getUserModelSelection(modelType);
+            let blockedModelSelection;
+            if (userSelection.model) {
+              blockedModelSelection = {
+                model: userSelection.model,
+                reason: `User selected: ${userSelection.description}`,
+                confidence: 'high'
+              };
+            } else {
+              blockedModelSelection = selectOptimalModel({
+                articleText: '',
+                url: effectiveUrl,
+                title: headlineFast,
+                contentLength: 0
+              });
+            }
+            console.log(`Blocked content model selection: ${blockedModelSelection.model} - ${blockedModelSelection.reason}`);
+            
+            const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
+            const r2 = await callGeminiWithRetryAndFallback({
+              primaryModel: blockedModelSelection.model,
+              fallbackModels: FALLBACK_MODELS,
+              prompt: safePrompt,
+              timeout: userSelection.timeout
+            });
+            const normalized = normalizeOutput(r2.parsed, { 
+              url: effectiveUrl, 
+              contentSource, 
+              isBlocked: true 
+            });
+            normalized.hash = cacheKey;
+            normalized.modelUsed = r2.modelUsed;
+            normalized.contentSource = contentSource;
+            await kv.set(cacheKey, normalized, { ex: 2592000 });
+            console.log(`SAVED TO CACHE (blocked-safe) for URL: ${effectiveUrl}`);
+            try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+            return normalized;
+          }
+
           // If fast path is acceptable, proceed directly to LLM without Chromium.
           // Even if thin, try safe prompt immediately to avoid Chromium unless necessary.
           try {
@@ -984,7 +1072,7 @@ export default async function handler(req, res) {
           });
 
           const DOMAIN_SELECTORS = {
-            'oxu.az': ['.news-inner', '.news-detail', 'article', '.article', '.content'],
+            'oxu.az': ['.news-inner .news-text', '.news-detail .news-text', '.news-inner', '.news-detail', 'article .content', 'article'],
             'publika.az': ['.news-content','.news_text','.news-detail','.post-content','article'],
             'jam-news.net': ['article#articleContent', '.wi-single-content', 'main article', 'article', '.content']
           };
@@ -1072,7 +1160,8 @@ export default async function handler(req, res) {
           if (!articleText || articleText.length < 200) {
             try {
               const bodyTxt = await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : '');
-              articleText = String(bodyTxt || '').replace(/\s\s+/g, ' ').trim();
+              const rawText = String(bodyTxt || '').replace(/\s\s+/g, ' ').trim();
+              articleText = cleanArticleContent(rawText, effectiveUrl);
             } catch {}
           }
 
@@ -1082,7 +1171,8 @@ export default async function handler(req, res) {
               const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
               const raw = await fetch(effectiveUrl, { redirect: 'follow', headers: { 'User-Agent': ua, 'Accept': 'text/html,*/*', 'Accept-Language': 'az,en;q=0.9' } });
               const html = await raw.text();
-              articleText = htmlToText(html);
+              const rawText = htmlToText(html);
+              articleText = cleanArticleContent(rawText, effectiveUrl);
             } catch (fetchFallbackErr) {
               console.warn('Fetch-fallback failed:', fetchFallbackErr?.message || fetchFallbackErr);
             }
@@ -1216,10 +1306,10 @@ export default async function handler(req, res) {
                 await page.goto(snapshotUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
               } catch {}
               await new Promise(r => setTimeout(r, 400));
-              articleText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
+              const rawText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
                 .replace(/\s\s+/g, ' ')
-                .trim()
-                .substring(0, MAX_ARTICLE_CHARS);
+                .trim();
+              articleText = cleanArticleContent(rawText, effectiveUrl).substring(0, MAX_ARTICLE_CHARS);
             } else {
               // Try archive.md as final fallback
               console.log(`Archive.org not available. Trying archive.md...`);
@@ -1230,10 +1320,10 @@ export default async function handler(req, res) {
                   contentSource = 'Archive.md';
                   await page.goto(archiveMdUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
                   await new Promise(r => setTimeout(r, 1000)); // Wait longer for archive.md
-                  articleText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
+                  const rawText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
                     .replace(/\s\s+/g, ' ')
-                    .trim()
-                    .substring(0, MAX_ARTICLE_CHARS);
+                    .trim();
+                  articleText = cleanArticleContent(rawText, effectiveUrl).substring(0, MAX_ARTICLE_CHARS);
                 } else {
                   const blockError = new Error('This website is protected by advanced bot detection and no archives are available.');
                   blockError.isBlockError = true;
