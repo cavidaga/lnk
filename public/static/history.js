@@ -3,12 +3,13 @@
 (function () {
   const $ = (s, r = document) => r.querySelector(s);
   const esc = (s = '') =>
-    String(s).replace(/&/g, '&amp;').replace(/<g, '&lt;')
+    String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
              .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   document.addEventListener('DOMContentLoaded', initHistory);
 
   function initHistory() {
+    console.log('History page initialized');
     loadHistory();
     wireClearButton();
   }
@@ -16,7 +17,11 @@
   // ---------- HISTORY STORAGE ----------
   function getHistory() {
     try {
-      return JSON.parse(localStorage.getItem('lnk_analysis_history') || '[]');
+      const stored = localStorage.getItem('lnk_analysis_history');
+      console.log('Stored history data:', stored);
+      const history = JSON.parse(stored || '[]');
+      console.log('Parsed history:', history);
+      return history;
     } catch (e) {
       console.error('Failed to load history:', e);
       return [];
@@ -50,23 +55,29 @@
     const actionsEl = $('#history-actions');
     const countEl = $('#history-count');
 
-    loadingEl.style.display = 'block';
-    emptyEl.style.display = 'none';
-    listEl.style.display = 'none';
-    actionsEl.style.display = 'none';
+    // Show loading state
+    if (loadingEl) loadingEl.style.display = 'block';
+    if (emptyEl) emptyEl.style.display = 'none';
+    if (listEl) listEl.style.display = 'none';
+    if (actionsEl) actionsEl.style.display = 'none';
 
     setTimeout(() => {
-      loadingEl.style.display = 'none';
+      // Hide loading
+      if (loadingEl) loadingEl.style.display = 'none';
 
       if (history.length === 0) {
-        emptyEl.style.display = 'block';
+        // Show empty state
+        if (emptyEl) emptyEl.style.display = 'block';
+        console.log('History is empty, showing empty state');
         return;
       }
 
+      // Show history
       renderHistory(history);
-      listEl.style.display = 'block';
-      actionsEl.style.display = 'block';
-      countEl.textContent = `${history.length} analiz`;
+      if (listEl) listEl.style.display = 'block';
+      if (actionsEl) actionsEl.style.display = 'block';
+      if (countEl) countEl.textContent = `${history.length} analiz`;
+      console.log('History loaded:', history.length, 'items');
     }, 300);
   }
 
