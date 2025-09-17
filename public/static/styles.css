@@ -1205,20 +1205,56 @@ footer.site-footer{
     display: block !important;
   }
   
-  /* Position radial items in circle */
-  .radial-item[data-angle="0"]{ transform: translate(0, -160px) scale(0) !important; }
-  .radial-item[data-angle="72"]{ transform: translate(125px, -95px) scale(0) !important; }
-  .radial-item[data-angle="144"]{ transform: translate(125px, 95px) scale(0) !important; }
-  .radial-item[data-angle="216"]{ transform: translate(0, 160px) scale(0) !important; }
-  .radial-item[data-angle="288"]{ transform: translate(-125px, 95px) scale(0) !important; }
-  .radial-item[data-angle="324"]{ transform: translate(-125px, -95px) scale(0) !important; }
+  /* Position radial items in circle - Mobile only */
+  .radial-item[data-angle="0"]{ 
+    position: absolute !important;
+    transform: translate(0, -160px) scale(0) !important; 
+  }
+  .radial-item[data-angle="72"]{ 
+    position: absolute !important;
+    transform: translate(125px, -95px) scale(0) !important; 
+  }
+  .radial-item[data-angle="144"]{ 
+    position: absolute !important;
+    transform: translate(125px, 95px) scale(0) !important; 
+  }
+  .radial-item[data-angle="216"]{ 
+    position: absolute !important;
+    transform: translate(0, 160px) scale(0) !important; 
+  }
+  .radial-item[data-angle="288"]{ 
+    position: absolute !important;
+    transform: translate(-125px, 95px) scale(0) !important; 
+  }
+  .radial-item[data-angle="324"]{ 
+    position: absolute !important;
+    transform: translate(-125px, -95px) scale(0) !important; 
+  }
   
-  .radial-menu.open .radial-item[data-angle="0"]{ transform: translate(0, -160px) scale(1) !important; }
-  .radial-menu.open .radial-item[data-angle="72"]{ transform: translate(125px, -95px) scale(1) !important; }
-  .radial-menu.open .radial-item[data-angle="144"]{ transform: translate(125px, 95px) scale(1) !important; }
-  .radial-menu.open .radial-item[data-angle="216"]{ transform: translate(0, 160px) scale(1) !important; }
-  .radial-menu.open .radial-item[data-angle="288"]{ transform: translate(-125px, 95px) scale(1) !important; }
-  .radial-menu.open .radial-item[data-angle="324"]{ transform: translate(-125px, -95px) scale(1) !important; }
+  .radial-menu.open .radial-item[data-angle="0"]{ 
+    position: absolute !important;
+    transform: translate(0, -160px) scale(1) !important; 
+  }
+  .radial-menu.open .radial-item[data-angle="72"]{ 
+    position: absolute !important;
+    transform: translate(125px, -95px) scale(1) !important; 
+  }
+  .radial-menu.open .radial-item[data-angle="144"]{ 
+    position: absolute !important;
+    transform: translate(125px, 95px) scale(1) !important; 
+  }
+  .radial-menu.open .radial-item[data-angle="216"]{ 
+    position: absolute !important;
+    transform: translate(0, 160px) scale(1) !important; 
+  }
+  .radial-menu.open .radial-item[data-angle="288"]{ 
+    position: absolute !important;
+    transform: translate(-125px, 95px) scale(1) !important; 
+  }
+  .radial-menu.open .radial-item[data-angle="324"]{ 
+    position: absolute !important;
+    transform: translate(-125px, -95px) scale(1) !important; 
+  }
   
   /* Center logo */
   .radial-center-logo{
