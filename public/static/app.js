@@ -496,10 +496,33 @@ function renderAnalysis(root, data, hash) {
 
   function metric(label, value, suffix = '') {
     const v = (value === null || value === undefined || value === '') ? '—' : value;
+    
+    // Determine background color based on label
+    let bgColor, borderColor;
+    if (label.includes('Etibarlılıq')) {
+      bgColor = 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05))';
+      borderColor = 'rgba(16, 185, 129, 0.3)';
+    } else if (label.includes('Siyasi')) {
+      bgColor = 'linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(185, 28, 28, 0.05))';
+      borderColor = 'rgba(239, 68, 68, 0.3)';
+    } else {
+      bgColor = 'var(--card-bg,rgba(255,255,255,0.02))';
+      borderColor = 'var(--border,#222)';
+    }
+    
     return `
-      <div class="stat" style="background:var(--card-bg,rgba(255,255,255,0.02));border:1px solid var(--border,#222);border-radius:12px;padding:10px 12px;min-width:210px">
-        <div class="small muted">${esc(label)}</div>
-        <div style="font-size:28px;font-weight:700;line-height:1">${esc(String(v))}${esc(suffix)}</div>
+      <div class="stat" style="
+        background: ${bgColor};
+        border: 1px solid ${borderColor};
+        border-radius: 12px;
+        padding: 16px;
+        min-width: 0;
+        flex: 1;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      ">
+        <div class="small muted" style="margin-bottom: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">${esc(label)}</div>
+        <div style="font-size: 32px; font-weight: 700; line-height: 1; color: var(--text);">${esc(String(v))}${esc(suffix)}</div>
       </div>`;
   }
 

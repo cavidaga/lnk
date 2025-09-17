@@ -296,8 +296,18 @@ h1{ font-size:26px; margin:0; letter-spacing:.2px }
 .card{ background:var(--card); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow) }
 .card > .bd{ padding:20px }
 
-.row{ display:grid; gap:12px; grid-template-columns:1fr 160px }
-@media (max-width:520px){ .row{ grid-template-columns:1fr } }
+.row{ 
+  display:grid; 
+  gap:12px; 
+  grid-template-columns:1fr 1fr;
+  margin-bottom: 16px;
+}
+@media (max-width:520px){ 
+  .row{ 
+    grid-template-columns:1fr;
+    gap: 8px;
+  } 
+}
 
 /* Only hide the label in the URL input row */
 .row > .label { position: absolute; left: -9999px; }
@@ -1120,7 +1130,7 @@ footer.site-footer{
 .hdr .v a{ color:var(--link,#4f7cff); text-decoration:underline }
 .hdr .v.anywrap{ overflow-wrap:anywhere; word-break:break-word }
 
-/* Mobile: Make it more compact */
+/* Mobile: Make it more compact and fix alignment */
 @media (max-width: 768px) {
   .hdr .kv{
     gap: 6px;
@@ -1128,13 +1138,23 @@ footer.site-footer{
   .hdr .item{
     padding: 4px 0;
     gap: 6px;
+    justify-content: space-between;
   }
   .hdr .k{
     font-size: 10px;
     min-width: 50px;
+    flex-shrink: 0;
   }
   .hdr .v{
     font-size: 13px;
+    text-align: right;
+    flex: 1;
+  }
+  .hdr .item.link {
+    justify-content: flex-start;
+  }
+  .hdr .item.link .v {
+    text-align: left;
   }
 }
 
@@ -1556,6 +1576,16 @@ kbd {
     flex-direction: column;
     align-items: stretch;
   }
+}
+
+/* =================== Metric Cards =================== */
+.stat {
+  transition: all 0.2s ease;
+}
+
+.stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 
 /* =================== Original Link Button =================== */
