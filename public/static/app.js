@@ -345,7 +345,7 @@ function renderAnalysis(root, data, hash) {
 
         <section class="card" id="feedback-card">
           <div class="bd">
-            <h3 style="margin:0 0 8px">Bu analiz sizə faydalı oldu?</h3>
+            <h3 style="margin:0 0 8px">Bu analizlə razısınız?</h3>
             <div class="feedback-buttons" style="display:flex;gap:12px;margin-bottom:12px">
               <button class="feedback-btn thumbs-up" data-hash="${hash || ''}" data-feedback="up" style="
                 background:var(--card-bg,rgba(255,255,255,0.02));
@@ -375,7 +375,7 @@ function renderAnalysis(root, data, hash) {
                 align-items:center;
                 gap:6px;
               ">
-                👎 Razı
+                👎 Razı deyiləm
               </button>
             </div>
             <div class="feedback-status" style="font-size:14px;color:var(--muted);min-height:20px;"></div>
