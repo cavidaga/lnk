@@ -148,6 +148,14 @@ header{
   display:inline-flex;
 }
 
+/* Ensure buttons are visible on desktop */
+@media (min-width: 769px) {
+  .site-nav .theme-toggle,
+  .site-nav .btn-support{
+    display:inline-flex !important;
+  }
+}
+
 .site-nav a{
   font-weight:500;
   text-decoration:none;
@@ -579,10 +587,16 @@ footer.site-footer{
     border-top:1px solid var(--border);
   }
   
-  /* Hide individual buttons from main nav on mobile */
+  /* Hide individual buttons from main nav on mobile (but keep them in nav-actions) */
   .site-nav > .theme-toggle,
   .site-nav > .btn-support{
     display:none;
+  }
+  
+  /* Show buttons in nav-actions container on mobile */
+  .nav-actions .theme-toggle,
+  .nav-actions .btn-support{
+    display:inline-flex;
   }
   
   /* Theme toggle in mobile nav-actions */
