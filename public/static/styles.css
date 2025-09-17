@@ -1231,13 +1231,30 @@ footer.site-footer{
 }
 
 @media (min-width: 720px){
+  .hdr {
+    width: 100%;
+    max-width: none;
+    padding-right: 0;
+    border-right: none;
+    margin-right: 0;
+    box-sizing: border-box;
+  }
   .hdr .kv{ 
     grid-template-columns: 1fr;
     gap: 16px;
+    width: 100%;
+    padding-right: 0;
+    border-right: none;
+    margin-right: 0;
+    box-sizing: border-box;
   }
   .hdr .item.buttons{ 
     grid-column: 1 / -1;
-    justify-content: center;
+    justify-content: stretch;
+    width: 100%;
+    padding-right: 0;
+    margin-right: 0;
+    box-sizing: border-box;
   }
   .hdr .k {
     display: flex;
