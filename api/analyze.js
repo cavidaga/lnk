@@ -1104,7 +1104,17 @@ export default async function handler(req, res) {
             return normalized;
           }
 
-          if (articleTextFast && articleTextFast.length > 0) {
+          // Check if the LightFetch result is actually blocked content (403, etc.)
+          const isBlockedContent = articleTextFast && (
+            articleTextFast.toLowerCase().includes('403') ||
+            articleTextFast.toLowerCase().includes('forbidden') ||
+            articleTextFast.toLowerCase().includes('qadağandır') ||
+            articleTextFast.toLowerCase().includes('access denied') ||
+            articleTextFast.toLowerCase().includes('unauthorized') ||
+            BLOCK_KEYWORDS.some(kw => articleTextFast.toLowerCase().includes(kw))
+          );
+
+          if (articleTextFast && articleTextFast.length > 0 && !isBlockedContent) {
             // Thin content: skip Chromium and do safe prompt quickly
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
             // Get user model selection for thin content
@@ -1146,6 +1156,10 @@ export default async function handler(req, res) {
             console.log(`SAVED TO CACHE (light-safe) for URL: ${effectiveUrl}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             return normalized;
+          }
+
+          if (isBlockedContent) {
+            console.log(`LightFetch detected blocked content, proceeding to full browser approach for: ${effectiveUrl}`);
           }
 
           // ---------- Chromium path ----------
