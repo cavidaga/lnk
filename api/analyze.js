@@ -532,6 +532,64 @@ Constraints:
 `.trim();
 }
 
+// --- Blocked content prompt (very restrictive) ---
+function buildBlockedPrompt({ url, title, site }) {
+  return `
+You are "LNK Evaluator" for LNK.az. The linked page is BLOCKED and cannot be accessed.
+You can ONLY work with the title and URL provided below.
+
+CRITICAL RULES:
+- You CANNOT access the actual article content
+- You CANNOT make assumptions about the article content
+- You CANNOT provide detailed analysis based on content you cannot see
+- You MUST indicate that analysis is limited due to blocked access
+- Reliability score MUST be low (0-30) due to lack of content access
+- Political bias score MUST be 0 (cannot assess without content)
+
+OUTPUT LANGUAGE: Azerbaijani. All free-text fields must be in Azerbaijani.
+
+INPUT
+- Link: ${url}
+- Headline: ${title || '(no headline)'}
+- Publication: ${site || '(unknown)'}
+
+RESPONSE
+Return a single valid JSON object with these keys:
+
+meta: {
+  article_type: "xəbər",
+  title: "${title || 'Başlıq yoxdur'}",
+  original_url: "${url}",
+  publication: "${site || 'naməlum'}",
+  published_at: null
+},
+scores: {
+  reliability: { 
+    value: 15, 
+    rationale: "Məqalənin məzmununa çatmaq mümkün olmadığı üçün etibarlılıq aşağı qiymətləndirilir. Yalnız başlıq əsasında təhlil aparıla bilməz." 
+  },
+  political_establishment_bias: { 
+    value: 0, 
+    rationale: "Məqalənin məzmununa çatmaq mümkün olmadığı üçün siyasi meyl qiymətləndirilə bilməz." 
+  }
+},
+diagnostics: {
+  socio_cultural_descriptions: [],
+  language_flags: [
+    {
+      term: "${title?.split(' ')[0] || 'başlıq'}",
+      category: "qeyri-müəyyən",
+      evidence: "Məqalənin məzmunu əlçatan deyil"
+    }
+  ]
+},
+cited_sources: [],
+human_summary: "Məqalənin məzmununa çatmaq mümkün olmadığı üçün təhlil edilə bilməz. Yalnız başlıq mövcuddur."
+
+IMPORTANT: Keep all analysis minimal and clearly indicate that content access was blocked.
+`.trim();
+}
+
 // --- NEW: light preflight policy before launching Chromium ---
 // --- Relaxed preflight: HEAD is advisory, only 404/410 are hard failures
 async function preflightPolicy(targetUrl) {
@@ -743,7 +801,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'URL daxil edilməyib.' });
   }
 
-  const cacheKey = crypto.createHash('md5').update(url).digest('hex');
+  // Add version to cache key to invalidate old blocked content results
+  const cacheVersion = 'v2-blocked-fix';
+  const cacheKey = crypto.createHash('md5').update(url + cacheVersion).digest('hex');
 
   try {
     // KV cache
@@ -844,7 +904,7 @@ export default async function handler(req, res) {
             }
             console.log(`Blocked content model selection: ${blockedModelSelection.model} - ${blockedModelSelection.reason}`);
             
-            const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
+            const safePrompt = buildBlockedPrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
             const r2 = await callGeminiWithRetryAndFallback({
               primaryModel: blockedModelSelection.model,
               fallbackModels: FALLBACK_MODELS,
@@ -860,7 +920,7 @@ export default async function handler(req, res) {
             normalized.modelUsed = r2.modelUsed;
             normalized.contentSource = contentSource;
             await kv.set(cacheKey, normalized, { ex: 2592000 });
-            console.log(`SAVED TO CACHE (blocked-safe) for URL: ${effectiveUrl}`);
+            console.log(`SAVED TO CACHE (blocked-safe) for URL: ${effectiveUrl} with hash: ${cacheKey}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             return normalized;
           }
