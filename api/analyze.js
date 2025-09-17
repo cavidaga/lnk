@@ -908,7 +908,8 @@ export default async function handler(req, res) {
                     ignoreHTTPSErrors: true,
                   });
                   const page = await browser.newPage();
-                  await page.setUserAgent(USER_AGENT);
+                  const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+                  await page.setUserAgent(userAgent);
                   await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
                   
                   console.log(`Navigating to archive.md URL: ${archiveMdUrl}`);
