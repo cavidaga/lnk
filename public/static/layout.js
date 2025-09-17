@@ -200,6 +200,9 @@
       // Update favicon
       updateFavicon(isDark);
       
+      // Update logo
+      updateLogo(isDark);
+      
       // Update theme toggle icons
       if (themeIconSun && themeIconMoon) {
         themeIconSun.style.display = isDark ? 'block' : 'none';
@@ -217,6 +220,13 @@
       const favicon = document.querySelector('link[rel="icon"]');
       if (favicon) {
         favicon.href = isDark ? '/static/favicon-dark.svg' : '/static/favicon-light.svg';
+      }
+    }
+    
+    function updateLogo(isDark) {
+      const logoImg = document.querySelector('.logo-img');
+      if (logoImg) {
+        logoImg.src = isDark ? '/static/logo-dark.svg' : '/static/logo-light.svg';
       }
     }
     
