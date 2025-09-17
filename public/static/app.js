@@ -268,24 +268,9 @@ function renderAnalysis(root, data, hash) {
 
         <section class="card">
           <div class="bd">
-            <!-- Speedometer visualization -->
-            <div class="speedometer-container">
-              ${(() => {
-                try {
-                  return speedometer('Etibarlılıq', reliabilityNum, 'reliability');
-                } catch (e) {
-                  console.error('Speedometer error:', e);
-                  return metric('Etibarlılıq', fmt100(reliabilityNum), '');
-                }
-              })()}
-              ${(() => {
-                try {
-                  return speedometer('Siyasi meyl', polBiasNum, 'political');
-                } catch (e) {
-                  console.error('Speedometer error:', e);
-                  return metric('Siyasi hakimiyyət meyli', fmtBias(polBiasNum), '');
-                }
-              })()}
+            <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
+              ${metric('Etibarlılıq', fmt100(reliabilityNum), '')}
+              ${metric('Siyasi hakimiyyət meyli', fmtBias(polBiasNum), '')}
             </div>
 
             <!-- Axis chart -->
@@ -518,163 +503,7 @@ function renderAnalysis(root, data, hash) {
       </div>`;
   }
 
-  function speedometer(label, value, type = 'reliability') {
-    console.log('Creating speedometer:', { label, value, type });
-    
-    let angle, displayValue, colorClass;
-    
-    if (type === 'reliability') {
-      // Reliability: 0-100, needle goes from 180deg (0) to 0deg (100)
-      const reliability = clamp(Number(value), 0, 100);
-      angle = 180 - (reliability / 100) * 180; // 180deg for 0, 0deg for 100
-      displayValue = `${reliability}/100`;
-      
-      if (reliability >= 80) colorClass = 'reliability-excellent';
-      else if (reliability >= 60) colorClass = 'reliability-good';
-      else if (reliability >= 40) colorClass = 'reliability-fair';
-      else if (reliability >= 20) colorClass = 'reliability-poor';
-      else colorClass = 'reliability-very-poor';
-    } else {
-      // Political bias: -5 to +5, needle goes from 180deg (-5) to 0deg (+5)
-      const bias = clamp(Number(value), -5, 5);
-      angle = 180 - ((bias + 5) / 10) * 180; // 180deg for -5, 0deg for +5
-      displayValue = fmtBias(bias);
-      
-      if (bias >= 3) colorClass = 'bias-strong-pro';
-      else if (bias >= 1) colorClass = 'bias-pro';
-      else if (bias === 0) colorClass = 'bias-neutral';
-      else if (bias >= -2) colorClass = 'bias-critical';
-      else colorClass = 'bias-strong-opposition';
-    }
-    
-    console.log('Speedometer data:', { angle, displayValue, colorClass });
-    
-    const html = `
-      <div class="speedometer ${type === 'political' ? 'political' : ''}" style="
-        position: relative;
-        width: 180px;
-        height: 120px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: 15px;
-      ">
-        <div class="speedometer-gauge" style="
-          position: relative;
-          width: 180px;
-          height: 90px;
-          border-radius: 90px 90px 0 0;
-          background: ${type === 'political' 
-            ? 'conic-gradient(from 180deg, #dc2626 0deg 36deg, #f59e0b 36deg 72deg, #6b7280 72deg 108deg, #3b82f6 108deg 144deg, #1d4ed8 144deg 180deg)'
-            : 'conic-gradient(from 180deg, #dc2626 0deg 36deg, #f97316 36deg 72deg, #f59e0b 72deg 108deg, #10b981 108deg 144deg, #059669 144deg 180deg)'
-          };
-          overflow: hidden;
-          border: 2px solid #333;
-        ">
-          <div class="speedometer-needle" style="
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            transform-origin: bottom center;
-            transform: rotate(${angle}deg);
-            z-index: 2;
-          ">
-            <div style="
-              position: absolute;
-              bottom: 0;
-              left: -3px;
-              width: 0;
-              height: 0;
-              border-left: 6px solid transparent;
-              border-right: 6px solid transparent;
-              border-bottom: 60px solid #ff0000;
-              filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-            "></div>
-          </div>
-          <div class="speedometer-center" style="
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 12px;
-            height: 12px;
-            background: #333;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 3;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-          "></div>
-        </div>
-        <div class="speedometer-value ${colorClass}" style="
-          margin-top: 12px;
-          font-size: 24px;
-          font-weight: 700;
-          color: ${colorClass.includes('excellent') ? '#059669' : 
-                  colorClass.includes('good') ? '#10b981' : 
-                  colorClass.includes('fair') ? '#f59e0b' : 
-                  colorClass.includes('poor') ? '#f97316' : 
-                  colorClass.includes('very-poor') ? '#dc2626' :
-                  colorClass.includes('strong-pro') ? '#1d4ed8' :
-                  colorClass.includes('pro') ? '#3b82f6' :
-                  colorClass.includes('neutral') ? '#6b7280' :
-                  colorClass.includes('critical') ? '#f59e0b' :
-                  colorClass.includes('strong-opposition') ? '#dc2626' : '#333'};
-          text-align: center;
-        ">${displayValue}</div>
-        <div class="speedometer-label" style="
-          font-size: 14px;
-          color: #666;
-          text-align: center;
-          margin-top: 6px;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          font-weight: 600;
-        ">${esc(label)}</div>
-      </div>`;
-    
-    console.log('Generated HTML:', html);
-    return html;
-  }
 
-  function generateTicks(min, max, step, startAngle, endAngle) {
-    const ticks = [];
-    const totalSteps = (max - min) / step;
-    const angleStep = (startAngle - endAngle) / totalSteps;
-    
-    for (let i = 0; i <= totalSteps; i++) {
-      const value = min + (i * step);
-      const angle = startAngle - (i * angleStep);
-      const isMajor = i % 2 === 0; // Every other tick is major
-      
-      ticks.push(`
-        <div class="speedometer-tick ${isMajor ? 'major' : ''}" 
-             style="transform: rotate(${angle}deg);"></div>
-      `);
-    }
-    
-    return ticks.join('');
-  }
-
-  function generateScaleNumbers(values, startAngle, endAngle) {
-    const numbers = [];
-    const totalSteps = values.length - 1;
-    const angleStep = (startAngle - endAngle) / totalSteps;
-    
-    values.forEach((value, i) => {
-      const angle = startAngle - (i * angleStep);
-      const radius = 35; // Distance from center (closer to the gauge)
-      const x = 50 + Math.cos((angle - 90) * Math.PI / 180) * radius;
-      const y = 50 + Math.sin((angle - 90) * Math.PI / 180) * radius;
-      
-      numbers.push(`
-        <div class="speedometer-scale-number" 
-             style="left: ${x}%; top: ${y}%;">${value}</div>
-      `);
-    });
-    
-    return numbers.join('');
-  }
 
   // ---------- SHARE ----------
   function wireShare(hash) {
@@ -937,12 +766,18 @@ function headerBlock({ title, publication, published_at, url, title_inferred }){
           <div class="k">Tarix</div>
           <div class="v">${esc(formatAzDate(published_at) || '—')}</div>
         </div>
+        ${url ? `
         <div class="item link">
-          <div class="k">Orijinal link</div>
-          <div class="v anywrap">
-            ${url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a>` : '—'}
-          </div>
+          <a href="${esc(url)}" target="_blank" rel="noopener" class="original-link-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15,3 21,3 21,9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            Orijinal məqaləni oxu
+          </a>
         </div>
+        ` : ''}
       </div>
       ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
     </header>
