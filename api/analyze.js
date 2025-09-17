@@ -35,7 +35,11 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // --- Config ---
 const MAX_ARTICLE_CHARS = 30000;
-const BLOCK_KEYWORDS = ['cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'];
+const BLOCK_KEYWORDS = [
+  'cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human',
+  'enable javascript and cookies to continue', 'challenge-error-text', 'cf-chl-opt',
+  'attention required', 'just a moment', 'please wait', 'verifying you are human'
+];
 
 // ⬇️ Models: smart selection based on content characteristics
 const FLASH_LITE_MODEL = 'gemini-2.5-flash-lite';
@@ -682,8 +686,11 @@ export default async function handler(req, res) {
               contentSource = 'LightFetch';
               const m = light.text.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
               if (m && m[1]) headlineFast = htmlToText(m[1]);
+              console.log(`LightFetch success for ${effectiveUrl}: ${articleTextFast.length} chars`);
             }
-          } catch {}
+          } catch (e) {
+            console.log(`LightFetch failed for ${effectiveUrl}: ${e?.message || e}`);
+          }
 
           // If fast path is acceptable, proceed directly to LLM without Chromium.
           // Even if thin, try safe prompt immediately to avoid Chromium unless necessary.
@@ -836,8 +843,21 @@ export default async function handler(req, res) {
           });
 
           const page = await browser.newPage();
-          await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
-          await page.setExtraHTTPHeaders({ 'Accept-Language': 'az,en;q=0.9' });
+          
+          // Enhanced user agent and headers for better compatibility
+          const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+          await page.setUserAgent(userAgent);
+          await page.setExtraHTTPHeaders({ 
+            'Accept-Language': 'az,en;q=0.9',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
+          });
+          
+          // Set viewport to look more like a real browser
+          await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
 
           // Trim heavy resources to speed up/avoid infinite network idles
           const originUrl = new URL(effectiveUrl);
@@ -874,6 +894,28 @@ export default async function handler(req, res) {
 
           // ---- OXU.AZ OVERRIDE (CF-friendly nav) ----
           let resp = null;
+          
+          // For oxu.az, add extra stealth measures
+          if (isOxu) {
+            // Inject some random mouse movements to look more human
+            await page.evaluateOnNewDocument(() => {
+              // Override navigator.webdriver
+              Object.defineProperty(navigator, 'webdriver', {
+                get: () => undefined,
+              });
+              
+              // Override plugins length
+              Object.defineProperty(navigator, 'plugins', {
+                get: () => [1, 2, 3, 4, 5],
+              });
+              
+              // Override languages
+              Object.defineProperty(navigator, 'languages', {
+                get: () => ['az-AZ', 'az', 'en-US', 'en'],
+              });
+            });
+          }
+          
           try {
             // First attempt: DOM ready (short timeout)
             resp = await page.goto(effectiveUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
@@ -889,18 +931,22 @@ export default async function handler(req, res) {
             } catch (e2) {
               console.warn('Second nav (networkidle2) failed:', e2?.message || e2);
             }
-            // Wait a touch for any JS challenge to clear
-            await sleep(800);
+            // Wait longer for oxu.az to clear any challenges
+            await sleep(isOxu ? 2000 : 800);
           }
 
-          // If title suggests Cloudflare, wait a bit more and re-load once
+          // If title or content suggests Cloudflare, wait a bit more and re-load once
           try {
             const t = (await page.title()) || '';
-            if (/cloudflare|attention required|checking your browser/i.test(t)) {
-              await sleep(800);
+            const bodyText = await page.evaluate(() => document.body ? document.body.innerText : '');
+            const isCloudflare = /cloudflare|attention required|checking your browser|enable javascript and cookies to continue|challenge-error-text/i.test(t + ' ' + bodyText);
+            
+            if (isCloudflare) {
+              console.log('Cloudflare challenge detected, waiting and retrying...');
+              await sleep(2000); // Wait longer for CF challenge to clear
               try {
-                await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 15000 });
-                await sleep(600);
+                await page.goto(effectiveUrl, { waitUntil: 'networkidle2', timeout: 20000 });
+                await sleep(1000);
               } catch {}
             }
           } catch {}
@@ -911,6 +957,7 @@ export default async function handler(req, res) {
             const sels = DOMAIN_SELECTORS[originUrl.hostname.replace(/^www\./,'')] ||
                         (isOxu ? DOMAIN_SELECTORS['oxu.az'] : null);
             if (sels && sels.length) {
+              console.log(`Trying selectors for ${originUrl.hostname}: ${sels.join(', ')}`);
               articleText = await page.evaluate((selectors) => {
                 for (const sel of selectors) {
                   const el = document.querySelector(sel);
@@ -918,8 +965,11 @@ export default async function handler(req, res) {
                 }
                 return '';
               }, sels);
+              console.log(`Selector extraction result: ${articleText.length} chars`);
             }
-          } catch {}
+          } catch (e) {
+            console.warn('Selector extraction failed:', e?.message || e);
+          }
 
           // Fallback to whole body if selectors failed/empty
           if (!articleText || articleText.length < 200) {
@@ -938,6 +988,52 @@ export default async function handler(req, res) {
               articleText = htmlToText(html);
             } catch (fetchFallbackErr) {
               console.warn('Fetch-fallback failed:', fetchFallbackErr?.message || fetchFallbackErr);
+            }
+          }
+
+          // Special handling for oxu.az if content is still blocked
+          if ((!articleText || articleText.length < 400) && isOxu) {
+            console.log('oxu.az content still blocked, trying alternative approach...');
+            
+            // Try to get content from different selectors or raw HTML
+            try {
+              const alternativeContent = await page.evaluate(() => {
+                // Try multiple selectors for oxu.az
+                const selectors = [
+                  '.news-inner .news-text',
+                  '.news-detail .news-text', 
+                  '.article-content',
+                  '.content-text',
+                  'main .content',
+                  '.news-body',
+                  'article .text'
+                ];
+                
+                for (const sel of selectors) {
+                  const el = document.querySelector(sel);
+                  if (el && el.innerText && el.innerText.length > 200) {
+                    return el.innerText;
+                  }
+                }
+                
+                // If no specific selectors work, try to get any text content
+                const body = document.body;
+                if (body) {
+                  // Remove script and style elements
+                  const scripts = body.querySelectorAll('script, style, nav, header, footer, .ad, .advertisement');
+                  scripts.forEach(el => el.remove());
+                  return body.innerText;
+                }
+                
+                return '';
+              });
+              
+              if (alternativeContent && alternativeContent.length > 200) {
+                articleText = alternativeContent.replace(/\s\s+/g, ' ').trim();
+                console.log(`Got alternative content for oxu.az: ${articleText.length} chars`);
+              }
+            } catch (e) {
+              console.warn('Alternative content extraction failed:', e?.message || e);
             }
           }
 
@@ -997,7 +1093,11 @@ export default async function handler(req, res) {
           }
 
           // Anti-bot fallback → Archive.org (only if still looks blocked)
-          if (BLOCK_KEYWORDS.some((kw) => lower.includes(kw))) {
+          // Check both article text and full page content for bot detection
+          const pageContent = await page.evaluate(() => document.documentElement ? document.documentElement.innerText : '');
+          const isBlocked = BLOCK_KEYWORDS.some((kw) => lower.includes(kw) || pageContent.toLowerCase().includes(kw));
+          
+          if (isBlocked) {
             console.log(`Initial fetch for ${effectiveUrl} was blocked. Checking Archive.org...`);
             const archiveApiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(effectiveUrl)}`;
             const archiveResponse = await fetch(archiveApiUrl);
