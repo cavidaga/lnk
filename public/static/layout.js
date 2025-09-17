@@ -22,6 +22,7 @@
 
         <nav id="primary-nav" class="site-nav" aria-label="Əsas menyu">
           <a href="/">Əsas səhifə</a>
+          <a href="/history.html">Tarixçə</a>
           <a href="/about.html">Haqqımızda</a>
           <a href="/methodology.html">Metodologiya</a>
           <a href="/privacy.html">Məxfilik</a>

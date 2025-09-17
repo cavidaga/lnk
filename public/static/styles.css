@@ -728,6 +728,118 @@ footer.site-footer{
   color: var(--accent) !important;
 }
 
+/* =================== History Styles =================== */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.history-item {
+  display: block;
+  background: var(--card-bg, rgba(255,255,255,0.02));
+  border: 1px solid var(--border, #222);
+  border-radius: 12px;
+  padding: 16px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.history-item:hover {
+  background: var(--panel);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.history-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.history-item-title {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+}
+
+.history-item-date {
+  font-size: 14px;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.history-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+.history-item-url {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-item-scores {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.history-item-scores .score-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.history-item-scores .score-value {
+  font-weight: 600;
+}
+
+.history-item-scores .score-value.reliability {
+  color: var(--success, #10b981);
+}
+
+.history-item-scores .score-value.bias {
+  color: var(--warning, #f59e0b);
+}
+
+@media (max-width: 768px) {
+  .history-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .history-item-scores {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .history-item-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
 @media (max-width: 480px) {
   .recent-item-meta {
     flex-direction: column;

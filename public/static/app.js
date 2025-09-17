@@ -185,6 +185,12 @@
       renderAnalysis(container, data, hash);
       wireCopyButton(location.origin + `/analysis/${encodeURIComponent(hash)}`);
       wireFeedbackButtons(hash);
+      
+      // Add to history
+      if (window.LNKHistory && window.LNKHistory.addAnalysis) {
+        window.LNKHistory.addAnalysis(data);
+      }
+      
       document.title = `${data?.meta?.title ? data.meta.title + ' — ' : ''}LNK.az`;
     } catch (err) {
       renderError(container, err.message || 'Yüklənmə xətası');
