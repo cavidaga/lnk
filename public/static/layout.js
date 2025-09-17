@@ -27,6 +27,19 @@
           <a href="/methodology.html">Metodologiya</a>
           <a href="/privacy.html">Məxfilik</a>
 
+          <!-- Theme toggle button -->
+          <button id="theme-toggle" class="theme-toggle" type="button" 
+                  data-tooltip="Tema dəyişdir" aria-label="Tema dəyişdir">
+            <svg class="icon theme-icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <svg class="icon theme-icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: none;">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="sr-only">Tema dəyişdir</span>
+          </button>
+
           <!-- Support button -->
           <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener"
             class="btn-support" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol">
@@ -147,8 +160,95 @@
     backdrop?.addEventListener('click', closeNav);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
     drawer?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+    drawer?.querySelector('.theme-toggle')?.addEventListener('click', closeNav);
     syncToggle();
     mq.addEventListener ? mq.addEventListener('change', syncToggle) : mq.addListener(syncToggle);
+
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIconSun = document.querySelector('.theme-icon-sun');
+    const themeIconMoon = document.querySelector('.theme-icon-moon');
+    
+    // Theme management
+    function getStoredTheme() {
+      return localStorage.getItem('theme');
+    }
+    
+    function setStoredTheme(theme) {
+      localStorage.setItem('theme', theme);
+    }
+    
+    function getSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    
+    function getCurrentTheme() {
+      const stored = getStoredTheme();
+      return stored || getSystemTheme();
+    }
+    
+    function applyTheme(theme) {
+      const root = document.documentElement;
+      const isDark = theme === 'dark';
+      
+      // Remove existing theme classes
+      root.classList.remove('theme-light', 'theme-dark');
+      
+      // Add new theme class
+      root.classList.add(isDark ? 'theme-dark' : 'theme-light');
+      
+      // Update favicon
+      updateFavicon(isDark);
+      
+      // Update theme toggle icons
+      if (themeIconSun && themeIconMoon) {
+        themeIconSun.style.display = isDark ? 'block' : 'none';
+        themeIconMoon.style.display = isDark ? 'none' : 'block';
+      }
+      
+      // Update theme toggle tooltip
+      if (themeToggle) {
+        themeToggle.setAttribute('data-tooltip', isDark ? 'Açıq tema' : 'Qaranlıq tema');
+        themeToggle.setAttribute('aria-label', isDark ? 'Açıq tema' : 'Qaranlıq tema');
+      }
+    }
+    
+    function updateFavicon(isDark) {
+      const favicon = document.querySelector('link[rel="icon"]');
+      if (favicon) {
+        favicon.href = isDark ? '/static/favicon-dark.svg' : '/static/favicon-light.svg';
+      }
+    }
+    
+    function toggleTheme() {
+      const currentTheme = getCurrentTheme();
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      setStoredTheme(newTheme);
+      applyTheme(newTheme);
+    }
+    
+    // Initialize theme
+    function initTheme() {
+      const theme = getCurrentTheme();
+      applyTheme(theme);
+    }
+    
+    // Set up theme toggle
+    if (themeToggle) {
+      themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    // Listen for system theme changes (only if no manual preference is stored)
+    const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    systemThemeQuery.addEventListener('change', () => {
+      if (!getStoredTheme()) {
+        const systemTheme = getSystemTheme();
+        applyTheme(systemTheme);
+      }
+    });
+    
+    // Initialize theme on load
+    initTheme();
   }
 
   function injectFooter() {

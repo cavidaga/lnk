@@ -50,6 +50,11 @@
       description: 'Keçidi kopyala',
       page: 'analysis'
     },
+    'Ctrl+Alt+T': {
+      action: 'toggle-theme',
+      description: 'Tema dəyişdir',
+      page: 'all'
+    },
     'Ctrl+Alt+?': {
       action: 'help',
       description: 'Qısayollar köməyini göstər',
@@ -158,6 +163,13 @@
           if (copyBtn) {
             copyBtn.click();
           }
+        }
+        break;
+
+      case 'toggle-theme':
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+          themeToggle.click();
         }
         break;
 

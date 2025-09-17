@@ -47,6 +47,49 @@
   }
 }
 
+/* Manual theme override classes */
+.theme-light{
+  /* Light theme (manual override) */
+  --bg:#ffffff;
+  --panel:#f8fafd;
+  --card:#ffffff;
+  --text: var(--navy);
+  --muted:#5b6678;
+  --border:#e7ebf3;
+  --accent: var(--red);
+  --accent-2: var(--red-dark);
+  --danger:#b42318;
+  --shadow: 0 10px 24px rgba(10,31,68,.08);
+  --ring: 0 0 0 3px rgba(255, 0, 0, .25);
+  --grid: rgba(0,31,63,.10); /* navy-tinted grid on light */
+
+  /* To-Top (light) */
+  --to-top-bg: #fff;
+  --to-top-fg: #111;
+  --to-top-border: #ccc;
+}
+
+.theme-dark{
+  /* Dark theme (manual override) */
+  --bg:#0c0d12;
+  --panel:#11131a;
+  --card:#10131a;
+  --text:#e9edf3;
+  --muted:#8e97ab;
+  --border:#1c2230;
+  --accent: var(--red);
+  --accent-2: var(--red-dark);
+  --danger:#ff5a52;
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+  --ring: 0 0 0 3px rgba(255, 0, 0, .35);
+  --grid: rgba(255,255,255,.08); /* bias chart grid on dark */
+
+  /* To-Top defaults (dark) */
+  --to-top-bg: #1a1b20;
+  --to-top-fg: #f5f5f5;
+  --to-top-border: #333;
+}
+
 *{ box-sizing:border-box }
 html:focus-within{ scroll-behavior:smooth }
 
@@ -106,6 +149,25 @@ header{
   border-bottom:2px solid var(--accent);
   padding-bottom:2px;
 }
+
+/* Theme toggle button */
+.theme-toggle{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:40px; height:40px; border:1px solid var(--border); background:var(--panel);
+  border-radius:10px; cursor:pointer; transition:all .2s ease;
+  position:relative; overflow:hidden;
+}
+.theme-toggle:hover,
+.theme-toggle:focus-visible{
+  background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
+  border-color:var(--accent);
+  transform:translateY(-1px);
+}
+.theme-toggle:focus-visible{ outline:none; box-shadow:var(--ring); }
+.theme-toggle .icon{ width:20px; height:20px; transition:all .3s ease; }
+.theme-toggle:hover .icon{ transform:rotate(180deg); }
+.theme-toggle .theme-icon-sun{ color:#fbbf24; }
+.theme-toggle .theme-icon-moon{ color:#6366f1; }
 
 /* Header Support button (Buy Me a Coffee) */
 .site-nav a.btn-support{
@@ -487,11 +549,13 @@ footer.site-footer{
     transition: transform .25s ease;
     z-index: 70;
   }
-  .site-nav a{
+  .site-nav a,
+  .site-nav .theme-toggle{
     padding:10px 8px; border-radius:8px;
     font-size:16px;
   }
-  .site-nav a:hover{ background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%) }
+  .site-nav a:hover,
+  .site-nav .theme-toggle:hover{ background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%) }
   body.nav-open .site-nav{ transform: translateX(0) }
 
   .nav-backdrop{ z-index:60 }
