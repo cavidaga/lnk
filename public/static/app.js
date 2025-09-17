@@ -142,7 +142,7 @@
       const title = esc(analysis.title || 'Başlıq yoxdur');
       const publication = esc(analysis.publication || '');
       const url = esc(analysis.url || '');
-      const publishedAt = analysis.published_at ? formatDate(analysis.published_at) : '';
+      const publishedAt = analysis.published_at ? formatAzDate(analysis.published_at) : '';
       const reliability = num(analysis.reliability, 0);
       const bias = num(analysis.political_bias, 0);
       const analysisUrl = `/analysis/${encodeURIComponent(analysis.hash)}`;
