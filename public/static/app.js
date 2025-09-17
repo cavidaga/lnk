@@ -393,9 +393,9 @@ function renderAnalysis(root, data, hash) {
             <p style="margin:0 0 12px;color:var(--muted);font-size:14px">
               Əgər analizimizdə səhv tapmısınızsa və ya təklifiniz varsa, lütfən bizə bildirin.
             </p>
-            <a href="/complaint.html?analysis_url=${encodeURIComponent(window.location.href)}" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:6px">
+            <button onclick="window.open('/complaint.html?analysis_url=${encodeURIComponent(window.location.href)}', '_blank')" style="display:inline-flex;align-items:center;gap:6px">
               👎 Şikayət et
-            </a>
+            </button>
           </div>
         </section>
 
