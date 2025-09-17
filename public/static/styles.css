@@ -1143,11 +1143,12 @@ footer.site-footer{
 /* Mobile: Simplify layout and remove card layers */
 @media (max-width: 768px) {
   .hdr {
-    padding: 0;
+    padding: 16px;
     margin-bottom: 20px;
-    background: none;
-    border: none;
-    box-shadow: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
   }
   .hdr .kv{
     gap: 0;

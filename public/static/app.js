@@ -253,18 +253,18 @@ function renderAnalysis(root, data, hash) {
   const flags = Array.isArray(diagnostics?.language_flags) ? diagnostics.language_flags : [];
 
   root.innerHTML = `
+    ${headerBlock({
+      title: meta.title || 'Məqalə',
+      publication: meta.publication || (() => {
+        try { return new URL(meta.original_url || '').hostname.replace(/^www\./,''); }
+        catch { return ''; }
+      })(),
+      published_at: meta.published_at || '',
+      url: meta.original_url || '',
+      title_inferred: meta?.title_inferred || false
+    })}
     <article class="card">
       <div class="bd">
-        ${headerBlock({
-          title: meta.title || 'Məqalə',
-          publication: meta.publication || (() => {
-            try { return new URL(meta.original_url || '').hostname.replace(/^www\./,''); }
-            catch { return ''; }
-          })(),
-          published_at: meta.published_at || '',
-          url: meta.original_url || '',
-          title_inferred: meta?.title_inferred || false
-        })}
 
         <section class="card">
           <div class="bd">
