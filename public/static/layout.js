@@ -230,6 +230,7 @@
     const toggle = document.querySelector('.nav-toggle');
     const drawer = document.getElementById('primary-nav');
     const backdrop = document.querySelector('.nav-backdrop');
+    const mobileThemeToggle = document.querySelector('.mobile-theme-toggle');
     const mq = window.matchMedia('(max-width: 768px)');
     function openNav(){ document.body.classList.add('nav-open'); toggle?.setAttribute('aria-expanded','true'); backdrop?.removeAttribute('hidden'); }
     function closeNav(){ document.body.classList.remove('nav-open'); toggle?.setAttribute('aria-expanded','false'); backdrop?.setAttribute('hidden',''); }
@@ -252,11 +253,15 @@
     drawer?.querySelector('.mobile-nav-close')?.addEventListener('click', closeNav);
     syncToggle();
     mq.addEventListener ? mq.addEventListener('change', syncToggle) : mq.addListener(syncToggle);
+    
+    // Initialize mobile theme toggle visibility
+    if (mobileThemeToggle) {
+      mobileThemeToggle.style.display = mq.matches ? 'inline-flex' : 'none';
+    }
 
     // Theme toggle functionality
     const themeToggle = document.getElementById('theme-toggle');
     const themeToggleMobile = document.querySelector('.theme-toggle-mobile');
-    const mobileThemeToggle = document.querySelector('.mobile-theme-toggle');
     const themeIconSun = document.querySelectorAll('.theme-icon-sun');
     const themeIconMoon = document.querySelectorAll('.theme-icon-moon');
     

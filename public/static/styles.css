@@ -632,15 +632,16 @@ footer.site-footer{
 /* Mobile header layout */
 @media (max-width: 768px) {
   header {
-    display: grid;
+    display: grid !important;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 12px;
+    justify-content: unset;
   }
   
   /* Theme toggle on the left */
   .mobile-theme-toggle {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     width: 40px;
@@ -651,6 +652,7 @@ footer.site-footer{
     cursor: pointer;
     color: var(--text);
     transition: all .2s ease;
+    grid-column: 1;
     justify-self: start;
   }
   
@@ -673,12 +675,13 @@ footer.site-footer{
   
   /* Logo in the center */
   .brand {
+    grid-column: 2;
     justify-self: center;
   }
   
   /* Hamburger menu on the right */
   .nav-toggle {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
     width: 40px;
@@ -689,6 +692,7 @@ footer.site-footer{
     cursor: pointer;
     color: var(--text);
     transition: all .2s ease;
+    grid-column: 3;
     justify-self: end;
   }
   
