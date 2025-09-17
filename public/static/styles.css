@@ -142,6 +142,11 @@ header{
   display:none;
 }
 
+/* Hide mobile nav header on desktop */
+.mobile-nav-header{
+  display:none;
+}
+
 /* Desktop: show theme toggle and support button inline */
 .site-nav .theme-toggle,
 .site-nav .btn-support{
@@ -576,9 +581,19 @@ footer.site-footer{
   background:var(--panel);
   border-radius:10px;
   cursor:pointer;
+  color:var(--text);
+  transition:all .2s ease;
+}
+.nav-toggle:hover{
+  background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
+  border-color:var(--accent);
+  transform:translateY(-1px);
 }
 .nav-toggle:focus-visible{ outline:none; box-shadow: var(--ring) }
-.nav-toggle svg{ width:22px; height:22px }
+.nav-toggle svg{ 
+  width:22px; height:22px;
+  stroke:currentColor;
+}
 
 /* Backdrop for drawer */
 .nav-backdrop{
@@ -596,32 +611,71 @@ footer.site-footer{
 
   .site-nav{
     position: fixed; top:0; right:0; height:100vh;
-    width: min(75vw, 300px);
+    width: 240px;
     background: var(--panel);
     border-left:1px solid var(--border);
     box-shadow: var(--shadow);
-    padding: 20px 16px;
+    padding: 20px 12px;
     display:flex; flex-direction:column; gap:6px;
     transform: translateX(100%);
     transition: transform .25s ease;
     z-index: 70;
   }
   
-  /* Navigation links on mobile - show text */
+  /* Mobile nav header */
+  .mobile-nav-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 4px 12px 4px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:8px;
+  }
+  .mobile-nav-title{
+    font-size:16px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .mobile-nav-close{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:32px;
+    height:32px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    border-radius:6px;
+    cursor:pointer;
+    color:var(--text);
+    transition:all .2s ease;
+  }
+  .mobile-nav-close:hover{
+    background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
+    border-color:var(--accent);
+  }
+  .mobile-nav-close svg{
+    width:16px;
+    height:16px;
+    stroke:currentColor;
+  }
+  
+  /* Navigation links on mobile - compact with icons and text */
   .nav-link{
-    padding:12px 10px; border-radius:8px;
-    font-size:16px; text-align:left;
+    padding:10px 8px; border-radius:8px;
+    font-size:14px; text-align:left;
     justify-content:flex-start;
-    gap:10px;
+    gap:8px;
     width:auto;
     height:auto;
+    min-height:40px;
   }
   .nav-link:hover{ 
     background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
   }
   .nav-link .icon{
-    width:18px;
-    height:18px;
+    width:16px;
+    height:16px;
+    flex-shrink:0;
   }
   .nav-link .sr-only{
     position:static;
@@ -629,6 +683,7 @@ footer.site-footer{
     height:auto;
     overflow:visible;
     clip:auto;
+    font-weight:500;
   }
   
   /* Action buttons container */
@@ -654,7 +709,7 @@ footer.site-footer{
   
   /* Theme toggle in mobile nav-actions */
   .nav-actions .theme-toggle{
-    width:40px; height:40px; padding:0;
+    width:36px; height:36px; padding:0;
     flex-shrink:0;
   }
   
