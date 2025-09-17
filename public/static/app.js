@@ -125,6 +125,23 @@
     }
   }
 
+  // Helper functions for color classification
+  function getReliabilityColorClass(score) {
+    if (score >= 80) return 'reliability-excellent';
+    if (score >= 60) return 'reliability-good';
+    if (score >= 40) return 'reliability-fair';
+    if (score >= 20) return 'reliability-poor';
+    return 'reliability-very-poor';
+  }
+
+  function getBiasColorClass(score) {
+    if (score >= 3) return 'bias-strong-pro';
+    if (score >= 1) return 'bias-pro';
+    if (score === 0) return 'bias-neutral';
+    if (score >= -2) return 'bias-critical';
+    return 'bias-strong-opposition';
+  }
+
   function renderRecentAnalyses(analyses) {
     console.log('Rendering recent analyses:', analyses);
     const container = $('#recent-list');
@@ -147,6 +164,10 @@
       const politicalBias = num(analysis.political_bias, 0);
       const analysisUrl = `/analysis/${encodeURIComponent(analysis.hash)}`;
 
+      // Get color classes based on scores
+      const reliabilityClass = getReliabilityColorClass(reliability);
+      const biasClass = getBiasColorClass(politicalBias);
+
       return `
         <a href="${analysisUrl}" class="recent-item">
           <div class="recent-item-title">${title}</div>
@@ -157,11 +178,11 @@
           <div class="recent-item-scores">
             <div class="score-item">
               <span>Etibarlılıq:</span>
-              <span class="score-value reliability">${reliability}/100</span>
+              <span class="score-value reliability ${reliabilityClass}">${reliability}/100</span>
             </div>
             <div class="score-item">
               <span>Siyasi meyl:</span>
-              <span class="score-value bias">${bias(politicalBias)}</span>
+              <span class="score-value bias ${biasClass}">${bias(politicalBias)}</span>
             </div>
           </div>
           ${url ? `<div class="recent-item-url">${url}</div>` : ''}

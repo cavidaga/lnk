@@ -1192,12 +1192,46 @@ footer.site-footer{
   font-weight: 600;
 }
 
-.score-value.reliability {
-  color: #10b981;
+/* Dynamic reliability colors based on score ranges */
+.score-value.reliability-excellent {
+  color: #059669; /* Dark green for 80-100 */
 }
 
-.score-value.bias {
-  color: #f59e0b;
+.score-value.reliability-good {
+  color: #10b981; /* Green for 60-79 */
+}
+
+.score-value.reliability-fair {
+  color: #f59e0b; /* Yellow/Orange for 40-59 */
+}
+
+.score-value.reliability-poor {
+  color: #f97316; /* Orange for 20-39 */
+}
+
+.score-value.reliability-very-poor {
+  color: #dc2626; /* Red for 0-19 */
+}
+
+/* Dynamic bias colors based on score ranges */
+.score-value.bias-strong-pro {
+  color: #1d4ed8; /* Dark blue for +3 to +5 */
+}
+
+.score-value.bias-pro {
+  color: #3b82f6; /* Blue for +1 to +2 */
+}
+
+.score-value.bias-neutral {
+  color: #6b7280; /* Gray for 0 */
+}
+
+.score-value.bias-critical {
+  color: #f59e0b; /* Orange for -1 to -2 */
+}
+
+.score-value.bias-strong-opposition {
+  color: #dc2626; /* Red for -3 to -5 */
 }
 
 .recent-item-url {
