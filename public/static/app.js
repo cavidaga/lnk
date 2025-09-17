@@ -205,7 +205,6 @@
       const data = await fetchAnalysis(hash);
       renderAnalysis(container, data, hash);
       wireCopyButton(location.origin + `/analysis/${encodeURIComponent(hash)}`);
-      wireFeedbackButtons(hash);
       
       // Add to history
       if (window.LNKHistory && window.LNKHistory.addAnalysis) {
@@ -388,42 +387,15 @@ function renderAnalysis(root, data, hash) {
           </div>
         </section>
 
-        <section class="card" id="feedback-card">
+        <section class="card" id="complaint-card">
           <div class="bd">
-            <h3 style="margin:0 0 8px">Bu analiz haqqında nə düşünürsünüz?</h3>
-            <div class="feedback-buttons" style="display:flex;gap:12px;margin-bottom:12px">
-              <button class="feedback-btn thumbs-up" data-hash="${hash || ''}" data-feedback="up" style="
-                background:var(--card-bg,rgba(255,255,255,0.02));
-                border:1px solid var(--border,#222);
-                border-radius:8px;
-                padding:8px 16px;
-                color:var(--text);
-                cursor:pointer;
-                font-size:14px;
-                transition:all 0.3s ease;
-                display:flex;
-                align-items:center;
-                gap:6px;
-              ">
-                👍 Razıyam
-              </button>
-              <button class="feedback-btn thumbs-down" data-hash="${hash || ''}" data-feedback="down" style="
-                background:var(--card-bg,rgba(255,255,255,0.02));
-                border:1px solid var(--border,#222);
-                border-radius:8px;
-                padding:8px 16px;
-                color:var(--text);
-                cursor:pointer;
-                font-size:14px;
-                transition:all 0.3s ease;
-                display:flex;
-                align-items:center;
-                gap:6px;
-              ">
-                👎 Şikayət et
-              </button>
-            </div>
-            <div class="feedback-status" style="font-size:14px;color:var(--muted);min-height:20px;"></div>
+            <h3 style="margin:0 0 8px">Analizdə problem tapmısınız?</h3>
+            <p style="margin:0 0 12px;color:var(--muted);font-size:14px">
+              Əgər analizimizdə səhv tapmısınızsa və ya təklifiniz varsa, lütfən bizə bildirin.
+            </p>
+            <a href="/complaint.html?analysis_url=${encodeURIComponent(window.location.href)}" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:6px">
+              👎 Şikayət et
+            </a>
           </div>
         </section>
 
@@ -865,118 +837,4 @@ function headerBlock({ title, publication, published_at, url, title_inferred }){
     try { return await res.json(); } catch { return {}; }
   }
 
-  // ---------- FEEDBACK FUNCTIONALITY ----------
-  function wireFeedbackButtons(hash) {
-    const feedbackButtons = document.querySelectorAll('.feedback-btn');
-    feedbackButtons.forEach(btn => {
-      btn.addEventListener('click', (e) => handleFeedback(e, hash));
-    });
-    
-    // Check if user already provided feedback
-    const existingFeedback = getStoredFeedback(hash);
-    if (existingFeedback) {
-      markFeedbackAsGiven(existingFeedback);
-    }
-  }
-
-  function handleFeedback(e, hash) {
-    const feedback = e.target.dataset.feedback;
-    const button = e.target;
-    
-    if (feedback === 'down') {
-      // Redirect to complaint form with prefilled analysis link
-      const analysisUrl = `${window.location.origin}/analysis/${encodeURIComponent(hash)}`;
-      const complaintUrl = `/complaint.html?analysis_url=${encodeURIComponent(analysisUrl)}`;
-      window.open(complaintUrl, '_blank');
-      return;
-    }
-    
-    // Handle positive feedback (thumbs up)
-    if (feedback === 'up') {
-      // Store feedback locally
-      storeFeedback(hash, feedback);
-      
-      // Send to API
-      sendFeedbackToAPI(hash, feedback);
-      
-      // Update UI
-      markFeedbackAsGiven(feedback);
-      
-      // Show confirmation
-      const statusEl = document.querySelector('.feedback-status');
-      if (statusEl) {
-        statusEl.textContent = 'Təşəkkürlər! Geri bildiriminiz qeydə alındı.';
-        statusEl.style.color = 'var(--accent)';
-      }
-    }
-  }
-
-  function storeFeedback(hash, feedback) {
-    try {
-      const feedbacks = JSON.parse(localStorage.getItem('lnk_feedback') || '{}');
-      feedbacks[hash] = {
-        feedback: feedback,
-        timestamp: Date.now()
-      };
-      localStorage.setItem('lnk_feedback', JSON.stringify(feedbacks));
-    } catch (e) {
-      console.error('Failed to store feedback locally:', e);
-    }
-  }
-
-  function getStoredFeedback(hash) {
-    try {
-      const feedbacks = JSON.parse(localStorage.getItem('lnk_feedback') || '{}');
-      return feedbacks[hash]?.feedback;
-    } catch (e) {
-      console.error('Failed to get stored feedback:', e);
-      return null;
-    }
-  }
-
-  function markFeedbackAsGiven(feedback) {
-    const buttons = document.querySelectorAll('.feedback-btn');
-    console.log('Marking feedback as given:', feedback, 'Found buttons:', buttons.length);
-    
-    buttons.forEach(btn => {
-      if (btn.dataset.feedback === 'down') {
-        // Keep complaint button always enabled
-        return;
-      }
-      
-      btn.disabled = true;
-      btn.style.cursor = 'not-allowed';
-      
-      if (btn.dataset.feedback === feedback) {
-        // Selected button - make it prominent
-        btn.style.background = 'var(--accent)';
-        btn.style.color = 'white';
-        btn.style.borderColor = 'var(--accent)';
-        btn.style.opacity = '1';
-        btn.style.transform = 'scale(1.05)';
-        console.log('Highlighting selected button:', btn.dataset.feedback);
-      } else {
-        // Unselected button - dim it out
-        btn.style.background = 'var(--card-bg, rgba(255,255,255,0.02))';
-        btn.style.color = 'var(--text-muted, #666)';
-        btn.style.borderColor = 'var(--border-muted, #333)';
-        btn.style.opacity = '0.3';
-        btn.style.transform = 'scale(0.95)';
-        console.log('Dimming unselected button:', btn.dataset.feedback);
-      }
-    });
-  }
-
-  async function sendFeedbackToAPI(hash, feedback) {
-    try {
-      await fetch('/api/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hash, feedback })
-      });
-    } catch (e) {
-      console.error('Failed to send feedback to API:', e);
-      // Don't show error to user as local storage already worked
-    }
-  }
 })();
