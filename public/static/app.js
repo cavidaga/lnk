@@ -451,12 +451,18 @@ function renderAnalysis(root, data, hash) {
         <table class="sources-table">
           <thead><tr><th>Ad</th><th>Rol</th><th>Mövqe</th></tr></thead>
           <tbody>
-          ${rows.map(s => `
+          ${rows.map(s => {
+            const stance = s?.stance || '';
+            const stanceClass = stance.toLowerCase().includes('müsbət') ? 'stance-positive' : 
+                               stance.toLowerCase().includes('mənfi') ? 'stance-negative' : 
+                               stance.toLowerCase().includes('neytral') ? 'stance-neutral' : '';
+            return `
             <tr>
               <td>${esc(s?.name || '—')}</td>
               <td>${esc(toAZRole(s?.role))}</td>
-              <td>${esc(toAZStance(s?.stance))}</td>
-            </tr>`).join('')}
+              <td class="${stanceClass}">${esc(toAZStance(s?.stance))}</td>
+            </tr>`;
+          }).join('')}
           </tbody>
         </table>
       </div>`;

@@ -460,6 +460,43 @@ select.input {
   }
 }
 
+/* Stance color coding - light mode only */
+@media (prefers-color-scheme: light) {
+  /* Müsbət (positive) - green background */
+  .sources-table .stance-positive {
+    background-color: #dcfce7 !important;
+    color: #166534 !important;
+  }
+  
+  /* Mənfi (negative) - red background */
+  .sources-table .stance-negative {
+    background-color: #fef2f2 !important;
+    color: #991b1b !important;
+  }
+  
+  /* Neytral (neutral) - keep default styling */
+  .sources-table .stance-neutral {
+    background-color: var(--card) !important;
+    color: var(--text) !important;
+  }
+}
+
+/* Manual theme override for stance colors */
+.theme-light .sources-table .stance-positive {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.theme-light .sources-table .stance-negative {
+  background-color: #fef2f2 !important;
+  color: #991b1b !important;
+}
+
+.theme-light .sources-table .stance-neutral {
+  background-color: var(--card) !important;
+  color: var(--text) !important;
+}
+
 /* Diagnostics (new schema) */
 .diagnostics-grid{ display:grid; grid-template-columns:1fr; gap:16px }
 .diag-item{ background-color:var(--panel); padding:15px; border-radius:10px; border:1px solid var(--border) }
