@@ -37,6 +37,13 @@
         <div class="nav-backdrop" hidden></div>
 
         <nav id="primary-nav" class="site-nav radial-menu" aria-label="Əsas menyu">
+          <!-- Center logo -->
+          <div class="radial-center-logo">
+            <picture>
+              <source srcset="/static/logo-dark.svg" media="(prefers-color-scheme: light)">
+              <img src="/static/logo-light.svg" alt="LNK loqo" width="32" height="32" />
+            </picture>
+          </div>
           
           <a href="/" class="radial-item" data-tooltip="Əsas səhifə" aria-label="Əsas səhifə" data-angle="0">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -98,13 +105,12 @@
 
           <!-- Support button (desktop) -->
           <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener"
-            class="btn-support" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol">
+            class="radial-item support-item" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol" data-angle="324">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z"
                     stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               <path d="M6.2 13h9.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            <span class="label">Dəstək ol</span>
           </a>
 
         </nav>
