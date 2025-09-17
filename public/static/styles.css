@@ -133,7 +133,19 @@ header{
 }
 .site-nav{
   display:flex;
-  gap:20px;
+  gap:16px;
+  align-items:center;
+}
+
+/* Hide nav-actions container on desktop */
+.nav-actions{
+  display:none;
+}
+
+/* Desktop: show theme toggle and support button inline */
+.site-nav .theme-toggle,
+.site-nav .btn-support{
+  display:inline-flex;
 }
 
 .site-nav a{
@@ -153,9 +165,9 @@ header{
 /* Theme toggle button */
 .theme-toggle{
   display:inline-flex; align-items:center; justify-content:center;
-  width:40px; height:40px; border:1px solid var(--border); background:var(--panel);
-  border-radius:10px; cursor:pointer; transition:all .2s ease;
-  position:relative; overflow:hidden;
+  width:36px; height:36px; border:1px solid var(--border); background:var(--panel);
+  border-radius:8px; cursor:pointer; transition:all .2s ease;
+  position:relative; overflow:hidden; flex-shrink:0;
 }
 .theme-toggle:hover,
 .theme-toggle:focus-visible{
@@ -164,23 +176,25 @@ header{
   transform:translateY(-1px);
 }
 .theme-toggle:focus-visible{ outline:none; box-shadow:var(--ring); }
-.theme-toggle .icon{ width:20px; height:20px; transition:all .3s ease; }
+.theme-toggle .icon{ width:18px; height:18px; transition:all .3s ease; }
 .theme-toggle:hover .icon{ transform:rotate(180deg); }
 .theme-toggle .theme-icon-sun{ color:#fbbf24; }
 .theme-toggle .theme-icon-moon{ color:#6366f1; }
 
 /* Header Support button (Buy Me a Coffee) */
 .site-nav a.btn-support{
-  display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  padding:8px 12px; border-radius:999px; font-weight:600; text-decoration:none;
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:6px 10px; border-radius:8px; font-weight:600; text-decoration:none;
   background: linear-gradient(135deg, #ffdd00, #ffc107);
-  color:#1a1a1a; box-shadow:0 2px 10px rgba(255,193,7,.35);
+  color:#1a1a1a; box-shadow:0 2px 8px rgba(255,193,7,.3);
+  font-size:13px; flex-shrink:0; white-space:nowrap;
 }
 .site-nav a.btn-support:hover,
 .site-nav a.btn-support:focus-visible{
-  box-shadow:0 4px 16px rgba(255,193,7,.45);
+  box-shadow:0 3px 12px rgba(255,193,7,.4);
+  transform:translateY(-1px);
 }
-.site-nav a.btn-support .icon{ width:18px; height:18px }
+.site-nav a.btn-support .icon{ width:16px; height:16px }
 
 .logo-img{
   width: clamp(40px, 4vw, 56px);
@@ -539,31 +553,54 @@ footer.site-footer{
 
   .site-nav{
     position: fixed; top:0; right:0; height:100vh;
-    width: min(78vw, 320px);
+    width: min(75vw, 300px);
     background: var(--panel);
     border-left:1px solid var(--border);
     box-shadow: var(--shadow);
-    padding: 18px;
-    display:flex; flex-direction:column; gap:8px;
+    padding: 20px 16px;
+    display:flex; flex-direction:column; gap:6px;
     transform: translateX(100%);
     transition: transform .25s ease;
     z-index: 70;
   }
-  .site-nav a,
-  .site-nav .theme-toggle{
-    padding:10px 8px; border-radius:8px;
-    font-size:16px;
+  
+  /* Navigation links */
+  .site-nav > a:not(.btn-support){
+    padding:12px 10px; border-radius:8px;
+    font-size:16px; text-align:left;
   }
-  .site-nav a:hover,
-  .site-nav .theme-toggle:hover{ background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%) }
+  .site-nav > a:not(.btn-support):hover{ 
+    background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
+  }
+  
+  /* Action buttons container */
+  .site-nav .nav-actions{
+    display:flex; gap:8px; margin-top:12px; padding-top:12px;
+    border-top:1px solid var(--border);
+  }
+  
+  /* Hide individual buttons from main nav on mobile */
+  .site-nav > .theme-toggle,
+  .site-nav > .btn-support{
+    display:none;
+  }
+  
+  /* Theme toggle in mobile nav-actions */
+  .nav-actions .theme-toggle{
+    width:40px; height:40px; padding:0;
+    flex-shrink:0;
+  }
+  
+  /* Support button in mobile nav-actions - more compact */
+  .nav-actions .btn-support{ 
+    padding:8px 12px; font-size:14px; flex:1;
+    justify-content:center; min-width:0;
+  }
+  .nav-actions .btn-support .label{ display:inline; }
+  
   body.nav-open .site-nav{ transform: translateX(0) }
-
   .nav-backdrop{ z-index:60 }
   body.nav-open .nav-backdrop{ opacity:1; pointer-events:auto }
-
-  /* Make Support button compact on small screens (icon-only optional) */
-  .site-nav a.btn-support{ padding:8px 10px }
-  .site-nav a.btn-support .label{ display:none }
 }
 
 /* Keep existing active link style consistent */

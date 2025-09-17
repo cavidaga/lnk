@@ -27,29 +27,32 @@
           <a href="/methodology.html">Metodologiya</a>
           <a href="/privacy.html">Məxfilik</a>
 
-          <!-- Theme toggle button -->
-          <button id="theme-toggle" class="theme-toggle" type="button" 
-                  data-tooltip="Tema dəyişdir" aria-label="Tema dəyişdir">
-            <svg class="icon theme-icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <svg class="icon theme-icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: none;">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <span class="sr-only">Tema dəyişdir</span>
-          </button>
+          <!-- Action buttons container (mobile) -->
+          <div class="nav-actions">
+            <!-- Theme toggle button -->
+            <button id="theme-toggle" class="theme-toggle" type="button" 
+                    data-tooltip="Tema dəyişdir" aria-label="Tema dəyişdir">
+              <svg class="icon theme-icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <svg class="icon theme-icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: none;">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span class="sr-only">Tema dəyişdir</span>
+            </button>
 
-          <!-- Support button -->
-          <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener"
-            class="btn-support" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z"
-                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M6.2 13h9.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <span class="label">Dəstək ol</span>
-          </a>
+            <!-- Support button -->
+            <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener"
+              class="btn-support" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z"
+                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M6.2 13h9.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <span class="label">Dəstək ol</span>
+            </a>
+          </div>
         </nav>
       </header>
     `;
@@ -160,7 +163,7 @@
     backdrop?.addEventListener('click', closeNav);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
     drawer?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
-    drawer?.querySelector('.theme-toggle')?.addEventListener('click', closeNav);
+    drawer?.querySelector('.nav-actions .theme-toggle')?.addEventListener('click', closeNav);
     syncToggle();
     mq.addEventListener ? mq.addEventListener('change', syncToggle) : mq.addListener(syncToggle);
 
