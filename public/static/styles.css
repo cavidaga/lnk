@@ -1707,6 +1707,9 @@ kbd {
   cursor: pointer;
   flex: 1;
   justify-content: center;
+  box-sizing: border-box;
+  height: 40px;
+  line-height: 1;
 }
 
 .action-btn:hover {
@@ -1717,6 +1720,26 @@ kbd {
 
 .action-btn svg {
   flex-shrink: 0;
+}
+
+/* Ensure both a and button elements have identical styling */
+a.action-btn,
+button.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 40px;
+  line-height: 1;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 .summary-btn {
