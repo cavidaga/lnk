@@ -1140,23 +1140,26 @@ footer.site-footer{
 .hdr .v a{ color:var(--link,#4f7cff); text-decoration:underline }
 .hdr .v.anywrap{ overflow-wrap:anywhere; word-break:break-word }
 
-/* Mobile: Make it more compact and fix alignment */
+/* Mobile: Simplify layout and remove card layers */
 @media (max-width: 768px) {
   .hdr {
-    padding: 16px;
+    padding: 0;
+    margin-bottom: 20px;
+    background: none;
+    border: none;
+    box-shadow: none;
   }
   .hdr .kv{
-    gap: 12px;
-    display: flex;
-    flex-direction: column;
+    gap: 0;
+    display: block;
   }
   .hdr .item{
-    padding: 12px 0;
+    padding: 16px 0;
     gap: 12px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     border-bottom: 1px solid var(--border, #eee);
   }
   .hdr .item:last-child {
@@ -1181,7 +1184,7 @@ footer.site-footer{
   }
   .hdr .item.link {
     justify-content: center;
-    padding: 16px 0;
+    padding: 20px 0;
     border-bottom: none;
   }
   .hdr .item.link .k {
@@ -1190,6 +1193,15 @@ footer.site-footer{
   .hdr .item.link .v {
     text-align: center;
     flex: none;
+  }
+  
+  /* Reduce card padding on mobile */
+  .card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card > .bd {
+    padding: 0;
   }
 }
 
