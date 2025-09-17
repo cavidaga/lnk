@@ -224,9 +224,36 @@
     }
     
     function updateLogo(isDark) {
-      const logoImg = document.querySelector('.logo-img');
-      if (logoImg) {
-        logoImg.src = isDark ? '/static/logo-dark.svg' : '/static/logo-light.svg';
+      const picture = document.querySelector('picture');
+      if (picture) {
+        const sources = picture.querySelectorAll('source');
+        const img = picture.querySelector('img');
+        
+        if (sources.length >= 2 && img) {
+          // Update the media queries to force the correct logo
+          sources[0].setAttribute('media', isDark ? 'all' : 'none'); // dark logo source
+          sources[1].setAttribute('media', isDark ? 'none' : 'all'); // light logo source
+          
+          // Also update the fallback img src
+          img.src = isDark ? '/static/logo-dark.svg' : '/static/logo-light.svg';
+        }
+      }
+    }
+    
+    function resetLogoToSystem() {
+      const picture = document.querySelector('picture');
+      if (picture) {
+        const sources = picture.querySelectorAll('source');
+        const img = picture.querySelector('img');
+        
+        if (sources.length >= 2 && img) {
+          // Reset to original media queries
+          sources[0].setAttribute('media', '(prefers-color-scheme: dark)');
+          sources[1].setAttribute('media', '(prefers-color-scheme: light)');
+          
+          // Reset fallback to light (original default)
+          img.src = '/static/logo-light.svg';
+        }
       }
     }
     
@@ -254,6 +281,7 @@
       if (!getStoredTheme()) {
         const systemTheme = getSystemTheme();
         applyTheme(systemTheme);
+        resetLogoToSystem();
       }
     });
     
