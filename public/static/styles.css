@@ -408,6 +408,37 @@ h1{ font-size:26px; margin:0; letter-spacing:.2px }
     gap: 8px;
     margin-bottom: 16px;
   } 
+  
+  .form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-row .btn {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* Form layout */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-row .btn {
+  flex-shrink: 0;
+  min-width: 120px;
 }
 
 /* Only hide the label in the URL input row */

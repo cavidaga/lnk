@@ -76,20 +76,26 @@
       <div id="app-container">
         <div class="card" role="region" aria-label="Məqalə təhlili formu">
           <div class="bd">
-            <form id="analyze-form" class="row" autocomplete="on">
-              <label class="label" for="url">Məqalə linki</label>
-              <input class="input" id="url" name="url" type="url" inputmode="url"
-                     placeholder="Məqalə linkini yapışdırın..." aria-describedby="helper" required />
+            <form id="analyze-form" autocomplete="on">
+              <div class="form-group">
+                <label class="label" for="url">Məqalə linki</label>
+                <input class="input" id="url" name="url" type="url" inputmode="url"
+                       placeholder="Məqalə linkini yapışdırın..." aria-describedby="helper" required />
+              </div>
               
-              <button class="btn" type="submit" aria-label="Məqaləni təhlil et">Təhlil et</button>
-              
-              <label class="label" for="model-type">Təhlil növü</label>
-              <select class="input" id="model-type" name="model-type" aria-describedby="model-helper">
-                <option value="auto">Avtomatik seçim (tövsiyə olunan)</option>
-                <option value="flash-lite">Qısa xəbər (sürətli)</option>
-                <option value="flash">Orta uzunluq (balanslı)</option>
-                <option value="pro">Analitika (dərin təhlil)</option>
-              </select>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="label" for="model-type">Təhlil növü</label>
+                  <select class="input" id="model-type" name="model-type" aria-describedby="model-helper">
+                    <option value="auto">Avtomatik seçim (tövsiyə olunan)</option>
+                    <option value="flash-lite">Qısa xəbər (sürətli)</option>
+                    <option value="flash">Orta uzunluq (balanslı)</option>
+                    <option value="pro">Analitika (dərin təhlil)</option>
+                  </select>
+                </div>
+                
+                <button class="btn" type="submit" aria-label="Məqaləni təhlil et">Təhlil et</button>
+              </div>
             </form>
             <div id="helper" class="small muted" style="margin-top:8px">
               Nümunə: https://abzas.org/az/2025/09/nufuzlu-exemple-məqalə/
