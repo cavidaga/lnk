@@ -1154,11 +1154,19 @@ footer.site-footer{
     box-shadow: var(--shadow);
     width: 100%;
     max-width: none;
+    padding-right: 0;
+    border-right: none;
+    margin-right: 0;
+    box-sizing: border-box;
   }
   .hdr .kv{
     gap: 0;
     display: block;
     width: 100%;
+    padding-right: 0;
+    border-right: none;
+    margin-right: 0;
+    box-sizing: border-box;
   }
   .hdr .item{
     padding: 16px 0;
@@ -1169,6 +1177,9 @@ footer.site-footer{
     align-items: flex-start;
     border-bottom: 1px solid var(--border, #eee);
     width: 100%;
+    padding-right: 0;
+    margin-right: 0;
+    box-sizing: border-box;
   }
   .hdr .item:last-child {
     border-bottom: none;
@@ -1189,6 +1200,10 @@ footer.site-footer{
     flex: 1;
     color: var(--text, #333);
     word-wrap: break-word;
+    padding-right: 0;
+    margin-right: 0;
+    box-sizing: border-box;
+    min-width: 0;
   }
   .hdr .item.link {
     justify-content: center;
