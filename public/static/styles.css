@@ -1063,15 +1063,15 @@ footer.site-footer{
   
   .site-nav.radial-menu.open{
     transform: translate(-50%, -50%) scale(1) !important;
-    width: 360px !important;
-    height: 360px !important;
+    width: 420px !important;
+    height: 420px !important;
   }
   
   /* Radial menu items */
   .radial-item{
     position: absolute;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     background: var(--panel);
     border: 2px solid var(--border);
     border-radius: 50%;
@@ -1079,15 +1079,17 @@ footer.site-footer{
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     text-decoration: none;
     color: var(--text);
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 500;
     box-shadow: var(--shadow);
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     opacity: 0;
     transform: scale(0);
+    padding: 4px;
+    box-sizing: border-box;
   }
   
   .radial-menu.open .radial-item{
@@ -1104,31 +1106,35 @@ footer.site-footer{
   }
   
   .radial-item .icon{
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     flex-shrink: 0;
   }
   
   .radial-item .label{
-    font-size: 11px;
+    font-size: 9px;
     text-align: center;
-    line-height: 1;
+    line-height: 1.1;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   
   /* Position radial items in circle */
-  .radial-item[data-angle="0"]{ transform: translate(0, -140px) scale(0); }
-  .radial-item[data-angle="72"]{ transform: translate(110px, -85px) scale(0); }
-  .radial-item[data-angle="144"]{ transform: translate(110px, 85px) scale(0); }
-  .radial-item[data-angle="216"]{ transform: translate(0, 140px) scale(0); }
-  .radial-item[data-angle="288"]{ transform: translate(-110px, 85px) scale(0); }
-  .radial-item[data-angle="324"]{ transform: translate(-110px, -85px) scale(0); }
+  .radial-item[data-angle="0"]{ transform: translate(0, -160px) scale(0); }
+  .radial-item[data-angle="72"]{ transform: translate(125px, -95px) scale(0); }
+  .radial-item[data-angle="144"]{ transform: translate(125px, 95px) scale(0); }
+  .radial-item[data-angle="216"]{ transform: translate(0, 160px) scale(0); }
+  .radial-item[data-angle="288"]{ transform: translate(-125px, 95px) scale(0); }
+  .radial-item[data-angle="324"]{ transform: translate(-125px, -95px) scale(0); }
   
-  .radial-menu.open .radial-item[data-angle="0"]{ transform: translate(0, -140px) scale(1); }
-  .radial-menu.open .radial-item[data-angle="72"]{ transform: translate(110px, -85px) scale(1); }
-  .radial-menu.open .radial-item[data-angle="144"]{ transform: translate(110px, 85px) scale(1); }
-  .radial-menu.open .radial-item[data-angle="216"]{ transform: translate(0, 140px) scale(1); }
-  .radial-menu.open .radial-item[data-angle="288"]{ transform: translate(-110px, 85px) scale(1); }
-  .radial-menu.open .radial-item[data-angle="324"]{ transform: translate(-110px, -85px) scale(1); }
+  .radial-menu.open .radial-item[data-angle="0"]{ transform: translate(0, -160px) scale(1); }
+  .radial-menu.open .radial-item[data-angle="72"]{ transform: translate(125px, -95px) scale(1); }
+  .radial-menu.open .radial-item[data-angle="144"]{ transform: translate(125px, 95px) scale(1); }
+  .radial-menu.open .radial-item[data-angle="216"]{ transform: translate(0, 160px) scale(1); }
+  .radial-menu.open .radial-item[data-angle="288"]{ transform: translate(-125px, 95px) scale(1); }
+  .radial-menu.open .radial-item[data-angle="324"]{ transform: translate(-125px, -95px) scale(1); }
   
   /* Center logo */
   .radial-center-logo{
@@ -1146,10 +1152,10 @@ footer.site-footer{
   }
   
   .radial-center-logo img{
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    width: 144px;
+    height: 144px;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
   }
   
   /* Blur background when menu is open */
