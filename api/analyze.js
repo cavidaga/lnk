@@ -860,6 +860,7 @@ export default async function handler(req, res) {
         let contentSource = 'Live';
         let articleTextFast = '';
         let headlineFast = '';
+        let articleText = '';
         try {
           // Fast path: try gatedFetch first to avoid Chromium for simple pages
           try {
@@ -1266,7 +1267,6 @@ export default async function handler(req, res) {
           } catch {}
 
           // Try site-specific content selectors first
-          let articleText = '';
           try {
             const sels = DOMAIN_SELECTORS[originUrl.hostname.replace(/^www\./,'')] ||
                         (isOxu ? DOMAIN_SELECTORS['oxu.az'] : null);
