@@ -161,7 +161,7 @@
             </div>
             <div class="score-item">
               <span>Siyasi meyl:</span>
-              <span class="score-value bias">${bias(bias)}</span>
+              <span class="score-value bias">${bias(political_bias)}</span>
             </div>
           </div>
           ${url ? `<div class="recent-item-url">${url}</div>` : ''}
