@@ -681,7 +681,7 @@ async function preflightPolicy(targetUrl) {
   return finalUrl;
 }
 
-function normalizeOutput(o = {}, { url, contentSource, isBlocked = false }) {
+function normalizeOutput(o = {}, { url, contentSource, isBlocked = false, articleText = '' }) {
   const out = { ...o };
   out.schema_version = '2025-09-16';
 
@@ -720,10 +720,10 @@ function normalizeOutput(o = {}, { url, contentSource, isBlocked = false }) {
       message: 'Mənbə bloklanıb, lakin archive.md nüsxəsi tapılıb. Təhlil arxiv məlumatı əsasında aparılıb.',
       severity: 'medium'
     });
-  } else if (contentSource === 'LightFetch') {
+  } else if (contentSource === 'LightFetch' && articleText && articleText.length < 500) {
     out.warnings.push({
       type: 'limited_content',
-      message: 'Məqalənin tam məzmununa çatmaq mümkün olmayıb. Təhlil mövcud məlumat əsasında aparılıb.',
+      message: 'Məqalənin məzmunu qısa olduğu üçün təhlil məhdud məlumat əsasında aparılıb.',
       severity: 'medium'
     });
   }
@@ -959,7 +959,8 @@ export default async function handler(req, res) {
             const normalized = normalizeOutput(r2.parsed, { 
               url: effectiveUrl, 
               contentSource, 
-              isBlocked: true 
+              isBlocked: true,
+              articleText: ''
             });
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
@@ -1006,7 +1007,8 @@ export default async function handler(req, res) {
               const normalized = normalizeOutput(r2.parsed, { 
                 url: effectiveUrl, 
                 contentSource, 
-                isBlocked: contentSource === 'Blocked' 
+                isBlocked: contentSource === 'Blocked',
+                articleText: articleTextFast || ''
               });
               normalized.hash = cacheKey;
               normalized.modelUsed = r2.modelUsed;
@@ -1070,7 +1072,8 @@ export default async function handler(req, res) {
             const normalized = normalizeOutput(parsedQuick, { 
               url: effectiveUrl, 
               contentSource, 
-              isBlocked: contentSource === 'Blocked' 
+              isBlocked: contentSource === 'Blocked',
+              articleText: articleTextFast || ''
             });
             normalized.hash = cacheKey;
             normalized.modelUsed = modelUsedQuick;
@@ -1113,7 +1116,8 @@ export default async function handler(req, res) {
             const normalized = normalizeOutput(r2.parsed, { 
               url: effectiveUrl, 
               contentSource, 
-              isBlocked: contentSource === 'Blocked' 
+              isBlocked: contentSource === 'Blocked',
+              articleText: articleTextFast || ''
             });
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
@@ -1365,7 +1369,8 @@ export default async function handler(req, res) {
             const normalized = normalizeOutput(r2.parsed, { 
               url: effectiveUrl, 
               contentSource, 
-              isBlocked: contentSource === 'Blocked' 
+              isBlocked: contentSource === 'Blocked',
+              articleText: articleText || ''
             });
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
@@ -1526,7 +1531,8 @@ export default async function handler(req, res) {
           const normalized = normalizeOutput(parsed, { 
             url: effectiveUrl, 
             contentSource, 
-            isBlocked: contentSource === 'Blocked' 
+            isBlocked: contentSource === 'Blocked',
+            articleText: articleText || ''
           });
 
           // Decorate + cache
