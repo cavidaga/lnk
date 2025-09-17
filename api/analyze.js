@@ -37,8 +37,9 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const MAX_ARTICLE_CHARS = 30000;
 const BLOCK_KEYWORDS = ['cloudflare', 'checking your browser', 'ddos protection', 'verifying you are human'];
 
-// ⬇️ Models: primary + tiered fallbacks
-const PRIMARY_MODEL = 'gemini-2.5-flash-lite';
+// ⬇️ Models: smart selection based on content characteristics
+const FLASH_LITE_MODEL = 'gemini-2.5-flash-lite';
+const PRO_MODEL = 'gemini-2.5-pro';
 const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.5-pro'];
 
 const RETRY_ATTEMPTS = 1;          // single attempt per model (kept conservative)
@@ -47,6 +48,128 @@ const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 20000); // 20s de
 
 // --- Helpers ---
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+// Smart model selection based on content characteristics
+function selectOptimalModel({ articleText, url, title, contentLength }) {
+  const text = articleText || '';
+  const length = contentLength || text.length;
+  const hostname = url ? new URL(url).hostname.toLowerCase().replace(/^www\./, '') : '';
+  
+  // Short news indicators (Flash Lite is better)
+  const shortNewsIndicators = {
+    // Length thresholds
+    isShort: length < 2000,
+    isVeryShort: length < 1000,
+    
+    // Content type indicators
+    hasNewsKeywords: /\b(xəbər|news|report|bildirir|açıqlayır|məlumat|hadisə|olay)\b/i.test(text),
+    hasBreakingNews: /\b(sondakı|son|breaking|təcili|urgent|son dəqiqə)\b/i.test(text),
+    hasEventKeywords: /\b(keçirilib|təşkil|mərasim|toplantı|görüş|iclas)\b/i.test(text),
+    
+    // Structural indicators
+    hasShortParagraphs: (text.match(/\n\s*\n/g) || []).length > 3 && length < 3000,
+    hasBulletPoints: /^[\s]*[•\-\*]\s/m.test(text),
+    hasDateTime: /\b(\d{1,2}[\.\/]\d{1,2}[\.\/]\d{2,4}|\d{4}-\d{2}-\d{2})\b/.test(text),
+    
+    // URL patterns for news sites
+    isNewsSite: /\.(az|com|net|org)$/.test(hostname) && 
+      (hostname.includes('news') || hostname.includes('media') || 
+       hostname.includes('crossmedia') || hostname.includes('report') ||
+       hostname.includes('xəbər') || hostname.includes('az')),
+    
+    // Title patterns
+    hasNewsTitle: title && (
+      /^(tələbə|şagird|məktəb|universitet|təhsil|iş|işçi|əmək|maaş|əhali|vətəndaş|prezident|hökumət|parlament|deputat)/i.test(title) ||
+      /(keçirilib|açıqlanıb|bildirilib|qeyd edilib|deyilib|təşkil edilib)/i.test(title)
+    )
+  };
+  
+  // Complex analysis indicators (Pro is better)
+  const complexAnalysisIndicators = {
+    // Length thresholds
+    isLong: length > 5000,
+    isVeryLong: length > 10000,
+    
+    // Content complexity indicators
+    hasAnalysisKeywords: /\b(təhlil|analiz|araşdırma|tədqiqat|müzakirə|münasibət|məsələ|problemin|həll|təklif|görüş|məqam)\b/i.test(text),
+    hasOpinionKeywords: /\b(rəy|fikir|mülahizə|nəzər|baxış|yanaşma|münasibət|qənaət|nəticə|nəticələr)\b/i.test(text),
+    hasResearchKeywords: /\b(araşdırma|tədqiqat|ekspert|professor|doktor|mütəxəssis|təcrübə|nəticə|statistika|məlumat)\b/i.test(text),
+    
+    // Structural complexity
+    hasMultipleSections: (text.match(/\n\s*[A-ZĞƏÖÇŞÜ][^.]{20,}\n/g) || []).length > 2,
+    hasQuotes: (text.match(/"[^"]{20,}"/g) || []).length > 2,
+    hasReferences: (text.match(/\[[^\]]+\]|\([^)]+\)/g) || []).length > 3,
+    hasNumbers: (text.match(/\b\d+[%\.\,]\d*\b/g) || []).length > 5,
+    
+    // URL patterns for analysis sites
+    isAnalysisSite: hostname.includes('research') || hostname.includes('institute') || 
+                   hostname.includes('center') || hostname.includes('think') ||
+                   hostname.includes('analiz') || hostname.includes('təhlil'),
+    
+    // Title patterns
+    hasAnalysisTitle: title && (
+      /^(təhlil|analiz|araşdırma|müzakirə|problemin|məsələ|görüş|məqam)/i.test(title) ||
+      /(şikayət|complaint|problem|məsələ|sual|sualın|cavab|həll)/i.test(title)
+    )
+  };
+  
+  // Scoring system
+  let flashLiteScore = 0;
+  let proScore = 0;
+  
+  // Flash Lite scoring (short news)
+  if (shortNewsIndicators.isVeryShort) flashLiteScore += 3;
+  if (shortNewsIndicators.isShort) flashLiteScore += 2;
+  if (shortNewsIndicators.hasNewsKeywords) flashLiteScore += 2;
+  if (shortNewsIndicators.hasBreakingNews) flashLiteScore += 2;
+  if (shortNewsIndicators.hasEventKeywords) flashLiteScore += 1;
+  if (shortNewsIndicators.hasShortParagraphs) flashLiteScore += 1;
+  if (shortNewsIndicators.hasBulletPoints) flashLiteScore += 1;
+  if (shortNewsIndicators.hasDateTime) flashLiteScore += 1;
+  if (shortNewsIndicators.isNewsSite) flashLiteScore += 2;
+  if (shortNewsIndicators.hasNewsTitle) flashLiteScore += 2;
+  
+  // Pro scoring (complex analysis)
+  if (complexAnalysisIndicators.isVeryLong) proScore += 3;
+  if (complexAnalysisIndicators.isLong) proScore += 2;
+  if (complexAnalysisIndicators.hasAnalysisKeywords) proScore += 2;
+  if (complexAnalysisIndicators.hasOpinionKeywords) proScore += 2;
+  if (complexAnalysisIndicators.hasResearchKeywords) proScore += 2;
+  if (complexAnalysisIndicators.hasMultipleSections) proScore += 1;
+  if (complexAnalysisIndicators.hasQuotes) proScore += 1;
+  if (complexAnalysisIndicators.hasReferences) proScore += 1;
+  if (complexAnalysisIndicators.hasNumbers) proScore += 1;
+  if (complexAnalysisIndicators.isAnalysisSite) proScore += 2;
+  if (complexAnalysisIndicators.hasAnalysisTitle) proScore += 2;
+  
+  // Decision logic
+  const scoreDifference = proScore - flashLiteScore;
+  
+  // If Pro has significantly higher score, use Pro
+  if (scoreDifference >= 3) {
+    return {
+      model: PRO_MODEL,
+      reason: `Complex analysis content (Pro score: ${proScore}, Flash Lite score: ${flashLiteScore})`,
+      confidence: 'high'
+    };
+  }
+  
+  // If Flash Lite has higher score or scores are close, use Flash Lite for efficiency
+  if (flashLiteScore >= proScore) {
+    return {
+      model: FLASH_LITE_MODEL,
+      reason: `Short news content (Flash Lite score: ${flashLiteScore}, Pro score: ${proScore})`,
+      confidence: flashLiteScore > proScore ? 'high' : 'medium'
+    };
+  }
+  
+  // Default to Flash Lite for efficiency unless Pro is clearly better
+  return {
+    model: FLASH_LITE_MODEL,
+    reason: `Default to Flash Lite for efficiency (Pro score: ${proScore}, Flash Lite score: ${flashLiteScore})`,
+    confidence: 'low'
+  };
+}
 
 // ultra-light fallback: turn raw HTML into readable text
 function htmlToText(html = "") {
@@ -540,9 +663,18 @@ export default async function handler(req, res) {
             const hostQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
             if (hostQuick.endsWith('jam-news.net')) {
               const siteQuick = hostQuick;
+              // Smart model selection for fast path
+              const fastModelSelection = selectOptimalModel({
+                articleText: articleTextFast,
+                url: effectiveUrl,
+                title: headlineFast,
+                contentLength: articleTextFast.length
+              });
+              console.log(`Fast path model selection: ${fastModelSelection.model} - ${fastModelSelection.reason}`);
+              
               const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
               const r2 = await callGeminiWithRetryAndFallback({
-                primaryModel: PRIMARY_MODEL,
+                primaryModel: fastModelSelection.model,
                 fallbackModels: FALLBACK_MODELS,
                 prompt: safePrompt
               });
@@ -559,6 +691,15 @@ export default async function handler(req, res) {
 
           if (articleTextFast && articleTextFast.length >= 400) {
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
+            // Smart model selection for light fetch path
+            const lightModelSelection = selectOptimalModel({
+              articleText: articleTextFast,
+              url: effectiveUrl,
+              title: headlineFast,
+              contentLength: articleTextFast.length
+            });
+            console.log(`Light fetch model selection: ${lightModelSelection.model} - ${lightModelSelection.reason}`);
+            
             const SHRINKS = [0.7, 0.4];
             let parsedQuick = null, modelUsedQuick = null, lastErrQuick = null;
             for (let i = 0; i < SHRINKS.length; i++) {
@@ -567,7 +708,7 @@ export default async function handler(req, res) {
               const prompt = buildPrompt({ url: effectiveUrl, articleText: slice });
               try {
                 const r = await callGeminiWithRetryAndFallback({
-                  primaryModel: PRIMARY_MODEL,
+                  primaryModel: lightModelSelection.model,
                   fallbackModels: FALLBACK_MODELS,
                   prompt
                 });
@@ -579,7 +720,7 @@ export default async function handler(req, res) {
             if (!parsedQuick) {
               const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
               const r2 = await callGeminiWithRetryAndFallback({
-                primaryModel: PRIMARY_MODEL,
+                primaryModel: lightModelSelection.model,
                 fallbackModels: FALLBACK_MODELS,
                 prompt: safePrompt
               });
@@ -598,9 +739,18 @@ export default async function handler(req, res) {
           if (articleTextFast && articleTextFast.length > 0) {
             // Thin content: skip Chromium and do safe prompt quickly
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
+            // Smart model selection for thin content
+            const thinModelSelection = selectOptimalModel({
+              articleText: articleTextFast,
+              url: effectiveUrl,
+              title: headlineFast,
+              contentLength: articleTextFast.length
+            });
+            console.log(`Thin content model selection: ${thinModelSelection.model} - ${thinModelSelection.reason}`);
+            
             const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
             const r2 = await callGeminiWithRetryAndFallback({
-              primaryModel: PRIMARY_MODEL,
+              primaryModel: thinModelSelection.model,
               fallbackModels: FALLBACK_MODELS,
               prompt: safePrompt
             });
@@ -734,9 +884,19 @@ export default async function handler(req, res) {
             const siteQuick = originUrl.hostname.replace(/^www\./,'');
             let titleForSafe = '';
             try { titleForSafe = (await page.title()).slice(0, 180); } catch {}
+            
+            // Smart model selection for jam-news thin content
+            const jamNewsModelSelection = selectOptimalModel({
+              articleText,
+              url: effectiveUrl,
+              title: titleForSafe,
+              contentLength: articleText.length
+            });
+            console.log(`Jam-news thin content model selection: ${jamNewsModelSelection.model} - ${jamNewsModelSelection.reason}`);
+            
             const safePrompt = buildSafePrompt({ url: effectiveUrl, title: titleForSafe, site: siteQuick });
             const r2 = await callGeminiWithRetryAndFallback({
-              primaryModel: PRIMARY_MODEL,
+              primaryModel: jamNewsModelSelection.model,
               fallbackModels: FALLBACK_MODELS,
               prompt: safePrompt
             });
@@ -797,20 +957,30 @@ export default async function handler(req, res) {
             if (ogt && ogt.length > 5) headline = ogt;
           } catch {}
 
+          // Smart model selection based on content characteristics
+          const modelSelection = selectOptimalModel({
+            articleText,
+            url: effectiveUrl,
+            title: headline,
+            contentLength: articleText.length
+          });
+          
+          console.log(`Smart model selection: ${modelSelection.model} - ${modelSelection.reason} (confidence: ${modelSelection.confidence})`);
+
           // If content is very short/blocked, jump straight to safe prompt to save tokens.
           const tooThin = !articleText || articleText.length < 400;
           const SHRINKS = [0.7, 0.4];
           let parsed, modelUsed, lastErr;
 
           if (!tooThin) {
-            // Try reduced slices first; lite model is very fast but keep within token budget
+            // Try reduced slices first; use smart-selected model but keep within token budget
             for (let i = 0; i < SHRINKS.length; i++) {
               const cut = Math.floor(MAX_ARTICLE_CHARS * SHRINKS[i]);
               const slice = articleText.slice(0, cut);
               const prompt = buildPrompt({ url: effectiveUrl, articleText: slice });
               try {
                 const r = await callGeminiWithRetryAndFallback({
-                  primaryModel: PRIMARY_MODEL,
+                  primaryModel: modelSelection.model,
                   fallbackModels: FALLBACK_MODELS,
                   prompt
                 });
@@ -831,7 +1001,7 @@ export default async function handler(req, res) {
           if (!parsed) {
             const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headline, site });
             const r2 = await callGeminiWithRetryAndFallback({
-              primaryModel: PRIMARY_MODEL,
+              primaryModel: modelSelection.model,
               fallbackModels: FALLBACK_MODELS,
               prompt: safePrompt
             });
