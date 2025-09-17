@@ -448,7 +448,7 @@ function renderAnalysis(root, data, hash) {
   function tableSources(rows) {
     return `
       <div class="table-wrap" style="overflow:auto">
-        <table class="table">
+        <table class="sources-table">
           <thead><tr><th>Ad</th><th>Rol</th><th>Mövqe</th></tr></thead>
           <tbody>
           ${rows.map(s => `

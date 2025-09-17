@@ -405,9 +405,60 @@ select.input {
 .sec-title{ margin:22px 0 8px; font-weight:700; font-size:18px; border-bottom:1px solid var(--border); padding-bottom:6px; letter-spacing:.2px }
 .article-type-tag{ display:inline-block; background-color:var(--accent); color:white; padding:4px 12px; border-radius:999px; font-size:14px; font-weight:700; margin-bottom:10px }
 
-.sources-table{ width:100%; border-collapse:collapse; font-size:14px; margin-top:10px }
-.sources-table th, .sources-table td{ text-align:left; padding:12px 10px; border-bottom:1px solid var(--border) }
-.sources-table th{ color:var(--muted) }
+.sources-table{ 
+  width:100%; 
+  border-collapse:collapse; 
+  font-size:14px; 
+  margin-top:10px;
+  table-layout: fixed;
+}
+.sources-table th, .sources-table td{ 
+  text-align:left; 
+  padding:12px 10px; 
+  border-bottom:1px solid var(--border);
+  border-right:1px solid var(--border);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.sources-table th:last-child, .sources-table td:last-child{ 
+  border-right: none;
+}
+.sources-table th{ 
+  color:var(--muted);
+  font-weight: 600;
+  background: var(--panel);
+}
+.sources-table td:first-child{ 
+  width: 40%;
+  max-width: 0;
+}
+.sources-table td:nth-child(2){ 
+  width: 30%;
+  max-width: 0;
+}
+.sources-table td:nth-child(3){ 
+  width: 30%;
+  max-width: 0;
+}
+
+/* Mobile responsive improvements for sources table */
+@media (max-width: 768px) {
+  .sources-table {
+    font-size: 13px;
+  }
+  .sources-table th, .sources-table td {
+    padding: 8px 6px;
+  }
+  .sources-table td:first-child{ 
+    width: 45%;
+  }
+  .sources-table td:nth-child(2){ 
+    width: 25%;
+  }
+  .sources-table td:nth-child(3){ 
+    width: 30%;
+  }
+}
 
 /* Diagnostics (new schema) */
 .diagnostics-grid{ display:grid; grid-template-columns:1fr; gap:16px }
