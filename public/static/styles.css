@@ -156,7 +156,8 @@ header{
   }
 }
 
-.site-nav a{
+/* Navigation links with icons */
+.nav-link{
   font-weight:500;
   text-decoration:none;
   color:var(--text);
@@ -170,18 +171,24 @@ header{
   align-items:center;
   justify-content:center;
   white-space:nowrap;
+  gap:6px;
 }
-.site-nav a:hover{ 
+.nav-link:hover{ 
   color:var(--accent);
   background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
   border-color:var(--accent);
   transform:translateY(-1px);
 }
-.site-nav a.active{
+.nav-link.active{
   color:var(--accent);
   background: color-mix(in oklab, var(--panel) 92%, var(--accent) 8%);
   border-color:var(--accent);
   transform:translateY(-1px);
+}
+.nav-link .icon{
+  width:16px;
+  height:16px;
+  flex-shrink:0;
 }
 
 /* Theme toggle button */
@@ -586,13 +593,19 @@ footer.site-footer{
     z-index: 70;
   }
   
-  /* Navigation links */
-  .site-nav > a:not(.btn-support){
+  /* Navigation links on mobile */
+  .nav-link{
     padding:12px 10px; border-radius:8px;
     font-size:16px; text-align:left;
+    justify-content:flex-start;
+    gap:10px;
   }
-  .site-nav > a:not(.btn-support):hover{ 
+  .nav-link:hover{ 
     background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
+  }
+  .nav-link .icon{
+    width:18px;
+    height:18px;
   }
   
   /* Action buttons container */
@@ -612,8 +625,7 @@ footer.site-footer{
     display:flex;
   }
   
-  .nav-actions .theme-toggle,
-  .nav-actions .btn-support{
+  .nav-actions .theme-toggle{
     display:inline-flex;
   }
   
@@ -622,13 +634,6 @@ footer.site-footer{
     width:40px; height:40px; padding:0;
     flex-shrink:0;
   }
-  
-  /* Support button in mobile nav-actions - more compact */
-  .nav-actions .btn-support{ 
-    padding:8px 12px; font-size:14px; flex:1;
-    justify-content:center; min-width:0;
-  }
-  .nav-actions .btn-support .label{ display:inline; }
   
   body.nav-open .site-nav{ transform: translateX(0) }
   .nav-backdrop{ z-index:60 }
