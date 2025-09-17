@@ -72,6 +72,10 @@
 
         const hash = json.hash || json?.meta?.hash;
         if (!hash) throw new Error('Hash tapılmadı');
+        
+        // Refresh recent analyses before redirecting
+        loadRecentAnalyses();
+        
         location.assign(`/analysis/${encodeURIComponent(hash)}`);
       } catch (err) {
         renderError(out || form, err.message || 'Xəta');
@@ -82,6 +86,65 @@
         submitBtn?.classList.remove('busy');
       }
     });
+
+    // Load recent analyses
+    loadRecentAnalyses();
+  }
+
+  // ---------- RECENT ANALYSES ----------
+  async function loadRecentAnalyses() {
+    try {
+      const res = await fetch('/api/recent-analyses');
+      if (!res.ok) return;
+      
+      const analyses = await res.json();
+      if (analyses && analyses.length > 0) {
+        renderRecentAnalyses(analyses);
+      }
+    } catch (e) {
+      console.error('Failed to load recent analyses:', e);
+    }
+  }
+
+  function renderRecentAnalyses(analyses) {
+    const container = $('#recent-list');
+    const section = $('#recent-analyses');
+    
+    if (!container || !section) return;
+
+    const html = analyses.map(analysis => {
+      const title = esc(analysis.title || 'Başlıq yoxdur');
+      const publication = esc(analysis.publication || '');
+      const url = esc(analysis.url || '');
+      const publishedAt = analysis.published_at ? formatDate(analysis.published_at) : '';
+      const reliability = num(analysis.reliability, 0);
+      const bias = num(analysis.political_bias, 0);
+      const analysisUrl = `/analysis/${encodeURIComponent(analysis.hash)}`;
+
+      return `
+        <a href="${analysisUrl}" class="recent-item">
+          <div class="recent-item-title">${title}</div>
+          <div class="recent-item-meta">
+            ${publication ? `<span>${publication}</span>` : ''}
+            ${publishedAt ? `<span>•</span><span>${publishedAt}</span>` : ''}
+          </div>
+          <div class="recent-item-scores">
+            <div class="score-item">
+              <span>Etibarlılıq:</span>
+              <span class="score-value reliability">${reliability}/100</span>
+            </div>
+            <div class="score-item">
+              <span>Siyasi meyl:</span>
+              <span class="score-value bias">${bias(bias)}</span>
+            </div>
+          </div>
+          ${url ? `<div class="recent-item-url">${url}</div>` : ''}
+        </a>
+      `;
+    }).join('');
+
+    container.innerHTML = html;
+    section.style.display = 'block';
   }
 
   // ---------- ANALYSIS FLOW ----------
