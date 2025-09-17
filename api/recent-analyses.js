@@ -3,10 +3,8 @@ import { kv } from '@vercel/kv';
 
 export const config = { runtime: 'edge' };
 
-export default async function handler(req, res) {
+export default async function handler(req) {
   try {
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    
     console.log('Recent analyses API called');
     
     // Get last 5 analysis hashes
@@ -15,7 +13,13 @@ export default async function handler(req, res) {
     
     if (!hashes || hashes.length === 0) {
       console.log('No hashes found, returning empty array');
-      return res.status(200).json([]);
+      return new Response(JSON.stringify([]), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60'
+        }
+      });
     }
 
     // Fetch the actual analysis data for each hash
@@ -46,12 +50,20 @@ export default async function handler(req, res) {
     const validAnalyses = analyses.filter(Boolean);
     console.log('Valid analyses:', validAnalyses.length);
     
-    // Cache for 5 minutes
-    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
-    
-    res.status(200).json(validAnalyses);
+    return new Response(JSON.stringify(validAnalyses), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60'
+      }
+    });
   } catch (e) {
     console.error('recent-analyses error:', e);
-    res.status(500).json({ error: true, message: 'Internal error: ' + (e.message || '') });
+    return new Response(JSON.stringify({ error: true, message: 'Internal error: ' + (e.message || '') }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8'
+      }
+    });
   }
 }
