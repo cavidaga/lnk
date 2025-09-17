@@ -240,6 +240,7 @@ header{
     padding: 8px !important;
     white-space: nowrap !important;
     min-width: 44px !important;
+    position: relative !important;
   }
   
   .radial-item:hover{
@@ -276,6 +277,11 @@ header{
     color: #1a1a1a !important;
     box-shadow: 0 2px 8px rgba(255,193,7,.3) !important;
     font-weight: 600 !important;
+    flex-direction: row !important;
+    gap: 6px !important;
+    padding: 8px 12px !important;
+    min-width: auto !important;
+    white-space: nowrap !important;
   }
   
   .radial-item.support-item:hover{
@@ -286,7 +292,44 @@ header{
   
   .radial-item.support-item .label{
     display: inline !important;
-    font-size: 11px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+  }
+  
+  .radial-item.support-item .icon{
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  /* Tooltips for desktop navigation */
+  .radial-item[data-tooltip]::after {
+    content: attr(data-tooltip) !important;
+    position: absolute !important;
+    bottom: calc(100% + 8px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) translateY(4px) !important;
+    background: rgba(0,0,0,.8) !important;
+    color: white !important;
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: all 0.2s ease !important;
+    z-index: 1000 !important;
+  }
+  
+  .radial-item[data-tooltip]:hover::after {
+    opacity: 1 !important;
+    transform: translateX(-50%) translateY(0) !important;
+  }
+  
+  @media (prefers-color-scheme: light) {
+    .radial-item[data-tooltip]::after {
+      background: rgba(20,20,25,.9) !important;
+    }
   }
 }
 
