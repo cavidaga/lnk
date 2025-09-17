@@ -25,9 +25,12 @@
         </a>
 
         <!-- Mobile menu toggle (right side on mobile) -->
-        <button class="nav-toggle" type="button" aria-label="Menyunu aç" aria-controls="primary-nav" aria-expanded="false" style="display:none">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <button class="nav-toggle radial-menu-toggle" type="button" aria-label="Menyunu aç" aria-controls="primary-nav" aria-expanded="false" style="display:none">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <svg class="close-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: none;">
+            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </button>
 
@@ -216,8 +219,28 @@
     const backdrop = document.querySelector('.nav-backdrop');
     const mobileThemeToggle = document.querySelector('.mobile-theme-toggle');
     const mq = window.matchMedia('(max-width: 768px)');
-    function openNav(){ document.body.classList.add('nav-open'); toggle?.setAttribute('aria-expanded','true'); backdrop?.removeAttribute('hidden'); }
-    function closeNav(){ document.body.classList.remove('nav-open'); toggle?.setAttribute('aria-expanded','false'); backdrop?.setAttribute('hidden',''); }
+    function openNav(){ 
+      document.body.classList.add('nav-open'); 
+      toggle?.setAttribute('aria-expanded','true'); 
+      backdrop?.removeAttribute('hidden');
+      drawer?.classList.add('open');
+      // Toggle icons
+      const menuIcon = toggle?.querySelector('.menu-icon');
+      const closeIcon = toggle?.querySelector('.close-icon');
+      if (menuIcon) menuIcon.style.display = 'none';
+      if (closeIcon) closeIcon.style.display = 'block';
+    }
+    function closeNav(){ 
+      document.body.classList.remove('nav-open'); 
+      toggle?.setAttribute('aria-expanded','false'); 
+      backdrop?.setAttribute('hidden','');
+      drawer?.classList.remove('open');
+      // Toggle icons
+      const menuIcon = toggle?.querySelector('.menu-icon');
+      const closeIcon = toggle?.querySelector('.close-icon');
+      if (menuIcon) menuIcon.style.display = 'block';
+      if (closeIcon) closeIcon.style.display = 'none';
+    }
     function syncToggle(){ 
       if (!toggle) return; 
       if (mq.matches){ 
@@ -232,7 +255,7 @@
     toggle?.addEventListener('click', () => (toggle.getAttribute('aria-expanded') === 'true' ? closeNav() : openNav()));
     backdrop?.addEventListener('click', closeNav);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
-    drawer?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+    drawer?.querySelectorAll('.radial-item').forEach(link => link.addEventListener('click', closeNav));
     // Theme toggle removed from mobile nav
     // Close button removed - navigation closes on backdrop click or outside click
     syncToggle();
