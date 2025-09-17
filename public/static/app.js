@@ -184,6 +184,7 @@
       const data = await fetchAnalysis(hash);
       renderAnalysis(container, data);
       wireCopyButton(location.origin + `/analysis/${encodeURIComponent(hash)}`);
+      wireFeedbackButtons(hash);
       document.title = `${data?.meta?.title ? data.meta.title + ' — ' : ''}LNK.az`;
     } catch (err) {
       renderError(container, err.message || 'Yüklənmə xətası');
@@ -333,6 +334,45 @@ function renderAnalysis(root, data) {
               <summary>Xam JSON datanı göstər</summary>
               <pre class="json">${esc(JSON.stringify(data, null, 2))}</pre>
             </details>
+          </div>
+        </section>
+
+        <section class="card" id="feedback-card">
+          <div class="bd">
+            <h3 style="margin:0 0 8px">Bu analiz sizə faydalı oldu?</h3>
+            <div class="feedback-buttons" style="display:flex;gap:12px;margin-bottom:12px">
+              <button class="feedback-btn thumbs-up" data-hash="${hash}" data-feedback="up" style="
+                background:var(--card-bg,rgba(255,255,255,0.02));
+                border:1px solid var(--border,#222);
+                border-radius:8px;
+                padding:8px 16px;
+                color:var(--text);
+                cursor:pointer;
+                font-size:14px;
+                transition:all 0.2s;
+                display:flex;
+                align-items:center;
+                gap:6px;
+              ">
+                👍 Bəli, faydalı
+              </button>
+              <button class="feedback-btn thumbs-down" data-hash="${hash}" data-feedback="down" style="
+                background:var(--card-bg,rgba(255,255,255,0.02));
+                border:1px solid var(--border,#222);
+                border-radius:8px;
+                padding:8px 16px;
+                color:var(--text);
+                cursor:pointer;
+                font-size:14px;
+                transition:all 0.2s;
+                display:flex;
+                align-items:center;
+                gap:6px;
+              ">
+                👎 Xeyr, faydalı deyil
+              </button>
+            </div>
+            <div class="feedback-status" style="font-size:14px;color:var(--muted);min-height:20px;"></div>
           </div>
         </section>
 
@@ -700,5 +740,92 @@ function headerBlock({ title, publication, published_at, url, title_inferred }){
 
   async function safeJson(res) {
     try { return await res.json(); } catch { return {}; }
+  }
+
+  // ---------- FEEDBACK FUNCTIONALITY ----------
+  function wireFeedbackButtons(hash) {
+    const feedbackButtons = document.querySelectorAll('.feedback-btn');
+    feedbackButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => handleFeedback(e, hash));
+    });
+    
+    // Check if user already provided feedback
+    const existingFeedback = getStoredFeedback(hash);
+    if (existingFeedback) {
+      markFeedbackAsGiven(existingFeedback);
+    }
+  }
+
+  function handleFeedback(e, hash) {
+    const feedback = e.target.dataset.feedback;
+    const button = e.target;
+    
+    // Store feedback locally
+    storeFeedback(hash, feedback);
+    
+    // Send to API
+    sendFeedbackToAPI(hash, feedback);
+    
+    // Update UI
+    markFeedbackAsGiven(feedback);
+    
+    // Show confirmation
+    const statusEl = document.querySelector('.feedback-status');
+    if (statusEl) {
+      statusEl.textContent = 'Təşəkkürlər! Geri bildiriminiz qeydə alındı.';
+      statusEl.style.color = 'var(--accent)';
+    }
+  }
+
+  function storeFeedback(hash, feedback) {
+    try {
+      const feedbacks = JSON.parse(localStorage.getItem('lnk_feedback') || '{}');
+      feedbacks[hash] = {
+        feedback: feedback,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('lnk_feedback', JSON.stringify(feedbacks));
+    } catch (e) {
+      console.error('Failed to store feedback locally:', e);
+    }
+  }
+
+  function getStoredFeedback(hash) {
+    try {
+      const feedbacks = JSON.parse(localStorage.getItem('lnk_feedback') || '{}');
+      return feedbacks[hash]?.feedback;
+    } catch (e) {
+      console.error('Failed to get stored feedback:', e);
+      return null;
+    }
+  }
+
+  function markFeedbackAsGiven(feedback) {
+    const buttons = document.querySelectorAll('.feedback-btn');
+    buttons.forEach(btn => {
+      btn.disabled = true;
+      btn.style.cursor = 'not-allowed';
+      
+      if (btn.dataset.feedback === feedback) {
+        btn.style.background = 'var(--accent)';
+        btn.style.color = 'white';
+        btn.style.borderColor = 'var(--accent)';
+      } else {
+        btn.style.opacity = '0.5';
+      }
+    });
+  }
+
+  async function sendFeedbackToAPI(hash, feedback) {
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hash, feedback })
+      });
+    } catch (e) {
+      console.error('Failed to send feedback to API:', e);
+      // Don't show error to user as local storage already worked
+    }
   }
 })();
