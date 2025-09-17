@@ -219,27 +219,23 @@
     }
   }
 
-  function addShortcutHints() {
-    // Add hints to relevant elements
-    const urlInput = document.getElementById('url');
-    if (urlInput) {
-      const hint = document.createElement('div');
-      hint.className = 'shortcut-hint';
-      hint.textContent = 'Ctrl+Alt+F';
-      hint.title = 'URL sahəsini fokusla';
-      urlInput.parentNode.style.position = 'relative';
-      urlInput.parentNode.appendChild(hint);
-    }
-
-    const submitBtn = document.querySelector('button[type="submit"]');
-    if (submitBtn) {
-      const hint = document.createElement('div');
-      hint.className = 'shortcut-hint';
-      hint.textContent = 'Ctrl+Alt+Enter';
-      hint.title = 'Formu göndər';
-      submitBtn.parentNode.style.position = 'relative';
-      submitBtn.parentNode.appendChild(hint);
-    }
+  function addShortcutsBubble() {
+    // Create a floating bubble for shortcuts
+    const bubble = document.createElement('div');
+    bubble.id = 'shortcuts-bubble';
+    bubble.className = 'shortcuts-bubble';
+    bubble.innerHTML = `
+      <button class="shortcuts-bubble-btn" onclick="showShortcutsHelp()" aria-label="Klaviatura qısayollarını göstər" title="Klaviatura qısayolları">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <path d="M9 9h6v6H9z" fill="currentColor"/>
+          <path d="M9 1h6v2H9zM9 21h6v2H9zM1 9h2v6H1zM21 9h2v6h-2z" fill="currentColor"/>
+          <path d="M12 3v2M12 19v2M3 12h2M19 12h2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+        <span class="shortcuts-bubble-text">Qısayollar</span>
+      </button>
+    `;
+    
+    document.body.appendChild(bubble);
   }
 
   function initShortcuts() {
@@ -258,16 +254,10 @@
       }
     });
 
-    // Show shortcuts help on first visit
-    if (!localStorage.getItem('lnk_shortcuts_shown')) {
-      setTimeout(() => {
-        showShortcutsHelp();
-        localStorage.setItem('lnk_shortcuts_shown', 'true');
-      }, 2000);
-    }
+    // Don't show popup automatically - power users can find the bubble
 
-    // Add visual hints
-    addShortcutHints();
+    // Add clickable bubble
+    addShortcutsBubble();
 
     // Render shortcuts help
     renderShortcutsHelp();
