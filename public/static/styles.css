@@ -1757,13 +1757,12 @@ button.action-btn {
     grid-column: 1 / -1;
     display: flex;
     gap: 12px;
-    justify-content: center;
+    justify-content: stretch;
   }
   
   .action-btn {
-    flex: 0 0 auto;
-    min-width: 180px;
-    max-width: 200px;
+    flex: 1;
+    min-width: 0;
     white-space: nowrap;
   }
 }
