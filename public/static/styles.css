@@ -1158,6 +1158,8 @@ footer.site-footer{
     border-right: none;
     margin-right: 0;
     box-sizing: border-box;
+    display: block !important;
+    grid-template-columns: none !important;
   }
   .hdr .kv{
     gap: 0;
