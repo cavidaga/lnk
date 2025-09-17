@@ -896,21 +896,30 @@ export default async function handler(req, res) {
                 console.log(`Archive.md found. Fetching from: ${archiveMdUrl}`);
                 
                 // Use Puppeteer to fetch from archive.md
+                console.log(`Launching Puppeteer for archive.md fetch...`);
                 const browser = await puppeteer.launch({
-                  headless: true,
-                  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--no-first-run', '--no-zygote', '--single-process', '--disable-gpu']
+                  args: chromium.args,
+                  defaultViewport: chromium.defaultViewport,
+                  executablePath: await chromium.executablePath(),
+                  headless: chromium.headless,
+                  ignoreHTTPSErrors: true,
                 });
                 const page = await browser.newPage();
                 await page.setUserAgent(USER_AGENT);
                 await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
                 
+                console.log(`Navigating to archive.md URL: ${archiveMdUrl}`);
                 await page.goto(archiveMdUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
                 await new Promise(r => setTimeout(r, 2000)); // Wait for content to load
                 
+                console.log(`Extracting content from archive.md...`);
                 const rawText = (await page.evaluate(() => (document.body && document.body.innerText) ? document.body.innerText : ''))
                   .replace(/\s\s+/g, ' ')
                   .trim();
+                console.log(`Raw text length from archive.md: ${rawText.length}`);
+                
                 articleText = cleanArticleContent(rawText, effectiveUrl).substring(0, MAX_ARTICLE_CHARS);
+                console.log(`Cleaned article text length: ${articleText.length}`);
                 
                 await browser.close();
                 console.log(`Successfully fetched from archive.md: ${articleText.length} chars`);
