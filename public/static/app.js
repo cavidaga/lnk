@@ -237,7 +237,7 @@
 
   // ---------- RENDERERS ----------
 function renderAnalysis(root, data, hash) {
-  const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = '' } = data || {};
+  const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = '', warnings = [] } = data || {};
   const title = meta.title || 'Başlıq yoxdur';
 
   // Numbers (with guards)
@@ -263,6 +263,25 @@ function renderAnalysis(root, data, hash) {
       url: meta.original_url || '',
       title_inferred: meta?.title_inferred || false
     })}
+    
+    ${warnings.length ? `
+    <section class="card warnings-section" style="margin-bottom:16px">
+      <div class="bd">
+        <h3 style="margin:0 0 8px;color:var(--warning-color,#ff9800)">⚠️ Xəbərdarlıq</h3>
+        <ul style="margin:0;padding-left:20px">
+          ${warnings.map(warning => `
+            <li class="warning-item" style="margin-bottom:8px">
+              <strong>${esc(warning.type === 'content_blocked' ? 'Mənbə bloklanıb' : 
+                        warning.type === 'archived_content' ? 'Arxiv məlumatı' : 
+                        warning.type === 'limited_content' ? 'Məhdud məzmun' : 'Xəbərdarlıq')}:</strong>
+              ${esc(warning.message || '')}
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    </section>
+    ` : ''}
+    
     <article class="card">
       <div class="bd">
 

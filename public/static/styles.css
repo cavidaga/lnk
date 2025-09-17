@@ -14,6 +14,8 @@
   --accent: var(--red);
   --accent-2: var(--red-dark);
   --danger:#ff5a52;
+  --warning-color:#ff9800;
+  --warning-text: var(--navy);
   --shadow: 0 10px 30px rgba(0,0,0,.35);
   --ring: 0 0 0 3px rgba(255, 0, 0, .35);
   --grid: rgba(255,255,255,.08); /* bias chart grid on dark */
@@ -80,6 +82,8 @@
   --accent: var(--red);
   --accent-2: var(--red-dark);
   --danger:#ff5a52;
+  --warning-color:#ff9800;
+  --warning-text: var(--navy);
   --shadow: 0 10px 30px rgba(0,0,0,.35);
   --ring: 0 0 0 3px rgba(255, 0, 0, .35);
   --grid: rgba(255,255,255,.08); /* bias chart grid on dark */
@@ -2014,4 +2018,18 @@ button.action-btn {
     align-items: flex-start;
     gap: 0.5rem;
   }
+}
+
+/* Warning styles */
+.warnings-section {
+  border-left: 4px solid var(--warning-color, #ff9800);
+  background: rgba(255, 152, 0, 0.05);
+}
+
+.warning-item {
+  color: var(--warning-text, var(--text));
+}
+
+.warning-item strong {
+  color: var(--warning-color, #ff9800);
 }

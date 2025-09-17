@@ -531,7 +531,7 @@ async function preflightPolicy(targetUrl) {
   return finalUrl;
 }
 
-function normalizeOutput(o = {}, { url }) {
+function normalizeOutput(o = {}, { url, contentSource, isBlocked = false }) {
   const out = { ...o };
   out.schema_version = '2025-09-16';
 
@@ -546,6 +546,30 @@ function normalizeOutput(o = {}, { url }) {
     const d = new Date(m.published_at);
     if (!isNaN(d)) m.published_at = d.toISOString();
     else delete m.published_at;
+  }
+
+  // ---- WARNINGS ----
+  out.warnings = out.warnings && Array.isArray(out.warnings) ? out.warnings : [];
+  
+  // Add content access warnings
+  if (isBlocked || contentSource === 'Blocked') {
+    out.warnings.push({
+      type: 'content_blocked',
+      message: 'Bu mənbə bot mühafizəsi ilə qorunur və tam məzmuna çatmaq mümkün olmayıb. Təhlil məhdud məlumat əsasında aparılıb.',
+      severity: 'high'
+    });
+  } else if (contentSource === 'Archive.org') {
+    out.warnings.push({
+      type: 'archived_content',
+      message: 'Mənbə bloklanıb, lakin arxiv nüsxəsi tapılıb. Təhlil arxiv məlumatı əsasında aparılıb.',
+      severity: 'medium'
+    });
+  } else if (contentSource === 'LightFetch') {
+    out.warnings.push({
+      type: 'limited_content',
+      message: 'Məqalənin tam məzmununa çatmaq mümkün olmayıb. Təhlil mövcud məlumat əsasında aparılıb.',
+      severity: 'medium'
+    });
   }
 
   // ---- SCORES ----
@@ -682,14 +706,23 @@ export default async function handler(req, res) {
           try {
             const light = await gatedFetch(effectiveUrl);
             if (light?.text) {
-              articleTextFast = htmlToText(light.text).substring(0, MAX_ARTICLE_CHARS);
-              contentSource = 'LightFetch';
-              const m = light.text.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-              if (m && m[1]) headlineFast = htmlToText(m[1]);
-              console.log(`LightFetch success for ${effectiveUrl}: ${articleTextFast.length} chars`);
+              const rawText = htmlToText(light.text);
+              const isBlockedContent = BLOCK_KEYWORDS.some((kw) => rawText.toLowerCase().includes(kw));
+              
+              if (isBlockedContent) {
+                console.log(`LightFetch detected blocked content for ${effectiveUrl}: ${rawText.substring(0, 200)}...`);
+                contentSource = 'Blocked';
+              } else {
+                articleTextFast = rawText.substring(0, MAX_ARTICLE_CHARS);
+                contentSource = 'LightFetch';
+                const m = light.text.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+                if (m && m[1]) headlineFast = htmlToText(m[1]);
+                console.log(`LightFetch success for ${effectiveUrl}: ${articleTextFast.length} chars`);
+              }
             }
           } catch (e) {
             console.log(`LightFetch failed for ${effectiveUrl}: ${e?.message || e}`);
+            contentSource = 'Blocked';
           }
 
           // If fast path is acceptable, proceed directly to LLM without Chromium.
@@ -724,7 +757,11 @@ export default async function handler(req, res) {
                 prompt: safePrompt,
                 timeout: userSelection.timeout
               });
-              const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
+              const normalized = normalizeOutput(r2.parsed, { 
+                url: effectiveUrl, 
+                contentSource, 
+                isBlocked: contentSource === 'Blocked' 
+              });
               normalized.hash = cacheKey;
               normalized.modelUsed = r2.modelUsed;
               normalized.contentSource = contentSource;
@@ -784,7 +821,11 @@ export default async function handler(req, res) {
               });
               parsedQuick = r2.parsed; modelUsedQuick = r2.modelUsed;
             }
-            const normalized = normalizeOutput(parsedQuick, { url: effectiveUrl });
+            const normalized = normalizeOutput(parsedQuick, { 
+              url: effectiveUrl, 
+              contentSource, 
+              isBlocked: contentSource === 'Blocked' 
+            });
             normalized.hash = cacheKey;
             normalized.modelUsed = modelUsedQuick;
             normalized.contentSource = contentSource;
@@ -823,7 +864,11 @@ export default async function handler(req, res) {
               prompt: safePrompt,
               timeout: userSelection.timeout
             });
-            const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
+            const normalized = normalizeOutput(r2.parsed, { 
+              url: effectiveUrl, 
+              contentSource, 
+              isBlocked: contentSource === 'Blocked' 
+            });
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
             normalized.contentSource = contentSource;
@@ -1069,7 +1114,11 @@ export default async function handler(req, res) {
               prompt: safePrompt,
               timeout: userSelection.timeout
             });
-            const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
+            const normalized = normalizeOutput(r2.parsed, { 
+              url: effectiveUrl, 
+              contentSource, 
+              isBlocked: contentSource === 'Blocked' 
+            });
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
             normalized.contentSource = contentSource;
@@ -1096,6 +1145,11 @@ export default async function handler(req, res) {
           // Check both article text and full page content for bot detection
           const pageContent = await page.evaluate(() => document.documentElement ? document.documentElement.innerText : '');
           const isBlocked = BLOCK_KEYWORDS.some((kw) => lower.includes(kw) || pageContent.toLowerCase().includes(kw));
+          
+          // Update contentSource if blocked
+          if (isBlocked) {
+            contentSource = 'Blocked';
+          }
           
           if (isBlocked) {
             console.log(`Initial fetch for ${effectiveUrl} was blocked. Checking Archive.org...`);
@@ -1200,7 +1254,11 @@ export default async function handler(req, res) {
             parsed = r2.parsed; modelUsed = r2.modelUsed;
           }
 
-          const normalized = normalizeOutput(parsed, { url: effectiveUrl });
+          const normalized = normalizeOutput(parsed, { 
+            url: effectiveUrl, 
+            contentSource, 
+            isBlocked: contentSource === 'Blocked' 
+          });
 
           // Decorate + cache
           normalized.hash = cacheKey;
