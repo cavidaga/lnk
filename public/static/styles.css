@@ -1154,8 +1154,9 @@ footer.site-footer{
   .radial-center-logo img{
     width: 144px;
     height: 144px;
-    border-radius: 24px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
   }
   
   /* Blur background when menu is open */
