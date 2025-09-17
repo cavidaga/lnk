@@ -217,7 +217,7 @@ header{
   }
   
   /* Show radial items as icon-only nav links on desktop */
-  .radial-item{
+  .radial-item.nav-link{
     position: static !important;
     width: auto !important;
     height: auto !important;
@@ -243,7 +243,7 @@ header{
     position: relative !important;
   }
   
-  .radial-item:hover{
+  .radial-item.nav-link:hover{
     background: var(--hover) !important;
     color: var(--accent) !important;
     border-color: transparent !important;
@@ -251,23 +251,23 @@ header{
     box-shadow: none !important;
   }
   
-  .radial-item .icon{
+  .radial-item.nav-link .icon{
     width: 16px !important;
     height: 16px !important;
     flex-shrink: 0 !important;
   }
   
-  .radial-item .label{
+  .radial-item.nav-link .label{
     display: none !important;
   }
   
   /* Active state for current page */
-  .radial-item.active{
+  .radial-item.nav-link.active{
     background: var(--accent) !important;
     color: white !important;
   }
   
-  .radial-item.active .icon{
+  .radial-item.nav-link.active .icon{
     color: white !important;
   }
   
@@ -302,7 +302,7 @@ header{
   }
   
   /* Tooltips for desktop navigation */
-  .radial-item[data-tooltip]::after {
+  .radial-item.nav-link[data-tooltip]::after {
     content: attr(data-tooltip) !important;
     position: absolute !important;
     bottom: calc(100% + 8px) !important;
@@ -321,13 +321,13 @@ header{
     z-index: 1000 !important;
   }
   
-  .radial-item[data-tooltip]:hover::after {
+  .radial-item.nav-link[data-tooltip]:hover::after {
     opacity: 1 !important;
     transform: translateX(-50%) translateY(0) !important;
   }
   
   @media (prefers-color-scheme: light) {
-    .radial-item[data-tooltip]::after {
+    .radial-item.nav-link[data-tooltip]::after {
       background: rgba(20,20,25,.9) !important;
     }
   }
