@@ -90,6 +90,23 @@
   --to-top-border: #333;
 }
 
+/* Ensure gradient background is always applied */
+.theme-light{
+  background:
+    radial-gradient(1100px 760px at 8% -18%, color-mix(in oklab, var(--navy) 8%, transparent), transparent 60%),
+    radial-gradient(900px 640px at 112% 6%, color-mix(in oklab, var(--navy) 6%, transparent), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0) 30%),
+    var(--bg);
+}
+
+.theme-dark{
+  background:
+    radial-gradient(1100px 760px at 8% -18%, color-mix(in oklab, var(--navy) 14%, transparent), transparent 60%),
+    radial-gradient(900px 640px at 112% 6%, color-mix(in oklab, var(--navy) 10%, transparent), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0) 30%),
+    var(--bg);
+}
+
 *{ box-sizing:border-box }
 html:focus-within{ scroll-behavior:smooth }
 
