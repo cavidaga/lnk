@@ -216,30 +216,30 @@ header{
     display: none !important;
   }
   
-  /* Show radial items as normal nav links on desktop */
+  /* Show radial items as icon-only nav links on desktop */
   .radial-item{
     position: static !important;
     width: auto !important;
     height: auto !important;
     background: transparent !important;
     border: none !important;
-    border-radius: 0 !important;
+    border-radius: 8px !important;
     display: inline-flex !important;
-    flex-direction: row !important;
+    flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
+    gap: 4px !important;
     text-decoration: none !important;
     color: var(--text) !important;
-    font-size: 15px !important;
+    font-size: 12px !important;
     font-weight: 500 !important;
     box-shadow: none !important;
     transition: all 0.2s ease !important;
     opacity: 1 !important;
     transform: none !important;
-    padding: 10px 16px !important;
-    border-radius: 8px !important;
+    padding: 8px !important;
     white-space: nowrap !important;
+    min-width: 44px !important;
   }
   
   .radial-item:hover{
@@ -257,9 +257,17 @@ header{
   }
   
   .radial-item .label{
-    font-size: 15px !important;
-    text-align: left !important;
-    line-height: 1.2 !important;
+    display: none !important;
+  }
+  
+  /* Active state for current page */
+  .radial-item.active{
+    background: var(--accent) !important;
+    color: white !important;
+  }
+  
+  .radial-item.active .icon{
+    color: white !important;
   }
   
   /* Special styling for support button on desktop */
@@ -278,6 +286,7 @@ header{
   
   .radial-item.support-item .label{
     display: inline !important;
+    font-size: 11px !important;
   }
 }
 
