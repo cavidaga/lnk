@@ -802,8 +802,9 @@ export default async function handler(req, res) {
   }
 
   // Add version to cache key to invalidate old blocked content results
-  const cacheVersion = 'v2-blocked-fix';
+  const cacheVersion = 'v3-archive-md-fix';
   const cacheKey = crypto.createHash('md5').update(url + cacheVersion).digest('hex');
+  console.log(`Cache key for ${url}: ${cacheKey} (version: ${cacheVersion})`);
 
   try {
     // KV cache
@@ -885,11 +886,12 @@ export default async function handler(req, res) {
 
           // If content is blocked, try archive.md first before falling back to blocked analysis
           if (contentSource === 'Blocked') {
-            console.log(`Content blocked, trying archive.md fallback...`);
+            console.log(`Content blocked, trying archive.md fallback for ${effectiveUrl}...`);
             let archiveMdSuccess = false;
             
             try {
               const archiveMdUrl = await getArchiveMdUrl(effectiveUrl);
+              console.log(`Archive.md lookup for ${effectiveUrl}: ${archiveMdUrl || 'not found'}`);
               if (archiveMdUrl) {
                 console.log(`Archive.md found. Fetching from: ${archiveMdUrl}`);
                 
