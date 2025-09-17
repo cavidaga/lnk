@@ -354,7 +354,7 @@ function renderAnalysis(root, data) {
                 align-items:center;
                 gap:6px;
               ">
-                👍 Bəli, faydalı
+                👍 Razıyam
               </button>
               <button class="feedback-btn thumbs-down" data-hash="${hash}" data-feedback="down" style="
                 background:var(--card-bg,rgba(255,255,255,0.02));
@@ -369,7 +369,7 @@ function renderAnalysis(root, data) {
                 align-items:center;
                 gap:6px;
               ">
-                👎 Xeyr, faydalı deyil
+                👎 Razı deyiləm
               </button>
             </div>
             <div class="feedback-status" style="font-size:14px;color:var(--muted);min-height:20px;"></div>
