@@ -302,10 +302,18 @@ h1{ font-size:26px; margin:0; letter-spacing:.2px }
   grid-template-columns:1fr 1fr;
   margin-bottom: 16px;
 }
+@media (max-width:768px){ 
+  .row{ 
+    grid-template-columns:1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  } 
+}
 @media (max-width:520px){ 
   .row{ 
     grid-template-columns:1fr;
     gap: 8px;
+    margin-bottom: 16px;
   } 
 }
 
@@ -1132,29 +1140,46 @@ footer.site-footer{
 
 /* Mobile: Make it more compact and fix alignment */
 @media (max-width: 768px) {
+  .hdr {
+    padding: 16px;
+  }
   .hdr .kv{
-    gap: 6px;
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
   }
   .hdr .item{
-    padding: 4px 0;
-    gap: 6px;
+    padding: 6px 0;
+    gap: 8px;
+    display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border, #eee);
+  }
+  .hdr .item:last-child {
+    border-bottom: none;
   }
   .hdr .k{
-    font-size: 10px;
-    min-width: 50px;
+    font-size: 11px;
+    min-width: 60px;
     flex-shrink: 0;
+    font-weight: 600;
+    color: var(--muted, #666);
   }
   .hdr .v{
-    font-size: 13px;
+    font-size: 14px;
     text-align: right;
     flex: 1;
+    line-height: 1.3;
   }
   .hdr .item.link {
-    justify-content: flex-start;
+    justify-content: center;
+    padding: 12px 0;
+    border-bottom: none;
   }
   .hdr .item.link .v {
-    text-align: left;
+    text-align: center;
+    flex: none;
   }
 }
 
@@ -1586,6 +1611,22 @@ kbd {
 .stat:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 768px) {
+  .stat {
+    padding: 12px;
+    border-radius: 10px;
+  }
+  
+  .stat .small {
+    font-size: 10px !important;
+    margin-bottom: 6px !important;
+  }
+  
+  .stat > div:last-child {
+    font-size: 24px !important;
+  }
 }
 
 /* =================== Original Link Button =================== */

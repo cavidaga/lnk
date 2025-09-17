@@ -520,9 +520,10 @@ function renderAnalysis(root, data, hash) {
         flex: 1;
         transition: all 0.2s ease;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
       ">
-        <div class="small muted" style="margin-bottom: 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">${esc(label)}</div>
-        <div style="font-size: 32px; font-weight: 700; line-height: 1; color: var(--text);">${esc(String(v))}${esc(suffix)}</div>
+        <div class="small muted" style="margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">${esc(label)}</div>
+        <div style="font-size: 28px; font-weight: 700; line-height: 1; color: var(--text);">${esc(String(v))}${esc(suffix)}</div>
       </div>`;
   }
 
