@@ -513,6 +513,31 @@ pre{
   }
 }
 
+/* Manual theme overrides for share buttons */
+.theme-light .share-btn.x  { color:#000 }          /* X (Twitter) */
+.theme-light .share-btn.fb { color:#1877f2 }       /* Facebook */
+.theme-light .share-btn.li { color:#0a66c2 }       /* LinkedIn */
+.theme-light .share-btn.tg { color:#229ED9 }       /* Telegram */
+.theme-light .share-btn.wa { color:#25D366 }       /* WhatsApp */
+
+.theme-light .share-btn.x:hover  { background:#000;    color:#fff; border-color:transparent }
+.theme-light .share-btn.fb:hover { background:#1877f2; color:#fff; border-color:transparent }
+.theme-light .share-btn.li:hover { background:#0a66c2; color:#fff; border-color:transparent }
+.theme-light .share-btn.tg:hover { background:#229ED9; color:#fff; border-color:transparent }
+.theme-light .share-btn.wa:hover { background:#25D366; color:#fff; border-color:transparent }
+
+.theme-dark .share-btn.x,
+.theme-dark .share-btn.fb,
+.theme-dark .share-btn.li,
+.theme-dark .share-btn.tg,
+.theme-dark .share-btn.wa { color:#fff }
+
+.theme-dark .share-btn:hover{
+  background:rgba(255,255,255,.12);
+  color:#fff;
+  border-color:transparent;
+}
+
 /* =================== Footer =================== */
 footer.site-footer{
   margin-top:36px; padding:22px; border-top:1px solid var(--border);
