@@ -950,7 +950,9 @@ footer.site-footer{
 
   .site-nav{
     position: fixed; top:0; right:0; height:100vh;
-    width: 240px;
+    width: auto;
+    min-width: 200px;
+    max-width: 280px;
     background: var(--panel);
     border-left:1px solid var(--border);
     box-shadow: var(--shadow);

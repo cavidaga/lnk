@@ -110,18 +110,7 @@
 
           <!-- Action buttons container (mobile only) -->
           <div class="nav-actions">
-            <!-- Theme toggle button (mobile) -->
-            <button class="theme-toggle theme-toggle-mobile" type="button" 
-                    data-tooltip="Tema dəyişdir" aria-label="Tema dəyişdir">
-              <svg class="icon theme-icon-sun" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-              <svg class="icon theme-icon-moon" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="display: none;">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-              <span class="sr-only">Tema dəyişdir</span>
-            </button>
+            <!-- Theme toggle removed - available in header -->
           </div>
         </nav>
       </header>
@@ -244,7 +233,7 @@
     backdrop?.addEventListener('click', closeNav);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
     drawer?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
-    drawer?.querySelector('.nav-actions .theme-toggle')?.addEventListener('click', closeNav);
+    // Theme toggle removed from mobile nav
     // Close button removed - navigation closes on backdrop click or outside click
     syncToggle();
     mq.addEventListener ? mq.addEventListener('change', syncToggle) : mq.addListener(syncToggle);
@@ -256,7 +245,6 @@
 
     // Theme toggle functionality
     const themeToggle = document.getElementById('theme-toggle');
-    const themeToggleMobile = document.querySelector('.theme-toggle-mobile');
     const themeIconSun = document.querySelectorAll('.theme-icon-sun');
     const themeIconMoon = document.querySelectorAll('.theme-icon-moon');
     
@@ -370,9 +358,6 @@
     // Set up theme toggle
     if (themeToggle) {
       themeToggle.addEventListener('click', toggleTheme);
-    }
-    if (themeToggleMobile) {
-      themeToggleMobile.addEventListener('click', toggleTheme);
     }
     if (mobileThemeToggle) {
       mobileThemeToggle.addEventListener('click', toggleTheme);
