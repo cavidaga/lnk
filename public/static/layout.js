@@ -36,38 +36,34 @@
 
         <div class="nav-backdrop" hidden></div>
 
-        <nav id="primary-nav" class="site-nav" aria-label="Əsas menyu">
-          <!-- Mobile nav header -->
-          <div class="mobile-nav-header">
-            <span class="mobile-nav-title">Menyu</span>
-          </div>
+        <nav id="primary-nav" class="site-nav radial-menu" aria-label="Əsas menyu">
           
-          <a href="/" class="nav-link" data-tooltip="Əsas səhifə" aria-label="Əsas səhifə">
+          <a href="/" class="radial-item" data-tooltip="Əsas səhifə" aria-label="Əsas səhifə" data-angle="0">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <polyline points="9,22 9,12 15,12 15,22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span class="sr-only">Əsas səhifə</span>
+            <span class="label">Əsas</span>
           </a>
           
-          <a href="/history.html" class="nav-link" data-tooltip="Tarixçə" aria-label="Tarixçə">
+          <a href="/history.html" class="radial-item" data-tooltip="Tarixçə" aria-label="Tarixçə" data-angle="72">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M3 3v5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M12 7v5l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span class="sr-only">Tarixçə</span>
+            <span class="label">Tarixçə</span>
           </a>
           
-          <a href="/about.html" class="nav-link" data-tooltip="Haqqımızda" aria-label="Haqqımızda">
+          <a href="/about.html" class="radial-item" data-tooltip="Haqqımızda" aria-label="Haqqımızda" data-angle="144">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span class="sr-only">Haqqımızda</span>
+            <span class="label">Haqqımızda</span>
           </a>
           
-          <a href="/methodology.html" class="nav-link" data-tooltip="Metodologiya" aria-label="Metodologiya">
+          <a href="/methodology.html" class="radial-item" data-tooltip="Metodologiya" aria-label="Metodologiya" data-angle="216">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -75,16 +71,16 @@
               <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <polyline points="10,9 9,9 8,9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span class="sr-only">Metodologiya</span>
+            <span class="label">Metodologiya</span>
           </a>
           
-          <a href="/privacy.html" class="nav-link" data-tooltip="Məxfilik" aria-label="Məxfilik">
+          <a href="/privacy.html" class="radial-item" data-tooltip="Məxfilik" aria-label="Məxfilik" data-angle="288">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="12" cy="16" r="1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span class="sr-only">Məxfilik</span>
+            <span class="label">Məxfilik</span>
           </a>
 
           <!-- Theme toggle button (desktop) -->
@@ -111,10 +107,6 @@
             <span class="label">Dəstək ol</span>
           </a>
 
-          <!-- Action buttons container (mobile only) -->
-          <div class="nav-actions">
-            <!-- Theme toggle removed - available in header -->
-          </div>
         </nav>
       </header>
     `;
