@@ -49,6 +49,34 @@ const MAX_TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS || 20000); // 20s de
 // --- Helpers ---
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
+// Map user model selection to actual models and timeouts
+function getUserModelSelection(userModelType) {
+  const modelMap = {
+    'auto': { 
+      model: null, // Will use smart selection
+      timeout: 60000, // 60s default
+      description: 'Avtomatik seçim'
+    },
+    'flash-lite': { 
+      model: FLASH_LITE_MODEL, 
+      timeout: 30000, // 30s for fast model
+      description: 'Qısa xəbər (sürətli)'
+    },
+    'flash': { 
+      model: 'gemini-2.5-flash', 
+      timeout: 45000, // 45s for balanced model
+      description: 'Orta uzunluq (balanslı)'
+    },
+    'pro': { 
+      model: PRO_MODEL, 
+      timeout: 90000, // 90s for complex analysis
+      description: 'Analitika (dərin təhlil)'
+    }
+  };
+  
+  return modelMap[userModelType] || modelMap['auto'];
+}
+
 // Smart model selection based on content characteristics
 function selectOptimalModel({ articleText, url, title, contentLength }) {
   const text = articleText || '';
@@ -272,13 +300,13 @@ function isUnavailableError(e) {
 }
 
 // Multi-tier fallback: primary → fallbacks[]
-async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModels = [], prompt }) {
+async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModels = [], prompt, timeout = MAX_TIMEOUT_MS }) {
   const models = [primaryModel, ...fallbackModels];
   let lastError = null;
   for (const model of models) {
     for (let attempt = 1; attempt <= RETRY_ATTEMPTS; attempt++) {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), MAX_TIMEOUT_MS);
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
       try {
         const { text, finishReason } = await callGeminiOnce({ model, prompt, signal: controller.signal });
         const parsed = extractJsonLoose(text);
@@ -292,7 +320,7 @@ async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModels = [
           continue;
         }
         break;
-      } finally { clearTimeout(timeout); }
+      } finally { clearTimeout(timeoutId); }
     }
   }
   throw lastError || new Error('Model call failed without a specific error');
@@ -584,7 +612,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { url } = req.body || {};
+  const { url, modelType = 'auto' } = req.body || {};
   if (!url) {
     return res.status(400).json({ error: 'URL daxil edilməyib.' });
   }
@@ -663,20 +691,31 @@ export default async function handler(req, res) {
             const hostQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
             if (hostQuick.endsWith('jam-news.net')) {
               const siteQuick = hostQuick;
-              // Smart model selection for fast path
-              const fastModelSelection = selectOptimalModel({
-                articleText: articleTextFast,
-                url: effectiveUrl,
-                title: headlineFast,
-                contentLength: articleTextFast.length
-              });
+              // Get user model selection for fast path
+              const userSelection = getUserModelSelection(modelType);
+              let fastModelSelection;
+              if (userSelection.model) {
+                fastModelSelection = {
+                  model: userSelection.model,
+                  reason: `User selected: ${userSelection.description}`,
+                  confidence: 'high'
+                };
+              } else {
+                fastModelSelection = selectOptimalModel({
+                  articleText: articleTextFast,
+                  url: effectiveUrl,
+                  title: headlineFast,
+                  contentLength: articleTextFast.length
+                });
+              }
               console.log(`Fast path model selection: ${fastModelSelection.model} - ${fastModelSelection.reason}`);
               
               const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
               const r2 = await callGeminiWithRetryAndFallback({
                 primaryModel: fastModelSelection.model,
                 fallbackModels: FALLBACK_MODELS,
-                prompt: safePrompt
+                prompt: safePrompt,
+                timeout: userSelection.timeout
               });
               const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
               normalized.hash = cacheKey;
@@ -691,13 +730,23 @@ export default async function handler(req, res) {
 
           if (articleTextFast && articleTextFast.length >= 400) {
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
-            // Smart model selection for light fetch path
-            const lightModelSelection = selectOptimalModel({
-              articleText: articleTextFast,
-              url: effectiveUrl,
-              title: headlineFast,
-              contentLength: articleTextFast.length
-            });
+            // Get user model selection for light fetch path
+            const userSelection = getUserModelSelection(modelType);
+            let lightModelSelection;
+            if (userSelection.model) {
+              lightModelSelection = {
+                model: userSelection.model,
+                reason: `User selected: ${userSelection.description}`,
+                confidence: 'high'
+              };
+            } else {
+              lightModelSelection = selectOptimalModel({
+                articleText: articleTextFast,
+                url: effectiveUrl,
+                title: headlineFast,
+                contentLength: articleTextFast.length
+              });
+            }
             console.log(`Light fetch model selection: ${lightModelSelection.model} - ${lightModelSelection.reason}`);
             
             const SHRINKS = [0.7, 0.4];
@@ -710,7 +759,8 @@ export default async function handler(req, res) {
                 const r = await callGeminiWithRetryAndFallback({
                   primaryModel: lightModelSelection.model,
                   fallbackModels: FALLBACK_MODELS,
-                  prompt
+                  prompt,
+                  timeout: userSelection.timeout
                 });
                 parsedQuick = r.parsed; modelUsedQuick = r.modelUsed; break;
               } catch (e) {
@@ -722,7 +772,8 @@ export default async function handler(req, res) {
               const r2 = await callGeminiWithRetryAndFallback({
                 primaryModel: lightModelSelection.model,
                 fallbackModels: FALLBACK_MODELS,
-                prompt: safePrompt
+                prompt: safePrompt,
+                timeout: userSelection.timeout
               });
               parsedQuick = r2.parsed; modelUsedQuick = r2.modelUsed;
             }
@@ -739,20 +790,31 @@ export default async function handler(req, res) {
           if (articleTextFast && articleTextFast.length > 0) {
             // Thin content: skip Chromium and do safe prompt quickly
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
-            // Smart model selection for thin content
-            const thinModelSelection = selectOptimalModel({
-              articleText: articleTextFast,
-              url: effectiveUrl,
-              title: headlineFast,
-              contentLength: articleTextFast.length
-            });
+            // Get user model selection for thin content
+            const userSelection = getUserModelSelection(modelType);
+            let thinModelSelection;
+            if (userSelection.model) {
+              thinModelSelection = {
+                model: userSelection.model,
+                reason: `User selected: ${userSelection.description}`,
+                confidence: 'high'
+              };
+            } else {
+              thinModelSelection = selectOptimalModel({
+                articleText: articleTextFast,
+                url: effectiveUrl,
+                title: headlineFast,
+                contentLength: articleTextFast.length
+              });
+            }
             console.log(`Thin content model selection: ${thinModelSelection.model} - ${thinModelSelection.reason}`);
             
             const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headlineFast, site: siteQuick });
             const r2 = await callGeminiWithRetryAndFallback({
               primaryModel: thinModelSelection.model,
               fallbackModels: FALLBACK_MODELS,
-              prompt: safePrompt
+              prompt: safePrompt,
+              timeout: userSelection.timeout
             });
             const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
             normalized.hash = cacheKey;
@@ -885,20 +947,31 @@ export default async function handler(req, res) {
             let titleForSafe = '';
             try { titleForSafe = (await page.title()).slice(0, 180); } catch {}
             
-            // Smart model selection for jam-news thin content
-            const jamNewsModelSelection = selectOptimalModel({
-              articleText,
-              url: effectiveUrl,
-              title: titleForSafe,
-              contentLength: articleText.length
-            });
+            // Get user model selection for jam-news thin content
+            const userSelection = getUserModelSelection(modelType);
+            let jamNewsModelSelection;
+            if (userSelection.model) {
+              jamNewsModelSelection = {
+                model: userSelection.model,
+                reason: `User selected: ${userSelection.description}`,
+                confidence: 'high'
+              };
+            } else {
+              jamNewsModelSelection = selectOptimalModel({
+                articleText,
+                url: effectiveUrl,
+                title: titleForSafe,
+                contentLength: articleText.length
+              });
+            }
             console.log(`Jam-news thin content model selection: ${jamNewsModelSelection.model} - ${jamNewsModelSelection.reason}`);
             
             const safePrompt = buildSafePrompt({ url: effectiveUrl, title: titleForSafe, site: siteQuick });
             const r2 = await callGeminiWithRetryAndFallback({
               primaryModel: jamNewsModelSelection.model,
               fallbackModels: FALLBACK_MODELS,
-              prompt: safePrompt
+              prompt: safePrompt,
+              timeout: userSelection.timeout
             });
             const normalized = normalizeOutput(r2.parsed, { url: effectiveUrl });
             normalized.hash = cacheKey;
@@ -957,15 +1030,32 @@ export default async function handler(req, res) {
             if (ogt && ogt.length > 5) headline = ogt;
           } catch {}
 
-          // Smart model selection based on content characteristics
-          const modelSelection = selectOptimalModel({
-            articleText,
-            url: effectiveUrl,
-            title: headline,
-            contentLength: articleText.length
-          });
+          // Get user model selection and timeout
+          const userSelection = getUserModelSelection(modelType);
+          console.log(`User model selection: ${userSelection.description} (timeout: ${userSelection.timeout}ms)`);
           
-          console.log(`Smart model selection: ${modelSelection.model} - ${modelSelection.reason} (confidence: ${modelSelection.confidence})`);
+          // Determine final model selection
+          let finalModelSelection;
+          if (userSelection.model) {
+            // User explicitly selected a model
+            finalModelSelection = {
+              model: userSelection.model,
+              reason: `User selected: ${userSelection.description}`,
+              confidence: 'high'
+            };
+          } else {
+            // Use smart selection for 'auto' mode
+            finalModelSelection = selectOptimalModel({
+              articleText,
+              url: effectiveUrl,
+              title: headline,
+              contentLength: articleText.length
+            });
+            console.log(`Smart model selection: ${finalModelSelection.model} - ${finalModelSelection.reason} (confidence: ${finalModelSelection.confidence})`);
+          }
+          
+          // Update timeout based on user selection
+          const effectiveTimeout = userSelection.timeout;
 
           // If content is very short/blocked, jump straight to safe prompt to save tokens.
           const tooThin = !articleText || articleText.length < 400;
@@ -980,9 +1070,10 @@ export default async function handler(req, res) {
               const prompt = buildPrompt({ url: effectiveUrl, articleText: slice });
               try {
                 const r = await callGeminiWithRetryAndFallback({
-                  primaryModel: modelSelection.model,
+                  primaryModel: finalModelSelection.model,
                   fallbackModels: FALLBACK_MODELS,
-                  prompt
+                  prompt,
+                  timeout: effectiveTimeout
                 });
                 parsed = r.parsed; modelUsed = r.modelUsed;
                 break;
@@ -1001,9 +1092,10 @@ export default async function handler(req, res) {
           if (!parsed) {
             const safePrompt = buildSafePrompt({ url: effectiveUrl, title: headline, site });
             const r2 = await callGeminiWithRetryAndFallback({
-              primaryModel: modelSelection.model,
+              primaryModel: finalModelSelection.model,
               fallbackModels: FALLBACK_MODELS,
-              prompt: safePrompt
+              prompt: safePrompt,
+              timeout: effectiveTimeout
             });
             parsed = r2.parsed; modelUsed = r2.modelUsed;
           }

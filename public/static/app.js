@@ -39,7 +39,9 @@
     let inFlight = false;
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const url = new FormData(form).get('url');
+      const formData = new FormData(form);
+      const url = formData.get('url');
+      const modelType = formData.get('model-type') || 'auto';
       if (!url) return;
       if (inFlight) return;           // prevent double submits
       inFlight = true;
@@ -53,7 +55,10 @@
         const res = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: String(url).trim() })
+          body: JSON.stringify({ 
+            url: String(url).trim(),
+            modelType: String(modelType)
+          })
         });
         const json = await res.json();
         if (!res.ok || json.error) {
