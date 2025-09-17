@@ -965,55 +965,33 @@ footer.site-footer{
   .mobile-nav-header{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    padding:0 4px 12px 4px;
+    justify-content:center;
+    padding:8px 4px 12px 4px;
     border-bottom:1px solid var(--border);
-    margin-bottom:8px;
+    margin-bottom:12px;
   }
   .mobile-nav-title{
-    font-size:16px;
+    font-size:14px;
     font-weight:600;
     color:var(--text);
-  }
-  .mobile-nav-close{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:32px;
-    height:32px;
-    border:1px solid var(--border);
-    background:var(--panel);
-    border-radius:6px;
-    cursor:pointer;
-    color:var(--text);
-    transition:all .2s ease;
-  }
-  .mobile-nav-close:hover{
-    background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
-    border-color:var(--accent);
-  }
-  .mobile-nav-close svg{
-    width:16px;
-    height:16px;
-    stroke:currentColor;
   }
   
   /* Navigation links on mobile - compact with icons and text */
   .nav-link{
-    padding:10px 8px; border-radius:8px;
-    font-size:14px; text-align:left;
+    padding:8px 6px; border-radius:6px;
+    font-size:13px; text-align:left;
     justify-content:flex-start;
-    gap:8px;
+    gap:6px;
     width:auto;
     height:auto;
-    min-height:40px;
+    min-height:36px;
   }
   .nav-link:hover{ 
     background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
   }
   .nav-link .icon{
-    width:16px;
-    height:16px;
+    width:14px;
+    height:14px;
     flex-shrink:0;
   }
   .nav-link .sr-only{

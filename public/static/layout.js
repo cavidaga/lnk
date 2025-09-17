@@ -37,11 +37,6 @@
           <!-- Mobile nav header -->
           <div class="mobile-nav-header">
             <span class="mobile-nav-title">Menyu</span>
-            <button class="mobile-nav-close" type="button" aria-label="Menyunu bağla">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              </svg>
-            </button>
           </div>
           
           <a href="/" class="nav-link" data-tooltip="Əsas səhifə" aria-label="Əsas səhifə">
@@ -250,7 +245,7 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
     drawer?.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
     drawer?.querySelector('.nav-actions .theme-toggle')?.addEventListener('click', closeNav);
-    drawer?.querySelector('.mobile-nav-close')?.addEventListener('click', closeNav);
+    // Close button removed - navigation closes on backdrop click or outside click
     syncToggle();
     mq.addEventListener ? mq.addEventListener('change', syncToggle) : mq.addListener(syncToggle);
     
