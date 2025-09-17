@@ -1682,8 +1682,8 @@ kbd {
   }
 }
 
-/* =================== Original Link Button =================== */
-.original-link-btn {
+/* =================== Action Buttons =================== */
+.action-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1695,17 +1695,59 @@ kbd {
   font-size: 14px;
   font-weight: 500;
   transition: all 0.2s ease;
-  margin-top: 8px;
+  border: none;
+  cursor: pointer;
+  flex: 1;
+  justify-content: center;
 }
 
-.original-link-btn:hover {
+.action-btn:hover {
   background: var(--accent-2);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
 }
 
-.original-link-btn svg {
+.action-btn svg {
   flex-shrink: 0;
+}
+
+.summary-btn {
+  background: var(--muted, #666);
+}
+
+.summary-btn:hover {
+  background: var(--text, #333);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Desktop: Buttons in grid */
+@media (min-width: 720px) {
+  .hdr .item.buttons {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+  
+  .action-btn {
+    flex: 0 0 auto;
+    min-width: 200px;
+  }
+}
+
+/* Mobile: Buttons share space evenly */
+@media (max-width: 768px) {
+  .hdr .item.buttons {
+    display: flex;
+    gap: 8px;
+    padding: 16px 0;
+  }
+  
+  .action-btn {
+    flex: 1;
+    font-size: 13px;
+    padding: 10px 12px;
+  }
 }
 
 /* =================== History Styles =================== */
