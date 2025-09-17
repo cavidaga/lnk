@@ -160,14 +160,28 @@ header{
   font-weight:500;
   text-decoration:none;
   color:var(--text);
-  font-size:15px;
-  transition:color .2s ease;
+  font-size:14px;
+  transition:all .2s ease;
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  white-space:nowrap;
 }
-.site-nav a:hover{ color:var(--accent) }
+.site-nav a:hover{ 
+  color:var(--accent);
+  background: color-mix(in oklab, var(--panel) 88%, var(--accent) 12%);
+  border-color:var(--accent);
+  transform:translateY(-1px);
+}
 .site-nav a.active{
   color:var(--accent);
-  border-bottom:2px solid var(--accent);
-  padding-bottom:2px;
+  background: color-mix(in oklab, var(--panel) 92%, var(--accent) 8%);
+  border-color:var(--accent);
+  transform:translateY(-1px);
 }
 
 /* Theme toggle button */
@@ -587,13 +601,17 @@ footer.site-footer{
     border-top:1px solid var(--border);
   }
   
-  /* Hide individual buttons from main nav on mobile (but keep them in nav-actions) */
+  /* Hide desktop buttons on mobile */
   .site-nav > .theme-toggle,
   .site-nav > .btn-support{
     display:none;
   }
   
-  /* Show buttons in nav-actions container on mobile */
+  /* Show mobile buttons in nav-actions container */
+  .nav-actions{
+    display:flex;
+  }
+  
   .nav-actions .theme-toggle,
   .nav-actions .btn-support{
     display:inline-flex;
