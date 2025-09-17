@@ -190,6 +190,32 @@ header{
   .site-nav .btn-support{
     display:inline-flex !important;
   }
+  
+  /* Ensure desktop nav works properly (not radial menu) */
+  .site-nav.radial-menu{
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    width: auto !important;
+    height: auto !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    transition: none !important;
+    z-index: auto !important;
+    gap: 16px !important;
+  }
+  
+  /* Hide radial menu elements on desktop */
+  .radial-center-logo,
+  .radial-item{
+    display: none !important;
+  }
 }
 
 /* Navigation links with icons */
@@ -952,28 +978,30 @@ footer.site-footer{
   header{ position: relative }
   .nav-toggle{ display:inline-flex } /* show burger */
 
+  /* Override desktop nav styles for mobile radial menu */
   .site-nav.radial-menu{
-    position: fixed; 
-    top: 50%; 
-    left: 50%; 
-    transform: translate(-50%, -50%) scale(0);
-    width: 0;
-    height: 0;
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    z-index: 70;
+    position: fixed !important; 
+    top: 50% !important; 
+    left: 50% !important; 
+    transform: translate(-50%, -50%) scale(0) !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important;
+    z-index: 70 !important;
+    gap: 0 !important;
   }
   
   .site-nav.radial-menu.open{
-    transform: translate(-50%, -50%) scale(1);
-    width: 300px;
-    height: 300px;
+    transform: translate(-50%, -50%) scale(1) !important;
+    width: 300px !important;
+    height: 300px !important;
   }
   
   /* Radial menu items */
