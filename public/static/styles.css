@@ -728,6 +728,13 @@ footer.site-footer{
   color: var(--accent) !important;
 }
 
+/* History page empty state button */
+#history-empty .btn {
+  text-decoration: none !important;
+  display: inline-block;
+  margin-top: 8px;
+}
+
 /* =================== History Styles =================== */
 .history-list {
   display: flex;
