@@ -462,20 +462,29 @@ select.input {
 
 /* Stance color coding - light mode only */
 @media (prefers-color-scheme: light) {
-  /* Müsbət (positive) - green background */
+  /* Müsbət (positive) - green background for entire row */
   .sources-table .stance-positive {
+    background-color: #dcfce7 !important;
+  }
+  .sources-table .stance-positive td {
     background-color: #dcfce7 !important;
     color: #166534 !important;
   }
   
-  /* Mənfi (negative) - red background */
+  /* Mənfi (negative) - red background for entire row */
   .sources-table .stance-negative {
+    background-color: #fef2f2 !important;
+  }
+  .sources-table .stance-negative td {
     background-color: #fef2f2 !important;
     color: #991b1b !important;
   }
   
   /* Neytral (neutral) - keep default styling */
   .sources-table .stance-neutral {
+    background-color: var(--card) !important;
+  }
+  .sources-table .stance-neutral td {
     background-color: var(--card) !important;
     color: var(--text) !important;
   }
@@ -484,15 +493,24 @@ select.input {
 /* Manual theme override for stance colors */
 .theme-light .sources-table .stance-positive {
   background-color: #dcfce7 !important;
+}
+.theme-light .sources-table .stance-positive td {
+  background-color: #dcfce7 !important;
   color: #166534 !important;
 }
 
 .theme-light .sources-table .stance-negative {
   background-color: #fef2f2 !important;
+}
+.theme-light .sources-table .stance-negative td {
+  background-color: #fef2f2 !important;
   color: #991b1b !important;
 }
 
 .theme-light .sources-table .stance-neutral {
+  background-color: var(--card) !important;
+}
+.theme-light .sources-table .stance-neutral td {
   background-color: var(--card) !important;
   color: var(--text) !important;
 }
@@ -509,6 +527,79 @@ select.input {
 .socio-list li{ padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--panel); margin-bottom:8px }
 .socio-list li:last-child{ margin-bottom:0 }
 .socio-list .muted{ display:block; margin-top:4px }
+
+/* Socio-cultural stance color coding - light mode only */
+@media (prefers-color-scheme: light) {
+  /* Müsbət (positive) - green background */
+  .socio-list .stance-positive {
+    background-color: #dcfce7 !important;
+    border-color: #bbf7d0 !important;
+  }
+  .socio-list .stance-positive div {
+    color: #166534 !important;
+  }
+  .socio-list .stance-positive .muted {
+    color: #15803d !important;
+  }
+  
+  /* Mənfi (negative) - red background */
+  .socio-list .stance-negative {
+    background-color: #fef2f2 !important;
+    border-color: #fecaca !important;
+  }
+  .socio-list .stance-negative div {
+    color: #991b1b !important;
+  }
+  .socio-list .stance-negative .muted {
+    color: #dc2626 !important;
+  }
+  
+  /* Neytral (neutral) - keep default styling */
+  .socio-list .stance-neutral {
+    background-color: var(--panel) !important;
+    border-color: var(--border) !important;
+  }
+  .socio-list .stance-neutral div {
+    color: var(--text) !important;
+  }
+  .socio-list .stance-neutral .muted {
+    color: var(--muted) !important;
+  }
+}
+
+/* Manual theme override for socio-cultural stance colors */
+.theme-light .socio-list .stance-positive {
+  background-color: #dcfce7 !important;
+  border-color: #bbf7d0 !important;
+}
+.theme-light .socio-list .stance-positive div {
+  color: #166534 !important;
+}
+.theme-light .socio-list .stance-positive .muted {
+  color: #15803d !important;
+}
+
+.theme-light .socio-list .stance-negative {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+.theme-light .socio-list .stance-negative div {
+  color: #991b1b !important;
+}
+.theme-light .socio-list .stance-negative .muted {
+  color: #dc2626 !important;
+}
+
+.theme-light .socio-list .stance-neutral {
+  background-color: var(--panel) !important;
+  border-color: var(--border) !important;
+}
+.theme-light .socio-list .stance-neutral div {
+  color: var(--text) !important;
+}
+.theme-light .socio-list .stance-neutral .muted {
+  color: var(--muted) !important;
+}
 
 /* Language flags list */
 .flags{ list-style:none; padding:0; margin:0 }

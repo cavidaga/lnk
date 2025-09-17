@@ -288,12 +288,17 @@ function renderAnalysis(root, data, hash) {
             ${
               socio.length
               ? `<ul class="socio-list">${
-                  socio.map(it => `
-                    <li>
+                  socio.map(it => {
+                    const stance = it?.stance || '';
+                    const stanceClass = stance.toLowerCase().includes('müsbət') ? 'stance-positive' : 
+                                       stance.toLowerCase().includes('mənfi') ? 'stance-negative' : 
+                                       stance.toLowerCase().includes('neytral') ? 'stance-neutral' : '';
+                    return `
+                    <li class="${stanceClass}">
                       <div><strong>${esc(it.group || '—')}</strong> — ${esc(it.stance || '—')}</div>
                       ${it.rationale ? `<div class="small muted anywrap">${esc(it.rationale)}</div>` : ''}
-                    </li>
-                  `).join('')
+                    </li>`;
+                  }).join('')
                 }</ul>`
               : `<div class="small muted">—</div>`
             }
@@ -457,10 +462,10 @@ function renderAnalysis(root, data, hash) {
                                stance.toLowerCase().includes('mənfi') ? 'stance-negative' : 
                                stance.toLowerCase().includes('neytral') ? 'stance-neutral' : '';
             return `
-            <tr>
+            <tr class="${stanceClass}">
               <td>${esc(s?.name || '—')}</td>
               <td>${esc(toAZRole(s?.role))}</td>
-              <td class="${stanceClass}">${esc(toAZStance(s?.stance))}</td>
+              <td>${esc(toAZStance(s?.stance))}</td>
             </tr>`;
           }).join('')}
           </tbody>
