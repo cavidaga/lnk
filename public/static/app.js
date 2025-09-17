@@ -400,7 +400,7 @@ function renderAnalysis(root, data, hash) {
                 color:var(--text);
                 cursor:pointer;
                 font-size:14px;
-                transition:all 0.2s;
+                transition:all 0.3s ease;
                 display:flex;
                 align-items:center;
                 gap:6px;
@@ -415,7 +415,7 @@ function renderAnalysis(root, data, hash) {
                 color:var(--text);
                 cursor:pointer;
                 font-size:14px;
-                transition:all 0.2s;
+                transition:all 0.3s ease;
                 display:flex;
                 align-items:center;
                 gap:6px;
@@ -925,16 +925,28 @@ function headerBlock({ title, publication, published_at, url, title_inferred }){
 
   function markFeedbackAsGiven(feedback) {
     const buttons = document.querySelectorAll('.feedback-btn');
+    console.log('Marking feedback as given:', feedback, 'Found buttons:', buttons.length);
+    
     buttons.forEach(btn => {
       btn.disabled = true;
       btn.style.cursor = 'not-allowed';
       
       if (btn.dataset.feedback === feedback) {
+        // Selected button - make it prominent
         btn.style.background = 'var(--accent)';
         btn.style.color = 'white';
         btn.style.borderColor = 'var(--accent)';
+        btn.style.opacity = '1';
+        btn.style.transform = 'scale(1.05)';
+        console.log('Highlighting selected button:', btn.dataset.feedback);
       } else {
-        btn.style.opacity = '0.5';
+        // Unselected button - dim it out
+        btn.style.background = 'var(--card-bg, rgba(255,255,255,0.02))';
+        btn.style.color = 'var(--text-muted, #666)';
+        btn.style.borderColor = 'var(--border-muted, #333)';
+        btn.style.opacity = '0.3';
+        btn.style.transform = 'scale(0.95)';
+        console.log('Dimming unselected button:', btn.dataset.feedback);
       }
     });
   }
