@@ -144,7 +144,7 @@
       const url = esc(analysis.url || '');
       const publishedAt = analysis.published_at ? formatAzDate(analysis.published_at) : '';
       const reliability = num(analysis.reliability, 0);
-      const bias = num(analysis.political_bias, 0);
+      const politicalBias = num(analysis.political_bias, 0);
       const analysisUrl = `/analysis/${encodeURIComponent(analysis.hash)}`;
 
       return `
@@ -161,7 +161,7 @@
             </div>
             <div class="score-item">
               <span>Siyasi meyl:</span>
-              <span class="score-value bias">${bias(political_bias)}</span>
+              <span class="score-value bias">${bias(politicalBias)}</span>
             </div>
           </div>
           ${url ? `<div class="recent-item-url">${url}</div>` : ''}
