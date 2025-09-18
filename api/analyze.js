@@ -829,7 +829,7 @@ export default async function handler(req, res) {
       effectiveUrl = await preflightPolicy(url);
     } catch (polErr) {
       const messages = {
-        "BLOCKED_HOST":    "Böyük sənədlər (Google Docs/Drive və s.) analiz edilmir.",
+        "BLOCKED_HOST":    "Bu sayt LNK tərəfindən bloklanıb.",
         "BLOCKED_PATH":    "Bu keçid başqa bir hostinqdəki sənədə və ya birbaşa fayl yükləməsinə yönləndirir.",
         "DISALLOWED_MIME": "Analiz üçün dəstəklənməyən məzmun növü.",
         "ATTACHMENT":      "Birbaşa fayl əlavələri analiz edilmir.",
@@ -948,9 +948,33 @@ export default async function handler(req, res) {
               console.log(`Archive.md fallback failed: ${e?.message || e}`);
             }
             
-            // If archive.md failed, use blocked content analysis
+            // If archive.md failed, check if this is a known blocked site
             if (!archiveMdSuccess) {
             const siteQuick = new URL(effectiveUrl).hostname.replace(/^www\./,'');
+            
+            // Check if this site is in the blocked hosts list
+            if (isBlockedHost(siteQuick)) {
+              console.log(`Site ${siteQuick} is in blocked hosts list, returning error without caching`);
+              return res.status(403).json({ 
+                error: 'Bu sayt LNK tərəfindən bloklanıb', 
+                reason: 'Site is blocked by LNK policy',
+                url: effectiveUrl,
+                site: siteQuick
+              });
+            }
+            
+            // Only proceed with blocked content analysis if we have some meaningful content
+            // (title or partial content) to analyze
+            if (!headlineFast || headlineFast.length < 10) {
+              console.log(`No meaningful content available for blocked analysis, returning error without caching`);
+              return res.status(403).json({ 
+                error: 'Məqalənin məzmununa çatmaq mümkün olmadı', 
+                reason: 'No meaningful content available for analysis',
+                url: effectiveUrl,
+                site: siteQuick
+              });
+            }
+            
             const userSelection = getUserModelSelection(modelType);
             let blockedModelSelection;
             if (userSelection.model) {
