@@ -40,8 +40,8 @@
           <!-- Center logo -->
           <div class="radial-center-logo">
             <picture>
-              <source srcset="/static/logo-dark.svg" media="(prefers-color-scheme: light)">
-              <source srcset="/static/logo-light.svg" media="(prefers-color-scheme: dark)">
+              <source srcset="/static/logo-dark.svg" media="(prefers-color-scheme: dark)">
+              <source srcset="/static/logo-light.svg" media="(prefers-color-scheme: light)">
               <img src="/static/logo-light.svg" alt="LNK loqo" width="32" height="32" />
             </picture>
           </div>
@@ -332,8 +332,9 @@
     }
     
     function updateLogo(isDark) {
-      const picture = document.querySelector('picture');
-      if (picture) {
+      // Update all picture elements (main header logo and radial menu center logo)
+      const pictures = document.querySelectorAll('picture');
+      pictures.forEach(picture => {
         const sources = picture.querySelectorAll('source');
         const img = picture.querySelector('img');
         
@@ -345,12 +346,13 @@
           // Also update the fallback img src
           img.src = isDark ? '/static/logo-dark.svg' : '/static/logo-light.svg';
         }
-      }
+      });
     }
     
     function resetLogoToSystem() {
-      const picture = document.querySelector('picture');
-      if (picture) {
+      // Reset all picture elements to system theme
+      const pictures = document.querySelectorAll('picture');
+      pictures.forEach(picture => {
         const sources = picture.querySelectorAll('source');
         const img = picture.querySelector('img');
         
@@ -362,7 +364,7 @@
           // Reset fallback to light (original default)
           img.src = '/static/logo-light.svg';
         }
-      }
+      });
     }
     
     function toggleTheme() {
