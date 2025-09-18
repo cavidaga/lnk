@@ -389,7 +389,12 @@ function renderAnalysis(root, data, hash) {
         <section class="card">
           <div class="bd">
             <details>
-              <summary>Xam JSON datanı göstər</summary>
+              <summary class="json-summary">
+                <span>Xam JSON datanı göstər</span>
+                <button class="copy-json-btn" onclick="copyJsonData()">
+                  📋 Kopyala
+                </button>
+              </summary>
               <pre class="json">${esc(JSON.stringify(data, null, 2))}</pre>
             </details>
           </div>
@@ -843,6 +848,77 @@ function headerBlock({ title, publication, published_at, url, title_inferred }){
 
   async function safeJson(res) {
     try { return await res.json(); } catch { return {}; }
+  }
+
+  // Copy JSON data to clipboard
+  window.copyJsonData = function() {
+    try {
+      const hash = window.__LNK_HASH__ || (location.pathname.startsWith('/analysis/') ? location.pathname.split('/').pop() : '');
+      if (!hash) {
+        alert('JSON məlumatı tapılmadı');
+        return;
+      }
+
+      // Get the current analysis data from the page
+      const jsonPre = document.querySelector('.json');
+      if (!jsonPre) {
+        alert('JSON məlumatı tapılmadı');
+        return;
+      }
+
+      const jsonText = jsonPre.textContent;
+      
+      // Copy to clipboard
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(jsonText).then(() => {
+          showCopySuccess();
+        }).catch(() => {
+          fallbackCopyTextToClipboard(jsonText);
+        });
+      } else {
+        fallbackCopyTextToClipboard(jsonText);
+      }
+    } catch (error) {
+      console.error('Copy failed:', error);
+      alert('Kopyalama uğursuz oldu');
+    }
+  };
+
+  function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        showCopySuccess();
+      } else {
+        alert('Kopyalama uğursuz oldu');
+      }
+    } catch (err) {
+      alert('Kopyalama uğursuz oldu');
+    }
+    
+    document.body.removeChild(textArea);
+  }
+
+  function showCopySuccess() {
+    const button = document.querySelector('.copy-json-btn');
+    if (button) {
+      const originalText = button.textContent;
+      button.textContent = '✅ Kopyalandı!';
+      button.style.background = '#28a745';
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.style.background = 'var(--accent)';
+      }, 2000);
+    }
   }
 
 })();
