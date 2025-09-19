@@ -10,11 +10,6 @@
       description: 'Yeni analiz başlat',
       page: 'home'
     },
-    'Ctrl+Alt+H': {
-      action: 'history',
-      description: 'Tarixçəyə keç',
-      page: 'all'
-    },
     'Ctrl+Alt+M': {
       action: 'methodology',
       description: 'Metodologiyaya keç',
@@ -39,11 +34,6 @@
       action: 'clear',
       description: 'Formu təmizlə',
       page: 'home'
-    },
-    'Ctrl+Alt+C': {
-      action: 'clear-history',
-      description: 'Tarixçəni təmizlə',
-      page: 'history'
     },
     'Ctrl+Alt+S': {
       action: 'share',
@@ -79,7 +69,6 @@
   function getCurrentPage() {
     const path = location.pathname;
     if (path === '/' || path === '/index.html') return 'home';
-    if (path === '/history.html') return 'history';
     if (path.startsWith('/analysis/')) return 'analysis';
     return 'other';
   }
@@ -100,11 +89,6 @@
         }
         break;
 
-      case 'history':
-        if (currentPage !== 'history') {
-          location.href = '/history.html';
-        }
-        break;
 
       case 'methodology':
         location.href = '/methodology.html';
@@ -143,19 +127,9 @@
             input.value = '';
             input.focus();
           }
-        } else if (currentPage === 'history') {
-          location.href = '/';
         }
         break;
 
-      case 'clear-history':
-        if (currentPage === 'history') {
-          const clearBtn = document.getElementById('clear-history');
-          if (clearBtn) {
-            clearBtn.click();
-          }
-        }
-        break;
 
       case 'share':
         if (currentPage === 'analysis') {

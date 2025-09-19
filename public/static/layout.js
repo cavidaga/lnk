@@ -54,16 +54,8 @@
             <span class="label">Əsas</span>
           </a>
           
-          <a href="/history.html" class="radial-item nav-link" data-tooltip="Tarixçə" aria-label="Tarixçə" data-angle="72">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M3 3v5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M12 7v5l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span class="label">Tarixçə</span>
-          </a>
           
-          <a href="/about.html" class="radial-item nav-link" data-tooltip="Haqqımızda" aria-label="Haqqımızda" data-angle="144">
+          <a href="/about.html" class="radial-item nav-link" data-tooltip="Haqqımızda" aria-label="Haqqımızda" data-angle="72">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -71,7 +63,7 @@
             <span class="label">Haqqımızda</span>
           </a>
           
-          <a href="/methodology.html" class="radial-item nav-link" data-tooltip="Metodologiya" aria-label="Metodologiya" data-angle="216">
+          <a href="/methodology.html" class="radial-item nav-link" data-tooltip="Metodologiya" aria-label="Metodologiya" data-angle="144">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -82,7 +74,7 @@
             <span class="label">Metodologiya</span>
           </a>
           
-          <a href="/privacy.html" class="radial-item nav-link" data-tooltip="Məxfilik" aria-label="Məxfilik" data-angle="288">
+          <a href="/privacy.html" class="radial-item nav-link" data-tooltip="Məxfilik" aria-label="Məxfilik" data-angle="216">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="12" cy="16" r="1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -106,7 +98,7 @@
 
           <!-- Support button (desktop) -->
           <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener"
-            class="radial-item support-item" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol" data-angle="324">
+            class="radial-item support-item" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol" data-angle="288">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z"
                     stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
