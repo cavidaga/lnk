@@ -274,17 +274,6 @@ function renderAnalysis(root, data, hash) {
   const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = '', warnings = [], is_advertisement = false, advertisement_reason = '' } = data || {};
   const title = meta.title || 'Başlıq yoxdur';
   
-  // Debug: Check advertisement data
-  console.log('Advertisement data:', { is_advertisement, advertisement_reason });
-  
-  // Debug: Force add a very visible test element
-  setTimeout(() => {
-    const testDiv = document.createElement('div');
-    testDiv.innerHTML = '🔴 TEST LABEL - SHOULD BE VERY VISIBLE 🔴';
-    testDiv.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: red; color: white; padding: 20px; font-size: 24px; font-weight: bold; z-index: 9999; text-align: center;';
-    document.body.appendChild(testDiv);
-    console.log('Test div added to DOM');
-  }, 1000);
   
   // Numbers (with guards)
   const reliabilityNum = clamp(scores?.reliability?.value ?? 0, 0, 100);
@@ -519,13 +508,6 @@ function renderAnalysis(root, data, hash) {
   
   root.innerHTML = template;
   
-  // Debug: Check if advertisement label was rendered
-  const adLabel = root.querySelector('.advertisement-label');
-  console.log('Advertisement label found in DOM:', adLabel ? 'YES' : 'NO');
-  if (adLabel) {
-    console.log('Advertisement label text:', adLabel.textContent);
-    console.log('Advertisement label visible:', adLabel.offsetHeight > 0);
-  }
   
 }
 
@@ -894,18 +876,21 @@ function headerBlock({ title, publication, published_at, url, title_inferred, is
           </button>
         </div>
       </div>
-      <div class="advertisement-label" style="margin-top:12px;padding:8px 12px;background:linear-gradient(135deg, #ff6b6b, #ee5a52);border-radius:8px;display:flex;align-items:center;gap:8px;color:white;font-weight:600;font-size:14px;">
+      ${is_advertisement ? `
+      <div class="advertisement-label">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
         </svg>
-        <span>REKLAM XARAKTERLİ (TEST)</span>
-        <button onclick="window.open('/complaint.html?analysis_url=' + encodeURIComponent(window.location.href), '_blank')" style="margin-left:auto;background:rgba(255,255,255,0.2);border:none;color:white;padding:6px;border-radius:4px;cursor:pointer;" title="Şikayət et">
+        <span>REKLAM XARAKTERLİ</span>
+        <button class="complaint-btn" onclick="window.open('/complaint.html?analysis_url=' + encodeURIComponent(window.location.href), '_blank')" title="Şikayət et">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 12l2 2 4-4"></path>
             <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.91.37 4.15 1.02"></path>
           </svg>
         </button>
       </div>
+      ${advertisement_reason ? `<div class="micro muted">${esc(advertisement_reason)}</div>` : ''}
+      ` : ''}
       ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
     </header>
   `;
