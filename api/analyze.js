@@ -32,6 +32,17 @@ try {
 } catch {}
 puppeteer.use(stealth); // ✅ important for CF/anti-bot
 
+// Helper function to increment total analyses counter
+async function incrementTotalAnalysesCounter() {
+  try {
+    await kv.incr('total_analyses_count');
+    console.log('Incremented total analyses counter');
+  } catch (e) {
+    console.error('Failed to increment total analyses counter:', e);
+    // Don't throw - this is not critical for the main functionality
+  }
+}
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // --- Config ---
@@ -1012,6 +1023,9 @@ export default async function handler(req, res) {
             await kv.set(cacheKey, normalized, { ex: 2592000 });
             console.log(`SAVED TO CACHE (blocked-safe) for URL: ${effectiveUrl} with hash: ${cacheKey}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+            
+            // Increment total analyses counter
+            await incrementTotalAnalysesCounter();
             return normalized;
             }
           }
@@ -1060,6 +1074,9 @@ export default async function handler(req, res) {
               await kv.set(cacheKey, normalized, { ex: 2592000 });
               console.log(`SAVED TO CACHE (jam-news safe) for URL: ${effectiveUrl}`);
               try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+              
+              // Increment total analyses counter
+              await incrementTotalAnalysesCounter();
               return normalized;
             }
           } catch {}
@@ -1125,6 +1142,9 @@ export default async function handler(req, res) {
             await kv.set(cacheKey, normalized, { ex: 2592000 });
             console.log(`SAVED TO CACHE (light) for URL: ${effectiveUrl}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+            
+            // Increment total analyses counter
+            await incrementTotalAnalysesCounter();
             return normalized;
           }
 
@@ -1179,6 +1199,9 @@ export default async function handler(req, res) {
             await kv.set(cacheKey, normalized, { ex: 2592000 });
             console.log(`SAVED TO CACHE (light-safe) for URL: ${effectiveUrl}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+            
+            // Increment total analyses counter
+            await incrementTotalAnalysesCounter();
             return normalized;
           }
 
@@ -1435,6 +1458,9 @@ export default async function handler(req, res) {
             await kv.set(cacheKey, normalized, { ex: 2592000 });
             console.log(`SAVED TO CACHE (jam-news chromium-safe) for URL: ${effectiveUrl}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
+            
+            // Increment total analyses counter
+            await incrementTotalAnalysesCounter();
             return normalized;
           }
 
@@ -1606,6 +1632,9 @@ export default async function handler(req, res) {
           } catch (e) {
             console.error('KV list update error:', e);
           }
+
+          // Increment total analyses counter
+          await incrementTotalAnalysesCounter();
 
           return normalized;
         } finally {

@@ -151,11 +151,20 @@
       console.log('Statistics data:', stats);
       
       const totalElement = $('#total-analyses');
+      const recentElement = $('#recent-analyses');
+      
       if (totalElement && stats.total_analyses !== undefined) {
         // Format the number with thousands separator
-        const formattedNumber = stats.total_analyses.toLocaleString('az-AZ');
-        totalElement.textContent = formattedNumber;
-        console.log('Updated statistics display:', formattedNumber);
+        const formattedTotal = stats.total_analyses.toLocaleString('az-AZ');
+        totalElement.textContent = formattedTotal;
+        console.log('Updated total analyses display:', formattedTotal);
+      }
+      
+      if (recentElement && stats.recent_analyses !== undefined) {
+        // Format the number with thousands separator
+        const formattedRecent = stats.recent_analyses.toLocaleString('az-AZ');
+        recentElement.textContent = formattedRecent;
+        console.log('Updated recent analyses display:', formattedRecent);
       }
     } catch (e) {
       console.error('Failed to load statistics:', e);
