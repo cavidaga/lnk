@@ -97,7 +97,9 @@ export default async function handler(req) {
         language_flags: true
       },
       cited_sources: true,
-      human_summary: true
+      human_summary: true,
+      is_advertisement: true,
+      advertisement_reason: true
     };
   </script>
   

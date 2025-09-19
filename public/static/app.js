@@ -279,9 +279,6 @@ function renderAnalysis(root, data, hash) {
     console.log('Advertisement detected:', { is_advertisement, advertisement_reason });
   }
   
-  // Temporary debug: Force advertisement label for testing
-  const debugForceAd = true; // Set to false after testing
-  
 
   // Numbers (with guards)
   const reliabilityNum = clamp(scores?.reliability?.value ?? 0, 0, 100);
@@ -878,7 +875,7 @@ function headerBlock({ title, publication, published_at, url, title_inferred, is
           </button>
         </div>
       </div>
-      ${(is_advertisement || debugForceAd) ? `
+      ${is_advertisement ? `
       <div class="advertisement-label" style="margin-top:12px;padding:8px 12px;background:linear-gradient(135deg, #ff6b6b, #ee5a52);border-radius:8px;display:flex;align-items:center;gap:8px;color:white;font-weight:600;font-size:14px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
