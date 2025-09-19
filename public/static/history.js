@@ -193,7 +193,7 @@
       return `${weeks} həftə əvvəl`;
     } else {
       const base = `${AZ_MONTHS[d.getMonth()]} ${d.getDate()}`;
-      return d.getFullYear() === now.getFullYear() ? base : `${base}, ${d.getFullYear()}`;
+      return `${base}, ${d.getFullYear()}`;
     }
   }
 

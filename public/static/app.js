@@ -772,9 +772,8 @@ function renderAnalysis(root, data, hash) {
     if (!dateLike) return '';
     const d = new Date(dateLike);
     if (isNaN(d)) return String(dateLike);
-    const now = new Date();
     const base = `${AZ_MONTHS[d.getMonth()]} ${d.getDate()}`;
-    return d.getFullYear() === now.getFullYear() ? base : `${base}, ${d.getFullYear()}`;
+    return `${base}, ${d.getFullYear()}`;
   }
 
 
