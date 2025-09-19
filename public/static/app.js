@@ -277,6 +277,15 @@ function renderAnalysis(root, data, hash) {
   // Debug: Check advertisement data
   console.log('Advertisement data:', { is_advertisement, advertisement_reason });
   
+  // Debug: Force add a very visible test element
+  setTimeout(() => {
+    const testDiv = document.createElement('div');
+    testDiv.innerHTML = '🔴 TEST LABEL - SHOULD BE VERY VISIBLE 🔴';
+    testDiv.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; background: red; color: white; padding: 20px; font-size: 24px; font-weight: bold; z-index: 9999; text-align: center;';
+    document.body.appendChild(testDiv);
+    console.log('Test div added to DOM');
+  }, 1000);
+  
   // Numbers (with guards)
   const reliabilityNum = clamp(scores?.reliability?.value ?? 0, 0, 100);
   const polBiasNum     = clamp(scores?.political_establishment_bias?.value ?? 0, -5, 5);
@@ -509,6 +518,14 @@ function renderAnalysis(root, data, hash) {
   
   
   root.innerHTML = template;
+  
+  // Debug: Check if advertisement label was rendered
+  const adLabel = root.querySelector('.advertisement-label');
+  console.log('Advertisement label found in DOM:', adLabel ? 'YES' : 'NO');
+  if (adLabel) {
+    console.log('Advertisement label text:', adLabel.textContent);
+    console.log('Advertisement label visible:', adLabel.offsetHeight > 0);
+  }
   
 }
 
