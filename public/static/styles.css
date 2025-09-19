@@ -103,6 +103,27 @@
     var(--bg);
 }
 
+/* Additional accessibility improvements for better contrast */
+.score-value {
+  font-weight: 700; /* Bolder text for better readability */
+}
+
+/* Ensure all score values have sufficient contrast */
+.recent-item .score-value {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for better contrast */
+}
+
+/* Improve contrast for muted text in light mode */
+@media (prefers-color-scheme: light) {
+  .muted {
+    color: #4b5563 !important; /* Darker gray for better contrast */
+  }
+  
+  .recent-item-meta {
+    color: #4b5563 !important; /* Darker gray for better contrast */
+  }
+}
+
 .theme-dark{
   background:
     radial-gradient(1100px 760px at 8% -18%, color-mix(in oklab, var(--navy) 14%, transparent), transparent 60%),
@@ -1723,46 +1744,46 @@ footer.site-footer{
   font-weight: 600;
 }
 
-/* Dynamic reliability colors based on score ranges */
+/* Dynamic reliability colors based on score ranges - improved contrast */
 .score-value.reliability-excellent {
-  color: #059669; /* Dark green for 80-100 */
+  color: #047857; /* Darker green for 80-100 - better contrast */
 }
 
 .score-value.reliability-good {
-  color: #10b981; /* Green for 60-79 */
+  color: #059669; /* Darker green for 60-79 - better contrast */
 }
 
 .score-value.reliability-fair {
-  color: #f59e0b; /* Yellow/Orange for 40-59 */
+  color: #d97706; /* Darker orange for 40-59 - better contrast */
 }
 
 .score-value.reliability-poor {
-  color: #f97316; /* Orange for 20-39 */
+  color: #ea580c; /* Darker orange for 20-39 - better contrast */
 }
 
 .score-value.reliability-very-poor {
-  color: #dc2626; /* Red for 0-19 */
+  color: #b91c1c; /* Darker red for 0-19 - better contrast */
 }
 
-/* Dynamic bias colors based on score ranges */
+/* Dynamic bias colors based on score ranges - improved contrast */
 .score-value.bias-strong-pro {
-  color: #1d4ed8; /* Dark blue for +3 to +5 */
+  color: #1e40af; /* Darker blue for +3 to +5 - better contrast */
 }
 
 .score-value.bias-pro {
-  color: #3b82f6; /* Blue for +1 to +2 */
+  color: #2563eb; /* Darker blue for +1 to +2 - better contrast */
 }
 
 .score-value.bias-neutral {
-  color: #6b7280; /* Gray for 0 */
+  color: #4b5563; /* Darker gray for 0 - better contrast */
 }
 
 .score-value.bias-critical {
-  color: #f59e0b; /* Orange for -1 to -2 */
+  color: #d97706; /* Darker orange for -1 to -2 - better contrast */
 }
 
 .score-value.bias-strong-opposition {
-  color: #dc2626; /* Red for -3 to -5 */
+  color: #b91c1c; /* Darker red for -3 to -5 - better contrast */
 }
 
 .recent-item-url {
@@ -1972,6 +1993,8 @@ kbd {
 
 .shortcuts-bubble-text {
   white-space: nowrap;
+  color: white; /* Ensure white text for better contrast against red background */
+  font-weight: 500; /* Slightly bolder for better readability */
 }
 
 /* Mobile styles removed - bubble not shown on mobile */
