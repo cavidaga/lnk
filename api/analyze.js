@@ -483,14 +483,30 @@ Original URL: ${url}
 ## ARTICLE TEXT TO ANALYZE ##
 ${articleText}
 
+## ADVERTISEMENT DETECTION ##
+IMPORTANT: Before analyzing bias and reliability, first determine if this content is:
+1. A paid advertisement or press release
+2. Sponsored content
+3. Corporate announcement
+4. Promotional material
+
+If the content appears to be promotional, note this prominently in your analysis and adjust reliability scores accordingly. Paid content should receive lower reliability scores due to inherent bias toward the paying entity.
+
+Look for indicators such as:
+- Corporate press release language
+- Brand promotion and marketing tone
+- Lack of independent verification
+- One-sided positive presentation
+- Promotional announcements rather than news reporting
+
 ## JSON SCHEMA & METHODOLOGY INSTRUCTIONS ##
 Your entire output must be a single, valid JSON object. All free-text rationales and summaries must be in Azerbaijani. In the 'human_summary' and all 'rationale' fields, write natural, flowing paragraphs. Do NOT place commas between full sentences.
 
-The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", and "human_summary". In all string fields—including meta.title, scores.*.rationale, cited_sources[*].name, cited_sources[*].role, cited_sources[*].stance, diagnostics.socio_cultural_descriptions[*].*, and diagnostics.language_flags[*].category—use Azerbaijani.
+The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", "human_summary", and "is_advertisement". In all string fields—including meta.title, scores.*.rationale, cited_sources[*].name, cited_sources[*].role, cited_sources[*].stance, diagnostics.socio_cultural_descriptions[*].*, and diagnostics.language_flags[*].category—use Azerbaijani.
 
 ### META
 "meta": {
-  "article_type": "xəbər | rəy | analitika | reportaj | .",
+  "article_type": "xəbər | rəy | analitika | reportaj | reklam | press-reliz | .",
   "title": "Məqalənin qısa Azərbaycandilli başlığı (mətn yoxdursa, məzmundan çıxar)",
   "original_url": "https://.. (məqalənin əsas URL-i)",
   "publication": "saytın və ya nəşrin adı (məs. abzas.org)",
@@ -531,6 +547,10 @@ The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", a
 
 ### HUMAN SUMMARY
 "human_summary": "Məqalənin əsas məzmununu və nəticələrini aydın, axıcı Azərbaycan dilində 2–4 cümlə ilə xülasə et."
+
+### ADVERTISEMENT DETECTION
+"is_advertisement": true/false,
+"advertisement_reason": "Reklam xarakterli olduğunu göstərən əsas amillər (məs. korporativ elan, marka təbliği, məqsədli məlumatlandırma)"
 `.trim();
 }
 
@@ -545,6 +565,11 @@ SAFETY RULES (must follow):
 - Do NOT invent facts; if uncertain, say so in Azerbaijani.
 - Work only from the headline/context below; do not add specifics from memory.
 
+ADVERTISEMENT DETECTION:
+- First determine if this content is promotional (advertisement, press release, corporate announcement)
+- If promotional, note this prominently and adjust reliability scores accordingly
+- Look for corporate language, brand promotion, lack of independent verification
+
 OUTPUT LANGUAGE: Azerbaijani. All free-text fields must be in Azerbaijani.
 
 INPUT
@@ -556,7 +581,7 @@ RESPONSE
 Return a single valid JSON object with these keys:
 
 meta: {
-  article_type,            // "xəbər" | "rəy" | "analitika" | "reportaj" | ...
+  article_type,            // "xəbər" | "rəy" | "analitika" | "reportaj" | "reklam" | "press-reliz" | ...
   title,                   // a short Azerbaijani title
   original_url,            // the link above
   publication,             // site/publication name
@@ -575,7 +600,9 @@ diagnostics: {
   ]
 },
 cited_sources: [{ name, role, stance }],
-human_summary: "2–4 cümləlik AZ xülasə."
+human_summary: "2–4 cümləlik AZ xülasə.",
+is_advertisement: true/false,
+advertisement_reason: "Reklam xarakterli olduğunu göstərən əsas amillər (yoxdursa boş burax)"
 
 Constraints:
 - Natural paragraphs (no bullet lists inside rationales).
@@ -635,7 +662,9 @@ diagnostics: {
   ]
 },
 cited_sources: [],
-human_summary: "Məqalənin məzmununa çatmaq mümkün olmadığı üçün təhlil edilə bilməz. Yalnız başlıq mövcuddur."
+human_summary: "Məqalənin məzmununa çatmaq mümkün olmadığı üçün təhlil edilə bilməz. Yalnız başlıq mövcuddur.",
+is_advertisement: false,
+advertisement_reason: ""
 
 IMPORTANT: Keep all analysis minimal and clearly indicate that content access was blocked.
 `.trim();
@@ -839,6 +868,10 @@ function normalizeOutput(o = {}, { url, contentSource, isBlocked = false, articl
   // ---- SUMMARY ----
   if (typeof out.human_summary !== 'string') out.human_summary = '';
 
+  // ---- ADVERTISEMENT DETECTION ----
+  if (typeof out.is_advertisement !== 'boolean') out.is_advertisement = false;
+  if (typeof out.advertisement_reason !== 'string') out.advertisement_reason = '';
+
   return out;
 }
 
@@ -853,7 +886,7 @@ export default async function handler(req, res) {
   }
 
   // Add version to cache key to invalidate old blocked content results
-  const cacheVersion = 'v3-archive-md-fix';
+  const cacheVersion = 'v4-advertisement-detection';
   const cacheKey = crypto.createHash('md5').update(url + cacheVersion).digest('hex');
   console.log(`Cache key for ${url}: ${cacheKey} (version: ${cacheVersion})`);
 

@@ -271,7 +271,7 @@
 
   // ---------- RENDERERS ----------
 function renderAnalysis(root, data, hash) {
-  const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = '', warnings = [] } = data || {};
+  const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = '', warnings = [], is_advertisement = false, advertisement_reason = '' } = data || {};
   const title = meta.title || 'Başlıq yoxdur';
 
   // Numbers (with guards)
@@ -295,7 +295,9 @@ function renderAnalysis(root, data, hash) {
       })(),
       published_at: meta.published_at || '',
       url: meta.original_url || '',
-      title_inferred: meta?.title_inferred || false
+      title_inferred: meta?.title_inferred || false,
+      is_advertisement: is_advertisement,
+      advertisement_reason: advertisement_reason
     })}
     
     ${warnings.length ? `
@@ -804,7 +806,7 @@ function renderAnalysis(root, data, hash) {
   }
 
 
-function headerBlock({ title, publication, published_at, url, title_inferred }){
+function headerBlock({ title, publication, published_at, url, title_inferred, is_advertisement, advertisement_reason }){
   return `
     <header class="hdr">
       <div class="kv">
@@ -867,6 +869,22 @@ function headerBlock({ title, publication, published_at, url, title_inferred }){
           </button>
         </div>
       </div>
+      ${is_advertisement ? `
+      <div class="advertisement-label" style="margin-top:12px;padding:8px 12px;background:linear-gradient(135deg, #ff6b6b, #ee5a52);border-radius:8px;display:flex;align-items:center;gap:8px;color:white;font-weight:600;font-size:14px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+        </svg>
+        <span>REKLAM XARAKTERLİ</span>
+        <button class="complaint-btn" onclick="window.open('/complaint.html?analysis_url=' + encodeURIComponent(window.location.href), '_blank')" style="margin-left:auto;background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"></path>
+            <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.91.37 4.15 1.02"></path>
+          </svg>
+          Şikayət
+        </button>
+      </div>
+      ${advertisement_reason ? `<div class="micro muted" style="margin-top:6px;color:var(--muted);font-size:12px;">${esc(advertisement_reason)}</div>` : ''}
+      ` : ''}
       ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
     </header>
   `;
