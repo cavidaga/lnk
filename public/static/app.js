@@ -81,8 +81,9 @@
           console.warn('LNKHistory not available for adding analysis to history');
         }
         
-        // Refresh recent analyses before redirecting
+        // Refresh recent analyses and statistics before redirecting
         loadRecentAnalyses();
+        loadStatistics();
         
         location.assign(`/analysis/${encodeURIComponent(hash)}`);
       } catch (err) {
@@ -95,8 +96,9 @@
       }
     });
 
-    // Load recent analyses
+    // Load recent analyses and statistics
     loadRecentAnalyses();
+    loadStatistics();
   }
 
   // ---------- RECENT ANALYSES ----------
@@ -130,6 +132,33 @@
       }
     } catch (e) {
       console.error('Failed to load recent analyses:', e);
+    }
+  }
+
+  // ---------- STATISTICS ----------
+  async function loadStatistics() {
+    try {
+      console.log('Loading statistics...');
+      const res = await fetch('/api/statistics');
+      console.log('Statistics response:', res.status, res.ok);
+      
+      if (!res.ok) {
+        console.error('Statistics API error:', res.status);
+        return;
+      }
+      
+      const stats = await res.json();
+      console.log('Statistics data:', stats);
+      
+      const totalElement = $('#total-analyses');
+      if (totalElement && stats.total_analyses !== undefined) {
+        // Format the number with thousands separator
+        const formattedNumber = stats.total_analyses.toLocaleString('az-AZ');
+        totalElement.textContent = formattedNumber;
+        console.log('Updated statistics display:', formattedNumber);
+      }
+    } catch (e) {
+      console.error('Failed to load statistics:', e);
     }
   }
 
