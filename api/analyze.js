@@ -43,6 +43,46 @@ async function incrementTotalAnalysesCounter() {
   }
 }
 
+// Markdowner API integration
+async function tryMarkdowner(url) {
+  try {
+    console.log(`Trying Markdowner for: ${url}`);
+    const markdownerUrl = `https://md.dhr.wtf/?url=${encodeURIComponent(url)}&llmFilter=true`;
+    
+    const response = await fetch(markdownerUrl, {
+      headers: {
+        'User-Agent': 'LNK.az/1.0 (+https://lnk.az/about)',
+        'Accept': 'text/plain'
+      },
+      timeout: 30000 // 30 second timeout
+    });
+    
+    if (response.ok) {
+      const markdown = await response.text();
+      if (markdown && markdown.length > 200) {
+        console.log(`Markdowner success: ${markdown.length} chars`);
+        
+        // Extract title from markdown (look for # heading)
+        const titleMatch = markdown.match(/^#\s+(.+)$/m);
+        const title = titleMatch ? titleMatch[1].trim() : '';
+        
+        return {
+          text: markdown,
+          title: title,
+          source: 'Markdowner'
+        };
+      } else {
+        console.log('Markdowner returned insufficient content');
+      }
+    } else {
+      console.log(`Markdowner failed with status: ${response.status}`);
+    }
+  } catch (error) {
+    console.warn('Markdowner error:', error.message);
+  }
+  return null;
+}
+
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // --- Config ---
@@ -1206,7 +1246,47 @@ export default async function handler(req, res) {
           }
 
           if (isBlockedContent) {
-            console.log(`LightFetch detected blocked content, proceeding to full browser approach for: ${effectiveUrl}`);
+            console.log(`LightFetch detected blocked content, trying Markdowner for: ${effectiveUrl}`);
+            
+            // Try Markdowner as a fallback before full browser approach
+            const markdownerResult = await tryMarkdowner(effectiveUrl);
+            if (markdownerResult) {
+              console.log(`Markdowner success for ${effectiveUrl}: ${markdownerResult.text.length} chars`);
+              articleText = markdownerResult.text.substring(0, MAX_ARTICLE_CHARS);
+              contentSource = markdownerResult.source;
+              if (markdownerResult.title) {
+                headline = markdownerResult.title;
+              }
+              
+              // Save to cache
+              const normalized = {
+                hash: cacheKey,
+                url: effectiveUrl,
+                title: headline,
+                publication: publication,
+                published_at: publishedAt,
+                reliability: reliability,
+                political_bias: politicalBias,
+                human_summary: humanSummary,
+                contentSource: contentSource,
+                schema_version: '2025-09-16'
+              };
+              
+              await kv.set(cacheKey, normalized, { ex: 2592000 });
+              console.log(`SAVED TO CACHE (markdowner) for URL: ${effectiveUrl}`);
+              
+              try {
+                await kv.lpush('recent_hashes', cacheKey);
+                await kv.ltrim('recent_hashes', 0, 499);
+              } catch (e) {
+                console.error('KV list update error:', e);
+              }
+              
+              await incrementTotalAnalysesCounter();
+              return normalized;
+            } else {
+              console.log(`Markdowner failed, proceeding to full browser approach for: ${effectiveUrl}`);
+            }
           }
 
           // ---------- Chromium path ----------
@@ -1355,16 +1435,28 @@ export default async function handler(req, res) {
             } catch {}
           }
 
-          // If DOM is too empty, do a raw GET fallback and strip tags
+          // If DOM is too empty, try Markdowner before raw GET fallback
           if (!articleText || articleText.length < 200) {
-            try {
-              const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
-              const raw = await fetch(effectiveUrl, { redirect: 'follow', headers: { 'User-Agent': ua, 'Accept': 'text/html,*/*', 'Accept-Language': 'az,en;q=0.9' } });
-              const html = await raw.text();
-              const rawText = htmlToText(html);
-              articleText = cleanArticleContent(rawText, effectiveUrl);
-            } catch (fetchFallbackErr) {
-              console.warn('Fetch-fallback failed:', fetchFallbackErr?.message || fetchFallbackErr);
+            console.log(`Insufficient content from browser (${articleText?.length || 0} chars), trying Markdowner for: ${effectiveUrl}`);
+            const markdownerResult = await tryMarkdowner(effectiveUrl);
+            if (markdownerResult) {
+              console.log(`Markdowner success for ${effectiveUrl}: ${markdownerResult.text.length} chars`);
+              articleText = markdownerResult.text.substring(0, MAX_ARTICLE_CHARS);
+              contentSource = markdownerResult.source;
+              if (markdownerResult.title) {
+                headline = markdownerResult.title;
+              }
+            } else {
+              // Fallback to raw GET
+              try {
+                const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+                const raw = await fetch(effectiveUrl, { redirect: 'follow', headers: { 'User-Agent': ua, 'Accept': 'text/html,*/*', 'Accept-Language': 'az,en;q=0.9' } });
+                const html = await raw.text();
+                const rawText = htmlToText(html);
+                articleText = cleanArticleContent(rawText, effectiveUrl);
+              } catch (fetchFallbackErr) {
+                console.warn('Fetch-fallback failed:', fetchFallbackErr?.message || fetchFallbackErr);
+              }
             }
           }
 
