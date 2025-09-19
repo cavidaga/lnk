@@ -282,6 +282,7 @@ header{
     padding: 8px 12px !important;
     min-width: auto !important;
     white-space: nowrap !important;
+    text-decoration: none !important;
   }
   
   .radial-item.support-item:hover{
