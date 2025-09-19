@@ -151,7 +151,7 @@
       console.log('Statistics data:', stats);
       
       const totalElement = $('#total-analyses');
-      const recentElement = $('#recent-analyses');
+      const recentElement = $('#recent-analyses-count');
       
       if (totalElement && stats.total_analyses !== undefined) {
         // Format the number with thousands separator
