@@ -877,21 +877,20 @@ function headerBlock({ title, publication, published_at, url, title_inferred, is
         </div>
       </div>
       ${is_advertisement ? `
-      <div class="info-notice">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="promo-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"></circle>
           <path d="M12 16v-4"></path>
           <path d="M12 8h.01"></path>
         </svg>
-        <span>⚠️ XƏBƏRDARLIQ: Bu məzmun promosional xarakterlidir</span>
+        <span>Promosional məzmun</span>
         <button class="complaint-btn" onclick="window.open('/complaint.html?analysis_url=' + encodeURIComponent(window.location.href), '_blank')" title="Şikayət et">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 12l2 2 4-4"></path>
             <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.91.37 4.15 1.02"></path>
           </svg>
         </button>
       </div>
-      ${advertisement_reason ? `<div class="micro muted">${esc(advertisement_reason)}</div>` : ''}
       ` : ''}
       ${title_inferred ? `<div class="micro muted" style="margin-top:6px">Qeyd: Yazıda başlıq yoxdursa avtomatik yaradılır.</div>` : ''}
     </header>

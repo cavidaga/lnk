@@ -2169,77 +2169,73 @@ button.action-btn {
   color: var(--warning-color, #ff9800);
 }
 
-/* =================== Advertisement Label Styles =================== */
-.info-notice {
-  margin-top: 12px;
-  padding: 8px 12px;
+/* =================== Promotional Content Badge =================== */
+.promo-badge {
+  margin-top: 8px;
+  padding: 6px 10px;
   background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-  border-radius: 8px;
-  display: flex;
+  border-radius: 20px;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: white;
-  font-weight: 600;
-  font-size: 14px;
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  font-weight: 500;
+  font-size: 12px;
+  box-shadow: 0 1px 3px rgba(255, 107, 107, 0.3);
   transition: all 0.2s ease;
+  max-width: fit-content;
 }
 
-.info-notice:hover {
+.promo-badge:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+  box-shadow: 0 2px 6px rgba(255, 107, 107, 0.4);
 }
 
-.info-notice svg {
+.promo-badge svg {
   flex-shrink: 0;
+  opacity: 0.9;
 }
 
-.info-notice .complaint-btn {
-  margin-left: auto;
+.promo-badge .complaint-btn {
+  margin-left: 4px;
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
-  padding: 6px;
-  border-radius: 4px;
+  padding: 4px;
+  border-radius: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  min-width: 28px;
-  min-height: 28px;
+  min-width: 20px;
+  min-height: 20px;
 }
 
-.info-notice .complaint-btn:hover {
+.promo-badge .complaint-btn:hover {
   background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
-.info-notice .complaint-btn svg {
-  width: 12px;
-  height: 12px;
+.promo-badge .complaint-btn svg {
+  width: 10px;
+  height: 10px;
 }
 
-/* Dark theme support for info notice */
-.theme-dark .info-notice {
+/* Dark theme support for promo badge */
+.theme-dark .promo-badge {
   background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.2);
+  box-shadow: 0 1px 3px rgba(255, 107, 107, 0.2);
 }
 
-.theme-dark .info-notice:hover {
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+.theme-dark .promo-badge:hover {
+  box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
 }
 
-/* Mobile responsiveness for info notice */
+/* Mobile responsiveness for promo badge */
 @media (max-width: 768px) {
-  .info-notice {
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-    padding: 12px;
-  }
-  
-  .info-notice .complaint-btn {
-    margin-left: auto;
+  .promo-badge {
+    font-size: 11px;
+    padding: 5px 8px;
   }
 }
