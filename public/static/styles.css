@@ -2199,14 +2199,15 @@ button.action-btn {
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
-  padding: 4px 8px;
+  padding: 6px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
   transition: all 0.2s ease;
+  min-width: 28px;
+  min-height: 28px;
 }
 
 .advertisement-label .complaint-btn:hover {
@@ -2232,14 +2233,13 @@ button.action-btn {
 /* Mobile responsiveness for advertisement label */
 @media (max-width: 768px) {
   .advertisement-label {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
     padding: 12px;
   }
   
   .advertisement-label .complaint-btn {
-    margin-left: 0;
-    align-self: flex-end;
+    margin-left: auto;
   }
 }
