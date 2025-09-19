@@ -456,7 +456,7 @@ function renderAnalysis(root, data, hash) {
             <div class="share-buttons">
               <!-- X / Twitter -->
               <a class="share-btn x"
-                href="https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent('Yeni analiz: ' + (title || ''))}"
+                href="https://x.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent('Yeni analiz: ' + (title || '') + ' via @lnk_az')}"
                 target="_blank" rel="noopener" aria-label="X-də paylaş">
                 <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                   <path d="M18.244 2H21l-6.59 7.523L22 22h-6.828l-5.34-6.508L3.338 22H1l7.093-8.106L2 2h6.828l4.89 5.972L18.244 2Zm-2.393 18h1.89L7.247 3.98H5.27L15.85 20Z"/>
