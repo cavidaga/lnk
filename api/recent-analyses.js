@@ -7,8 +7,9 @@ export default async function handler(req) {
   try {
     console.log('Recent analyses API called');
     
-    // Get last 5 analysis hashes
-    const hashes = await kv.lrange('recent_hashes', 0, 4); // Last 5
+    // Get more hashes initially to account for filtering out advertisements
+    // We'll fetch up to 20 hashes to ensure we get 5 non-advertisement analyses
+    const hashes = await kv.lrange('recent_hashes', 0, 19); // Last 20
     console.log('Found hashes:', hashes);
     
     if (!hashes || hashes.length === 0) {
@@ -35,7 +36,8 @@ export default async function handler(req) {
               url: data.meta.original_url || '',
               published_at: data.meta.published_at || '',
               reliability: data.scores?.reliability?.value || 0,
-              political_bias: data.scores?.political_establishment_bias?.value || 0
+              political_bias: data.scores?.political_establishment_bias?.value || 0,
+              is_advertisement: data.is_advertisement || false
             };
           }
           return null;
@@ -46,9 +48,11 @@ export default async function handler(req) {
       })
     );
 
-    // Filter out null results and return
-    const validAnalyses = analyses.filter(Boolean);
-    console.log('Valid analyses:', validAnalyses.length);
+    // Filter out null results and advertisements, then limit to 5
+    const validAnalyses = analyses
+      .filter(analysis => analysis && !analysis.is_advertisement)
+      .slice(0, 5); // Limit to 5 analyses
+    console.log('Valid analyses after filtering:', validAnalyses.length);
     
     return new Response(JSON.stringify(validAnalyses), {
       status: 200,
