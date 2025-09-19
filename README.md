@@ -19,6 +19,7 @@ A web app that uses Google's Gemini models and a headless browser to analyze the
 -   **AI-powered:** Calls Gemini models (primary: `gemini-2.5-flash-lite`, fallbacks: `gemini-2.5-flash`, `gemini-2.5-pro`) with retries and backoff.
 -   **Caching & sharing:** Results are cached in Vercel KV and retrievable by hash; pretty HTML view available at `/analysis/:hash`.
 -   **Resilience:** Heuristics for Cloudflare/anti-bot, Archive.org fallback when live fetch is blocked, and URL/content-type safety policy.
+-   **Markdowner Integration:** Enhanced content extraction using Markdowner for better quality text processing and improved analysis accuracy.
 -   **Serverless-ready:** Deployed on Vercel Functions; no persistent servers to manage.
 
 ***
@@ -28,6 +29,7 @@ A web app that uses Google's Gemini models and a headless browser to analyze the
 -   **Frontend:** Static site in `public/` (HTML/CSS/Vanilla JS)
 -   **Backend:** Node.js Vercel Functions in `api/`
 -   **Scraping:** [Puppeteer Core](https://pptr.dev/) + [`@sparticuz/chromium`](https://github.com/Sparticuz/chromium)
+-   **Content Processing:** [Markdowner](https://markdowner.vercel.app/) for enhanced text extraction
 -   **AI:** Google Gemini API (models noted above)
 -   **Storage/Cache:** Vercel KV via `@vercel/kv`
 -   **Platform:** [Vercel](https://vercel.com)
