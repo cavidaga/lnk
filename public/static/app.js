@@ -274,13 +274,6 @@ function renderAnalysis(root, data, hash) {
   const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = '', warnings = [], is_advertisement = false, advertisement_reason = '' } = data || {};
   const title = meta.title || 'Başlıq yoxdur';
   
-  // Debug logging for advertisement detection
-  console.log('Advertisement detection debug:', {
-    is_advertisement,
-    advertisement_reason,
-    data_keys: Object.keys(data || {}),
-    full_data: data
-  });
 
   // Numbers (with guards)
   const reliabilityNum = clamp(scores?.reliability?.value ?? 0, 0, 100);
