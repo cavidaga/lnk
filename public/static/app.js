@@ -299,7 +299,13 @@ function renderAnalysis(root, data, hash) {
   const socio = Array.isArray(diagnostics?.socio_cultural_descriptions) ? diagnostics.socio_cultural_descriptions : [];
   const flags = Array.isArray(diagnostics?.language_flags) ? diagnostics.language_flags : [];
 
-  root.innerHTML = `
+  // Debug: Log the template before rendering
+  console.log('About to render template with advertisement data:', {
+    is_advertisement,
+    advertisement_reason
+  });
+  
+  const template = `
     ${headerBlock({
       title: meta.title || 'Məqalə',
       publication: meta.publication || (() => {
@@ -515,6 +521,12 @@ function renderAnalysis(root, data, hash) {
       </div>
     </article>
   `;
+  
+  // Debug: Log the generated template
+  console.log('Generated template length:', template.length);
+  console.log('Template contains advertisement label:', template.includes('REKLAM XARAKTERLİ'));
+  
+  root.innerHTML = template;
 }
 
   function tableSources(rows) {
