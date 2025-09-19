@@ -128,7 +128,7 @@ export default async function handler(req) {
   </div>
   
   <script src="/static/layout.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <script src="/static/app.js?v=adblock-test" defer></script>
   <script src="/static/shortcuts.js" defer></script>
 </body>
 </html>`;

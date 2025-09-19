@@ -879,11 +879,13 @@ function headerBlock({ title, publication, published_at, url, title_inferred, is
           </button>
         </div>
       </div>
-      <div class="content-warning-label" style="margin-top:12px;padding:8px 12px;background:linear-gradient(135deg, #ff6b6b, #ee5a52);border-radius:8px;display:flex;align-items:center;gap:8px;color:white;font-weight:600;font-size:14px;">
+      <div class="info-notice" style="margin-top:12px;padding:8px 12px;background:linear-gradient(135deg, #ff6b6b, #ee5a52);border-radius:8px;display:flex;align-items:center;gap:8px;color:white;font-weight:600;font-size:14px;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 16v-4"></path>
+          <path d="M12 8h.01"></path>
         </svg>
-        <span>⚠️ MARKETİNQ MƏZMUNU (TEST)</span>
+        <span>⚠️ XƏBƏRDARLIQ: Bu məzmun təbliğat xarakterlidir</span>
         <button onclick="window.open('/complaint.html?analysis_url=' + encodeURIComponent(window.location.href), '_blank')" style="margin-left:auto;background:rgba(255,255,255,0.2);border:none;color:white;padding:6px;border-radius:4px;cursor:pointer;" title="Şikayət et">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 12l2 2 4-4"></path>
