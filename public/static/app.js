@@ -527,6 +527,20 @@ function renderAnalysis(root, data, hash) {
   console.log('Template contains advertisement label:', template.includes('REKLAM XARAKTERLİ'));
   
   root.innerHTML = template;
+  
+  // Debug: Check if the element was inserted
+  const adLabel = root.querySelector('.advertisement-label');
+  console.log('Advertisement label element found in DOM:', adLabel ? 'YES' : 'NO');
+  if (adLabel) {
+    console.log('Advertisement label text:', adLabel.textContent);
+    console.log('Advertisement label visible:', adLabel.offsetHeight > 0);
+  }
+  
+  // Debug: Force add a test label to see if it appears
+  const testLabel = document.createElement('div');
+  testLabel.innerHTML = 'TEST LABEL - SHOULD BE VISIBLE';
+  testLabel.style.cssText = 'background: red; color: white; padding: 10px; margin: 10px 0; font-weight: bold;';
+  root.appendChild(testLabel);
 }
 
   function tableSources(rows) {
