@@ -884,8 +884,46 @@ export default async function handler(req, res) {
   }
 
   const { url, modelType = 'auto' } = req.body || {};
-  if (!url) {
+  
+  // Enhanced input validation
+  if (!url || typeof url !== 'string') {
     return res.status(400).json({ error: 'URL daxil edilməyib.' });
+  }
+  
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) {
+    return res.status(400).json({ error: 'URL boş ola bilməz.' });
+  }
+  
+  // URL format validation
+  try {
+    const urlObj = new URL(trimmedUrl);
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      return res.status(400).json({ error: 'Yalnız HTTP/HTTPS linkləri qəbul edilir.' });
+    }
+  } catch (e) {
+    return res.status(400).json({ error: 'Düzgün URL formatı deyil.' });
+  }
+  
+  // Model type validation
+  const validModelTypes = ['auto', 'flash-lite', 'flash', 'pro'];
+  if (!validModelTypes.includes(modelType)) {
+    return res.status(400).json({ error: 'Etibarsız model növü.' });
+  }
+  
+  // Rate limiting check (basic)
+  const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const rateLimitKey = `rate_limit:${clientIP}`;
+  
+  try {
+    const currentRequests = await kv.get(rateLimitKey) || 0;
+    if (currentRequests > 10) { // 10 requests per minute
+      return res.status(429).json({ error: 'Çox sayda sorğu göndərilir. Zəhmət olmasa gözləyin.' });
+    }
+    await kv.incr(rateLimitKey);
+    await kv.expire(rateLimitKey, 60); // 1 minute expiry
+  } catch (rateLimitError) {
+    console.warn('Rate limiting check failed:', rateLimitError);
   }
 
   // Add version to cache key to invalidate old blocked content results

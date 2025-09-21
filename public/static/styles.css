@@ -1,10 +1,7 @@
 :root{
-  /* === LNK.az brand tokens === */
-  --navy: #001F3F;            /* quadrant navy */
-  --red: #FF0000;             /* bias dots */
+  --navy: #001F3F;
+  --red: #FF0000;
   --red-dark: #B50000;
-
-  /* Dark theme (default) */
   --bg:#0c0d12;
   --panel:#11131a;
   --card:#10131a;
@@ -18,9 +15,7 @@
   --warning-text: var(--navy);
   --shadow: 0 10px 30px rgba(0,0,0,.35);
   --ring: 0 0 0 3px rgba(255, 0, 0, .35);
-  --grid: rgba(255,255,255,.08); /* bias chart grid on dark */
-
-  /* To-Top defaults (dark) */
+  --grid: rgba(255,255,255,.08);
   --to-top-bg: #1a1b20;
   --to-top-fg: #f5f5f5;
   --to-top-border: #333;

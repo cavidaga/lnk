@@ -6,9 +6,25 @@
     String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
              .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-  // Show any runtime errors in the page as well as console
-  window.addEventListener('error', (e) => showFatal(e.message || 'Script error'));
-  window.addEventListener('unhandledrejection', (e) => showFatal((e.reason && e.reason.message) || 'Unhandled Promise rejection'));
+  // Enhanced error handling
+  window.addEventListener('error', (e) => {
+    console.error('JavaScript Error:', e);
+    showFatal(e.message || 'Script error');
+  });
+  
+  window.addEventListener('unhandledrejection', (e) => {
+    console.error('Unhandled Promise Rejection:', e);
+    showFatal((e.reason && e.reason.message) || 'Unhandled Promise rejection');
+  });
+
+  // Network error handling
+  window.addEventListener('online', () => {
+    showNotification('İnternet bağlantısı bərpa olundu', 'success');
+  });
+  
+  window.addEventListener('offline', () => {
+    showNotification('İnternet bağlantısı kəsildi', 'error');
+  });
 
   document.addEventListener('DOMContentLoaded', bootstrap);
 
@@ -42,16 +58,36 @@
       const formData = new FormData(form);
       const url = formData.get('url');
       const modelType = formData.get('model-type') || 'auto';
-      if (!url) return;
+      
+      // Input validation
+      if (!url || !url.trim()) {
+        showNotification('Zəhmət olmasa URL daxil edin', 'error');
+        return;
+      }
+      
       if (inFlight) return;           // prevent double submits
       inFlight = true;
+      
       const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn?.setAttribute('disabled','');
-      submitBtn?.classList.add('busy');
+      const originalText = submitBtn?.textContent;
+      
+      // Enhanced loading state
+      if (submitBtn) {
+        submitBtn.setAttribute('disabled','');
+        submitBtn.classList.add('busy');
+        submitBtn.innerHTML = `
+          <div class="spinner"></div>
+          Təhlil edilir...
+        `;
+      }
 
       setSpinner(out || form);
-      (out || form).classList.add('show');   // <-- make spinner visible
+      (out || form).classList.add('show');
+      
       try {
+        // Show progress notification
+        showNotification('Təhlil başladı...', 'info', 2000);
+        
         const res = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -60,8 +96,13 @@
             modelType: String(modelType)
           })
         });
+        
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        
         const json = await res.json();
-        if (!res.ok || json.error) {
+        if (json.error) {
           // Blocked-site special case (Cloudflare, etc.)
           if (json.isBlockError) {
             renderBlockError(out || form, { message: json.message, prompt: json.prompt, url });
@@ -73,19 +114,36 @@
         const hash = json.hash || json?.meta?.hash;
         if (!hash) throw new Error('Hash tapılmadı');
         
+        // Success notification
+        showNotification('Təhlil tamamlandı!', 'success', 2000);
         
         // Refresh recent analyses and statistics before redirecting
-        loadRecentAnalyses();
-        loadStatistics();
+        try {
+          await Promise.all([
+            loadRecentAnalyses(),
+            loadStatistics()
+          ]);
+        } catch (refreshErr) {
+          console.warn('Failed to refresh data:', refreshErr);
+        }
         
-        location.assign(`/analysis/${encodeURIComponent(hash)}`);
+        // Small delay to show success message
+        setTimeout(() => {
+          location.assign(`/analysis/${encodeURIComponent(hash)}`);
+        }, 500);
+        
       } catch (err) {
-        renderError(out || form, err.message || 'Xəta');
-        } finally {
+        console.error('Analysis error:', err);
+        const errorMessage = err.message || 'Xəta';
+        showNotification(errorMessage, 'error', 5000);
+        renderError(out || form, errorMessage);
+      } finally {
         inFlight = false;
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn?.removeAttribute('disabled');
-        submitBtn?.classList.remove('busy');
+        if (submitBtn) {
+          submitBtn.removeAttribute('disabled');
+          submitBtn.classList.remove('busy');
+          submitBtn.textContent = originalText;
+        }
       }
     });
 
@@ -729,6 +787,86 @@ function renderAnalysis(root, data, hash) {
     console.error('[app.js error]', msg);
     const box = ensureResult();
     box.innerHTML = `<div class="card"><div class="bd"><strong>Xəta:</strong> ${esc(msg)}</div></div>`;
+  }
+
+  // Notification system
+  function showNotification(message, type = 'info', duration = 3000) {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+      <div class="notification-content">
+        <span class="notification-message">${esc(message)}</span>
+        <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+      </div>
+    `;
+    
+    // Add styles if not already added
+    if (!document.querySelector('#notification-styles')) {
+      const style = document.createElement('style');
+      style.id = 'notification-styles';
+      style.textContent = `
+        .notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 10000;
+          background: var(--card);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          box-shadow: var(--shadow);
+          padding: 12px 16px;
+          max-width: 400px;
+          animation: slideIn 0.3s ease-out;
+        }
+        .notification-success { border-left: 4px solid #10b981; }
+        .notification-error { border-left: 4px solid #ef4444; }
+        .notification-warning { border-left: 4px solid #f59e0b; }
+        .notification-info { border-left: 4px solid #3b82f6; }
+        .notification-content {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+        .notification-message {
+          color: var(--text);
+          font-size: 14px;
+          line-height: 1.4;
+        }
+        .notification-close {
+          background: none;
+          border: none;
+          color: var(--muted);
+          cursor: pointer;
+          font-size: 18px;
+          line-height: 1;
+          padding: 0;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .notification-close:hover {
+          color: var(--text);
+        }
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after duration
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => notification.remove(), 300);
+      }
+    }, duration);
   }
 
   function num(x, def = 0) {

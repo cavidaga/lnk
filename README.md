@@ -21,6 +21,10 @@ A web app that uses Google's Gemini models and a headless browser to analyze the
 -   **Resilience:** Heuristics for Cloudflare/anti-bot, Archive.org fallback when live fetch is blocked, and URL/content-type safety policy.
 -   **Markdowner Integration:** Enhanced content extraction using Markdowner for better quality text processing and improved analysis accuracy.
 -   **Serverless-ready:** Deployed on Vercel Functions; no persistent servers to manage.
+-   **Enhanced UX:** Comprehensive error handling, loading states, notifications, and accessibility improvements.
+-   **Security:** Input validation, rate limiting, security headers, and XSS protection.
+-   **Performance:** Optimized caching, compression, and responsive design for all devices.
+-   **Accessibility:** ARIA labels, keyboard navigation, screen reader support, and high contrast modes.
 
 ***
 
@@ -78,7 +82,33 @@ Notes:
 
 ## Local Development
 
-This project targets Vercel’s serverless runtime (with `@sparticuz/chromium`). For the smoothest experience, deploy to Vercel. If you run locally, you’ll need Node 18+ and compatible Chromium binaries; behavior may differ from the serverless environment.
+This project targets Vercel's serverless runtime (with `@sparticuz/chromium`). For the smoothest experience, deploy to Vercel. If you run locally, you'll need Node 18+ and compatible Chromium binaries; behavior may differ from the serverless environment.
+
+### Running Tests
+
+A basic test suite is included to verify core functionality:
+
+```bash
+node test/test.js
+```
+
+The test suite covers:
+- URL validation and sanitization
+- Model type validation
+- Content cleaning and processing
+- Score normalization
+- Error handling
+- Caching logic
+
+### Development Improvements
+
+Recent enhancements include:
+- **Error Handling:** Comprehensive error catching with user-friendly notifications
+- **Loading States:** Visual feedback during analysis with progress indicators
+- **Accessibility:** ARIA labels, keyboard navigation, and screen reader support
+- **Security:** Input validation, rate limiting, and security headers
+- **Performance:** Optimized caching strategies and responsive design
+- **UX:** Enhanced mobile experience and better error messages
 
 ## Privacy
 
