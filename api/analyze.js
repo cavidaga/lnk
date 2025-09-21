@@ -1363,6 +1363,50 @@ export default async function handler(req, res) {
             const sameHost = u.hostname === originUrl.hostname;
             const sameSite = sameHost || u.hostname.endsWith('.' + siteBase);
 
+            // Block unnecessary JavaScript resources
+            if (type === 'script') {
+              const url = req.url().toLowerCase();
+              // Block analytics, ads, social media, tracking, and other non-essential JS
+              if (url.includes('google-analytics') || 
+                  url.includes('googletagmanager') ||
+                  url.includes('facebook.com') || 
+                  url.includes('twitter.com') ||
+                  url.includes('instagram.com') ||
+                  url.includes('linkedin.com') ||
+                  url.includes('youtube.com') ||
+                  url.includes('ads.') ||
+                  url.includes('analytics') ||
+                  url.includes('tracking') ||
+                  url.includes('metrics') ||
+                  url.includes('gtm') ||
+                  url.includes('doubleclick') ||
+                  url.includes('googlesyndication') ||
+                  url.includes('amazon-adsystem') ||
+                  url.includes('adsystem') ||
+                  url.includes('outbrain') ||
+                  url.includes('taboola') ||
+                  url.includes('disqus') ||
+                  url.includes('livechat') ||
+                  url.includes('hotjar') ||
+                  url.includes('mixpanel') ||
+                  url.includes('segment') ||
+                  url.includes('amplitude') ||
+                  url.includes('intercom') ||
+                  url.includes('zendesk') ||
+                  url.includes('recaptcha') ||
+                  url.includes('hcaptcha') ||
+                  url.includes('cloudflare') ||
+                  url.includes('jquery') && url.includes('min') ||
+                  url.includes('bootstrap') && url.includes('min') ||
+                  url.includes('fontawesome') ||
+                  url.includes('cdnjs') ||
+                  url.includes('unpkg') ||
+                  url.includes('jsdelivr')) {
+                return req.abort();
+              }
+              return req.continue();
+            }
+
             // For oxu.az, be a bit less aggressive (keep images/css from same-site).
             if (isOxu) {
               if (type === 'font' || (type === 'image' && !sameSite)) return req.abort();
