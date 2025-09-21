@@ -24,14 +24,38 @@ export default async function handler(req) {
     
     console.log('Total analyses count:', totalCount);
     
-    // Since the tool was launched this week and we don't have time-based tracking,
-    // we'll show a simple estimate for today's activity
-    // This is a rough estimate based on the assumption that activity is distributed across the week
-    const recentCount = Math.max(1, Math.floor(totalCount / 7)); // Rough estimate: total divided by 7 days
+    // Calculate today's activity based on actual analysis timestamps
+    const recentHashes = await kv.lrange('recent_hashes', 0, 99); // Get last 100 hashes
+    let todayCount = 0;
+    
+    if (recentHashes && recentHashes.length > 0) {
+      // Get today's date in UTC
+      const today = new Date();
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+      
+      // Check each recent analysis to see if it was analyzed today
+      for (const hash of recentHashes) {
+        try {
+          const analysis = await kv.get(hash);
+          if (analysis && analysis.analyzed_at) {
+            const analyzedAt = new Date(analysis.analyzed_at);
+            if (analyzedAt >= todayStart && analyzedAt < todayEnd) {
+              todayCount++;
+            }
+          }
+        } catch (e) {
+          console.error(`Error checking analysis ${hash}:`, e);
+        }
+      }
+    }
+    
+    // If no analyses found for today, show 0 instead of a misleading count
+    // This is more honest than showing recent count as "today"
     
     const stats = {
       total_analyses: totalCount,
-      recent_analyses: recentCount, // Estimated analyses from today
+      recent_analyses: todayCount, // Recent analyses count
       timestamp: new Date().toISOString()
     };
     

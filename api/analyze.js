@@ -872,6 +872,9 @@ function normalizeOutput(o = {}, { url, contentSource, isBlocked = false, articl
   if (typeof out.is_advertisement !== 'boolean') out.is_advertisement = false;
   if (typeof out.advertisement_reason !== 'string') out.advertisement_reason = '';
 
+  // ---- ANALYSIS TIMESTAMP ----
+  out.analyzed_at = new Date().toISOString();
+
   return out;
 }
 
