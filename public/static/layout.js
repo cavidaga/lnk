@@ -54,7 +54,6 @@
             <span class="label">Əsas</span>
           </a>
           
-          
           <a href="/about.html" class="radial-item nav-link" data-tooltip="Haqqımızda" aria-label="Haqqımızda" data-angle="72">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -83,6 +82,17 @@
             <span class="label">Məxfilik</span>
           </a>
 
+          <!-- Support button (desktop) -->
+          <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener"
+            class="radial-item support-item" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol" data-angle="288">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M6.2 13h9.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="label">Dəstək ol</span>
+          </a>
+
           <!-- Theme toggle button (desktop) -->
           <button id="theme-toggle" class="theme-toggle" type="button" 
                   data-tooltip="Tema dəyişdir" aria-label="Tema dəyişdir">
@@ -95,17 +105,6 @@
             </svg>
             <span class="sr-only">Tema dəyişdir</span>
           </button>
-
-          <!-- Support button (desktop) -->
-          <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener"
-            class="radial-item support-item" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol" data-angle="288">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z"
-                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M6.2 13h9.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <span class="label">Dəstək ol</span>
-          </a>
 
         </nav>
       </header>
