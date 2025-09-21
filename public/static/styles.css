@@ -1259,15 +1259,30 @@ footer.site-footer{
   
   .radial-menu.open .radial-item{
     opacity: 1 !important;
-    transform: scale(1) !important;
   }
   
   .radial-item:hover{
     background: var(--accent) !important;
     color: white !important;
     border-color: var(--accent) !important;
-    transform: scale(1.1) !important;
     box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3) !important;
+  }
+  
+  /* Hover effects for each positioned item */
+  .radial-item[data-angle="0"]:hover{
+    transform: translate(0, -160px) scale(1.1) !important;
+  }
+  .radial-item[data-angle="72"]:hover{
+    transform: translate(152px, -49px) scale(1.1) !important;
+  }
+  .radial-item[data-angle="144"]:hover{
+    transform: translate(94px, 130px) scale(1.1) !important;
+  }
+  .radial-item[data-angle="216"]:hover{
+    transform: translate(-94px, 130px) scale(1.1) !important;
+  }
+  .radial-item[data-angle="288"]:hover{
+    transform: translate(-152px, -49px) scale(1.1) !important;
   }
   
   .radial-item .icon{
