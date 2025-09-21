@@ -1287,30 +1287,26 @@ footer.site-footer{
     display: block !important;
   }
   
-  /* Position radial items in circle - Mobile only */
+  /* Position radial items in circle - Mobile only (5 items) */
   .radial-item[data-angle="0"]{ 
     position: absolute !important;
     transform: translate(0, -160px) scale(0) !important; 
   }
   .radial-item[data-angle="72"]{ 
     position: absolute !important;
-    transform: translate(125px, -95px) scale(0) !important; 
+    transform: translate(152px, -49px) scale(0) !important; 
   }
   .radial-item[data-angle="144"]{ 
     position: absolute !important;
-    transform: translate(125px, 95px) scale(0) !important; 
+    transform: translate(94px, 130px) scale(0) !important; 
   }
   .radial-item[data-angle="216"]{ 
     position: absolute !important;
-    transform: translate(0, 160px) scale(0) !important; 
+    transform: translate(-94px, 130px) scale(0) !important; 
   }
   .radial-item[data-angle="288"]{ 
     position: absolute !important;
-    transform: translate(-125px, 95px) scale(0) !important; 
-  }
-  .radial-item[data-angle="324"]{ 
-    position: absolute !important;
-    transform: translate(-125px, -95px) scale(0) !important; 
+    transform: translate(-152px, -49px) scale(0) !important; 
   }
   
   .radial-menu.open .radial-item[data-angle="0"]{ 
@@ -1319,23 +1315,19 @@ footer.site-footer{
   }
   .radial-menu.open .radial-item[data-angle="72"]{ 
     position: absolute !important;
-    transform: translate(125px, -95px) scale(1) !important; 
+    transform: translate(152px, -49px) scale(1) !important; 
   }
   .radial-menu.open .radial-item[data-angle="144"]{ 
     position: absolute !important;
-    transform: translate(125px, 95px) scale(1) !important; 
+    transform: translate(94px, 130px) scale(1) !important; 
   }
   .radial-menu.open .radial-item[data-angle="216"]{ 
     position: absolute !important;
-    transform: translate(0, 160px) scale(1) !important; 
+    transform: translate(-94px, 130px) scale(1) !important; 
   }
   .radial-menu.open .radial-item[data-angle="288"]{ 
     position: absolute !important;
-    transform: translate(-125px, 95px) scale(1) !important; 
-  }
-  .radial-menu.open .radial-item[data-angle="324"]{ 
-    position: absolute !important;
-    transform: translate(-125px, -95px) scale(1) !important; 
+    transform: translate(-152px, -49px) scale(1) !important; 
   }
   
   /* Center logo */
