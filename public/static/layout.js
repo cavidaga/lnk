@@ -82,9 +82,17 @@
             <span class="label">Məxfilik</span>
           </a>
 
+          <a href="/about.html#contact" class="radial-item nav-link" data-tooltip="Əlaqə" aria-label="Əlaqə" data-angle="252">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5"/>
+              <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="label">Əlaqə</span>
+          </a>
+
           <!-- Support button (desktop) -->
           <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener"
-            class="radial-item support-item" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol" data-angle="288">
+            class="radial-item support-item" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol" data-angle="324">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z"
                     stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>

@@ -1273,16 +1273,19 @@ footer.site-footer{
     transform: translate(0, -160px) scale(1.1) !important;
   }
   .site-nav.radial-menu .radial-item[data-angle="72"]:hover{
-    transform: translate(152px, -49px) scale(1.1) !important;
+    transform: translate(138px, -111px) scale(1.1) !important;
   }
   .site-nav.radial-menu .radial-item[data-angle="144"]:hover{
-    transform: translate(94px, 130px) scale(1.1) !important;
+    transform: translate(138px, 111px) scale(1.1) !important;
   }
   .site-nav.radial-menu .radial-item[data-angle="216"]:hover{
-    transform: translate(-94px, 130px) scale(1.1) !important;
+    transform: translate(0, 160px) scale(1.1) !important;
   }
-  .site-nav.radial-menu .radial-item[data-angle="288"]:hover{
-    transform: translate(-152px, -49px) scale(1.1) !important;
+  .site-nav.radial-menu .radial-item[data-angle="252"]:hover{
+    transform: translate(-138px, 111px) scale(1.1) !important;
+  }
+  .site-nav.radial-menu .radial-item[data-angle="324"]:hover{
+    transform: translate(-138px, -111px) scale(1.1) !important;
   }
   
   .radial-item .icon{
@@ -1302,26 +1305,30 @@ footer.site-footer{
     display: block !important;
   }
   
-  /* Position radial items in circle - Mobile only (5 items) */
+  /* Position radial items in circle - Mobile only (6 items) */
   .site-nav.radial-menu .radial-item[data-angle="0"]{ 
     position: absolute !important;
     transform: translate(0, -160px) scale(0) !important; 
   }
   .site-nav.radial-menu .radial-item[data-angle="72"]{ 
     position: absolute !important;
-    transform: translate(152px, -49px) scale(0) !important; 
+    transform: translate(138px, -111px) scale(0) !important; 
   }
   .site-nav.radial-menu .radial-item[data-angle="144"]{ 
     position: absolute !important;
-    transform: translate(94px, 130px) scale(0) !important; 
+    transform: translate(138px, 111px) scale(0) !important; 
   }
   .site-nav.radial-menu .radial-item[data-angle="216"]{ 
     position: absolute !important;
-    transform: translate(-94px, 130px) scale(0) !important; 
+    transform: translate(0, 160px) scale(0) !important; 
   }
-  .site-nav.radial-menu .radial-item[data-angle="288"]{ 
+  .site-nav.radial-menu .radial-item[data-angle="252"]{ 
     position: absolute !important;
-    transform: translate(-152px, -49px) scale(0) !important; 
+    transform: translate(-138px, 111px) scale(0) !important; 
+  }
+  .site-nav.radial-menu .radial-item[data-angle="324"]{ 
+    position: absolute !important;
+    transform: translate(-138px, -111px) scale(0) !important; 
   }
   
   .site-nav.radial-menu.open .radial-item[data-angle="0"]{ 
@@ -1330,19 +1337,23 @@ footer.site-footer{
   }
   .site-nav.radial-menu.open .radial-item[data-angle="72"]{ 
     position: absolute !important;
-    transform: translate(152px, -49px) scale(1) !important; 
+    transform: translate(138px, -111px) scale(1) !important; 
   }
   .site-nav.radial-menu.open .radial-item[data-angle="144"]{ 
     position: absolute !important;
-    transform: translate(94px, 130px) scale(1) !important; 
+    transform: translate(138px, 111px) scale(1) !important; 
   }
   .site-nav.radial-menu.open .radial-item[data-angle="216"]{ 
     position: absolute !important;
-    transform: translate(-94px, 130px) scale(1) !important; 
+    transform: translate(0, 160px) scale(1) !important; 
   }
-  .site-nav.radial-menu.open .radial-item[data-angle="288"]{ 
+  .site-nav.radial-menu.open .radial-item[data-angle="252"]{ 
     position: absolute !important;
-    transform: translate(-152px, -49px) scale(1) !important; 
+    transform: translate(-138px, 111px) scale(1) !important; 
+  }
+  .site-nav.radial-menu.open .radial-item[data-angle="324"]{ 
+    position: absolute !important;
+    transform: translate(-138px, -111px) scale(1) !important; 
   }
   
   /* Center logo */
