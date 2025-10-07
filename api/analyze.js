@@ -1904,6 +1904,8 @@ export default async function handler(req, res) {
           try {
             await kv.lpush('recent_hashes', cacheKey);
             await kv.ltrim('recent_hashes', 0, 499);
+            // Index for search (keep a larger window)
+            try { await kv.lpush('search_hashes', cacheKey); await kv.ltrim('search_hashes', 0, 4999); } catch {}
           } catch (e) {
             console.error('KV list update error:', e);
           }

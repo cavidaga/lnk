@@ -61,7 +61,11 @@ export default async function handler(req) {
     while (results.length < limit && scanned < scan) {
       const start = next_cursor;
       const end = start + Math.min(CHUNK, scan - scanned) - 1;
-      const hashes = await kv.lrange('recent_hashes', start, end);
+      // Prefer broader search index if present
+      let hashes = await kv.lrange('search_hashes', start, end);
+      if (!hashes || hashes.length === 0) {
+        hashes = await kv.lrange('recent_hashes', start, end);
+      }
       if (!hashes || hashes.length === 0) { next_cursor = null; break; }
 
       for (const h of hashes) {
