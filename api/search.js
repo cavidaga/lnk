@@ -12,6 +12,28 @@ function normalizeHost(h){
   return x;
 }
 
+function fold(s = ''){
+  // Lowercase, strip diacritics, normalize Azeri letters, collapse quotes
+  let t = String(s).toLowerCase();
+  t = t
+    .replace(/[“”„”‹›«»]/g, '"')
+    .replace(/[’‘‛']/g, "'");
+  // Replace Azerbaijani letters to ASCII approximations
+  t = t
+    .replace(/ə/g, 'e')
+    .replace(/ı/g, 'i')
+    .replace(/ş/g, 's')
+    .replace(/ç/g, 'c')
+    .replace(/ğ/g, 'g')
+    .replace(/ö/g, 'o')
+    .replace(/ü/g, 'u')
+    .replace(/İ/g, 'i');
+  try {
+    t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  } catch {}
+  return t;
+}
+
 export default async function handler(req) {
   try {
     const url = new URL(req.url);
@@ -29,7 +51,8 @@ export default async function handler(req) {
     }
 
     // Scan multiple windows to find up to `limit` matches
-    const ql = q.toLowerCase();
+    const ql = fold(q);
+    const qTokens = ql.split(/\s+/).filter(Boolean);
     const results = [];
     let scanned = 0;
     let next_cursor = cursor;
@@ -55,8 +78,15 @@ export default async function handler(req) {
 
           // Include cited_sources text in haystack to match entities like "København"
           const cited = Array.isArray(a.cited_sources) ? a.cited_sources.map(x => `${x?.name||''} ${x?.role||''} ${x?.stance||''}`).join('\n') : '';
-          const hay = `${title}\n${publication}\n${original_url}\n${cited}`.toLowerCase();
-          if (q && !hay.includes(ql)) continue;
+          const human = a.human_summary || '';
+          const hayRaw = `${title}\n${publication}\n${original_url}\n${cited}\n${human}`;
+          const hay = fold(hayRaw);
+          if (q) {
+            // All tokens must be present (simple AND search)
+            let ok = true;
+            for (const tok of qTokens) { if (!hay.includes(tok)) { ok = false; break; } }
+            if (!ok) continue;
+          }
 
           results.push({
             hash: a.hash || h,
