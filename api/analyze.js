@@ -1916,6 +1916,46 @@ export default async function handler(req, res) {
           // Update per-site stats
           try { await updateSiteStatsFromAnalysis(normalized); } catch {}
 
+          // Upsert to Upstash Search (if configured)
+          try {
+            const S_URL = process.env.UPSTASH_SEARCH_REST_URL;
+            const S_TOKEN = process.env.UPSTASH_SEARCH_REST_TOKEN;
+            const INDEX = 'lnk';
+            if (S_URL && S_TOKEN) {
+              // Prepare document
+              const citedTxt = Array.isArray(normalized.cited_sources)
+                ? normalized.cited_sources.map(x => `${x?.name||''} ${x?.role||''} ${x?.stance||''}`).join(' | ')
+                : '';
+              let hostDoc = '';
+              try { hostDoc = new URL(normalized?.meta?.original_url || '').hostname.toLowerCase().replace(/^www\./,''); } catch {}
+              if (hostDoc.endsWith('.wikipedia.org')) hostDoc = 'wikipedia.org';
+              if (/(^|\.)m\./.test(hostDoc)) hostDoc = hostDoc.replace(/^(?:[a-z]{1,3}\.)?m\./,'');
+              const bd = hostDoc.split('.'); if (bd.length>2) hostDoc = bd.slice(-2).join('.');
+              if (['abzas.org','abzas.net','abzas.info'].includes(hostDoc)) hostDoc = 'abzas.org';
+
+              const doc = {
+                id: normalized.hash,
+                title: normalized?.meta?.title || '',
+                publication: normalized?.meta?.publication || '',
+                host: hostDoc || '',
+                original_url: normalized?.meta?.original_url || '',
+                human_summary: normalized?.human_summary || '',
+                cited_sources_text: citedTxt,
+                published_at: normalized?.meta?.published_at || '',
+                analyzed_at: normalized?.analyzed_at || new Date().toISOString(),
+                reliability: normalized?.scores?.reliability?.value ?? 0,
+                political_bias: normalized?.scores?.political_establishment_bias?.value ?? 0,
+                is_advertisement: !!normalized?.is_advertisement
+              };
+
+              await fetch(String(S_URL).replace(/\/$/, '') + '/upsert', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${S_TOKEN}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ index: INDEX, documents: [doc] })
+              }).catch(()=>{});
+            }
+          } catch {}
+
           return normalized;
         } finally {
           if (browser) { try { await browser.close(); } catch (e) {} }
