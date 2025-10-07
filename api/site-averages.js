@@ -8,10 +8,17 @@ export default async function handler(req) {
     const hostParam = (url.searchParams.get('host') || '').trim();
     const urlParam = (url.searchParams.get('url') || '').trim();
 
+    function normalizeHost(h){
+      const x = String(h||'').toLowerCase().replace(/^www\./,'');
+      if (x === 'abzas.info' || x === 'abzas.net' || x === 'abzas.org') return 'abzas.org';
+      return x;
+    }
+
     let host = hostParam;
     if (!host && urlParam) {
       try { host = new URL(urlParam).hostname.replace(/^www\./, ''); } catch {}
     }
+    host = normalizeHost(host);
 
     if (!host) {
       return new Response(JSON.stringify({ error: true, message: 'Missing host or url' }), {

@@ -44,13 +44,19 @@ async function incrementTotalAnalysesCounter() {
 }
 
 // Update per-site running statistics (reliability and political bias)
+function normalizeHost(host) {
+  const h = String(host || '').toLowerCase().replace(/^www\./, '');
+  if (h === 'abzas.info' || h === 'abzas.net' || h === 'abzas.org') return 'abzas.org';
+  return h;
+}
+
 async function updateSiteStatsFromAnalysis(analysis) {
   try {
     if (!analysis || analysis.is_advertisement) return;
 
     const originalUrl = analysis?.meta?.original_url || '';
     let host = '';
-    try { host = new URL(originalUrl).hostname.replace(/^www\./, ''); } catch {}
+    try { host = normalizeHost(new URL(originalUrl).hostname); } catch {}
     if (!host) return;
 
     const rel = analysis?.scores?.reliability?.value;

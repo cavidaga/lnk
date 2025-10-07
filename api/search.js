@@ -6,11 +6,17 @@ function norm(s = '') {
   return String(s).toLowerCase();
 }
 
+function normalizeHost(h){
+  const x = String(h||'').toLowerCase().replace(/^www\./,'');
+  if (x === 'abzas.info' || x === 'abzas.net' || x === 'abzas.org') return 'abzas.org';
+  return x;
+}
+
 export default async function handler(req) {
   try {
     const url = new URL(req.url);
     const q = (url.searchParams.get('q') || '').trim();
-    const host = (url.searchParams.get('host') || '').trim().toLowerCase();
+    const host = normalizeHost((url.searchParams.get('host') || '').trim());
     const cursor = Math.max(0, parseInt(url.searchParams.get('cursor') || '0', 10) || 0);
     const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') || '20', 10) || 20));
 
@@ -37,9 +43,9 @@ export default async function handler(req) {
           const title = a.meta.title || '';
           const publication = a.meta.publication || '';
           const original_url = a.meta.original_url || '';
-          const hostFromUrl = (() => { try { return new URL(original_url).hostname.replace(/^www\./,'').toLowerCase(); } catch { return ''; } })();
+          const hostFromUrl = (() => { try { return normalizeHost(new URL(original_url).hostname); } catch { return ''; } })();
 
-          if (host && hostFromUrl !== host && publication.toLowerCase() !== host) continue;
+          if (host && hostFromUrl !== host && norm(publication) !== host) continue;
 
           const hay = `${title}\n${publication}\n${original_url}`.toLowerCase();
           if (q && !hay.includes(ql)) continue;
