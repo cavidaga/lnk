@@ -54,7 +54,9 @@ export default async function handler(req) {
     const host = normalizeHost((url.searchParams.get('host') || '').trim());
     const cursor = Math.max(0, parseInt(url.searchParams.get('cursor') || '0', 10) || 0);
     const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') || '20', 10) || 20));
-    const scan = Math.min(5000, Math.max(limit, parseInt(url.searchParams.get('scan') || '1000', 10) || 1000));
+    const scan = Math.min(20000, Math.max(limit, parseInt(url.searchParams.get('scan') || '1000', 10) || 1000));
+    const budgetMs = Math.min(20000, Math.max(300, parseInt(url.searchParams.get('budget') || '1500', 10) || 1500));
+    const started = Date.now();
 
     if (!q && !host) {
       return new Response(JSON.stringify({ error: true, message: 'Missing q or host' }), {
@@ -69,61 +71,70 @@ export default async function handler(req) {
     const results = [];
     let scanned = 0;
     let next_cursor = cursor;
-    const CHUNK = 200;
+    const CHUNK = 120;
 
     while (results.length < limit && scanned < scan) {
       const start = next_cursor;
       const end = start + Math.min(CHUNK, scan - scanned) - 1;
       // Prefer broader search index if present
+      // Time guard before hitting storage
+      if (Date.now() - started >= budgetMs) { next_cursor = start; break; }
+
       let hashes = await kv.lrange('search_hashes', start, end);
       if (!hashes || hashes.length === 0) {
         hashes = await kv.lrange('recent_hashes', start, end);
       }
       if (!hashes || hashes.length === 0) { next_cursor = null; break; }
 
-      for (const h of hashes) {
+      for (let i = 0; i < hashes.length; i++) {
+        const h = hashes[i];
         scanned++;
         try {
           const a = await kv.get(h);
-          if (!a || !a.meta) continue;
-          const title = a.meta.title || '';
-          const publication = a.meta.publication || '';
-          const original_url = a.meta.original_url || '';
-          const hostFromUrl = (() => { try { return normalizeHost(new URL(original_url).hostname); } catch { return ''; } })();
+          if (a && a.meta) {
+            const title = a.meta.title || '';
+            const publication = a.meta.publication || '';
+            const original_url = a.meta.original_url || '';
+            const hostFromUrl = (() => { try { return normalizeHost(new URL(original_url).hostname); } catch { return ''; } })();
 
-          if (host) {
-            const pubNorm = normalizeHost(publication);
-            if (hostFromUrl !== host && pubNorm !== host) continue;
+            if (host) {
+              const pubNorm = normalizeHost(publication);
+              if (hostFromUrl !== host && pubNorm !== host) { if (Date.now() - started >= budgetMs) { next_cursor = start + i + 1; break; } continue; }
+            }
+
+            const cited = Array.isArray(a.cited_sources) ? a.cited_sources.map(x => `${x?.name||''} ${x?.role||''} ${x?.stance||''}`).join('\n') : '';
+            const human = a.human_summary || '';
+            const hayRaw = `${title}\n${publication}\n${original_url}\n${cited}\n${human}`;
+            const hay = fold(hayRaw);
+            if (q) {
+              let okTok = true;
+              for (const tok of qTokens) { if (!hay.includes(tok)) { okTok = false; break; } }
+              if (!okTok) { if (Date.now() - started >= budgetMs) { next_cursor = start + i + 1; break; } continue; }
+            }
+
+            results.push({
+              hash: a.hash || h,
+              title,
+              publication,
+              url: original_url,
+              published_at: a.meta.published_at || '',
+              reliability: a.scores?.reliability?.value ?? 0,
+              political_bias: a.scores?.political_establishment_bias?.value ?? 0,
+              is_advertisement: !!a.is_advertisement
+            });
+            if (results.length >= limit) { next_cursor = start + i + 1; break; }
           }
-
-          // Include cited_sources text in haystack to match entities like "København"
-          const cited = Array.isArray(a.cited_sources) ? a.cited_sources.map(x => `${x?.name||''} ${x?.role||''} ${x?.stance||''}`).join('\n') : '';
-          const human = a.human_summary || '';
-          const hayRaw = `${title}\n${publication}\n${original_url}\n${cited}\n${human}`;
-          const hay = fold(hayRaw);
-          if (q) {
-            // All tokens must be present (simple AND search)
-            let ok = true;
-            for (const tok of qTokens) { if (!hay.includes(tok)) { ok = false; break; } }
-            if (!ok) continue;
-          }
-
-          results.push({
-            hash: a.hash || h,
-            title,
-            publication,
-            url: original_url,
-            published_at: a.meta.published_at || '',
-            reliability: a.scores?.reliability?.value ?? 0,
-            political_bias: a.scores?.political_establishment_bias?.value ?? 0,
-            is_advertisement: !!a.is_advertisement
-          });
-          if (results.length >= limit) break;
         } catch {}
+        if (Date.now() - started >= budgetMs) { next_cursor = start + i + 1; break; }
       }
 
-      next_cursor = end + 1;
+      if (next_cursor === start) {
+        // budget hit before scanning this chunk; keep next_cursor at start
+      } else if (next_cursor == null || next_cursor === cursor) {
+        next_cursor = end + 1;
+      }
       if (hashes.length < (end - start + 1)) { next_cursor = null; break; }
+      if (Date.now() - started >= budgetMs) break;
     }
 
     return new Response(JSON.stringify({ results, next_cursor }), {
