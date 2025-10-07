@@ -26,7 +26,7 @@ export default async function handler(req, res) {
         indexed++;
       } catch {}
     }
-    try { await kv.ltrim('search_hashes', 0, 4999); } catch {}
+    try { await kv.ltrim('search_hashes', 0, 19999); } catch {}
 
     const next_cursor = end + 1;
     return res.status(200).json({ indexed, next_cursor });
