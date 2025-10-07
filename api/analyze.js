@@ -43,6 +43,43 @@ async function incrementTotalAnalysesCounter() {
   }
 }
 
+// Update per-site running statistics (reliability and political bias)
+async function updateSiteStatsFromAnalysis(analysis) {
+  try {
+    if (!analysis || analysis.is_advertisement) return;
+
+    const originalUrl = analysis?.meta?.original_url || '';
+    let host = '';
+    try { host = new URL(originalUrl).hostname.replace(/^www\./, ''); } catch {}
+    if (!host) return;
+
+    const rel = analysis?.scores?.reliability?.value;
+    const bias = analysis?.scores?.political_establishment_bias?.value;
+    if (typeof rel !== 'number' || typeof bias !== 'number') return;
+
+    const key = `site_stats:${host}`;
+    const existing = await kv.get(key) || { count: 0, sum_rel: 0, sum_bias: 0 };
+
+    const count = (existing.count || 0) + 1;
+    const sum_rel = (existing.sum_rel || 0) + rel;
+    const sum_bias = (existing.sum_bias || 0) + bias;
+    const avg_rel = sum_rel / count;
+    const avg_bias = sum_bias / count;
+
+    await kv.set(key, {
+      host,
+      count,
+      sum_rel,
+      sum_bias,
+      avg_rel,
+      avg_bias,
+      updated_at: new Date().toISOString()
+    });
+  } catch (e) {
+    console.error('updateSiteStatsFromAnalysis error:', e);
+  }
+}
+
 // Markdowner API integration
 async function tryMarkdowner(url) {
   try {
@@ -1140,6 +1177,7 @@ export default async function handler(req, res) {
             
             // Increment total analyses counter
             await incrementTotalAnalysesCounter();
+            try { await updateSiteStatsFromAnalysis(normalized); } catch {}
             return normalized;
             }
           }
@@ -1191,6 +1229,7 @@ export default async function handler(req, res) {
               
               // Increment total analyses counter
               await incrementTotalAnalysesCounter();
+              try { await updateSiteStatsFromAnalysis(normalized); } catch {}
               return normalized;
             }
           } catch {}
@@ -1259,6 +1298,7 @@ export default async function handler(req, res) {
             
             // Increment total analyses counter
             await incrementTotalAnalysesCounter();
+            try { await updateSiteStatsFromAnalysis(normalized); } catch {}
             return normalized;
           }
 
@@ -1316,6 +1356,7 @@ export default async function handler(req, res) {
             
             // Increment total analyses counter
             await incrementTotalAnalysesCounter();
+            try { await updateSiteStatsFromAnalysis(normalized); } catch {}
             return normalized;
           }
 
@@ -1671,6 +1712,7 @@ export default async function handler(req, res) {
             
             // Increment total analyses counter
             await incrementTotalAnalysesCounter();
+            try { await updateSiteStatsFromAnalysis(normalized); } catch {}
             return normalized;
           }
 
@@ -1845,6 +1887,9 @@ export default async function handler(req, res) {
 
           // Increment total analyses counter
           await incrementTotalAnalysesCounter();
+
+          // Update per-site stats
+          try { await updateSiteStatsFromAnalysis(normalized); } catch {}
 
           return normalized;
         } finally {
