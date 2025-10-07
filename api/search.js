@@ -6,10 +6,23 @@ function norm(s = '') {
   return String(s).toLowerCase();
 }
 
+function baseDomain(h){
+  const parts = String(h||'').toLowerCase().split('.').filter(Boolean);
+  if (parts.length <= 2) return parts.join('.');
+  return parts.slice(-2).join('.');
+}
+
 function normalizeHost(h){
-  const x = String(h||'').toLowerCase().replace(/^www\./,'');
-  if (x === 'abzas.info' || x === 'abzas.net' || x === 'abzas.org') return 'abzas.org';
-  return x;
+  let x = String(h||'').toLowerCase().replace(/^www\./,'');
+  // Collapse common mobile prefixes like m., az.m.
+  x = x.replace(/^(?:[a-z]{1,3}\.)?m\./, '');
+  // Treat all wikipedia subdomains as one
+  if (x.endsWith('.wikipedia.org')) x = 'wikipedia.org';
+  // Treat azadliq and abzas domains as single brands
+  const b = baseDomain(x);
+  if (b === 'abzas.info' || b === 'abzas.net' || b === 'abzas.org') return 'abzas.org';
+  if (b === 'azadliq.org') return 'azadliq.org';
+  return b || x;
 }
 
 function fold(s = ''){
@@ -78,7 +91,10 @@ export default async function handler(req) {
           const original_url = a.meta.original_url || '';
           const hostFromUrl = (() => { try { return normalizeHost(new URL(original_url).hostname); } catch { return ''; } })();
 
-          if (host && hostFromUrl !== host && norm(publication) !== host) continue;
+          if (host) {
+            const pubNorm = normalizeHost(publication);
+            if (hostFromUrl !== host && pubNorm !== host) continue;
+          }
 
           // Include cited_sources text in haystack to match entities like "København"
           const cited = Array.isArray(a.cited_sources) ? a.cited_sources.map(x => `${x?.name||''} ${x?.role||''} ${x?.stance||''}`).join('\n') : '';
