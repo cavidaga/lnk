@@ -19,17 +19,21 @@ export default async function handler(req, res) {
       return res.status(200).json({ indexed: 0, next_cursor: null });
     }
 
-    let indexed = 0;
+    let indexed = 0, skipped = 0;
     for (const h of hashes) {
       try {
+        const markKey = `search_indexed:${h}`;
+        const marked = await kv.get(markKey);
+        if (marked) { skipped++; continue; }
         await kv.lpush('search_hashes', h);
+        await kv.set(markKey, 1);
         indexed++;
-      } catch {}
+      } catch { skipped++; }
     }
     try { await kv.ltrim('search_hashes', 0, 19999); } catch {}
 
     const next_cursor = end + 1;
-    return res.status(200).json({ indexed, next_cursor });
+    return res.status(200).json({ indexed, skipped, next_cursor });
   } catch (e) {
     return res.status(500).json({ error: true, message: 'Internal error' });
   }
