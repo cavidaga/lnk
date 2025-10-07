@@ -1,6 +1,6 @@
 import { kv } from '@vercel/kv';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs', maxDuration: 60 };
 
 function norm(s = '') {
   return String(s).toLowerCase();
@@ -65,60 +65,65 @@ export default async function handler(req) {
       });
     }
 
-    // --- Prefer Upstash Search when configured ---
+    // --- Upstash Search (required) ---
+    const S_URL = process.env.UPSTASH_SEARCH_REST_URL;
+    const S_TOKEN = process.env.UPSTASH_SEARCH_REST_TOKEN;
+    const INDEX = 'lnk';
+    if (!S_URL || !S_TOKEN) {
+      return new Response(JSON.stringify({ error: true, message: 'Search service not configured' }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json; charset=utf-8' }
+      });
+    }
+
     try {
-      const S_URL = process.env.UPSTASH_SEARCH_REST_URL;
-      const S_TOKEN = process.env.UPSTASH_SEARCH_REST_TOKEN;
-      const INDEX = 'lnk'; // user provided index/namespace
-      if (S_URL && S_TOKEN) {
-        const body = {
-          index: INDEX,
-          query: q || '*',
-          limit,
-          filter: host ? { host } : undefined
-        };
-        // Optional: support cursor if client passes string cursor
-        const cStr = url.searchParams.get('cursor');
-        if (cStr) body.cursor = cStr;
-
-        const res = await fetch(String(S_URL).replace(/\/$/, '') + '/query', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${S_TOKEN}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body)
+      const body = {
+        index: INDEX,
+        query: q || '*',
+        limit,
+        filter: host ? { host } : undefined,
+        cursor: url.searchParams.get('cursor') || undefined
+      };
+      const res = await fetch(String(S_URL).replace(/\/$/, '') + '/query', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${S_TOKEN}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) {
+        return new Response(JSON.stringify({ error: true, message: 'Search query failed' }), {
+          status: 502,
+          headers: { 'Content-Type': 'application/json; charset=utf-8' }
         });
-        if (res.ok) {
-          const data = await res.json();
-          const items = Array.isArray(data?.results) ? data.results : Array.isArray(data?.hits) ? data.hits : [];
-          const mapped = items.map((it) => {
-            const content = it?.content || {};
-            const meta = it?.metadata || {};
-            const id = it?.id || meta?.id || content?.id || '';
-            return {
-              hash: id,
-              title: content.title || meta.title || '',
-              publication: content.publication || meta.publication || '',
-              url: content.original_url || meta.original_url || '',
-              published_at: content.published_at || meta.published_at || '',
-              reliability: Number(content.reliability ?? meta.reliability ?? 0) || 0,
-              political_bias: Number(content.political_bias ?? meta.political_bias ?? 0) || 0,
-              is_advertisement: Boolean(content.is_advertisement ?? meta.is_advertisement ?? false)
-            };
-          });
-          return new Response(JSON.stringify({ results: mapped, next_cursor: data?.next_cursor || null }), {
-            status: 200,
-            headers: {
-              'Content-Type': 'application/json; charset=utf-8',
-              'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=30'
-            }
-          });
-        }
       }
-    } catch {}
+      const data = await res.json();
+      const items = Array.isArray(data?.results) ? data.results : Array.isArray(data?.hits) ? data.hits : [];
+      const mapped = items.map((it) => {
+        const content = it?.content || {};
+        const meta = it?.metadata || {};
+        const id = it?.id || meta?.id || content?.id || '';
+        return {
+          hash: id,
+          title: content.title || meta.title || '',
+          publication: content.publication || meta.publication || '',
+          url: content.original_url || meta.original_url || '',
+          published_at: content.published_at || meta.published_at || '',
+          reliability: Number(content.reliability ?? meta.reliability ?? 0) || 0,
+          political_bias: Number(content.political_bias ?? meta.political_bias ?? 0) || 0,
+          is_advertisement: Boolean(content.is_advertisement ?? meta.is_advertisement ?? false)
+        };
+      });
+      return new Response(JSON.stringify({ results: mapped, next_cursor: data?.next_cursor || null }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, s-maxage=60' }
+      });
+    } catch (e) {
+      return new Response(JSON.stringify({ error: true, message: 'Search error', detail: String(e?.message||e) }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json; charset=utf-8' }
+      });
+    }
 
-    // Scan multiple windows to find up to `limit` matches
+    // Legacy KV scan (unreachable when Upstash envs are set)
     const ql = fold(q);
     const qTokens = ql.split(/\s+/).filter(Boolean);
     const results = [];
