@@ -511,11 +511,13 @@ async function callGeminiWithRetryAndFallback({ primaryModel, fallbackModels = [
 }
 
 function buildPrompt({ url, articleText }) {
+  const CURRENT_DATE_UTC = new Date().toISOString();
   return `
 You are "LNK Evaluator", a sophisticated, neutral analysis AI developed for LNK.az. Analyze the provided ARTICLE TEXT and generate a single, valid JSON object with a comprehensive media reliability and bias report.
 
 ## CONTEXT ##
 Original URL: ${url}
+Current date (UTC): ${CURRENT_DATE_UTC}
 
 ## ARTICLE TEXT TO ANALYZE ##
 ${articleText}
@@ -588,11 +590,17 @@ The JSON object must contain "meta", "scores", "diagnostics", "cited_sources", "
 ### ADVERTISEMENT DETECTION
 "is_advertisement": true/false,
 "advertisement_reason": "Reklam xarakterli olduğunu göstərən əsas amillər (məs. korporativ elan, marka təbliği, məqsədli məlumatlandırma)"
+
+### DATE HANDLING (IMPORTANT)
+- 2025-ci il tarixləri hazırkı tarix kontekstində normaldır. "Gələcək tarix" kimi qiymətləndirmə ETMƏ.
+- Yalnız açıq uyğunsuzluq olduqda (məs., səhifə meta məlumatları bir-birini inkar edirsə) bunu qeyd et.
+- Təkcə il və ya yaxın tarix səbəbilə etibarlılığı azaltma.
 `.trim();
 }
 
 // --- Safe fallback prompt (English instructions, AZ output) ---
 function buildSafePrompt({ url, title, site }) {
+  const CURRENT_DATE_UTC = new Date().toISOString();
   return `
 You are "LNK Evaluator" for LNK.az. The linked page may contain sensitive material.
 Goal: assess media framing, sourcing transparency, and stance toward political institutions.
@@ -613,6 +621,7 @@ INPUT
 - Link: ${url}
 - Headline: ${title || '(no headline)'}
 - Publication: ${site || '(unknown)'}
+- Current date (UTC): ${CURRENT_DATE_UTC}
 
 RESPONSE
 Return a single valid JSON object with these keys:
@@ -644,11 +653,16 @@ advertisement_reason: "Reklam xarakterli olduğunu göstərən əsas amillər (y
 Constraints:
 - Natural paragraphs (no bullet lists inside rationales).
 - Stick to the ranges above (reliability 0–100; political bias –5..+5).
+
+DATE HANDLING (IMPORTANT):
+- 2025-ci il tarixləri hazırkı tarix kontekstində normaldır. "Gələcək tarix" kimi qiymətləndirmə ETMƏ.
+- Yalnız aşkar uyğunsuzluq olduqda qeyd et; təkcə yaxın tarixlər etibarlılığa cərimə deyil.
 `.trim();
 }
 
 // --- Blocked content prompt (very restrictive) ---
 function buildBlockedPrompt({ url, title, site }) {
+  const CURRENT_DATE_UTC = new Date().toISOString();
   return `
 You are "LNK Evaluator" for LNK.az. The linked page is BLOCKED and cannot be accessed.
 You can ONLY work with the title and URL provided below.
@@ -667,6 +681,7 @@ INPUT
 - Link: ${url}
 - Headline: ${title || '(no headline)'}
 - Publication: ${site || '(unknown)'}
+- Current date (UTC): ${CURRENT_DATE_UTC}
 
 RESPONSE
 Return a single valid JSON object with these keys:
@@ -704,6 +719,8 @@ is_advertisement: false,
 advertisement_reason: ""
 
 IMPORTANT: Keep all analysis minimal and clearly indicate that content access was blocked.
+
+DATE HANDLING: 2025-ci il normaldır; mövzu tarixini təkbaşına "gələcək" kimi şərh etmə.
 `.trim();
 }
 
