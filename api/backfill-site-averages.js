@@ -1,32 +1,47 @@
 import { kv } from '@vercel/kv';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs', maxDuration: 60 };
 
-export default async function handler(req) {
+export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
-      return new Response(JSON.stringify({ error: true, message: 'Method not allowed' }), {
-        status: 405,
-        headers: { 'Content-Type': 'application/json; charset=utf-8' }
-      });
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      return res.status(405).json({ error: true, message: 'Method not allowed' });
     }
 
-    // Optional limit in body: { limit: number }
-    let limit = 500;
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+
+    // Pagination via query params: ?cursor=0&limit=100
+    const url = new URL(req.url, 'http://localhost');
+    let cursor = Number(url.searchParams.get('cursor') || 0);
+    if (!Number.isFinite(cursor) || cursor < 0) cursor = 0;
+
+    // Optional JSON body for limit override
+    let limit = 100;
     try {
-      const body = await req.json();
-      if (body && Number.isFinite(body.limit) && body.limit > 0 && body.limit <= 5000) {
-        limit = Math.floor(body.limit);
+      let parsedBody = {};
+      const data = await new Promise((resolve) => {
+        try {
+          let buf = '';
+          req.on('data', (chunk) => { buf += chunk; });
+          req.on('end', () => resolve(buf));
+        } catch { resolve(''); }
+      });
+      if (data && String(data).trim()) {
+        try { parsedBody = JSON.parse(String(data)); } catch {}
+      }
+      if (parsedBody && Number.isFinite(parsedBody.limit) && parsedBody.limit > 0 && parsedBody.limit <= 1000) {
+        limit = Math.floor(parsedBody.limit);
       }
     } catch {}
 
-    // Get recent hashes window
-    const hashes = await kv.lrange('recent_hashes', 0, Math.max(0, limit - 1));
+    const start = cursor;
+    const end = cursor + Math.max(1, limit) - 1;
+
+    // Get a window of recent hashes
+    const hashes = await kv.lrange('recent_hashes', start, end);
     if (!hashes || hashes.length === 0) {
-      return new Response(JSON.stringify({ processed: 0, skipped: 0, errors: 0, message: 'No recent hashes' }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json; charset=utf-8' }
-      });
+      return res.status(200).json({ processed: 0, skipped: 0, errors: 0, message: 'No hashes in range', next_cursor: null });
     }
 
     let processed = 0, skipped = 0, errors = 0;
@@ -76,18 +91,10 @@ export default async function handler(req) {
       }
     }
 
-    return new Response(JSON.stringify({ processed, skipped, errors }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'no-store'
-      }
-    });
+    const next_cursor = end + 1;
+    return res.status(200).json({ processed, skipped, errors, next_cursor });
   } catch (e) {
-    return new Response(JSON.stringify({ error: true, message: 'Internal error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' }
-    });
+    return res.status(500).json({ error: true, message: 'Internal error' });
   }
 }
 
