@@ -76,6 +76,20 @@ export default async function handler(req) {
       });
     }
 
+    // Check if this is Vector Search (which won't work for text queries)
+    if (S_URL.includes('-search.upstash.io')) {
+      return new Response(JSON.stringify({ 
+        error: true, 
+        message: 'Vector Search detected - you need regular Upstash Search for text queries',
+        currentUrl: S_URL,
+        expectedUrl: 'https://your-db-name.upstash.io (not -search.upstash.io)',
+        help: 'Create a regular Upstash Search database and update your environment variables'
+      }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json; charset=utf-8' }
+      });
+    }
+
     try {
       const body = {
         index: INDEX,
