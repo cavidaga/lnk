@@ -57,9 +57,11 @@ export default async function handler(req) {
       console.log('[info] Regular Search error:', errorText);
     }
     
-    // If regular search fails, try vector search with text query
+    // Try vector search with different query formats
     console.log('[info] Trying vector search with text query...');
-    const vectorRes = await fetch(`${S_URL}/query/lnk`, {
+    
+    // Try 1: Simple text query
+    const vectorRes1 = await fetch(`${S_URL}/query/lnk`, {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${S_TOKEN}`, 
@@ -71,20 +73,46 @@ export default async function handler(req) {
       })
     });
     
-    console.log('[info] Vector search response:', vectorRes.status);
-    if (vectorRes.ok) {
-      const vectorData = await vectorRes.json();
+    console.log('[info] Vector search (text) response:', vectorRes1.status);
+    if (vectorRes1.ok) {
+      const vectorData = await vectorRes1.json();
       return new Response(JSON.stringify({ 
         success: true, 
-        serviceType: 'vector_search',
+        serviceType: 'vector_search_text',
         data: vectorData
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
     } else {
-      const errorText = await vectorRes.text();
-      console.log('[info] Vector search error:', errorText);
+      const errorText = await vectorRes1.text();
+      console.log('[info] Vector search (text) error:', errorText);
+    }
+    
+    // Try 2: List all documents to see what's in the index
+    console.log('[info] Trying to list documents in lnk index...');
+    const listRes = await fetch(`${S_URL}/lnk`, {
+      method: 'GET',
+      headers: { 
+        'Authorization': `Bearer ${S_TOKEN}`, 
+        'Content-Type': 'application/json' 
+      }
+    });
+    
+    console.log('[info] List documents response:', listRes.status);
+    if (listRes.ok) {
+      const listData = await listRes.json();
+      return new Response(JSON.stringify({ 
+        success: true, 
+        serviceType: 'vector_search_list',
+        data: listData
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } else {
+      const errorText = await listRes.text();
+      console.log('[info] List documents error:', errorText);
     }
     
     // Try different index names
