@@ -130,7 +130,6 @@ export default async function handler(req) {
     let scanned = 0;
     let next_cursor = cursor;
     const CHUNK = 25; // Reduced chunk size for better performance
-    const started = Date.now(); // Add missing started timestamp
 
     while (results.length < limit && scanned < scan) {
       const start = next_cursor;
