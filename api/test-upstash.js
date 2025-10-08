@@ -19,43 +19,9 @@ export default async function handler(req) {
   try {
     console.log('[info] Testing Upstash Search connection...');
     
-    // Check if this is Vector Search or regular Search
-    console.log('[info] Checking service type...');
+    // This is Vector Search - skip regular Search test
+    console.log('[info] Using Vector Search service');
     console.log('[info] URL:', S_URL);
-    
-    // Try regular Search API format first
-    const searchUrl = S_URL.replace('-search.upstash.io', '.upstash.io');
-    console.log('[info] Trying regular Search URL:', searchUrl);
-    
-    const searchRes = await fetch(`${searchUrl}/query`, {
-      method: 'POST',
-      headers: { 
-        'Authorization': `Bearer ${S_TOKEN}`, 
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify({
-        index: 'lnk',
-        query: '*',
-        limit: 1
-      })
-    });
-    
-    console.log('[info] Regular Search response:', searchRes.status);
-    if (searchRes.ok) {
-      const searchData = await searchRes.json();
-      return new Response(JSON.stringify({ 
-        success: true, 
-        serviceType: 'regular_search',
-        searchUrl,
-        data: searchData
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    } else {
-      const errorText = await searchRes.text();
-      console.log('[info] Regular Search error:', errorText);
-    }
     
     // Try vector search with different query formats
     console.log('[info] Trying vector search with text query...');
