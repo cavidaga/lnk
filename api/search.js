@@ -84,11 +84,18 @@ export default async function handler(req) {
         filter: host ? { host } : undefined,
         cursor: url.searchParams.get('cursor') || undefined
       };
+      // Add timeout to prevent hanging
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+      
       const res = await fetch(String(S_URL).replace(/\/$/, '') + '/query', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${S_TOKEN}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       if (!res.ok) {
         return new Response(JSON.stringify({ error: true, message: 'Search query failed' }), {
           status: 502,
@@ -117,6 +124,12 @@ export default async function handler(req) {
         headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, s-maxage=60' }
       });
     } catch (e) {
+      if (e.name === 'AbortError') {
+        return new Response(JSON.stringify({ error: true, message: 'Search timeout - Upstash Search took too long to respond' }), {
+          status: 502,
+          headers: { 'Content-Type': 'application/json; charset=utf-8' }
+        });
+      }
       return new Response(JSON.stringify({ error: true, message: 'Search error', detail: String(e?.message||e) }), {
         status: 502,
         headers: { 'Content-Type': 'application/json; charset=utf-8' }
