@@ -147,8 +147,6 @@
       }
     });
 
-    // Wire search box (added below)
-    wireSearch();
 
     // Load recent analyses and statistics
     loadRecentAnalyses();
@@ -295,94 +293,6 @@
     console.log('Recent analyses rendered, section shown');
   }
 
-  // ---------- SEARCH ----------
-  function wireSearch(){
-    // Inject a simple search UI under the form if not present
-    let holder = document.getElementById('search-holder');
-    if (!holder) {
-      const app = document.getElementById('app-container');
-      holder = document.createElement('section');
-      holder.id = 'search-holder';
-      holder.className = 'card';
-      holder.innerHTML = `
-        <div class="bd">
-          <h3 style="margin:0 0 8px">Axtar</h3>
-          <div class="form-row" style="gap:8px;align-items:flex-end;flex-wrap:wrap">
-            <div class="form-group" style="flex:2;min-width:240px">
-              <label class="label" for="search-q">Başlıq, sayt və ya URL</label>
-              <input class="input" id="search-q" type="text" placeholder="məs: qafqazinfo.az və ya başlıqdan söz">
-            </div>
-            <div class="form-group" style="flex:1;min-width:200px">
-              <label class="label" for="search-host">Yalnız bu host</label>
-              <input class="input" id="search-host" type="text" placeholder="məs: qafqazinfo.az">
-            </div>
-            <button class="btn" id="search-btn" type="button">Axtar</button>
-          </div>
-          <div id="search-status" class="small muted" style="margin-top:8px;display:none"></div>
-          <div id="search-results" style="margin-top:12px"></div>
-        </div>`;
-      if (app && app.parentNode) app.parentNode.insertBefore(holder, app.nextSibling);
-    }
-
-    const qEl = document.getElementById('search-q');
-    const hostEl = document.getElementById('search-host');
-    const btn = document.getElementById('search-btn');
-    const statusEl = document.getElementById('search-status');
-    const resultsEl = document.getElementById('search-results');
-
-    async function runSearch(cursor){
-      const q = (qEl?.value || '').trim();
-      const host = (hostEl?.value || '').trim();
-      if (!q && !host) {
-        statusEl.style.display = 'block';
-        statusEl.textContent = 'Sorğu boşdur. “q” və ya “host” doldurun.';
-        return;
-      }
-      statusEl.style.display = 'block';
-      statusEl.textContent = 'Axtarılır…';
-      resultsEl.innerHTML = '';
-      let next = cursor || 0;
-      let total = 0;
-      const items = [];
-      for (let i = 0; i < 5; i++) { // up to 5 pages per search
-        const url = `/api/search?${q?`q=${encodeURIComponent(q)}&`:''}${host?`host=${encodeURIComponent(host)}&`:''}cursor=${next}&limit=20`;
-        const res = await fetch(url);
-        if (!res.ok) break;
-        const data = await res.json();
-        const arr = Array.isArray(data?.results) ? data.results : [];
-        items.push(...arr);
-        total += arr.length;
-        if (!data?.next_cursor) break;
-        next = data.next_cursor;
-      }
-      statusEl.textContent = `${total} nəticə tapıldı`;
-      resultsEl.innerHTML = items.length ? items.map(renderSearchItem).join('') : '<div class="small muted">Nəticə yoxdur</div>';
-    }
-
-    function renderSearchItem(r){
-      const rel = num(r?.reliability, 0);
-      const pol = Number(r?.political_bias ?? 0);
-      const url = `/analysis/${encodeURIComponent(r?.hash || '')}`;
-      const pubAt = r?.published_at ? formatAzDate(r.published_at) : '';
-      return `
-        <a class="recent-item" href="${url}">
-          <div class="recent-item-title">${esc(r?.title || '—')}</div>
-          <div class="recent-item-meta">
-            ${r?.publication ? `<span>${esc(r.publication)}</span>` : ''}
-            ${pubAt ? `<span>•</span><span>${esc(pubAt)}</span>` : ''}
-          </div>
-          <div class="recent-item-scores">
-            <div class="score-item"><span>Etibarlılıq:</span><span class="score-value reliability ${getReliabilityColorClass(rel)}">${rel}/100</span></div>
-            <div class="score-item"><span>Siyasi meyl:</span><span class="score-value bias ${getBiasColorClass(pol)}">${bias(pol)}</span></div>
-          </div>
-          ${r?.url ? `<div class="recent-item-url">${esc(r.url)}</div>` : ''}
-        </a>`;
-    }
-
-    if (btn) btn.addEventListener('click', () => runSearch(0));
-    if (qEl) qEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') runSearch(0); });
-    if (hostEl) hostEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') runSearch(0); });
-  }
 
   // ---------- ANALYSIS FLOW ----------
   async function initAnalysis(hash) {
