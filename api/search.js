@@ -60,16 +60,16 @@ export default async function handler(req) {
       });
     }
 
-    // --- Upstash Search check ---
+    // --- Upstash Search (REST) check ---
     const S_URL = process.env.UPSTASH_SEARCH_REST_URL;
     const S_TOKEN = process.env.UPSTASH_SEARCH_REST_TOKEN;
-    const INDEX = 'lnk'; // Fixed: was 'Ink'
-    
-    // Check if it's Vector Search (URL contains '-search')
-    const isVectorSearch = S_URL && S_URL.includes('-search.upstash.io');
-    
-    if (S_URL && S_TOKEN && !isVectorSearch) {
-      // Only use Upstash Search if it's NOT Vector Search
+    const INDEX = process.env.UPSTASH_SEARCH_INDEX || 'lnk';
+
+    // Use Upstash Search when REST URL is provided (typical domain contains '-search.upstash.io')
+    const isSearchRest = Boolean(S_URL && S_TOKEN);
+
+    if (isSearchRest) {
+      // Prefer Upstash Search REST when configured
       try {
         const body = {
           query: q || '*',
