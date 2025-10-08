@@ -41,14 +41,14 @@ export default async function handler(req) {
     for (const indexName of possibleIndexes) {
       console.log(`[info] Trying index: ${indexName}`);
       const testBody = {
-        index: indexName,
         query: '*',
         limit: 1
       };
       
       console.log('[info] Request body:', JSON.stringify(testBody));
+      console.log('[info] Request URL:', `${S_URL}/query/${indexName}`);
       
-      const testRes = await fetch(`${S_URL}/query`, {
+      const testRes = await fetch(`${S_URL}/query/${indexName}`, {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${S_TOKEN}`, 
