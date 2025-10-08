@@ -31,7 +31,7 @@ export default async function handler(req) {
     }
     
     // Get recent hashes (limited to prevent timeout)
-    const hashes = await kv.lrange('recent_hashes', 0, 200);
+    const hashes = await kv.lrange('recent_hashes', 0, 50);
     const results = [];
     
     const normalizedQuery = normalizeText(query);

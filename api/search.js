@@ -88,6 +88,12 @@ export default async function handler(req) {
           body.filter = `publication:"${host}"`;
         }
         
+        console.log('Upstash Search request:', { 
+          url: `${S_URL}/query/${INDEX}`,
+          body,
+          hasToken: !!S_TOKEN
+        });
+        
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
         
@@ -100,8 +106,21 @@ export default async function handler(req) {
         
         clearTimeout(timeoutId);
         
+        console.log('Upstash Search response:', { 
+          status: res.status, 
+          ok: res.ok,
+          statusText: res.statusText
+        });
+        
         if (res.ok) {
           const data = await res.json();
+          console.log('Upstash Search data:', { 
+            hasResults: !!data?.results,
+            hasHits: !!data?.hits,
+            resultsLength: data?.results?.length || 0,
+            hitsLength: data?.hits?.length || 0
+          });
+          
           const items = Array.isArray(data?.results) ? data.results : Array.isArray(data?.hits) ? data.hits : [];
           const mapped = items.map((it) => {
             const content = it?.content || {};
@@ -118,13 +137,18 @@ export default async function handler(req) {
               is_advertisement: Boolean(content.is_advertisement ?? meta.is_advertisement ?? false)
             };
           });
+          
+          console.log('Upstash Search success, returning', mapped.length, 'results');
           return new Response(JSON.stringify({ results: mapped, next_cursor: data?.next_cursor || null }), {
             status: 200,
             headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, s-maxage=60' }
           });
+        } else {
+          const errorText = await res.text();
+          console.error('Upstash Search failed:', { status: res.status, error: errorText });
         }
       } catch (e) {
-        console.warn('Upstash Search failed, falling back to KV scan:', e.message);
+        console.error('Upstash Search exception:', e.message);
         // Fall through to KV scan
       }
     }
