@@ -19,12 +19,14 @@ export default async function handler(req) {
   try {
     console.log('[info] Testing Upstash Search connection...');
     
-    // Simple test query
+    // Simple test query - try different formats
     const testBody = {
       index: 'lnk',
       query: '*',
       limit: 1
     };
+    
+    console.log('[info] Request body:', JSON.stringify(testBody));
     
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -50,13 +52,15 @@ export default async function handler(req) {
     
     if (!res.ok) {
       const errorText = await res.text();
+      console.log('[error] Upstash response:', res.status, errorText);
       return new Response(JSON.stringify({ 
         error: true, 
         message: `Upstash Search failed: ${res.status}`,
         status: res.status,
         statusText: res.statusText,
         errorText,
-        duration
+        duration,
+        requestBody: testBody
       }), {
         status: 502,
         headers: { 'Content-Type': 'application/json' }
