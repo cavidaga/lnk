@@ -97,10 +97,13 @@ export default async function handler(req) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
         
-        const res = await fetch(`${S_URL}/query/${INDEX}`, {
+        const res = await fetch(`${S_URL}/query`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${S_TOKEN}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
+          body: JSON.stringify({
+            index: INDEX,
+            ...body
+          }),
           signal: controller.signal
         });
         
