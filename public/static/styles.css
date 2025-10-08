@@ -521,6 +521,83 @@ h1{ font-size:26px; margin:0; letter-spacing:.2px }
   }
 }
 
+/* Site Averages Styles */
+.site-averages-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.site-avg-stat {
+  background: var(--card-bg, rgba(255,255,255,0.02));
+  border: 1px solid var(--border, #222);
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.site-avg-reliability {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.site-avg-bias {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(185, 28, 28, 0.05));
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.site-avg-label {
+  margin-bottom: 8px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  color: var(--muted, #8e97ab);
+}
+
+.site-avg-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text, #e9edf3);
+}
+
+/* Mobile responsive styles for site averages */
+@media (max-width: 768px) {
+  .site-averages-row {
+    gap: 10px;
+  }
+  
+  .site-avg-stat {
+    padding: 14px;
+  }
+  
+  .site-avg-value {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-averages-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .site-avg-stat {
+    padding: 12px;
+  }
+  
+  .site-avg-value {
+    font-size: 18px;
+  }
+  
+  .site-avg-label {
+    font-size: 10px;
+  }
+}
+
 /* Form layout */
 .form-group {
   margin-bottom: 16px;

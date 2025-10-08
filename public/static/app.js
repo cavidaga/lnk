@@ -552,18 +552,18 @@ async function renderAnalysis(root, data, hash) {
             <h3 style="margin:0 0 8px">Sayt üzrə orta göstəricilər</h3>
             <div class="small muted" id="site-averages-status">Yüklənir…</div>
             <div id="site-averages-content" style="display:none">
-              <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
-                <div class="stat" style="background: var(--card-bg,rgba(255,255,255,0.02)); border: 1px solid var(--border,#222); border-radius: 12px; padding: 16px; min-width: 0; flex: 1; text-align:center;">
-                  <div class="small muted" style="margin-bottom:8px; font-size:11px; text-transform: uppercase; letter-spacing:.05em; font-weight:600;">Nümunə sayı</div>
-                  <div id="site-avg-count" style="font-size: 24px; font-weight:700;">—</div>
+              <div class="site-averages-row">
+                <div class="site-avg-stat site-avg-count">
+                  <div class="site-avg-label">Nümunə sayı</div>
+                  <div id="site-avg-count" class="site-avg-value">—</div>
                 </div>
-                <div class="stat" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05)); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 16px; min-width: 0; flex: 1; text-align:center;">
-                  <div class="small muted" style="margin-bottom:8px; font-size:11px; text-transform: uppercase; letter-spacing:.05em; font-weight:600;">Orta etibarlılıq</div>
-                  <div id="site-avg-rel" style="font-size: 24px; font-weight:700;">—</div>
+                <div class="site-avg-stat site-avg-reliability">
+                  <div class="site-avg-label">Orta etibarlılıq</div>
+                  <div id="site-avg-rel" class="site-avg-value">—</div>
                 </div>
-                <div class="stat" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(185, 28, 28, 0.05)); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 16px; min-width: 0; flex: 1; text-align:center;">
-                  <div class="small muted" style="margin-bottom:8px; font-size:11px; text-transform: uppercase; letter-spacing:.05em; font-weight:600;">Orta siyasi meyl</div>
-                  <div id="site-avg-bias" style="font-size: 24px; font-weight:700;">—</div>
+                <div class="site-avg-stat site-avg-bias">
+                  <div class="site-avg-label">Orta siyasi meyl</div>
+                  <div id="site-avg-bias" class="site-avg-value">—</div>
                 </div>
               </div>
               <div class="micro muted" id="site-avg-host" style="margin-top:6px"></div>
