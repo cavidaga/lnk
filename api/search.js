@@ -89,8 +89,8 @@ export default async function handler(req) {
         }
         
         console.log('Upstash Search request:', { 
-          url: `${S_URL}/query/${INDEX}`,
-          body,
+          url: `${S_URL}/query`,
+          body: { index: INDEX, ...body },
           hasToken: !!S_TOKEN
         });
         
