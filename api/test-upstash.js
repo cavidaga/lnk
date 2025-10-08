@@ -19,20 +19,72 @@ export default async function handler(req) {
   try {
     console.log('[info] Testing Upstash Search connection...');
     
-    // First, try to list available indexes
-    console.log('[info] Trying to list indexes...');
-    const listRes = await fetch(`${S_URL}`, {
-      method: 'GET',
+    // Check if this is Vector Search or regular Search
+    console.log('[info] Checking service type...');
+    console.log('[info] URL:', S_URL);
+    
+    // Try regular Search API format first
+    const searchUrl = S_URL.replace('-search.upstash.io', '.upstash.io');
+    console.log('[info] Trying regular Search URL:', searchUrl);
+    
+    const searchRes = await fetch(`${searchUrl}/query`, {
+      method: 'POST',
       headers: { 
         'Authorization': `Bearer ${S_TOKEN}`, 
         'Content-Type': 'application/json' 
-      }
+      },
+      body: JSON.stringify({
+        index: 'lnk',
+        query: '*',
+        limit: 1
+      })
     });
     
-    console.log('[info] List indexes response:', listRes.status);
-    if (listRes.ok) {
-      const listData = await listRes.json();
-      console.log('[info] Available indexes:', listData);
+    console.log('[info] Regular Search response:', searchRes.status);
+    if (searchRes.ok) {
+      const searchData = await searchRes.json();
+      return new Response(JSON.stringify({ 
+        success: true, 
+        serviceType: 'regular_search',
+        searchUrl,
+        data: searchData
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } else {
+      const errorText = await searchRes.text();
+      console.log('[info] Regular Search error:', errorText);
+    }
+    
+    // If regular search fails, try vector search with text query
+    console.log('[info] Trying vector search with text query...');
+    const vectorRes = await fetch(`${S_URL}/query/lnk`, {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${S_TOKEN}`, 
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({
+        query: 'test',
+        limit: 1
+      })
+    });
+    
+    console.log('[info] Vector search response:', vectorRes.status);
+    if (vectorRes.ok) {
+      const vectorData = await vectorRes.json();
+      return new Response(JSON.stringify({ 
+        success: true, 
+        serviceType: 'vector_search',
+        data: vectorData
+      }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } else {
+      const errorText = await vectorRes.text();
+      console.log('[info] Vector search error:', errorText);
     }
     
     // Try different index names
