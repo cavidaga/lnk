@@ -67,6 +67,14 @@ export default async function handler(req) {
 
     // Use Upstash Search when REST URL is provided (typical domain contains '-search.upstash.io')
     const isSearchRest = Boolean(S_URL && S_TOKEN);
+    
+    console.log('Upstash Search check:', { 
+      hasUrl: !!S_URL, 
+      hasToken: !!S_TOKEN, 
+      url: S_URL ? S_URL.substring(0, 50) + '...' : 'none',
+      index: INDEX,
+      isSearchRest 
+    });
 
     if (isSearchRest) {
       // Prefer Upstash Search REST when configured
