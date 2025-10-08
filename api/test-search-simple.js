@@ -22,15 +22,14 @@ export default async function handler(req) {
     
     // Test 1: Simple query with correct Upstash Search format
     const body = {
-      index: 'lnk',
       query: '*',
       limit: 1
     };
     
     console.log('[info] Request body:', JSON.stringify(body));
-    console.log('[info] Request URL:', `${S_URL}/query`);
+    console.log('[info] Request URL:', `${S_URL}/query/Ink`);
     
-    const res = await fetch(`${S_URL}/query`, {
+    const res = await fetch(`${S_URL}/query/Ink`, {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${S_TOKEN}`, 

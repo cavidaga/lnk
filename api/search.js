@@ -68,7 +68,7 @@ export default async function handler(req) {
     // --- Upstash Search (required) ---
     const S_URL = process.env.UPSTASH_SEARCH_REST_URL;
     const S_TOKEN = process.env.UPSTASH_SEARCH_REST_TOKEN;
-    const INDEX = 'lnk';
+    const INDEX = 'Ink';
     if (!S_URL || !S_TOKEN) {
       return new Response(JSON.stringify({ error: true, message: 'Search service not configured' }), {
         status: 502,
@@ -79,7 +79,6 @@ export default async function handler(req) {
 
     try {
       const body = {
-        index: INDEX,
         query: q || '*',
         limit
       };
@@ -91,7 +90,7 @@ export default async function handler(req) {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
       
-      const res = await fetch(String(S_URL).replace(/\/$/, '') + '/query', {
+      const res = await fetch(`${S_URL}/query/${INDEX}`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${S_TOKEN}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
