@@ -76,28 +76,17 @@ export default async function handler(req) {
       });
     }
 
-    // Check if this is Vector Search (which won't work for text queries)
-    if (S_URL.includes('-search.upstash.io')) {
-      return new Response(JSON.stringify({ 
-        error: true, 
-        message: 'Vector Search detected - you need regular Upstash Search for text queries',
-        currentUrl: S_URL,
-        expectedUrl: 'https://your-db-name.upstash.io (not -search.upstash.io)',
-        help: 'Create a regular Upstash Search database and update your environment variables'
-      }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json; charset=utf-8' }
-      });
-    }
 
     try {
       const body = {
         index: INDEX,
         query: q || '*',
-        limit,
-        filter: host ? { host } : undefined,
-        cursor: url.searchParams.get('cursor') || undefined
+        limit
       };
+      
+      if (host) {
+        body.filter = `publication:"${host}"`;
+      }
       // Add timeout to prevent hanging
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
