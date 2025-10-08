@@ -27,9 +27,9 @@ export default async function handler(req) {
     };
     
     console.log('[info] Request body:', JSON.stringify(body));
-    console.log('[info] Request URL:', `${S_URL}/query/Ink`);
+    console.log('[info] Request URL:', `${S_URL}/query/lnk`);
     
-    const res = await fetch(`${S_URL}/query/Ink`, {
+    const res = await fetch(`${S_URL}/query/lnk`, {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${S_TOKEN}`, 

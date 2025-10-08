@@ -68,7 +68,7 @@ export default async function handler(req) {
     // --- Upstash Search (required) ---
     const S_URL = process.env.UPSTASH_SEARCH_REST_URL;
     const S_TOKEN = process.env.UPSTASH_SEARCH_REST_TOKEN;
-    const INDEX = 'Ink';
+    const INDEX = 'lnk';
     if (!S_URL || !S_TOKEN) {
       return new Response(JSON.stringify({ error: true, message: 'Search service not configured' }), {
         status: 502,
