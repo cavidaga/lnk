@@ -89,21 +89,18 @@ export default async function handler(req) {
         }
         
         console.log('Upstash Search request:', { 
-          url: `${S_URL}/query`,
-          body: { index: INDEX, ...body },
+          url: `${S_URL}/query/${INDEX}`,
+          body,
           hasToken: !!S_TOKEN
         });
         
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
         
-        const res = await fetch(`${S_URL}/query`, {
+        const res = await fetch(`${S_URL}/query/${INDEX}`, {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${S_TOKEN}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            index: INDEX,
-            ...body
-          }),
+          body: JSON.stringify(body),
           signal: controller.signal
         });
         
