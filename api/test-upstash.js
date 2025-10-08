@@ -19,64 +19,67 @@ export default async function handler(req) {
   try {
     console.log('[info] Testing Upstash Search connection...');
     
-    // Simple test query - try different formats
-    const testBody = {
-      index: 'lnk',
-      query: '*',
-      limit: 1
-    };
-    
-    console.log('[info] Request body:', JSON.stringify(testBody));
-    
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      console.log('[info] Aborting request after 5 seconds');
-      controller.abort();
-    }, 5000);
-    
-    const startTime = Date.now();
-    const res = await fetch(`${S_URL}/query`, {
-      method: 'POST',
+    // First, try to list available indexes
+    console.log('[info] Trying to list indexes...');
+    const listRes = await fetch(`${S_URL}`, {
+      method: 'GET',
       headers: { 
         'Authorization': `Bearer ${S_TOKEN}`, 
         'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify(testBody),
-      signal: controller.signal
+      }
     });
     
-    clearTimeout(timeoutId);
-    const duration = Date.now() - startTime;
-    
-    console.log(`[info] Request completed in ${duration}ms, status: ${res.status}`);
-    
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.log('[error] Upstash response:', res.status, errorText);
-      return new Response(JSON.stringify({ 
-        error: true, 
-        message: `Upstash Search failed: ${res.status}`,
-        status: res.status,
-        statusText: res.statusText,
-        errorText,
-        duration,
-        requestBody: testBody
-      }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json' }
-      });
+    console.log('[info] List indexes response:', listRes.status);
+    if (listRes.ok) {
+      const listData = await listRes.json();
+      console.log('[info] Available indexes:', listData);
     }
     
-    const data = await res.json();
+    // Try different index names
+    const possibleIndexes = ['lnk', 'default', 'main', 'analyses'];
+    
+    for (const indexName of possibleIndexes) {
+      console.log(`[info] Trying index: ${indexName}`);
+      const testBody = {
+        index: indexName,
+        query: '*',
+        limit: 1
+      };
+      
+      console.log('[info] Request body:', JSON.stringify(testBody));
+      
+      const testRes = await fetch(`${S_URL}/query`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${S_TOKEN}`, 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(testBody)
+      });
+      
+      console.log(`[info] Index ${indexName} response:`, testRes.status);
+      if (testRes.ok) {
+        const testData = await testRes.json();
+        return new Response(JSON.stringify({ 
+          success: true, 
+          workingIndex: indexName,
+          data: testData
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } else {
+        const errorText = await testRes.text();
+        console.log(`[info] Index ${indexName} error:`, errorText);
+      }
+    }
+    
     return new Response(JSON.stringify({ 
-      success: true, 
-      duration,
-      status: res.status,
-      dataKeys: Object.keys(data || {}),
-      resultsCount: Array.isArray(data?.results) ? data.results.length : 'not array',
-      hasResults: Array.isArray(data?.results) && data.results.length > 0
+      error: true, 
+      message: 'No working index found',
+      triedIndexes: possibleIndexes
     }), {
-      status: 200,
+      status: 502,
       headers: { 'Content-Type': 'application/json' }
     });
     
