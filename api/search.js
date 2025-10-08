@@ -44,7 +44,7 @@ function fold(s = ''){
 
 export default async function handler(req) {
   try {
-    const url = new URL(req.url);
+    const url = new URL(req.url, 'http://localhost');
     const q = (url.searchParams.get('q') || '').trim();
     const host = normalizeHost((url.searchParams.get('host') || '').trim());
     const cursor = Math.max(0, parseInt(url.searchParams.get('cursor') || '0', 10) || 0);
