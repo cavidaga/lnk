@@ -49,8 +49,8 @@ export default async function handler(req) {
     const host = normalizeHost((url.searchParams.get('host') || '').trim());
     const cursor = Math.max(0, parseInt(url.searchParams.get('cursor') || '0', 10) || 0);
     const limit = Math.min(100, Math.max(1, parseInt(url.searchParams.get('limit') || '20', 10) || 20));
-    const scan = Math.min(20000, Math.max(limit, parseInt(url.searchParams.get('scan') || '1000', 10) || 1000));
-    const budgetMs = Math.min(20000, Math.max(300, parseInt(url.searchParams.get('budget') || '1500', 10) || 1500));
+    const scan = Math.min(1000, Math.max(limit, parseInt(url.searchParams.get('scan') || '200', 10) || 200));
+    const budgetMs = Math.min(10000, Math.max(300, parseInt(url.searchParams.get('budget') || '8000', 10) || 8000));
     const started = Date.now();
 
     if (!q && !host) {
@@ -129,7 +129,8 @@ export default async function handler(req) {
     const results = [];
     let scanned = 0;
     let next_cursor = cursor;
-    const CHUNK = 120;
+    const CHUNK = 25; // Reduced chunk size for better performance
+    const started = Date.now(); // Add missing started timestamp
 
     while (results.length < limit && scanned < scan) {
       const start = next_cursor;
@@ -211,10 +212,16 @@ export default async function handler(req) {
               is_advertisement: !!a.is_advertisement
             });
             
-            if (results.length >= limit) { 
-              next_cursor = start + i + 1; 
-              break; 
-            }
+             if (results.length >= limit) { 
+               next_cursor = start + i + 1; 
+               break; 
+             }
+             
+             // Early termination if we're running out of time
+             if (Date.now() - started >= budgetMs * 0.8) {
+               next_cursor = start + i + 1;
+               break;
+             }
           }
         } catch {}
         
