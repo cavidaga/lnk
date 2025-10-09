@@ -852,7 +852,13 @@ async function renderAnalysis(root, data, hash) {
     // Normalize any legacy mojibake messages
     const mojibakeMap = {
       '��nternet ba�Ylant��s�� b�trpa olundu': 'İnternet bağlantısı bərpa olundu',
-      '��nternet ba�Ylant��s�� k�tsildi': 'İnternet bağlantısı kəsildi'
+      '��nternet ba�Ylant��s�� k�tsildi': 'İnternet bağlantısı kəsildi',
+      'Z�thm�tt olmasa URL daxil edin': 'Zəhmət olmasa URL daxil edin',
+      'T�thlil ba�Ylad��...': 'Təhlil başladı...',
+      'T�thlil tamamland��!': 'Təhlil tamamlandı!',
+      'T�thlil zaman�� x�tta ba�Y verdi': 'Təhlil zamanı xəta baş verdi',
+      'Hash tap��lmad��': 'Hash tapılmadı',
+      'X�tta': 'Xəta'
     };
     if (Object.prototype.hasOwnProperty.call(mojibakeMap, message)) {
       message = mojibakeMap[message];
