@@ -7,3 +7,4 @@
 # Logs & Environment Variables
 *.log
 .env
+.vercel
