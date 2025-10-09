@@ -988,7 +988,11 @@ export default async function handler(req, res) {
 
   // Add version to cache key to invalidate old blocked content results
   const cacheVersion = 'v4-advertisement-detection';
-  const cacheKey = crypto.createHash('md5').update(url + cacheVersion).digest('hex');
+  // Include modelType in cache key to avoid cross-model cache collisions
+  const cacheKey = crypto
+    .createHash('md5')
+    .update(`${url}|ver=${cacheVersion}|mt=${modelType}`)
+    .digest('hex');
   console.log(`Cache key for ${url}: ${cacheKey} (version: ${cacheVersion})`);
 
   try {
