@@ -849,6 +849,14 @@ async function renderAnalysis(root, data, hash) {
 
   // Notification system
   function showNotification(message, type = 'info', duration = 3000) {
+    // Normalize any legacy mojibake messages
+    const mojibakeMap = {
+      '��nternet ba�Ylant��s�� b�trpa olundu': 'İnternet bağlantısı bərpa olundu',
+      '��nternet ba�Ylant��s�� k�tsildi': 'İnternet bağlantısı kəsildi'
+    };
+    if (Object.prototype.hasOwnProperty.call(mojibakeMap, message)) {
+      message = mojibakeMap[message];
+    }
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
