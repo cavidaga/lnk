@@ -587,6 +587,7 @@ h1{ font-size:26px; margin:0; letter-spacing:.2px }
   
   .site-avg-stat {
     padding: 12px;
+    min-width: 100%;
   }
   
   .site-avg-value {
@@ -595,6 +596,13 @@ h1{ font-size:26px; margin:0; letter-spacing:.2px }
   
   .site-avg-label {
     font-size: 10px;
+  }
+  
+  /* Ensure site averages section is visible on very small screens */
+  #site-averages-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 }
 
@@ -1719,6 +1727,18 @@ footer.site-footer{
   }
   .card > .bd {
     padding: 0;
+  }
+  
+  /* Ensure site averages section has proper padding on mobile */
+  #site-averages-card > .bd {
+    padding: 16px;
+  }
+  
+  /* Ensure site averages section is visible and properly styled on mobile */
+  #site-averages-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 }
 
