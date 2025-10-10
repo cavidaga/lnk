@@ -375,6 +375,30 @@
           </div>
         </div>
 
+        <!-- Usage Tracking -->
+        <div class="admin-section" id="usage-section">
+          <h2>Usage Tracking</h2>
+          <div class="admin-content">
+            <div class="form-group">
+              <label for="usage-period">Period</label>
+              <select id="usage-period" style="width: 100%; padding: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;">
+                <option value="day">Today</option>
+                <option value="week">This Week</option>
+                <option value="month" selected>This Month</option>
+              </select>
+            </div>
+            <div class="button-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+              <button id="load-usage-btn" class="btn btn-primary">Load My Usage</button>
+              <button id="load-limits-btn" class="btn btn-secondary">Load Limits</button>
+              <button id="load-history-btn" class="btn btn-secondary">Load History</button>
+            </div>
+            <div id="usage-result" class="hidden" style="margin-top: 1rem;">
+              <h4>Usage Data:</h4>
+              <pre id="usage-result-content" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.9rem;"></pre>
+            </div>
+          </div>
+        </div>
+
         <!-- Protected Endpoints Testing -->
         <div class="admin-section">
           <h2>Protected Endpoints Testing</h2>
@@ -448,6 +472,123 @@
       } catch (error) {
         const result = {
           endpoint: endpoint,
+          error: error.message,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        contentEl.style.borderLeft = '4px solid #dc3545';
+      }
+    }
+
+    // Usage tracking functions
+    async function loadUsage() {
+      const period = document.getElementById('usage-period').value;
+      const resultEl = document.getElementById('usage-result');
+      const contentEl = document.getElementById('usage-result-content');
+      
+      resultEl.classList.remove('hidden');
+      contentEl.textContent = 'Loading usage data...';
+      
+      try {
+        const response = await fetch(`/api/usage/my-usage?period=${period}&history=true&historyLimit=20`);
+        const data = await response.json();
+        
+        const result = {
+          endpoint: `/api/usage/my-usage?period=${period}`,
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        
+        if (response.ok) {
+          contentEl.style.borderLeft = '4px solid #28a745';
+        } else {
+          contentEl.style.borderLeft = '4px solid #dc3545';
+        }
+      } catch (error) {
+        const result = {
+          endpoint: '/api/usage/my-usage',
+          error: error.message,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        contentEl.style.borderLeft = '4px solid #dc3545';
+      }
+    }
+
+    async function loadLimits() {
+      const resultEl = document.getElementById('usage-result');
+      const contentEl = document.getElementById('usage-result-content');
+      
+      resultEl.classList.remove('hidden');
+      contentEl.textContent = 'Loading limits...';
+      
+      try {
+        const response = await fetch('/api/usage/limits');
+        const data = await response.json();
+        
+        const result = {
+          endpoint: '/api/usage/limits',
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        
+        if (response.ok) {
+          contentEl.style.borderLeft = '4px solid #28a745';
+        } else {
+          contentEl.style.borderLeft = '4px solid #dc3545';
+        }
+      } catch (error) {
+        const result = {
+          endpoint: '/api/usage/limits',
+          error: error.message,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        contentEl.style.borderLeft = '4px solid #dc3545';
+      }
+    }
+
+    async function loadHistory() {
+      const period = document.getElementById('usage-period').value;
+      const resultEl = document.getElementById('usage-result');
+      const contentEl = document.getElementById('usage-result-content');
+      
+      resultEl.classList.remove('hidden');
+      contentEl.textContent = 'Loading usage history...';
+      
+      try {
+        const response = await fetch(`/api/usage/my-usage?period=${period}&history=true&historyLimit=50`);
+        const data = await response.json();
+        
+        const result = {
+          endpoint: `/api/usage/my-usage?period=${period}&history=true`,
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        
+        if (response.ok) {
+          contentEl.style.borderLeft = '4px solid #28a745';
+        } else {
+          contentEl.style.borderLeft = '4px solid #dc3545';
+        }
+      } catch (error) {
+        const result = {
+          endpoint: '/api/usage/my-usage',
           error: error.message,
           timestamp: new Date().toISOString()
         };
@@ -554,6 +695,11 @@
         document.getElementById('test-analyze-btn').addEventListener('click', () => {
           this.testAnalysis();
         });
+
+        // Usage tracking buttons
+        document.getElementById('load-usage-btn').addEventListener('click', loadUsage);
+        document.getElementById('load-limits-btn').addEventListener('click', loadLimits);
+        document.getElementById('load-history-btn').addEventListener('click', loadHistory);
       }
 
       async handleLogin() {

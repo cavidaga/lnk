@@ -12,6 +12,7 @@ import { gatedFetch } from '../lib/gated-fetch.js';
 import { findArchiveForUrl } from '../lib/known-archives.js';
 import { requireApiKey, extractApiKeyFromRequest, validateApiKey } from '../lib/api-keys.js';
 import { getSessionFromRequest } from '../lib/auth.js';
+import { withAuth } from '../lib/middleware.js';
 
 // 🔒 policy helpers
 import {
@@ -940,12 +941,15 @@ function normalizeOutput(o = {}, { url, contentSource, isBlocked = false, articl
   return out;
 }
 
-export default async function handler(req, res) {
+async function analyzeHandler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
   const { url, modelType = 'auto' } = req.body || {};
+  
+  // Store model type for usage tracking
+  req.modelType = modelType;
   
   // Enhanced input validation
   if (!url || typeof url !== 'string') {
@@ -2026,3 +2030,10 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: true, message: `Gözlənilməz xəta: ${e.message}` });
   }
 }
+
+// Export with usage tracking middleware
+export default withAuth(analyzeHandler, {
+  require: 'optional', // Optional authentication for public access
+  trackUsage: true,
+  modelType: 'auto' // Will be overridden by actual modelType from request
+});
