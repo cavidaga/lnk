@@ -14,8 +14,10 @@ async function handler(req, res) {
     const plans = Object.values(STRIPE_PLANS).map(plan => ({
       id: plan.id,
       name: plan.name,
+      description: plan.description,
       price: plan.price,
       priceDollars: (plan.price / 100).toFixed(2),
+      billing: plan.billing,
       maxRequestsPerMonth: plan.maxRequestsPerMonth,
       maxCostPerMonth: plan.maxCostPerMonth,
       costPerRequest: plan.costPerRequest,
