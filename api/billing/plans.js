@@ -18,11 +18,13 @@ async function handler(req, res) {
       price: plan.price,
       priceDollars: (plan.price / 100).toFixed(2),
       billing: plan.billing,
+      status: plan.status || 'available',
       maxRequestsPerMonth: plan.maxRequestsPerMonth,
       maxCostPerMonth: plan.maxCostPerMonth,
       costPerRequest: plan.costPerRequest,
       features: plan.features,
-      isFree: plan.price === 0
+      isFree: plan.price === 0,
+      isComingSoon: plan.status === 'coming-soon'
     }));
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');

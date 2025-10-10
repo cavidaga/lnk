@@ -59,6 +59,17 @@ async function handler(req, res) {
       });
     }
 
+    // Check if plan is coming soon
+    if (plan.status === 'coming-soon') {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      return res.status(400).json({ 
+        error: true, 
+        message: 'This plan is coming soon! Please check back later.',
+        plan: planId,
+        status: 'coming-soon'
+      });
+    }
+
     // Get user data
     const { kv } = await import('@vercel/kv');
     const user = await kv.get(`user:id:${authInfo.userId}`);
