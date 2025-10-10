@@ -11,6 +11,8 @@
     "@vercel/kv": "latest",
     "@vercel/og": "latest",
     "react": "^18.2.0",
-    "glob": "latest"
+    "glob": "latest",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
   }
 }
