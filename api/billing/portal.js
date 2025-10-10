@@ -44,7 +44,9 @@ async function handler(req, res) {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     return res.status(500).json({ 
       error: true, 
-      message: 'Failed to create billing portal session' 
+      message: 'Failed to create billing portal session',
+      details: error.message,
+      type: error.type || 'unknown'
     });
   }
 }
