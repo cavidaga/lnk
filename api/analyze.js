@@ -10,6 +10,8 @@ import puppeteerCore from 'puppeteer-core';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { gatedFetch } from '../lib/gated-fetch.js';
 import { findArchiveForUrl } from '../lib/known-archives.js';
+import { requireApiKey, extractApiKeyFromRequest, validateApiKey } from '../lib/api-keys.js';
+import { getSessionFromRequest } from '../lib/auth.js';
 
 // 🔒 policy helpers
 import {
@@ -971,13 +973,47 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Etibarsız model növü.' });
   }
   
-  // Rate limiting check (basic)
+  // Authentication check - API key or session
+  let authUser = null;
+  let authMethod = 'none';
+  
+  // Check for API key first
+  const apiKey = extractApiKeyFromRequest(req);
+  if (apiKey) {
+    const keyData = await validateApiKey(apiKey);
+    if (keyData) {
+      authUser = keyData.user;
+      authMethod = 'api_key';
+    }
+  }
+  
+  // If no API key, check for session
+  if (!authUser) {
+    const session = getSessionFromRequest(req);
+    if (session?.sub) {
+      try {
+        const user = await kv.get(`user:id:${session.sub}`);
+        if (user) {
+          authUser = user;
+          authMethod = 'session';
+        }
+      } catch (e) {
+        console.warn('Session validation failed:', e);
+      }
+    }
+  }
+  
+  // If still no auth, this is a public request (for backward compatibility)
+  // But we'll apply stricter rate limiting for public requests
+  
+  // Rate limiting check (different limits for authenticated vs public)
   const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  const rateLimitKey = `rate_limit:${clientIP}`;
+  const rateLimitKey = authUser ? `rate_limit_user:${authUser.id}` : `rate_limit:${clientIP}`;
+  const rateLimit = authUser ? 100 : 10; // Higher limit for authenticated users
   
   try {
     const currentRequests = await kv.get(rateLimitKey) || 0;
-    if (currentRequests > 10) { // 10 requests per minute
+    if (currentRequests > rateLimit) {
       return res.status(429).json({ error: 'Çox sayda sorğu göndərilir. Zəhmət olmasa gözləyin.' });
     }
     await kv.incr(rateLimitKey);
@@ -1981,6 +2017,8 @@ export default async function handler(req, res) {
     // Success: set headers from the result we got (model/content source live in payload)
     if (result?.modelUsed) res.setHeader('X-Model-Used', result.modelUsed);
     if (result?.contentSource) res.setHeader('X-Content-Source', result.contentSource);
+    if (authMethod !== 'none') res.setHeader('X-Auth-Method', authMethod);
+    if (authUser) res.setHeader('X-User-ID', authUser.id);
     return res.status(200).json(result);
 
   } catch (e) {

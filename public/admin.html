@@ -311,6 +311,39 @@
           </div>
         </div>
 
+        <!-- API Key Management -->
+        <div class="admin-section" id="api-keys-section">
+          <h2>API Key Management</h2>
+          <div class="admin-content">
+            <div style="margin-bottom: 1rem;">
+              <button id="create-key-btn" class="btn btn-success">Create New API Key</button>
+              <button id="refresh-keys-btn" class="btn btn-secondary">Refresh List</button>
+            </div>
+            
+            <div id="create-key-form" class="hidden" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+              <h4>Create New API Key</h4>
+              <div class="form-group">
+                <label for="key-name">Key Name</label>
+                <input type="text" id="key-name" placeholder="My API Key">
+              </div>
+              <div class="form-group">
+                <label for="key-permissions">Permissions (comma-separated)</label>
+                <input type="text" id="key-permissions" placeholder="analyze,get-analysis" value="analyze,get-analysis">
+                <small style="color: #6c757d;">Available: analyze, get-analysis, statistics, site-averages, recent-analyses</small>
+              </div>
+              <button id="submit-key-btn" class="btn btn-success">Create Key</button>
+              <button id="cancel-key-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+            
+            <div id="api-keys-list">
+              <h4>Your API Keys</h4>
+              <div id="keys-container">
+                <p>Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- API Testing -->
         <div class="admin-section">
           <h2>API Testing</h2>
@@ -329,6 +362,10 @@
                   <option value="pro">Pro</option>
                 </select>
               </div>
+            </div>
+            <div class="form-group">
+              <label for="test-api-key">API Key (optional)</label>
+              <input type="password" id="test-api-key" placeholder="lnk_... (leave empty to use session)">
             </div>
             <button id="test-analyze-btn" class="btn">Test Analysis</button>
             <div id="test-result" class="hidden" style="margin-top: 1rem;">
@@ -391,12 +428,16 @@
           logoutBtn.classList.remove('hidden');
           loginSection.style.display = 'none';
           registerSection.style.display = 'none';
+          // Load API keys when logged in
+          this.loadApiKeys();
         } else {
           statusEl.innerHTML = '<div class="status-indicator status-offline"></div><span>Not logged in</span>';
           userInfoEl.classList.add('hidden');
           logoutBtn.classList.add('hidden');
           loginSection.style.display = 'block';
           registerSection.style.display = 'block';
+          // Clear API keys when not logged in
+          document.getElementById('keys-container').innerHTML = '<p>Please log in to manage API keys.</p>';
         }
       }
 
@@ -416,6 +457,23 @@
         // Logout button
         document.getElementById('logout-btn').addEventListener('click', () => {
           this.handleLogout();
+        });
+
+        // API Key management
+        document.getElementById('create-key-btn').addEventListener('click', () => {
+          this.showCreateKeyForm();
+        });
+
+        document.getElementById('cancel-key-btn').addEventListener('click', () => {
+          this.hideCreateKeyForm();
+        });
+
+        document.getElementById('submit-key-btn').addEventListener('click', () => {
+          this.handleCreateKey();
+        });
+
+        document.getElementById('refresh-keys-btn').addEventListener('click', () => {
+          this.loadApiKeys();
         });
 
         // Test analysis button
@@ -491,6 +549,7 @@
       async testAnalysis() {
         const url = document.getElementById('test-url').value;
         const modelType = document.getElementById('test-model').value;
+        const apiKey = document.getElementById('test-api-key').value;
 
         if (!url) {
           this.showMessage('Please enter a URL to test', 'danger');
@@ -503,11 +562,18 @@
         btn.textContent = 'Analyzing...';
 
         try {
+          const headers = {
+            'Content-Type': 'application/json',
+          };
+          
+          // Add API key if provided
+          if (apiKey) {
+            headers['Authorization'] = `Bearer ${apiKey}`;
+          }
+
           const response = await fetch('/api/analyze', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({ url, modelType }),
           });
 
@@ -528,6 +594,123 @@
         }
       }
 
+      // API Key Management Methods
+      showCreateKeyForm() {
+        document.getElementById('create-key-form').classList.remove('hidden');
+        document.getElementById('key-name').focus();
+      }
+
+      hideCreateKeyForm() {
+        document.getElementById('create-key-form').classList.add('hidden');
+        document.getElementById('key-name').value = '';
+        document.getElementById('key-permissions').value = 'analyze,get-analysis';
+      }
+
+      async handleCreateKey() {
+        const name = document.getElementById('key-name').value.trim();
+        const permissions = document.getElementById('key-permissions').value
+          .split(',')
+          .map(p => p.trim())
+          .filter(p => p);
+
+        if (!name) {
+          this.showMessage('Please enter a key name', 'danger');
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/keys/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name, permissions }),
+          });
+
+          const result = await response.json();
+          
+          if (response.ok) {
+            this.showMessage('API key created successfully!', 'success');
+            this.hideCreateKeyForm();
+            this.loadApiKeys();
+            
+            // Show the new key to the user
+            this.showMessage(`New API Key: ${result.apiKey.key}`, 'info');
+          } else {
+            this.showMessage(`Failed to create API key: ${result.message}`, 'danger');
+          }
+        } catch (error) {
+          this.showMessage(`Error creating API key: ${error.message}`, 'danger');
+        }
+      }
+
+      async loadApiKeys() {
+        if (!this.currentUser) return;
+
+        try {
+          const response = await fetch('/api/keys/list');
+          const result = await response.json();
+          
+          if (response.ok) {
+            this.displayApiKeys(result.apiKeys);
+          } else {
+            document.getElementById('keys-container').innerHTML = '<p>Failed to load API keys.</p>';
+          }
+        } catch (error) {
+          document.getElementById('keys-container').innerHTML = '<p>Error loading API keys.</p>';
+        }
+      }
+
+      displayApiKeys(keys) {
+        const container = document.getElementById('keys-container');
+        
+        if (!keys || keys.length === 0) {
+          container.innerHTML = '<p>No API keys found. Create one to get started.</p>';
+          return;
+        }
+
+        const keysHtml = keys.map(key => `
+          <div style="border: 1px solid #e9ecef; border-radius: 4px; padding: 1rem; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
+              <h5 style="margin: 0; flex: 1;">${key.name}</h5>
+              <button class="btn btn-danger" onclick="window.adminPanel.revokeKey('${key.id}')" style="margin-left: 1rem;">Revoke</button>
+            </div>
+            <p style="margin: 0.25rem 0; color: #6c757d; font-size: 0.9rem;">
+              <strong>ID:</strong> ${key.id}<br>
+              <strong>Permissions:</strong> ${key.permissions.join(', ')}<br>
+              <strong>Created:</strong> ${new Date(key.createdAt).toLocaleString()}<br>
+              <strong>Last Used:</strong> ${key.lastUsed ? new Date(key.lastUsed).toLocaleString() : 'Never'}<br>
+              <strong>Status:</strong> ${key.isActive ? 'Active' : 'Inactive'}
+            </p>
+          </div>
+        `).join('');
+
+        container.innerHTML = keysHtml;
+      }
+
+      async revokeKey(keyId) {
+        if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/keys/${keyId}`, {
+            method: 'DELETE',
+          });
+
+          const result = await response.json();
+          
+          if (response.ok) {
+            this.showMessage('API key revoked successfully!', 'success');
+            this.loadApiKeys();
+          } else {
+            this.showMessage(`Failed to revoke API key: ${result.message}`, 'danger');
+          }
+        } catch (error) {
+          this.showMessage(`Error revoking API key: ${error.message}`, 'danger');
+        }
+      }
+
       showMessage(text, type) {
         const messagesEl = document.getElementById('messages');
         const alertEl = document.createElement('div');
@@ -543,7 +726,7 @@
 
     // Initialize admin panel when DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
-      new AdminPanel();
+      window.adminPanel = new AdminPanel();
     });
   </script>
 
