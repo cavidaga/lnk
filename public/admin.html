@@ -382,6 +382,7 @@
             <div class="button-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
               <button id="load-plans-btn" class="btn btn-primary">Load Plans</button>
               <button id="load-subscription-btn" class="btn btn-secondary">Load Subscription</button>
+              <button id="test-checkout-btn" class="btn btn-secondary">Test Checkout (Basic)</button>
               <button id="billing-portal-btn" class="btn btn-secondary" disabled>Manage Billing (Coming Soon)</button>
             </div>
             <div id="billing-result" class="hidden" style="margin-top: 1rem;">
@@ -750,6 +751,60 @@
       }
     }
 
+    // Test checkout function
+    async function testCheckout() {
+      const resultEl = document.getElementById('billing-result');
+      const contentEl = document.getElementById('billing-result-content');
+      
+      resultEl.classList.remove('hidden');
+      contentEl.textContent = 'Creating checkout session...';
+      
+      try {
+        const response = await fetch('/api/billing/checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            planId: 'basic',
+            successUrl: window.location.href + '?success=true',
+            cancelUrl: window.location.href + '?canceled=true'
+          })
+        });
+        
+        const data = await response.json();
+        
+        const result = {
+          endpoint: '/api/billing/checkout',
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        
+        if (response.ok && data.url) {
+          contentEl.style.borderLeft = '4px solid #28a745';
+          // Optionally open checkout in new tab
+          if (confirm('Checkout session created! Open Stripe checkout in new tab?')) {
+            window.open(data.url, '_blank');
+          }
+        } else {
+          contentEl.style.borderLeft = '4px solid #dc3545';
+        }
+      } catch (error) {
+        const result = {
+          endpoint: '/api/billing/checkout',
+          error: error.message,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        contentEl.style.borderLeft = '4px solid #dc3545';
+      }
+    }
+
     // Admin Panel JavaScript
     class AdminPanel {
       constructor() {
@@ -856,6 +911,7 @@
         // Billing management buttons
         document.getElementById('load-plans-btn').addEventListener('click', loadPlans);
         document.getElementById('load-subscription-btn').addEventListener('click', loadSubscription);
+        document.getElementById('test-checkout-btn').addEventListener('click', testCheckout);
         document.getElementById('billing-portal-btn').addEventListener('click', openBillingPortal);
       }
 
