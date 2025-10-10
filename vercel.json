@@ -1,7 +1,8 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/analysis/:hash", "destination": "/api/analysis-html?hash=:hash" }
+    { "source": "/analysis/:hash", "destination": "/api/analysis-html?hash=:hash" },
+    { "source": "/documentation", "destination": "/documentation.html" }
   ],
   "functions": {
     "api/analysis-html.js": {
