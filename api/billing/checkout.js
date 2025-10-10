@@ -29,10 +29,34 @@ async function handler(req, res) {
       return res.status(400).json({ error: true, message: 'Invalid plan ID' });
     }
 
-    // Don't allow checkout for free plan
+    // Handle free plan differently
     if (planId === 'free') {
+      // For free plan, just update the user's plan directly
+      const { kv } = await import('@vercel/kv');
+      const user = await kv.get(`user:id:${authInfo.userId}`);
+      if (!user) {
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        return res.status(404).json({ error: true, message: 'User not found' });
+      }
+
+      // Update user to free plan
+      const updatedUser = {
+        ...user,
+        plan: 'free',
+        stripeSubscriptionId: null,
+        planUpdatedAt: new Date().toISOString()
+      };
+      
+      await kv.set(`user:id:${authInfo.userId}`, updatedUser);
+      await kv.set(`user:email:${user.email}`, updatedUser);
+
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      return res.status(400).json({ error: true, message: 'Cannot checkout free plan' });
+      return res.status(200).json({
+        success: true,
+        message: 'Successfully switched to free plan',
+        plan: 'free',
+        timestamp: new Date().toISOString()
+      });
     }
 
     // Get user data
