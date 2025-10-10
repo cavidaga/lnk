@@ -1,15 +1,11 @@
 import { clearSessionCookie } from '../../lib/auth.js';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
-export default async function handler() {
-  const headers = new Headers();
-  headers.set('Set-Cookie', clearSessionCookie());
-  headers.set('Content-Type', 'application/json; charset=utf-8');
-  return new Response(JSON.stringify({ ok: true }), {
-    status: 200,
-    headers
-  });
+export default async function handler(req, res) {
+  res.setHeader('Set-Cookie', clearSessionCookie());
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  return res.status(200).json({ ok: true });
 }
 
 
