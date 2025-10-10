@@ -29,14 +29,14 @@ export default async function handler(req, res) {
     }
 
     const name = String(body.name || '').trim();
-    const permissions = Array.isArray(body.permissions) ? body.permissions : ['analyze', 'get-analysis', 'usage'];
+    const permissions = Array.isArray(body.permissions) ? body.permissions : ['analyze', 'get-analysis', 'usage', 'billing'];
 
     if (!name) {
       return res.status(400).json({ error: true, message: 'API key name is required' });
     }
 
     // Validate permissions
-    const validPermissions = ['analyze', 'get-analysis', 'statistics', 'site-averages', 'recent-analyses', 'usage'];
+    const validPermissions = ['analyze', 'get-analysis', 'statistics', 'site-averages', 'recent-analyses', 'usage', 'billing'];
     const invalidPermissions = permissions.filter(p => !validPermissions.includes(p));
     if (invalidPermissions.length > 0) {
       return res.status(400).json({ 

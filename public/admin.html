@@ -375,6 +375,22 @@
           </div>
         </div>
 
+        <!-- Billing Management -->
+        <div class="admin-section" id="billing-section">
+          <h2>Billing Management</h2>
+          <div class="admin-content">
+            <div class="button-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+              <button id="load-plans-btn" class="btn btn-primary">Load Plans</button>
+              <button id="load-subscription-btn" class="btn btn-secondary">Load Subscription</button>
+              <button id="billing-portal-btn" class="btn btn-secondary">Manage Billing</button>
+            </div>
+            <div id="billing-result" class="hidden" style="margin-top: 1rem;">
+              <h4>Billing Data:</h4>
+              <pre id="billing-result-content" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.9rem;"></pre>
+            </div>
+          </div>
+        </div>
+
         <!-- Usage Tracking -->
         <div class="admin-section" id="usage-section">
           <h2>Usage Tracking</h2>
@@ -598,6 +614,142 @@
       }
     }
 
+    // Billing management functions
+    async function loadPlans() {
+      const resultEl = document.getElementById('billing-result');
+      const contentEl = document.getElementById('billing-result-content');
+      
+      resultEl.classList.remove('hidden');
+      contentEl.textContent = 'Loading plans...';
+      
+      try {
+        const response = await fetch('/api/billing/plans');
+        const data = await response.json();
+        
+        const result = {
+          endpoint: '/api/billing/plans',
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        
+        if (response.ok) {
+          contentEl.style.borderLeft = '4px solid #28a745';
+        } else {
+          contentEl.style.borderLeft = '4px solid #dc3545';
+        }
+      } catch (error) {
+        const result = {
+          endpoint: '/api/billing/plans',
+          error: error.message,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        contentEl.style.borderLeft = '4px solid #dc3545';
+      }
+    }
+
+    async function loadSubscription() {
+      const resultEl = document.getElementById('billing-result');
+      const contentEl = document.getElementById('billing-result-content');
+      
+      resultEl.classList.remove('hidden');
+      contentEl.textContent = 'Loading subscription...';
+      
+      try {
+        const response = await fetch('/api/billing/subscription');
+        const data = await response.json();
+        
+        const result = {
+          endpoint: '/api/billing/subscription',
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        
+        if (response.ok) {
+          contentEl.style.borderLeft = '4px solid #28a745';
+        } else {
+          contentEl.style.borderLeft = '4px solid #dc3545';
+        }
+      } catch (error) {
+        const result = {
+          endpoint: '/api/billing/subscription',
+          error: error.message,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        contentEl.style.borderLeft = '4px solid #dc3545';
+      }
+    }
+
+    async function openBillingPortal() {
+      const resultEl = document.getElementById('billing-result');
+      const contentEl = document.getElementById('billing-result-content');
+      
+      resultEl.classList.remove('hidden');
+      contentEl.textContent = 'Creating billing portal session...';
+      
+      try {
+        const response = await fetch('/api/billing/portal', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            returnUrl: window.location.href
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.url) {
+          // Open billing portal in new tab
+          window.open(data.url, '_blank');
+          
+          const result = {
+            endpoint: '/api/billing/portal',
+            status: response.status,
+            statusText: response.statusText,
+            data: data,
+            action: 'Opened billing portal in new tab',
+            timestamp: new Date().toISOString()
+          };
+          
+          contentEl.textContent = JSON.stringify(result, null, 2);
+          contentEl.style.borderLeft = '4px solid #28a745';
+        } else {
+          const result = {
+            endpoint: '/api/billing/portal',
+            status: response.status,
+            statusText: response.statusText,
+            data: data,
+            timestamp: new Date().toISOString()
+          };
+          
+          contentEl.textContent = JSON.stringify(result, null, 2);
+          contentEl.style.borderLeft = '4px solid #dc3545';
+        }
+      } catch (error) {
+        const result = {
+          endpoint: '/api/billing/portal',
+          error: error.message,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        contentEl.style.borderLeft = '4px solid #dc3545';
+      }
+    }
+
     // Admin Panel JavaScript
     class AdminPanel {
       constructor() {
@@ -700,6 +852,11 @@
         document.getElementById('load-usage-btn').addEventListener('click', loadUsage);
         document.getElementById('load-limits-btn').addEventListener('click', loadLimits);
         document.getElementById('load-history-btn').addEventListener('click', loadHistory);
+
+        // Billing management buttons
+        document.getElementById('load-plans-btn').addEventListener('click', loadPlans);
+        document.getElementById('load-subscription-btn').addEventListener('click', loadSubscription);
+        document.getElementById('billing-portal-btn').addEventListener('click', openBillingPortal);
       }
 
       async handleLogin() {

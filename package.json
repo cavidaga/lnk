@@ -12,6 +12,7 @@
     "@vercel/og": "latest",
     "react": "^18.2.0",
     "glob": "latest",
-    "bcryptjs": "^2.4.3"
+    "bcryptjs": "^2.4.3",
+    "stripe": "^14.0.0"
   }
 }
