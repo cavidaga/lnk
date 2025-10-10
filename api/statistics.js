@@ -1,9 +1,10 @@
 // /api/statistics.js
 import { kv } from '@vercel/kv';
+import { withAuth, optionalAuth } from '../lib/middleware.js';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
-export default async function handler(req) {
+async function handler(req, res) {
   try {
     console.log('Statistics API called');
     
@@ -59,20 +60,18 @@ export default async function handler(req) {
       timestamp: new Date().toISOString()
     };
     
-    return new Response(JSON.stringify(stats), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60'
-      }
-    });
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
+    return res.status(200).json(stats);
   } catch (e) {
     console.error('statistics error:', e);
-    return new Response(JSON.stringify({ error: true, message: 'Internal error: ' + (e.message || '') }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8'
-      }
-    });
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    return res.status(500).json({ error: true, message: 'Internal error: ' + (e.message || '') });
   }
 }
+
+// Export with optional authentication (public endpoint with enhanced features for authenticated users)
+export default withAuth(handler, { 
+  require: 'optional', // Optional authentication
+  rateLimit: true // Apply rate limiting
+});

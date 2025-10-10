@@ -1,8 +1,9 @@
 import { kv } from '@vercel/kv';
+import { withAuth } from '../lib/middleware.js';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
-export default async function handler(req) {
+async function handler(req, res) {
   try {
     const url = new URL(req.url);
     const hostParam = (url.searchParams.get('host') || '').trim();
@@ -21,29 +22,28 @@ export default async function handler(req) {
     host = normalizeHost(host);
 
     if (!host) {
-      return new Response(JSON.stringify({ error: true, message: 'Missing host or url' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json; charset=utf-8' }
-      });
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      return res.status(400).json({ error: true, message: 'Missing host or url' });
     }
 
     const key = `site_stats:${host}`;
     const stats = await kv.get(key);
 
-    return new Response(JSON.stringify(stats || { host, count: 0, avg_rel: 0, avg_bias: 0 }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60'
-      }
-    });
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
+    return res.status(200).json(stats || { host, count: 0, avg_rel: 0, avg_bias: 0 });
   } catch (e) {
     console.error('site-averages error:', e);
-    return new Response(JSON.stringify({ error: true, message: 'Internal error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' }
-    });
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    return res.status(500).json({ error: true, message: 'Internal error' });
   }
 }
+
+// Export with authentication required
+export default withAuth(handler, { 
+  require: 'any', // Accepts both session and API key
+  permission: 'site-averages', // Requires site-averages permission for API keys
+  rateLimit: true // Apply rate limiting
+});
 
 

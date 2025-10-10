@@ -1,9 +1,10 @@
 // /api/recent-analyses.js
 import { kv } from '@vercel/kv';
+import { withAuth } from '../lib/middleware.js';
 
-export const config = { runtime: 'edge' };
+export const config = { runtime: 'nodejs' };
 
-export default async function handler(req) {
+async function handler(req, res) {
   try {
     console.log('Recent analyses API called');
     
@@ -14,13 +15,9 @@ export default async function handler(req) {
     
     if (!hashes || hashes.length === 0) {
       console.log('No hashes found, returning empty array');
-      return new Response(JSON.stringify([]), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60'
-        }
-      });
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
+      return res.status(200).json([]);
     }
 
     // Fetch the actual analysis data for each hash
@@ -54,20 +51,19 @@ export default async function handler(req) {
       .slice(0, 5); // Limit to 5 analyses
     console.log('Valid analyses after filtering:', validAnalyses.length);
     
-    return new Response(JSON.stringify(validAnalyses), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60'
-      }
-    });
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
+    return res.status(200).json(validAnalyses);
   } catch (e) {
     console.error('recent-analyses error:', e);
-    return new Response(JSON.stringify({ error: true, message: 'Internal error: ' + (e.message || '') }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8'
-      }
-    });
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    return res.status(500).json({ error: true, message: 'Internal error: ' + (e.message || '') });
   }
 }
+
+// Export with authentication required
+export default withAuth(handler, { 
+  require: 'any', // Accepts both session and API key
+  permission: 'recent-analyses', // Requires recent-analyses permission for API keys
+  rateLimit: true // Apply rate limiting
+});

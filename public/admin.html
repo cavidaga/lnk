@@ -375,6 +375,27 @@
           </div>
         </div>
 
+        <!-- Protected Endpoints Testing -->
+        <div class="admin-section">
+          <h2>Protected Endpoints Testing</h2>
+          <div class="admin-content">
+            <div class="form-group">
+              <label for="protected-api-key">API Key (optional)</label>
+              <input type="password" id="protected-api-key" placeholder="lnk_... (leave empty to use session)">
+            </div>
+            <div class="button-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+              <button onclick="testProtectedEndpoint('/api/protected-example')" class="btn btn-secondary">Test Protected Example</button>
+              <button onclick="testProtectedEndpoint('/api/statistics')" class="btn btn-secondary">Test Statistics</button>
+              <button onclick="testProtectedEndpoint('/api/site-averages?host=bbc.com')" class="btn btn-secondary">Test Site Averages</button>
+              <button onclick="testProtectedEndpoint('/api/recent-analyses')" class="btn btn-secondary">Test Recent Analyses</button>
+            </div>
+            <div id="protected-test-result" class="hidden" style="margin-top: 1rem;">
+              <h4>Protected Endpoint Result:</h4>
+              <pre id="protected-test-result-content" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.9rem;"></pre>
+            </div>
+          </div>
+        </div>
+
         <!-- Messages -->
         <div id="messages"></div>
       </div>
@@ -383,6 +404,59 @@
   </div>
 
   <script>
+    // Test protected endpoints function
+    async function testProtectedEndpoint(endpoint) {
+      const apiKey = document.getElementById('protected-api-key').value;
+      const resultEl = document.getElementById('protected-test-result');
+      const contentEl = document.getElementById('protected-test-result-content');
+      
+      resultEl.classList.remove('hidden');
+      contentEl.textContent = 'Testing...';
+      
+      try {
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        
+        if (apiKey) {
+          headers['Authorization'] = `Bearer ${apiKey}`;
+        }
+        
+        const response = await fetch(endpoint, {
+          method: 'GET',
+          headers: headers
+        });
+        
+        const data = await response.json();
+        
+        const result = {
+          endpoint: endpoint,
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          data: data,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        
+        if (response.ok) {
+          contentEl.style.borderLeft = '4px solid #28a745';
+        } else {
+          contentEl.style.borderLeft = '4px solid #dc3545';
+        }
+      } catch (error) {
+        const result = {
+          endpoint: endpoint,
+          error: error.message,
+          timestamp: new Date().toISOString()
+        };
+        
+        contentEl.textContent = JSON.stringify(result, null, 2);
+        contentEl.style.borderLeft = '4px solid #dc3545';
+      }
+    }
+
     // Admin Panel JavaScript
     class AdminPanel {
       constructor() {
