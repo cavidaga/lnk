@@ -290,6 +290,392 @@
     .test-result pre.error {
       border-left: 4px solid var(--danger);
     }
+    
+    /* Beautiful UI Components */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .plan-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .plan-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    
+    .plan-card.featured {
+      border-color: var(--accent);
+      background: color-mix(in oklab, var(--accent) 5%, var(--card) 95%);
+    }
+    
+    .plan-card.coming-soon {
+      opacity: 0.7;
+      position: relative;
+    }
+    
+    .plan-card.coming-soon::after {
+      content: 'Coming Soon';
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--warning-color);
+      color: var(--warning-text);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .plan-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .plan-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+    }
+    
+    .plan-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    
+    .plan-price.free {
+      color: var(--muted);
+    }
+    
+    .plan-description {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+    
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1rem 0;
+    }
+    
+    .plan-features li {
+      padding: 0.25rem 0;
+      color: var(--text);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .plan-features li::before {
+      content: '✓';
+      color: var(--accent);
+      font-weight: bold;
+      width: 16px;
+      text-align: center;
+    }
+    
+    .plan-limits {
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .plan-limits h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .limit-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.25rem 0;
+      font-size: 0.9rem;
+    }
+    
+    .limit-value {
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .limit-value.unlimited {
+      color: var(--accent);
+    }
+    
+    /* Usage UI Components */
+    .usage-dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .usage-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .usage-card h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .usage-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 0.5rem 0;
+    }
+    
+    .usage-label {
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--panel);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 0.5rem 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+    
+    .progress-fill.warning {
+      background: linear-gradient(90deg, var(--warning-color), #ff9800);
+    }
+    
+    .progress-fill.danger {
+      background: linear-gradient(90deg, var(--danger), #c82333);
+    }
+    
+    .usage-history {
+      margin-top: 1rem;
+    }
+    
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem;
+      background: var(--panel);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .history-endpoint {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      color: var(--text);
+      flex: 1;
+    }
+    
+    .history-cost {
+      color: var(--accent);
+      font-weight: 600;
+      margin-left: 1rem;
+    }
+    
+    .history-success {
+      color: #28a745;
+      margin-left: 0.5rem;
+    }
+    
+    .history-failed {
+      color: var(--danger);
+      margin-left: 0.5rem;
+    }
+    
+    /* Limits UI */
+    .limits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .limit-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    
+    .limit-card h4 {
+      margin: 0 0 1rem 0;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+    
+    .limit-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    
+    .status-dot.warning {
+      background: var(--warning-color);
+    }
+    
+    .status-dot.danger {
+      background: var(--danger);
+    }
+    
+    .limit-text {
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    
+    .limit-usage {
+      font-weight: 600;
+      color: var(--accent);
+    }
+    
+    /* Subscription UI */
+    .subscription-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+    
+    .subscription-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    
+    .subscription-plan {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+    }
+    
+    .subscription-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .subscription-status.active {
+      background: color-mix(in oklab, #28a745 20%, var(--panel) 80%);
+      color: #155724;
+    }
+    
+    .subscription-status.canceled {
+      background: color-mix(in oklab, var(--danger) 20%, var(--panel) 80%);
+      color: #721c24;
+    }
+    
+    .subscription-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .subscription-detail {
+      text-align: center;
+    }
+    
+    .subscription-detail h5 {
+      margin: 0 0 0.25rem 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .subscription-detail p {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    /* Empty states */
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+    }
+    
+    .empty-state h4 {
+      margin: 0 0 0.5rem 0;
+      color: var(--text);
+    }
+    
+    .empty-state p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .plans-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .usage-dashboard {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .limits-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .subscription-details {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -437,9 +823,19 @@
               <button id="test-checkout-btn" class="btn btn-secondary" disabled>Test Checkout (Coming Soon)</button>
               <button id="billing-portal-btn" class="btn btn-secondary" disabled>Manage Billing (Coming Soon)</button>
             </div>
-            <div id="billing-result" class="test-result hidden">
-              <h4>Billing Data:</h4>
-              <pre id="billing-result-content"></pre>
+            <div id="billing-result" class="hidden">
+              <div id="plans-ui" class="hidden">
+                <h4>Available Plans</h4>
+                <div id="plans-container" class="plans-grid"></div>
+              </div>
+              <div id="subscription-ui" class="hidden">
+                <h4>Your Subscription</h4>
+                <div id="subscription-container"></div>
+              </div>
+              <div id="billing-json" class="test-result hidden">
+                <h4>Raw Data:</h4>
+                <pre id="billing-result-content"></pre>
+              </div>
             </div>
           </div>
         </div>
@@ -461,9 +857,19 @@
               <button id="load-limits-btn" class="btn btn-secondary">Load Limits</button>
               <button id="load-history-btn" class="btn btn-secondary">Load History</button>
             </div>
-            <div id="usage-result" class="test-result hidden">
-              <h4>Usage Data:</h4>
-              <pre id="usage-result-content"></pre>
+            <div id="usage-result" class="hidden">
+              <div id="usage-ui" class="hidden">
+                <h4>Usage Dashboard</h4>
+                <div id="usage-dashboard" class="usage-dashboard"></div>
+                <div id="usage-history" class="usage-history hidden">
+                  <h4>Recent Activity</h4>
+                  <div id="history-container"></div>
+                </div>
+              </div>
+              <div id="usage-json" class="test-result hidden">
+                <h4>Raw Data:</h4>
+                <pre id="usage-result-content"></pre>
+              </div>
             </div>
           </div>
         </div>
@@ -554,31 +960,45 @@
     async function loadUsage() {
       const period = document.getElementById('usage-period').value;
       const resultEl = document.getElementById('usage-result');
+      const usageUI = document.getElementById('usage-ui');
+      const usageDashboard = document.getElementById('usage-dashboard');
+      const jsonEl = document.getElementById('usage-json');
       const contentEl = document.getElementById('usage-result-content');
       
       resultEl.classList.remove('hidden');
-      contentEl.textContent = 'Loading usage data...';
+      usageUI.classList.remove('hidden');
+      usageDashboard.innerHTML = '<div class="empty-state"><h4>Loading usage data...</h4><p>Please wait while we fetch your usage statistics.</p></div>';
       
       try {
         const response = await fetch(`/api/usage/my-usage?period=${period}&history=true&historyLimit=20`);
         const data = await response.json();
         
-        const result = {
-          endpoint: `/api/usage/my-usage?period=${period}`,
-          status: response.status,
-          statusText: response.statusText,
-          data: data,
-          timestamp: new Date().toISOString()
-        };
-        
-        contentEl.textContent = JSON.stringify(result, null, 2);
-        
-        if (response.ok) {
+        if (response.ok && data.success) {
+          renderUsageUI(data.usage, data.history);
+          
+          // Also show raw data in JSON section
+          const result = {
+            endpoint: `/api/usage/my-usage?period=${period}`,
+            status: response.status,
+            statusText: response.statusText,
+            data: data,
+            timestamp: new Date().toISOString()
+          };
+          
+          contentEl.textContent = JSON.stringify(result, null, 2);
           contentEl.className = 'success';
+          jsonEl.classList.remove('hidden');
         } else {
-          contentEl.className = 'error';
+          throw new Error(data.message || 'Failed to load usage data');
         }
       } catch (error) {
+        usageDashboard.innerHTML = `
+          <div class="empty-state">
+            <h4>Error Loading Usage</h4>
+            <p>${error.message}</p>
+          </div>
+        `;
+        
         const result = {
           endpoint: '/api/usage/my-usage',
           error: error.message,
@@ -587,36 +1007,104 @@
         
         contentEl.textContent = JSON.stringify(result, null, 2);
         contentEl.className = 'error';
+        jsonEl.classList.remove('hidden');
+      }
+    }
+    
+    function renderUsageUI(usage, history) {
+      const dashboard = document.getElementById('usage-dashboard');
+      const historyContainer = document.getElementById('history-container');
+      const historySection = document.getElementById('usage-history');
+      
+      // Render usage dashboard
+      const usageHTML = `
+        <div class="usage-card">
+          <h4>Total Requests</h4>
+          <div class="usage-value">${usage.requests || 0}</div>
+          <div class="usage-label">requests this ${usage.period}</div>
+        </div>
+        
+        <div class="usage-card">
+          <h4>Successful Requests</h4>
+          <div class="usage-value">${usage.successfulRequests || 0}</div>
+          <div class="usage-label">successful calls</div>
+        </div>
+        
+        <div class="usage-card">
+          <h4>Failed Requests</h4>
+          <div class="usage-value">${usage.failedRequests || 0}</div>
+          <div class="usage-label">failed calls</div>
+        </div>
+        
+        <div class="usage-card">
+          <h4>Total Cost</h4>
+          <div class="usage-value">$${usage.costDollars || '0.00'}</div>
+          <div class="usage-label">this ${usage.period}</div>
+        </div>
+      `;
+      
+      dashboard.innerHTML = usageHTML;
+      
+      // Render usage history if available
+      if (history && history.length > 0) {
+        const historyHTML = history.map(item => `
+          <div class="history-item">
+            <div class="history-endpoint">${item.endpoint}</div>
+            <div class="history-cost">$${(item.cost / 100).toFixed(4)}</div>
+            <div class="${item.success ? 'history-success' : 'history-failed'}">
+              ${item.success ? '✓' : '✗'}
+            </div>
+          </div>
+        `).join('');
+        
+        historyContainer.innerHTML = historyHTML;
+        historySection.classList.remove('hidden');
+      } else {
+        historySection.classList.add('hidden');
       }
     }
 
     async function loadLimits() {
       const resultEl = document.getElementById('usage-result');
+      const usageUI = document.getElementById('usage-ui');
+      const usageDashboard = document.getElementById('usage-dashboard');
+      const jsonEl = document.getElementById('usage-json');
       const contentEl = document.getElementById('usage-result-content');
       
       resultEl.classList.remove('hidden');
-      contentEl.textContent = 'Loading limits...';
+      usageUI.classList.remove('hidden');
+      usageDashboard.innerHTML = '<div class="empty-state"><h4>Loading limits...</h4><p>Please wait while we fetch your usage limits.</p></div>';
       
       try {
         const response = await fetch('/api/usage/limits');
         const data = await response.json();
         
-        const result = {
-          endpoint: '/api/usage/limits',
-          status: response.status,
-          statusText: response.statusText,
-          data: data,
-          timestamp: new Date().toISOString()
-        };
-        
-        contentEl.textContent = JSON.stringify(result, null, 2);
-        
-        if (response.ok) {
+        if (response.ok && data.success) {
+          renderLimitsUI(data);
+          
+          // Also show raw data in JSON section
+          const result = {
+            endpoint: '/api/usage/limits',
+            status: response.status,
+            statusText: response.statusText,
+            data: data,
+            timestamp: new Date().toISOString()
+          };
+          
+          contentEl.textContent = JSON.stringify(result, null, 2);
           contentEl.className = 'success';
+          jsonEl.classList.remove('hidden');
         } else {
-          contentEl.className = 'error';
+          throw new Error(data.message || 'Failed to load limits');
         }
       } catch (error) {
+        usageDashboard.innerHTML = `
+          <div class="empty-state">
+            <h4>Error Loading Limits</h4>
+            <p>${error.message}</p>
+          </div>
+        `;
+        
         const result = {
           endpoint: '/api/usage/limits',
           error: error.message,
@@ -625,76 +1113,191 @@
         
         contentEl.textContent = JSON.stringify(result, null, 2);
         contentEl.className = 'error';
+        jsonEl.classList.remove('hidden');
       }
+    }
+    
+    function renderLimitsUI(data) {
+      const dashboard = document.getElementById('usage-dashboard');
+      const { plan, limits, currentUsage, canMakeRequest, exceeded } = data;
+      
+      const requestPercentage = limits.maxRequestsPerMonth > 0 ? 
+        (currentUsage.requests / limits.maxRequestsPerMonth) * 100 : 0;
+      const costPercentage = limits.maxCostPerMonth > 0 ? 
+        (currentUsage.cost / limits.maxCostPerMonth) * 100 : 0;
+      
+      const requestStatus = requestPercentage >= 90 ? 'danger' : requestPercentage >= 70 ? 'warning' : '';
+      const costStatus = costPercentage >= 90 ? 'danger' : costPercentage >= 70 ? 'warning' : '';
+      
+      const limitsHTML = `
+        <div class="limit-card">
+          <h4>Request Limits</h4>
+          <div class="limit-status">
+            <div class="status-dot ${requestStatus}"></div>
+            <div class="limit-text">
+              <span class="limit-usage">${currentUsage.requests}</span> / 
+              ${limits.maxRequestsPerMonth === -1 ? 'Unlimited' : limits.maxRequestsPerMonth.toLocaleString()} requests
+            </div>
+          </div>
+          ${limits.maxRequestsPerMonth > 0 ? `
+            <div class="progress-bar">
+              <div class="progress-fill ${requestStatus}" style="width: ${Math.min(requestPercentage, 100)}%"></div>
+            </div>
+          ` : ''}
+          <div class="limit-text">
+            ${canMakeRequest ? '✅ You can make more requests' : '❌ Request limit exceeded'}
+          </div>
+        </div>
+        
+        <div class="limit-card">
+          <h4>Cost Limits</h4>
+          <div class="limit-status">
+            <div class="status-dot ${costStatus}"></div>
+            <div class="limit-text">
+              <span class="limit-usage">$${currentUsage.costDollars}</span> / 
+              ${limits.maxCostPerMonth === -1 ? 'Unlimited' : `$${limits.maxCostPerMonth.toFixed(2)}`} cost
+            </div>
+          </div>
+          ${limits.maxCostPerMonth > 0 ? `
+            <div class="progress-bar">
+              <div class="progress-fill ${costStatus}" style="width: ${Math.min(costPercentage, 100)}%"></div>
+            </div>
+          ` : ''}
+          <div class="limit-text">
+            ${!exceeded.cost ? '✅ Within cost limits' : '❌ Cost limit exceeded'}
+          </div>
+        </div>
+        
+        <div class="limit-card">
+          <h4>Plan Details</h4>
+          <div class="limit-text">
+            <strong>Current Plan:</strong> ${plan}<br>
+            <strong>Cost per Request:</strong> $${limits.costPerRequest.toFixed(4)}<br>
+            <strong>Status:</strong> ${canMakeRequest ? 'Active' : 'Limited'}
+          </div>
+        </div>
+      `;
+      
+      dashboard.innerHTML = limitsHTML;
     }
 
     async function loadHistory() {
       const period = document.getElementById('usage-period').value;
       const resultEl = document.getElementById('usage-result');
+      const usageUI = document.getElementById('usage-ui');
+      const usageDashboard = document.getElementById('usage-dashboard');
+      const historySection = document.getElementById('usage-history');
+      const historyContainer = document.getElementById('history-container');
+      const jsonEl = document.getElementById('usage-json');
       const contentEl = document.getElementById('usage-result-content');
       
       resultEl.classList.remove('hidden');
-      contentEl.textContent = 'Loading usage history...';
+      usageUI.classList.remove('hidden');
+      usageDashboard.innerHTML = '<div class="empty-state"><h4>Loading history...</h4><p>Please wait while we fetch your usage history.</p></div>';
       
       try {
         const response = await fetch(`/api/usage/my-usage?period=${period}&history=true&historyLimit=50`);
         const data = await response.json();
         
-        const result = {
-          endpoint: `/api/usage/my-usage?period=${period}&history=true`,
-          status: response.status,
-          statusText: response.statusText,
-          data: data,
-          timestamp: new Date().toISOString()
-        };
-        
-        contentEl.textContent = JSON.stringify(result, null, 2);
-        
-        if (response.ok) {
+        if (response.ok && data.success) {
+          // Show only the history section for this function
+          usageDashboard.innerHTML = '<div class="empty-state"><h4>Usage History</h4><p>Your recent API usage activity.</p></div>';
+          
+          if (data.history && data.history.length > 0) {
+            const historyHTML = data.history.map(item => `
+              <div class="history-item">
+                <div class="history-endpoint">${item.endpoint}</div>
+                <div class="history-cost">$${(item.cost / 100).toFixed(4)}</div>
+                <div class="${item.success ? 'history-success' : 'history-failed'}">
+                  ${item.success ? '✓' : '✗'}
+                </div>
+              </div>
+            `).join('');
+            
+            historyContainer.innerHTML = historyHTML;
+            historySection.classList.remove('hidden');
+          } else {
+            historyContainer.innerHTML = '<div class="empty-state"><h4>No History</h4><p>No usage history found for this period.</p></div>';
+            historySection.classList.remove('hidden');
+          }
+          
+          // Also show raw data in JSON section
+          const result = {
+            endpoint: `/api/usage/my-usage?period=${period}&history=true`,
+            status: response.status,
+            statusText: response.statusText,
+            data: data,
+            timestamp: new Date().toISOString()
+          };
+          
+          contentEl.textContent = JSON.stringify(result, null, 2);
           contentEl.className = 'success';
+          jsonEl.classList.remove('hidden');
         } else {
-          contentEl.className = 'error';
+          throw new Error(data.message || 'Failed to load history');
         }
       } catch (error) {
+        usageDashboard.innerHTML = `
+          <div class="empty-state">
+            <h4>Error Loading History</h4>
+            <p>${error.message}</p>
+          </div>
+        `;
+        
         const result = {
-          endpoint: '/api/usage/my-usage',
+          endpoint: '/api/usage/my-usage?history=true',
           error: error.message,
           timestamp: new Date().toISOString()
         };
         
         contentEl.textContent = JSON.stringify(result, null, 2);
         contentEl.className = 'error';
+        jsonEl.classList.remove('hidden');
       }
     }
 
     // Billing management functions
     async function loadPlans() {
       const resultEl = document.getElementById('billing-result');
+      const plansUI = document.getElementById('plans-ui');
+      const plansContainer = document.getElementById('plans-container');
+      const jsonEl = document.getElementById('billing-json');
       const contentEl = document.getElementById('billing-result-content');
       
       resultEl.classList.remove('hidden');
-      contentEl.textContent = 'Loading plans...';
+      plansUI.classList.remove('hidden');
+      plansContainer.innerHTML = '<div class="empty-state"><h4>Loading plans...</h4><p>Please wait while we fetch the available plans.</p></div>';
       
       try {
         const response = await fetch('/api/billing/plans');
         const data = await response.json();
         
-        const result = {
-          endpoint: '/api/billing/plans',
-          status: response.status,
-          statusText: response.statusText,
-          data: data,
-          timestamp: new Date().toISOString()
-        };
-        
-        contentEl.textContent = JSON.stringify(result, null, 2);
-        
-        if (response.ok) {
+        if (response.ok && data.success) {
+          renderPlansUI(data.plans);
+          
+          // Also show raw data in JSON section
+          const result = {
+            endpoint: '/api/billing/plans',
+            status: response.status,
+            statusText: response.statusText,
+            data: data,
+            timestamp: new Date().toISOString()
+          };
+          
+          contentEl.textContent = JSON.stringify(result, null, 2);
           contentEl.className = 'success';
+          jsonEl.classList.remove('hidden');
         } else {
-          contentEl.className = 'error';
+          throw new Error(data.message || 'Failed to load plans');
         }
       } catch (error) {
+        plansContainer.innerHTML = `
+          <div class="empty-state">
+            <h4>Error Loading Plans</h4>
+            <p>${error.message}</p>
+          </div>
+        `;
+        
         const result = {
           endpoint: '/api/billing/plans',
           error: error.message,
@@ -703,36 +1306,106 @@
         
         contentEl.textContent = JSON.stringify(result, null, 2);
         contentEl.className = 'error';
+        jsonEl.classList.remove('hidden');
       }
+    }
+    
+    function renderPlansUI(plans) {
+      const container = document.getElementById('plans-container');
+      
+      if (!plans || plans.length === 0) {
+        container.innerHTML = '<div class="empty-state"><h4>No Plans Available</h4><p>No subscription plans found.</p></div>';
+        return;
+      }
+      
+      const plansHTML = plans.map(plan => {
+        const isFree = plan.isFree;
+        const isComingSoon = plan.isComingSoon;
+        const cardClass = isComingSoon ? 'plan-card coming-soon' : 'plan-card';
+        
+        return `
+          <div class="${cardClass}">
+            <div class="plan-header">
+              <h3 class="plan-name">${plan.name}</h3>
+              <div class="plan-price ${isFree ? 'free' : ''}">
+                ${isFree ? 'Free' : `$${plan.priceDollars}`}
+                ${plan.billing ? `<small style="display: block; font-size: 0.7rem; color: var(--muted);">${plan.billing}</small>` : ''}
+              </div>
+            </div>
+            
+            <p class="plan-description">${plan.description}</p>
+            
+            <ul class="plan-features">
+              ${plan.features.map(feature => `<li>${feature}</li>`).join('')}
+            </ul>
+            
+            <div class="plan-limits">
+              <h4>Usage Limits</h4>
+              <div class="limit-item">
+                <span>Requests per month</span>
+                <span class="limit-value ${plan.maxRequestsPerMonth === -1 ? 'unlimited' : ''}">
+                  ${plan.maxRequestsPerMonth === -1 ? 'Unlimited' : plan.maxRequestsPerMonth.toLocaleString()}
+                </span>
+              </div>
+              <div class="limit-item">
+                <span>Cost per month</span>
+                <span class="limit-value ${plan.maxCostPerMonth === -1 ? 'unlimited' : ''}">
+                  ${plan.maxCostPerMonth === -1 ? 'Unlimited' : `$${plan.maxCostPerMonth.toFixed(2)}`}
+                </span>
+              </div>
+              <div class="limit-item">
+                <span>Cost per request</span>
+                <span class="limit-value">$${plan.costPerRequest.toFixed(4)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      container.innerHTML = plansHTML;
     }
 
     async function loadSubscription() {
       const resultEl = document.getElementById('billing-result');
+      const subscriptionUI = document.getElementById('subscription-ui');
+      const subscriptionContainer = document.getElementById('subscription-container');
+      const jsonEl = document.getElementById('billing-json');
       const contentEl = document.getElementById('billing-result-content');
       
       resultEl.classList.remove('hidden');
-      contentEl.textContent = 'Loading subscription...';
+      subscriptionUI.classList.remove('hidden');
+      subscriptionContainer.innerHTML = '<div class="empty-state"><h4>Loading subscription...</h4><p>Please wait while we fetch your subscription details.</p></div>';
       
       try {
         const response = await fetch('/api/billing/subscription');
         const data = await response.json();
         
-        const result = {
-          endpoint: '/api/billing/subscription',
-          status: response.status,
-          statusText: response.statusText,
-          data: data,
-          timestamp: new Date().toISOString()
-        };
-        
-        contentEl.textContent = JSON.stringify(result, null, 2);
-        
-        if (response.ok) {
+        if (response.ok && data.success) {
+          renderSubscriptionUI(data.subscription);
+          
+          // Also show raw data in JSON section
+          const result = {
+            endpoint: '/api/billing/subscription',
+            status: response.status,
+            statusText: response.statusText,
+            data: data,
+            timestamp: new Date().toISOString()
+          };
+          
+          contentEl.textContent = JSON.stringify(result, null, 2);
           contentEl.className = 'success';
+          jsonEl.classList.remove('hidden');
         } else {
-          contentEl.className = 'error';
+          throw new Error(data.message || 'Failed to load subscription');
         }
       } catch (error) {
+        subscriptionContainer.innerHTML = `
+          <div class="empty-state">
+            <h4>Error Loading Subscription</h4>
+            <p>${error.message}</p>
+          </div>
+        `;
+        
         const result = {
           endpoint: '/api/billing/subscription',
           error: error.message,
@@ -741,7 +1414,48 @@
         
         contentEl.textContent = JSON.stringify(result, null, 2);
         contentEl.className = 'error';
+        jsonEl.classList.remove('hidden');
       }
+    }
+    
+    function renderSubscriptionUI(subscription) {
+      const container = document.getElementById('subscription-container');
+      
+      if (!subscription) {
+        container.innerHTML = '<div class="empty-state"><h4>No Subscription</h4><p>You are currently on the free plan.</p></div>';
+        return;
+      }
+      
+      const statusClass = subscription.status === 'active' ? 'active' : 'canceled';
+      const statusText = subscription.status === 'active' ? 'Active' : 'Canceled';
+      
+      container.innerHTML = `
+        <div class="subscription-card">
+          <div class="subscription-header">
+            <h3 class="subscription-plan">${subscription.planName || 'Free Plan'}</h3>
+            <span class="subscription-status ${statusClass}">${statusText}</span>
+          </div>
+          
+          <div class="subscription-details">
+            <div class="subscription-detail">
+              <h5>Plan</h5>
+              <p>${subscription.planName || 'Free'}</p>
+            </div>
+            <div class="subscription-detail">
+              <h5>Status</h5>
+              <p>${subscription.status || 'Active'}</p>
+            </div>
+            <div class="subscription-detail">
+              <h5>Price</h5>
+              <p>${subscription.price ? `$${subscription.price}` : 'Free'}</p>
+            </div>
+            <div class="subscription-detail">
+              <h5>Next Billing</h5>
+              <p>${subscription.currentPeriodEnd ? new Date(subscription.currentPeriodEnd * 1000).toLocaleDateString() : 'N/A'}</p>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     async function openBillingPortal() {
