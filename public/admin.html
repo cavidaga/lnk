@@ -27,19 +27,12 @@
   <link rel="stylesheet" href="/static/styles.css">
   
   <style>
-    .admin-panel {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
-      font-family: 'Poppins', sans-serif;
-      line-height: 1.6;
-    }
-    
+    /* Admin-specific styles that extend the main design system */
     .admin-header {
       text-align: center;
-      margin-bottom: 3rem;
+      margin-bottom: 2rem;
       padding: 2rem;
-      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      background: linear-gradient(135deg, var(--danger) 0%, #c82333 100%);
       color: white;
       border-radius: 12px;
     }
@@ -57,149 +50,46 @@
     
     .admin-section {
       margin-bottom: 2rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      overflow: hidden;
     }
     
     .admin-section h2 {
-      background: #f8f9fa;
+      background: var(--panel);
       padding: 1.5rem;
-      margin: 0;
-      border-bottom: 1px solid #e9ecef;
-      color: #2c3e50;
+      margin: 0 0 0 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
       font-size: 1.5rem;
+      border-radius: 12px 12px 0 0;
     }
     
     .admin-content {
       padding: 1.5rem;
-    }
-    
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: #495057;
-    }
-    
-    .form-group input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ced4da;
-      border-radius: 4px;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-    
-    .form-group input:focus {
-      outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-    }
-    
-    .btn {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-weight: 500;
-      transition: background-color 0.2s;
-    }
-    
-    .btn:hover {
-      background: #0056b3;
-    }
-    
-    .btn:disabled {
-      background: #6c757d;
-      cursor: not-allowed;
-    }
-    
-    .btn-danger {
-      background: #dc3545;
-    }
-    
-    .btn-danger:hover {
-      background: #c82333;
-    }
-    
-    .btn-success {
-      background: #28a745;
-    }
-    
-    .btn-success:hover {
-      background: #218838;
-    }
-    
-    .btn-secondary {
-      background: #6c757d;
-    }
-    
-    .btn-secondary:hover {
-      background: #545b62;
-    }
-    
-    .alert {
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 4px;
-      border: 1px solid transparent;
-    }
-    
-    .alert-success {
-      background: #d4edda;
-      border-color: #c3e6cb;
-      color: #155724;
-    }
-    
-    .alert-danger {
-      background: #f8d7da;
-      border-color: #f5c6cb;
-      color: #721c24;
-    }
-    
-    .alert-info {
-      background: #d1ecf1;
-      border-color: #bee5eb;
-      color: #0c5460;
+      background: var(--card);
+      border-radius: 0 0 12px 12px;
+      border: 1px solid var(--border);
+      border-top: none;
     }
     
     .user-info {
-      background: #f8f9fa;
+      background: var(--panel);
       padding: 1rem;
-      border-radius: 4px;
+      border-radius: 8px;
       margin-bottom: 1rem;
+      border: 1px solid var(--border);
     }
     
     .user-info h3 {
       margin: 0 0 0.5rem 0;
-      color: #495057;
+      color: var(--text);
     }
     
     .user-info p {
       margin: 0.25rem 0;
-      color: #6c757d;
+      color: var(--muted);
     }
     
     .hidden {
       display: none;
-    }
-    
-    .form-row {
-      display: flex;
-      gap: 1rem;
-    }
-    
-    .form-row .form-group {
-      flex: 1;
     }
     
     .status-indicator {
@@ -215,30 +105,190 @@
     }
     
     .status-offline {
-      background: #dc3545;
+      background: var(--danger);
     }
     
-    @media (prefers-color-scheme: dark) {
-      .admin-section {
-        background: #2d3748;
-        color: #e2e8f0;
-      }
-      
-      .admin-section h2 {
-        background: #4a5568;
-        color: #e2e8f0;
-      }
-      
-      .form-group input {
-        background: #4a5568;
-        border-color: #718096;
-        color: #e2e8f0;
-      }
-      
-      .user-info {
-        background: #4a5568;
-        color: #e2e8f0;
-      }
+    .button-group {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-2);
+    }
+    
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+    }
+    
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #218838;
+    }
+    
+    .btn-secondary {
+      background: var(--muted);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: #545b62;
+    }
+    
+    .btn:disabled {
+      background: var(--border);
+      cursor: not-allowed;
+      transform: none;
+      color: var(--muted);
+    }
+    
+    .alert {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+    }
+    
+    .alert-success {
+      background: color-mix(in oklab, #28a745 10%, var(--panel) 90%);
+      border-color: #28a745;
+      color: #155724;
+    }
+    
+    .alert-danger {
+      background: color-mix(in oklab, var(--danger) 10%, var(--panel) 90%);
+      border-color: var(--danger);
+      color: #721c24;
+    }
+    
+    .alert-info {
+      background: color-mix(in oklab, #007bff 10%, var(--panel) 90%);
+      border-color: #007bff;
+      color: #0c5460;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      background: var(--panel);
+      color: var(--text);
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.25);
+    }
+    
+    .form-group small {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: block;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .form-row .form-group {
+      flex: 1;
+    }
+    
+    .api-key-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: var(--card);
+    }
+    
+    .api-key-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    
+    .api-key-header h5 {
+      margin: 0;
+      flex: 1;
+      color: var(--text);
+    }
+    
+    .api-key-details {
+      margin: 0.25rem 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    
+    .api-key-details strong {
+      color: var(--text);
+    }
+    
+    .test-result {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--panel);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    
+    .test-result h4 {
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    
+    .test-result pre {
+      background: var(--bg);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      margin: 0;
+    }
+    
+    .test-result pre.success {
+      border-left: 4px solid #28a745;
+    }
+    
+    .test-result pre.error {
+      border-left: 4px solid var(--danger);
     }
   </style>
 </head>
@@ -284,7 +334,7 @@
                 <label for="login-password">Password</label>
                 <input type="password" id="login-password" required>
               </div>
-              <button type="submit" class="btn">Login</button>
+              <button type="submit" class="btn btn-primary">Login</button>
             </form>
           </div>
         </div>
@@ -315,12 +365,12 @@
         <div class="admin-section" id="api-keys-section">
           <h2>API Key Management</h2>
           <div class="admin-content">
-            <div style="margin-bottom: 1rem;">
+            <div class="button-group">
               <button id="create-key-btn" class="btn btn-success">Create New API Key</button>
               <button id="refresh-keys-btn" class="btn btn-secondary">Refresh List</button>
             </div>
             
-            <div id="create-key-form" class="hidden" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+            <div id="create-key-form" class="hidden" style="background: var(--panel); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border);">
               <h4>Create New API Key</h4>
               <div class="form-group">
                 <label for="key-name">Key Name</label>
@@ -329,10 +379,12 @@
               <div class="form-group">
                 <label for="key-permissions">Permissions (comma-separated)</label>
                 <input type="text" id="key-permissions" placeholder="analyze,get-analysis" value="analyze,get-analysis">
-                <small style="color: #6c757d;">Available: analyze, get-analysis, statistics, site-averages, recent-analyses</small>
+                <small>Available: analyze, get-analysis, statistics, site-averages, recent-analyses, usage, billing</small>
               </div>
-              <button id="submit-key-btn" class="btn btn-success">Create Key</button>
-              <button id="cancel-key-btn" class="btn btn-secondary">Cancel</button>
+              <div class="button-group">
+                <button id="submit-key-btn" class="btn btn-success">Create Key</button>
+                <button id="cancel-key-btn" class="btn btn-secondary">Cancel</button>
+              </div>
             </div>
             
             <div id="api-keys-list">
@@ -355,7 +407,7 @@
               </div>
               <div class="form-group">
                 <label for="test-model">Model Type</label>
-                <select id="test-model" style="width: 100%; padding: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;">
+                <select id="test-model">
                   <option value="auto">Auto</option>
                   <option value="flash-lite">Flash Lite</option>
                   <option value="flash">Flash</option>
@@ -367,10 +419,10 @@
               <label for="test-api-key">API Key (optional)</label>
               <input type="password" id="test-api-key" placeholder="lnk_... (leave empty to use session)">
             </div>
-            <button id="test-analyze-btn" class="btn">Test Analysis</button>
-            <div id="test-result" class="hidden" style="margin-top: 1rem;">
+            <button id="test-analyze-btn" class="btn btn-primary">Test Analysis</button>
+            <div id="test-result" class="test-result hidden">
               <h4>Analysis Result:</h4>
-              <pre id="test-result-content" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.9rem;"></pre>
+              <pre id="test-result-content"></pre>
             </div>
           </div>
         </div>
@@ -379,15 +431,15 @@
         <div class="admin-section" id="billing-section">
           <h2>Billing Management</h2>
           <div class="admin-content">
-            <div class="button-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div class="button-group">
               <button id="load-plans-btn" class="btn btn-primary">Load Plans</button>
               <button id="load-subscription-btn" class="btn btn-secondary">Load Subscription</button>
               <button id="test-checkout-btn" class="btn btn-secondary" disabled>Test Checkout (Coming Soon)</button>
               <button id="billing-portal-btn" class="btn btn-secondary" disabled>Manage Billing (Coming Soon)</button>
             </div>
-            <div id="billing-result" class="hidden" style="margin-top: 1rem;">
+            <div id="billing-result" class="test-result hidden">
               <h4>Billing Data:</h4>
-              <pre id="billing-result-content" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.9rem;"></pre>
+              <pre id="billing-result-content"></pre>
             </div>
           </div>
         </div>
@@ -398,20 +450,20 @@
           <div class="admin-content">
             <div class="form-group">
               <label for="usage-period">Period</label>
-              <select id="usage-period" style="width: 100%; padding: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;">
+              <select id="usage-period">
                 <option value="day">Today</option>
                 <option value="week">This Week</option>
                 <option value="month" selected>This Month</option>
               </select>
             </div>
-            <div class="button-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div class="button-group">
               <button id="load-usage-btn" class="btn btn-primary">Load My Usage</button>
               <button id="load-limits-btn" class="btn btn-secondary">Load Limits</button>
               <button id="load-history-btn" class="btn btn-secondary">Load History</button>
             </div>
-            <div id="usage-result" class="hidden" style="margin-top: 1rem;">
+            <div id="usage-result" class="test-result hidden">
               <h4>Usage Data:</h4>
-              <pre id="usage-result-content" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.9rem;"></pre>
+              <pre id="usage-result-content"></pre>
             </div>
           </div>
         </div>
@@ -424,15 +476,15 @@
               <label for="protected-api-key">API Key (optional)</label>
               <input type="password" id="protected-api-key" placeholder="lnk_... (leave empty to use session)">
             </div>
-            <div class="button-group" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div class="button-group">
               <button onclick="testProtectedEndpoint('/api/protected-example')" class="btn btn-secondary">Test Protected Example</button>
               <button onclick="testProtectedEndpoint('/api/statistics')" class="btn btn-secondary">Test Statistics</button>
               <button onclick="testProtectedEndpoint('/api/site-averages?host=bbc.com')" class="btn btn-secondary">Test Site Averages</button>
               <button onclick="testProtectedEndpoint('/api/recent-analyses')" class="btn btn-secondary">Test Recent Analyses</button>
             </div>
-            <div id="protected-test-result" class="hidden" style="margin-top: 1rem;">
+            <div id="protected-test-result" class="test-result hidden">
               <h4>Protected Endpoint Result:</h4>
-              <pre id="protected-test-result-content" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 0.9rem;"></pre>
+              <pre id="protected-test-result-content"></pre>
             </div>
           </div>
         </div>
@@ -482,9 +534,9 @@
         contentEl.textContent = JSON.stringify(result, null, 2);
         
         if (response.ok) {
-          contentEl.style.borderLeft = '4px solid #28a745';
+          contentEl.className = 'success';
         } else {
-          contentEl.style.borderLeft = '4px solid #dc3545';
+          contentEl.className = 'error';
         }
       } catch (error) {
         const result = {
@@ -494,7 +546,7 @@
         };
         
         contentEl.textContent = JSON.stringify(result, null, 2);
-        contentEl.style.borderLeft = '4px solid #dc3545';
+        contentEl.className = 'error';
       }
     }
 
@@ -522,9 +574,9 @@
         contentEl.textContent = JSON.stringify(result, null, 2);
         
         if (response.ok) {
-          contentEl.style.borderLeft = '4px solid #28a745';
+          contentEl.className = 'success';
         } else {
-          contentEl.style.borderLeft = '4px solid #dc3545';
+          contentEl.className = 'error';
         }
       } catch (error) {
         const result = {
@@ -534,7 +586,7 @@
         };
         
         contentEl.textContent = JSON.stringify(result, null, 2);
-        contentEl.style.borderLeft = '4px solid #dc3545';
+        contentEl.className = 'error';
       }
     }
 
@@ -560,9 +612,9 @@
         contentEl.textContent = JSON.stringify(result, null, 2);
         
         if (response.ok) {
-          contentEl.style.borderLeft = '4px solid #28a745';
+          contentEl.className = 'success';
         } else {
-          contentEl.style.borderLeft = '4px solid #dc3545';
+          contentEl.className = 'error';
         }
       } catch (error) {
         const result = {
@@ -572,7 +624,7 @@
         };
         
         contentEl.textContent = JSON.stringify(result, null, 2);
-        contentEl.style.borderLeft = '4px solid #dc3545';
+        contentEl.className = 'error';
       }
     }
 
@@ -599,9 +651,9 @@
         contentEl.textContent = JSON.stringify(result, null, 2);
         
         if (response.ok) {
-          contentEl.style.borderLeft = '4px solid #28a745';
+          contentEl.className = 'success';
         } else {
-          contentEl.style.borderLeft = '4px solid #dc3545';
+          contentEl.className = 'error';
         }
       } catch (error) {
         const result = {
@@ -611,7 +663,7 @@
         };
         
         contentEl.textContent = JSON.stringify(result, null, 2);
-        contentEl.style.borderLeft = '4px solid #dc3545';
+        contentEl.className = 'error';
       }
     }
 
@@ -638,9 +690,9 @@
         contentEl.textContent = JSON.stringify(result, null, 2);
         
         if (response.ok) {
-          contentEl.style.borderLeft = '4px solid #28a745';
+          contentEl.className = 'success';
         } else {
-          contentEl.style.borderLeft = '4px solid #dc3545';
+          contentEl.className = 'error';
         }
       } catch (error) {
         const result = {
@@ -650,7 +702,7 @@
         };
         
         contentEl.textContent = JSON.stringify(result, null, 2);
-        contentEl.style.borderLeft = '4px solid #dc3545';
+        contentEl.className = 'error';
       }
     }
 
@@ -676,9 +728,9 @@
         contentEl.textContent = JSON.stringify(result, null, 2);
         
         if (response.ok) {
-          contentEl.style.borderLeft = '4px solid #28a745';
+          contentEl.className = 'success';
         } else {
-          contentEl.style.borderLeft = '4px solid #dc3545';
+          contentEl.className = 'error';
         }
       } catch (error) {
         const result = {
@@ -688,7 +740,7 @@
         };
         
         contentEl.textContent = JSON.stringify(result, null, 2);
-        contentEl.style.borderLeft = '4px solid #dc3545';
+        contentEl.className = 'error';
       }
     }
 
@@ -726,7 +778,7 @@
           };
           
           contentEl.textContent = JSON.stringify(result, null, 2);
-          contentEl.style.borderLeft = '4px solid #28a745';
+          contentEl.className = 'success';
         } else {
           const result = {
             endpoint: '/api/billing/portal',
@@ -737,7 +789,7 @@
           };
           
           contentEl.textContent = JSON.stringify(result, null, 2);
-          contentEl.style.borderLeft = '4px solid #dc3545';
+          contentEl.className = 'error';
         }
       } catch (error) {
         const result = {
@@ -747,7 +799,7 @@
         };
         
         contentEl.textContent = JSON.stringify(result, null, 2);
-        contentEl.style.borderLeft = '4px solid #dc3545';
+        contentEl.className = 'error';
       }
     }
 
@@ -785,13 +837,13 @@
         contentEl.textContent = JSON.stringify(result, null, 2);
         
         if (response.ok && data.url) {
-          contentEl.style.borderLeft = '4px solid #28a745';
+          contentEl.className = 'success';
           // Optionally open checkout in new tab
           if (confirm('Checkout session created! Open Stripe checkout in new tab?')) {
             window.open(data.url, '_blank');
           }
         } else {
-          contentEl.style.borderLeft = '4px solid #dc3545';
+          contentEl.className = 'error';
         }
       } catch (error) {
         const result = {
@@ -801,7 +853,7 @@
         };
         
         contentEl.textContent = JSON.stringify(result, null, 2);
-        contentEl.style.borderLeft = '4px solid #dc3545';
+        contentEl.className = 'error';
       }
     }
 
@@ -1015,11 +1067,18 @@
           if (response.ok) {
             document.getElementById('test-result').classList.remove('hidden');
             document.getElementById('test-result-content').textContent = JSON.stringify(result, null, 2);
+            document.getElementById('test-result-content').className = 'success';
             this.showMessage('Analysis completed successfully!', 'success');
           } else {
+            document.getElementById('test-result').classList.remove('hidden');
+            document.getElementById('test-result-content').textContent = JSON.stringify(result, null, 2);
+            document.getElementById('test-result-content').className = 'error';
             this.showMessage(`Analysis failed: ${result.message || 'Unknown error'}`, 'danger');
           }
         } catch (error) {
+          document.getElementById('test-result').classList.remove('hidden');
+          document.getElementById('test-result-content').textContent = JSON.stringify({error: error.message}, null, 2);
+          document.getElementById('test-result-content').className = 'error';
           this.showMessage(`Analysis error: ${error.message}`, 'danger');
         } finally {
           btn.disabled = false;
@@ -1103,18 +1162,18 @@
         }
 
         const keysHtml = keys.map(key => `
-          <div style="border: 1px solid #e9ecef; border-radius: 4px; padding: 1rem; margin-bottom: 1rem;">
-            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
-              <h5 style="margin: 0; flex: 1;">${key.name}</h5>
-              <button class="btn btn-danger" onclick="window.adminPanel.revokeKey('${key.id}')" style="margin-left: 1rem;">Revoke</button>
+          <div class="api-key-item">
+            <div class="api-key-header">
+              <h5>${key.name}</h5>
+              <button class="btn btn-danger" onclick="window.adminPanel.revokeKey('${key.id}')">Revoke</button>
             </div>
-            <p style="margin: 0.25rem 0; color: #6c757d; font-size: 0.9rem;">
+            <div class="api-key-details">
               <strong>ID:</strong> ${key.id}<br>
               <strong>Permissions:</strong> ${key.permissions.join(', ')}<br>
               <strong>Created:</strong> ${new Date(key.createdAt).toLocaleString()}<br>
               <strong>Last Used:</strong> ${key.lastUsed ? new Date(key.lastUsed).toLocaleString() : 'Never'}<br>
               <strong>Status:</strong> ${key.isActive ? 'Active' : 'Inactive'}
-            </p>
+            </div>
           </div>
         `).join('');
 
