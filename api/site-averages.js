@@ -5,7 +5,7 @@ export const config = { runtime: 'nodejs' };
 
 async function handler(req, res) {
   try {
-    const url = new URL(req.url);
+    const url = new URL(req.url, 'http://localhost');
     const hostParam = (url.searchParams.get('host') || '').trim();
     const urlParam = (url.searchParams.get('url') || '').trim();
 
