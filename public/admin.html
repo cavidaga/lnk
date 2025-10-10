@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex, nofollow" />
 
-  <title>LNK.az Admin Panel</title>
-  <meta name="description" content="LNK.az Admin Panel - Hidden authentication testing interface" />
+  <title>LNK.az Admin Paneli</title>
+  <meta name="description" content="LNK.az Admin Paneli - Gizli autentifikasiya sınaq interfeysi" />
   <meta name="theme-color" content="#0c0d12">
   <meta name="color-scheme" content="light dark" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
@@ -684,99 +684,99 @@
     <main id="main" role="main">
       <div class="admin-panel">
         <div class="admin-header">
-          <h1>🔐 LNK.az Admin Panel</h1>
-          <p>Hidden authentication testing interface</p>
+          <h1>🔐 LNK.az Admin Paneli</h1>
+          <p>Gizli autentifikasiya sınaq interfeysi</p>
         </div>
 
         <!-- User Status -->
         <div class="admin-section">
-          <h2>Current User Status</h2>
+          <h2>Mövcud İstifadəçi Statusu</h2>
           <div class="admin-content">
             <div id="user-status">
               <div class="status-indicator status-offline"></div>
-              <span>Not logged in</span>
+              <span>Hesaba daxil olunmayıb</span>
             </div>
             <div id="user-info" class="user-info hidden">
-              <h3 id="user-name">User Name</h3>
+              <h3 id="user-name">İstifadəçi adı</h3>
               <p id="user-email">user@example.com</p>
-              <p id="user-plan">Plan: free</p>
+              <p id="user-plan">Plan: pulsuz</p>
             </div>
             <div style="margin-top: 1rem;">
-              <button id="logout-btn" class="btn btn-danger hidden">Logout</button>
+              <button id="logout-btn" class="btn btn-danger hidden">Çıxış</button>
             </div>
           </div>
         </div>
 
         <!-- Login Form -->
         <div class="admin-section" id="login-section">
-          <h2>Login</h2>
+          <h2>Daxil ol</h2>
           <div class="admin-content">
             <form id="login-form">
               <div class="form-group">
-                <label for="login-email">Email</label>
+                <label for="login-email">E-poçt</label>
                 <input type="email" id="login-email" required>
               </div>
               <div class="form-group">
-                <label for="login-password">Password</label>
+                <label for="login-password">Şifrə</label>
                 <input type="password" id="login-password" required>
               </div>
-              <button type="submit" class="btn btn-primary">Login</button>
+              <button type="submit" class="btn btn-primary">Daxil ol</button>
             </form>
           </div>
         </div>
 
         <!-- Registration Form -->
         <div class="admin-section" id="register-section">
-          <h2>Register New User</h2>
+          <h2>Yeni İstifadəçi Qeydiyyatı</h2>
           <div class="admin-content">
             <form id="register-form">
               <div class="form-group">
-                <label for="register-email">Email</label>
+                <label for="register-email">E-poçt</label>
                 <input type="email" id="register-email" required>
               </div>
               <div class="form-group">
-                <label for="register-password">Password</label>
+                <label for="register-password">Şifrə</label>
                 <input type="password" id="register-password" minlength="8" required>
               </div>
               <div class="form-group">
-                <label for="register-token">Admin Registration Token</label>
+                <label for="register-token">Admin Qeydiyyat Tokeni</label>
                 <input type="password" id="register-token" required>
               </div>
-              <button type="submit" class="btn btn-success">Register</button>
+              <button type="submit" class="btn btn-success">Qeydiyyatdan keç</button>
             </form>
           </div>
         </div>
 
         <!-- API Key Management -->
         <div class="admin-section" id="api-keys-section">
-          <h2>API Key Management</h2>
+          <h2>API Açarlarının İdarə edilməsi</h2>
           <div class="admin-content">
             <div class="button-group">
-              <button id="create-key-btn" class="btn btn-success">Create New API Key</button>
-              <button id="refresh-keys-btn" class="btn btn-secondary">Refresh List</button>
+              <button id="create-key-btn" class="btn btn-success">Yeni API Açarı Yarat</button>
+              <button id="refresh-keys-btn" class="btn btn-secondary">Siyahını yenilə</button>
             </div>
-            
+
             <div id="create-key-form" class="hidden" style="background: var(--panel); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border);">
-              <h4>Create New API Key</h4>
+              <h4>Yeni API Açarı Yarat</h4>
               <div class="form-group">
-                <label for="key-name">Key Name</label>
-                <input type="text" id="key-name" placeholder="My API Key">
+                <label for="key-name">Açarın adı</label>
+                <input type="text" id="key-name" placeholder="API açarım">
               </div>
               <div class="form-group">
-                <label for="key-permissions">Permissions (comma-separated)</label>
+                <label for="key-permissions">İcazələr (vergüllə ayırın)</label>
                 <input type="text" id="key-permissions" placeholder="analyze,get-analysis" value="analyze,get-analysis">
-                <small>Available: analyze, get-analysis, statistics, site-averages, recent-analyses, usage, billing</small>
+                <small>Mövcud icazələr: analyze, get-analysis, statistics, site-averages, recent-analyses, usage, billing</small>
               </div>
               <div class="button-group">
-                <button id="submit-key-btn" class="btn btn-success">Create Key</button>
-                <button id="cancel-key-btn" class="btn btn-secondary">Cancel</button>
+                <button id="submit-key-btn" class="btn btn-success">Açar yarat</button>
+                <button id="cancel-key-btn" class="btn btn-secondary">Ləğv et</button>
               </div>
             </div>
-            
+
             <div id="api-keys-list">
-              <h4>Your API Keys</h4>
+              <h4>API Açarlarınız</h4>
               <div id="keys-container">
-                <p>Loading...</p>
+                <p>Yüklənir...</p>
               </div>
             </div>
           </div>
@@ -784,15 +784,15 @@
 
         <!-- API Testing -->
         <div class="admin-section">
-          <h2>API Testing</h2>
+          <h2>API Sınağı</h2>
           <div class="admin-content">
             <div class="form-row">
               <div class="form-group">
-                <label for="test-url">Test URL</label>
+                <label for="test-url">Test URL-i</label>
                 <input type="url" id="test-url" placeholder="https://example.com/news-article">
               </div>
               <div class="form-group">
-                <label for="test-model">Model Type</label>
+                <label for="test-model">Model növü</label>
                 <select id="test-model">
                   <option value="auto">Auto</option>
                   <option value="flash-lite">Flash Lite</option>
@@ -802,12 +802,12 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="test-api-key">API Key (optional)</label>
-              <input type="password" id="test-api-key" placeholder="lnk_... (leave empty to use session)">
+              <label for="test-api-key">API açarı (istəyə görə)</label>
+              <input type="password" id="test-api-key" placeholder="lnk_... (sesiyanı istifadə etmək üçün boş saxlayın)">
             </div>
-            <button id="test-analyze-btn" class="btn btn-primary">Test Analysis</button>
+            <button id="test-analyze-btn" class="btn btn-primary">Təhlili sına</button>
             <div id="test-result" class="test-result hidden">
-              <h4>Analysis Result:</h4>
+              <h4>Təhlil Nəticəsi:</h4>
               <pre id="test-result-content"></pre>
             </div>
           </div>
@@ -815,25 +815,25 @@
 
         <!-- Billing Management -->
         <div class="admin-section" id="billing-section">
-          <h2>Billing Management</h2>
+          <h2>Ödənişlərin İdarə Edilməsi</h2>
           <div class="admin-content">
             <div class="button-group">
-              <button id="load-plans-btn" class="btn btn-primary">Load Plans</button>
-              <button id="load-subscription-btn" class="btn btn-secondary">Load Subscription</button>
-              <button id="test-checkout-btn" class="btn btn-secondary" disabled>Test Checkout (Coming Soon)</button>
-              <button id="billing-portal-btn" class="btn btn-secondary" disabled>Manage Billing (Coming Soon)</button>
+              <button id="load-plans-btn" class="btn btn-primary">Planları yüklə</button>
+              <button id="load-subscription-btn" class="btn btn-secondary">Abunəliyi yüklə</button>
+              <button id="test-checkout-btn" class="btn btn-secondary" disabled>Ödəniş Sınağı (Tezliklə)</button>
+              <button id="billing-portal-btn" class="btn btn-secondary" disabled>Ödənişləri idarə et (Tezliklə)</button>
             </div>
             <div id="billing-result" class="hidden">
               <div id="plans-ui" class="hidden">
-                <h4>Available Plans</h4>
+                <h4>Mövcud Planlar</h4>
                 <div id="plans-container" class="plans-grid"></div>
               </div>
               <div id="subscription-ui" class="hidden">
-                <h4>Your Subscription</h4>
+                <h4>Abunəliyiniz</h4>
                 <div id="subscription-container"></div>
               </div>
               <div id="billing-json" class="test-result hidden">
-                <h4>Raw Data:</h4>
+                <h4>Xam Məlumat:</h4>
                 <pre id="billing-result-content"></pre>
               </div>
             </div>
@@ -842,32 +842,32 @@
 
         <!-- Usage Tracking -->
         <div class="admin-section" id="usage-section">
-          <h2>Usage Tracking</h2>
+          <h2>İstifadənin İzlənməsi</h2>
           <div class="admin-content">
             <div class="form-group">
-              <label for="usage-period">Period</label>
+              <label for="usage-period">Dövür</label>
               <select id="usage-period">
-                <option value="day">Today</option>
-                <option value="week">This Week</option>
-                <option value="month" selected>This Month</option>
+                <option value="day">Bu gün</option>
+                <option value="week">Bu həftə</option>
+                <option value="month" selected>Bu ay</option>
               </select>
             </div>
             <div class="button-group">
-              <button id="load-usage-btn" class="btn btn-primary">Load My Usage</button>
-              <button id="load-limits-btn" class="btn btn-secondary">Load Limits</button>
-              <button id="load-history-btn" class="btn btn-secondary">Load History</button>
+              <button id="load-usage-btn" class="btn btn-primary">İstifadəmi yüklə</button>
+              <button id="load-limits-btn" class="btn btn-secondary">Limitləri yüklə</button>
+              <button id="load-history-btn" class="btn btn-secondary">Tarixçəni yüklə</button>
             </div>
             <div id="usage-result" class="hidden">
               <div id="usage-ui" class="hidden">
-                <h4>Usage Dashboard</h4>
+                <h4>İstifadə Paneli</h4>
                 <div id="usage-dashboard" class="usage-dashboard"></div>
                 <div id="usage-history" class="usage-history hidden">
-                  <h4>Recent Activity</h4>
+                  <h4>Son Aktivlik</h4>
                   <div id="history-container"></div>
                 </div>
               </div>
               <div id="usage-json" class="test-result hidden">
-                <h4>Raw Data:</h4>
+                <h4>Xam Məlumat:</h4>
                 <pre id="usage-result-content"></pre>
               </div>
             </div>
@@ -876,20 +876,20 @@
 
         <!-- Protected Endpoints Testing -->
         <div class="admin-section">
-          <h2>Protected Endpoints Testing</h2>
+          <h2>Qorunan Endpointlərin Sınanması</h2>
           <div class="admin-content">
             <div class="form-group">
-              <label for="protected-api-key">API Key (optional)</label>
-              <input type="password" id="protected-api-key" placeholder="lnk_... (leave empty to use session)">
+              <label for="protected-api-key">API açarı (istəyə görə)</label>
+              <input type="password" id="protected-api-key" placeholder="lnk_... (sesiyanı istifadə etmək üçün boş saxlayın)">
             </div>
             <div class="button-group">
-              <button onclick="testProtectedEndpoint('/api/protected-example')" class="btn btn-secondary">Test Protected Example</button>
-              <button onclick="testProtectedEndpoint('/api/statistics')" class="btn btn-secondary">Test Statistics</button>
-              <button onclick="testProtectedEndpoint('/api/site-averages?host=bbc.com')" class="btn btn-secondary">Test Site Averages</button>
-              <button onclick="testProtectedEndpoint('/api/recent-analyses')" class="btn btn-secondary">Test Recent Analyses</button>
+              <button onclick="testProtectedEndpoint('/api/protected-example')" class="btn btn-secondary">Qorunan nümunəni sına</button>
+              <button onclick="testProtectedEndpoint('/api/statistics')" class="btn btn-secondary">Statistikanı sına</button>
+              <button onclick="testProtectedEndpoint('/api/site-averages?host=bbc.com')" class="btn btn-secondary">Sayt ortalamalarını sına</button>
+              <button onclick="testProtectedEndpoint('/api/recent-analyses')" class="btn btn-secondary">Son təhlilləri sına</button>
             </div>
             <div id="protected-test-result" class="test-result hidden">
-              <h4>Protected Endpoint Result:</h4>
+              <h4>Qorunan Endpoint Nəticəsi:</h4>
               <pre id="protected-test-result-content"></pre>
             </div>
           </div>
@@ -903,14 +903,14 @@
   </div>
 
   <script>
-    // Test protected endpoints function
+    // Qorunan endpointləri sına funksiyası
     async function testProtectedEndpoint(endpoint) {
       const apiKey = document.getElementById('protected-api-key').value;
       const resultEl = document.getElementById('protected-test-result');
       const contentEl = document.getElementById('protected-test-result-content');
       
       resultEl.classList.remove('hidden');
-      contentEl.textContent = 'Testing...';
+      contentEl.textContent = 'Sına edilir...';
       
       try {
         const headers = {
@@ -956,7 +956,7 @@
       }
     }
 
-    // Usage tracking functions
+    // İstifadənin izlənməsi funksiyaları
     async function loadUsage() {
       const period = document.getElementById('usage-period').value;
       const resultEl = document.getElementById('usage-result');
@@ -967,7 +967,7 @@
       
       resultEl.classList.remove('hidden');
       usageUI.classList.remove('hidden');
-      usageDashboard.innerHTML = '<div class="empty-state"><h4>Loading usage data...</h4><p>Please wait while we fetch your usage statistics.</p></div>';
+      usageDashboard.innerHTML = '<div class="empty-state"><h4>İstifadə məlumatları yüklənir...</h4><p>İstifadə statistikalarınızı gətiririk, zəhmət olmasa gözləyin.</p></div>';
       
       try {
         const response = await fetch(`/api/usage/my-usage?period=${period}&history=true&historyLimit=20`);
@@ -976,7 +976,7 @@
         if (response.ok && data.success) {
           renderUsageUI(data.usage, data.history);
           
-          // Also show raw data in JSON section
+          // JSON bölməsində xam məlumatı da göstər
           const result = {
             endpoint: `/api/usage/my-usage?period=${period}`,
             status: response.status,
@@ -989,12 +989,12 @@
           contentEl.className = 'success';
           jsonEl.classList.remove('hidden');
         } else {
-          throw new Error(data.message || 'Failed to load usage data');
+          throw new Error(data.message || 'İstifadə məlumatlarını yükləmək mümkün olmadı');
         }
       } catch (error) {
         usageDashboard.innerHTML = `
           <div class="empty-state">
-            <h4>Error Loading Usage</h4>
+            <h4>İstifadə yüklənərkən səhv</h4>
             <p>${error.message}</p>
           </div>
         `;
@@ -1016,36 +1016,36 @@
       const historyContainer = document.getElementById('history-container');
       const historySection = document.getElementById('usage-history');
       
-      // Render usage dashboard
+      // İstifadə panelini qur
       const usageHTML = `
         <div class="usage-card">
-          <h4>Total Requests</h4>
+          <h4>Ümumi sorğular</h4>
           <div class="usage-value">${usage.requests || 0}</div>
-          <div class="usage-label">requests this ${usage.period}</div>
+          <div class="usage-label">bu ${usage.period} ərzində sorğular</div>
         </div>
-        
+
         <div class="usage-card">
-          <h4>Successful Requests</h4>
+          <h4>Uğurlu sorğular</h4>
           <div class="usage-value">${usage.successfulRequests || 0}</div>
-          <div class="usage-label">successful calls</div>
+          <div class="usage-label">uğurlu çağırışlar</div>
         </div>
-        
+
         <div class="usage-card">
-          <h4>Failed Requests</h4>
+          <h4>Uğursuz sorğular</h4>
           <div class="usage-value">${usage.failedRequests || 0}</div>
-          <div class="usage-label">failed calls</div>
+          <div class="usage-label">uğursuz çağırışlar</div>
         </div>
-        
+
         <div class="usage-card">
-          <h4>Total Cost</h4>
+          <h4>Ümumi xərc</h4>
           <div class="usage-value">$${usage.costDollars || '0.00'}</div>
-          <div class="usage-label">this ${usage.period}</div>
+          <div class="usage-label">bu ${usage.period} ərzində</div>
         </div>
       `;
       
       dashboard.innerHTML = usageHTML;
       
-      // Render usage history if available
+      // Mövcuddursa istifadə tarixçəsini göstər
       if (history && history.length > 0) {
         const historyHTML = history.map(item => `
           <div class="history-item">
@@ -1073,7 +1073,7 @@
       
       resultEl.classList.remove('hidden');
       usageUI.classList.remove('hidden');
-      usageDashboard.innerHTML = '<div class="empty-state"><h4>Loading limits...</h4><p>Please wait while we fetch your usage limits.</p></div>';
+      usageDashboard.innerHTML = '<div class="empty-state"><h4>Limitlər yüklənir...</h4><p>İstifadə limitlərinizi gətiririk, zəhmət olmasa gözləyin.</p></div>';
       
       try {
         const response = await fetch('/api/usage/limits');
@@ -1082,7 +1082,7 @@
         if (response.ok && data.success) {
           renderLimitsUI(data);
           
-          // Also show raw data in JSON section
+          // JSON bölməsində xam məlumatı da göstər
           const result = {
             endpoint: '/api/usage/limits',
             status: response.status,
@@ -1095,12 +1095,12 @@
           contentEl.className = 'success';
           jsonEl.classList.remove('hidden');
         } else {
-          throw new Error(data.message || 'Failed to load limits');
+          throw new Error(data.message || 'Limitləri yükləmək mümkün olmadı');
         }
       } catch (error) {
         usageDashboard.innerHTML = `
           <div class="empty-state">
-            <h4>Error Loading Limits</h4>
+            <h4>Limitlər yüklənərkən səhv</h4>
             <p>${error.message}</p>
           </div>
         `;
@@ -1131,12 +1131,12 @@
       
       const limitsHTML = `
         <div class="limit-card">
-          <h4>Request Limits</h4>
+          <h4>Sorğu limitləri</h4>
           <div class="limit-status">
             <div class="status-dot ${requestStatus}"></div>
             <div class="limit-text">
-              <span class="limit-usage">${currentUsage.requests}</span> / 
-              ${limits.maxRequestsPerMonth === -1 ? 'Unlimited' : limits.maxRequestsPerMonth.toLocaleString()} requests
+              <span class="limit-usage">${currentUsage.requests}</span> /
+              ${limits.maxRequestsPerMonth === -1 ? 'Limitsiz' : limits.maxRequestsPerMonth.toLocaleString()} sorğu
             </div>
           </div>
           ${limits.maxRequestsPerMonth > 0 ? `
@@ -1145,17 +1145,17 @@
             </div>
           ` : ''}
           <div class="limit-text">
-            ${canMakeRequest ? '✅ You can make more requests' : '❌ Request limit exceeded'}
+            ${canMakeRequest ? '✅ Daha çox sorğu göndərə bilərsiniz' : '❌ Sorğu limiti aşılıb'}
           </div>
         </div>
-        
+
         <div class="limit-card">
-          <h4>Cost Limits</h4>
+          <h4>Xərc limitləri</h4>
           <div class="limit-status">
             <div class="status-dot ${costStatus}"></div>
             <div class="limit-text">
-              <span class="limit-usage">$${currentUsage.costDollars}</span> / 
-              ${limits.maxCostPerMonth === -1 ? 'Unlimited' : `$${limits.maxCostPerMonth.toFixed(2)}`} cost
+              <span class="limit-usage">$${currentUsage.costDollars}</span> /
+              ${limits.maxCostPerMonth === -1 ? 'Limitsiz' : `$${limits.maxCostPerMonth.toFixed(2)}`} xərc
             </div>
           </div>
           ${limits.maxCostPerMonth > 0 ? `
@@ -1164,16 +1164,16 @@
             </div>
           ` : ''}
           <div class="limit-text">
-            ${!exceeded.cost ? '✅ Within cost limits' : '❌ Cost limit exceeded'}
+            ${!exceeded.cost ? '✅ Xərc limiti daxilindədir' : '❌ Xərc limiti aşılıb'}
           </div>
         </div>
-        
+
         <div class="limit-card">
-          <h4>Plan Details</h4>
+          <h4>Planın təfərrüatları</h4>
           <div class="limit-text">
-            <strong>Current Plan:</strong> ${plan}<br>
-            <strong>Cost per Request:</strong> $${limits.costPerRequest.toFixed(4)}<br>
-            <strong>Status:</strong> ${canMakeRequest ? 'Active' : 'Limited'}
+            <strong>Cari plan:</strong> ${plan}<br>
+            <strong>Bir sorğu üçün xərc:</strong> $${limits.costPerRequest.toFixed(4)}<br>
+            <strong>Status:</strong> ${canMakeRequest ? 'Aktiv' : 'Məhdud'}
           </div>
         </div>
       `;
@@ -1193,15 +1193,15 @@
       
       resultEl.classList.remove('hidden');
       usageUI.classList.remove('hidden');
-      usageDashboard.innerHTML = '<div class="empty-state"><h4>Loading history...</h4><p>Please wait while we fetch your usage history.</p></div>';
+      usageDashboard.innerHTML = '<div class="empty-state"><h4>Tarixçə yüklənir...</h4><p>İstifadə tarixçənizi gətiririk, zəhmət olmasa gözləyin.</p></div>';
       
       try {
         const response = await fetch(`/api/usage/my-usage?period=${period}&history=true&historyLimit=50`);
         const data = await response.json();
         
         if (response.ok && data.success) {
-          // Show only the history section for this function
-          usageDashboard.innerHTML = '<div class="empty-state"><h4>Usage History</h4><p>Your recent API usage activity.</p></div>';
+          // Bu funksiya üçün yalnız tarixçə bölməsini göstər
+          usageDashboard.innerHTML = '<div class="empty-state"><h4>İstifadə tarixçəsi</h4><p>API istifadənizin son aktivliyi.</p></div>';
           
           if (data.history && data.history.length > 0) {
             const historyHTML = data.history.map(item => `
@@ -1217,11 +1217,11 @@
             historyContainer.innerHTML = historyHTML;
             historySection.classList.remove('hidden');
           } else {
-            historyContainer.innerHTML = '<div class="empty-state"><h4>No History</h4><p>No usage history found for this period.</p></div>';
+            historyContainer.innerHTML = '<div class="empty-state"><h4>Tarixçə tapılmadı</h4><p>Bu dövr üçün istifadə tarixçəsi tapılmadı.</p></div>';
             historySection.classList.remove('hidden');
           }
           
-          // Also show raw data in JSON section
+          // JSON bölməsində xam məlumatı da göstər
           const result = {
             endpoint: `/api/usage/my-usage?period=${period}&history=true`,
             status: response.status,
@@ -1234,12 +1234,12 @@
           contentEl.className = 'success';
           jsonEl.classList.remove('hidden');
         } else {
-          throw new Error(data.message || 'Failed to load history');
+          throw new Error(data.message || 'Tarixçəni yükləmək mümkün olmadı');
         }
       } catch (error) {
         usageDashboard.innerHTML = `
           <div class="empty-state">
-            <h4>Error Loading History</h4>
+            <h4>Tarixçə yüklənərkən səhv</h4>
             <p>${error.message}</p>
           </div>
         `;
@@ -1256,7 +1256,7 @@
       }
     }
 
-    // Billing management functions
+    // Ödənişlərin idarə edilməsi funksiyaları
     async function loadPlans() {
       const resultEl = document.getElementById('billing-result');
       const plansUI = document.getElementById('plans-ui');
@@ -1266,7 +1266,7 @@
       
       resultEl.classList.remove('hidden');
       plansUI.classList.remove('hidden');
-      plansContainer.innerHTML = '<div class="empty-state"><h4>Loading plans...</h4><p>Please wait while we fetch the available plans.</p></div>';
+      plansContainer.innerHTML = '<div class="empty-state"><h4>Planlar yüklənir...</h4><p>Mövcud planları gətiririk, zəhmət olmasa gözləyin.</p></div>';
       
       try {
         const response = await fetch('/api/billing/plans');
@@ -1275,7 +1275,7 @@
         if (response.ok && data.success) {
           renderPlansUI(data.plans);
           
-          // Also show raw data in JSON section
+          // JSON bölməsində xam məlumatı da göstər
           const result = {
             endpoint: '/api/billing/plans',
             status: response.status,
@@ -1288,12 +1288,12 @@
           contentEl.className = 'success';
           jsonEl.classList.remove('hidden');
         } else {
-          throw new Error(data.message || 'Failed to load plans');
+          throw new Error(data.message || 'Planları yükləmək mümkün olmadı');
         }
       } catch (error) {
         plansContainer.innerHTML = `
           <div class="empty-state">
-            <h4>Error Loading Plans</h4>
+            <h4>Planlar yüklənərkən səhv</h4>
             <p>${error.message}</p>
           </div>
         `;
@@ -1314,7 +1314,7 @@
       const container = document.getElementById('plans-container');
       
       if (!plans || plans.length === 0) {
-        container.innerHTML = '<div class="empty-state"><h4>No Plans Available</h4><p>No subscription plans found.</p></div>';
+        container.innerHTML = '<div class="empty-state"><h4>Plan tapılmadı</h4><p>Heç bir abunə planı aşkarlanmadı.</p></div>';
         return;
       }
       
@@ -1374,7 +1374,7 @@
       
       resultEl.classList.remove('hidden');
       subscriptionUI.classList.remove('hidden');
-      subscriptionContainer.innerHTML = '<div class="empty-state"><h4>Loading subscription...</h4><p>Please wait while we fetch your subscription details.</p></div>';
+      subscriptionContainer.innerHTML = '<div class="empty-state"><h4>Abunəlik yüklənir...</h4><p>Abunəlik məlumatlarınızı gətiririk, zəhmət olmasa gözləyin.</p></div>';
       
       try {
         const response = await fetch('/api/billing/subscription');
@@ -1383,7 +1383,7 @@
         if (response.ok && data.success) {
           renderSubscriptionUI(data.subscription);
           
-          // Also show raw data in JSON section
+          // JSON bölməsində xam məlumatı da göstər
           const result = {
             endpoint: '/api/billing/subscription',
             status: response.status,
@@ -1396,12 +1396,12 @@
           contentEl.className = 'success';
           jsonEl.classList.remove('hidden');
         } else {
-          throw new Error(data.message || 'Failed to load subscription');
+          throw new Error(data.message || 'Abunəliyi yükləmək mümkün olmadı');
         }
       } catch (error) {
         subscriptionContainer.innerHTML = `
           <div class="empty-state">
-            <h4>Error Loading Subscription</h4>
+            <h4>Abunəlik yüklənərkən səhv</h4>
             <p>${error.message}</p>
           </div>
         `;
@@ -1422,35 +1422,35 @@
       const container = document.getElementById('subscription-container');
       
       if (!subscription) {
-        container.innerHTML = '<div class="empty-state"><h4>No Subscription</h4><p>You are currently on the free plan.</p></div>';
+        container.innerHTML = '<div class="empty-state"><h4>Abunəlik yoxdur</h4><p>Hazırda pulsuz plandasınız.</p></div>';
         return;
       }
       
       const statusClass = subscription.status === 'active' ? 'active' : 'canceled';
-      const statusText = subscription.status === 'active' ? 'Active' : 'Canceled';
-      
+      const statusText = subscription.status === 'active' ? 'Aktiv' : 'Ləğv edilib';
+
       container.innerHTML = `
         <div class="subscription-card">
           <div class="subscription-header">
-            <h3 class="subscription-plan">${subscription.planName || 'Free Plan'}</h3>
+            <h3 class="subscription-plan">${subscription.planName || 'Pulsuz plan'}</h3>
             <span class="subscription-status ${statusClass}">${statusText}</span>
           </div>
-          
+
           <div class="subscription-details">
             <div class="subscription-detail">
               <h5>Plan</h5>
-              <p>${subscription.planName || 'Free'}</p>
+              <p>${subscription.planName || 'Pulsuz'}</p>
             </div>
             <div class="subscription-detail">
               <h5>Status</h5>
-              <p>${subscription.status || 'Active'}</p>
+              <p>${subscription.status || 'Aktiv'}</p>
             </div>
             <div class="subscription-detail">
-              <h5>Price</h5>
-              <p>${subscription.price ? `$${subscription.price}` : 'Free'}</p>
+              <h5>Qiymət</h5>
+              <p>${subscription.price ? `$${subscription.price}` : 'Pulsuz'}</p>
             </div>
             <div class="subscription-detail">
-              <h5>Next Billing</h5>
+              <h5>Növbəti ödəniş</h5>
               <p>${subscription.currentPeriodEnd ? new Date(subscription.currentPeriodEnd * 1000).toLocaleDateString() : 'N/A'}</p>
             </div>
           </div>
@@ -1463,7 +1463,7 @@
       const contentEl = document.getElementById('billing-result-content');
       
       resultEl.classList.remove('hidden');
-      contentEl.textContent = 'Creating billing portal session...';
+      contentEl.textContent = 'Ödəniş portalı sessiyası yaradılır...';
       
       try {
         const response = await fetch('/api/billing/portal', {
@@ -1479,7 +1479,7 @@
         const data = await response.json();
         
         if (response.ok && data.url) {
-          // Open billing portal in new tab
+          // Ödəniş portalını yeni vərəqdə aç
           window.open(data.url, '_blank');
           
           const result = {
@@ -1487,7 +1487,7 @@
             status: response.status,
             statusText: response.statusText,
             data: data,
-            action: 'Opened billing portal in new tab',
+            action: 'Ödəniş portalı yeni vərəqdə açıldı',
             timestamp: new Date().toISOString()
           };
           
@@ -1517,13 +1517,13 @@
       }
     }
 
-    // Test checkout function
+    // Checkout funksiyasını sına
     async function testCheckout() {
       const resultEl = document.getElementById('billing-result');
       const contentEl = document.getElementById('billing-result-content');
       
       resultEl.classList.remove('hidden');
-      contentEl.textContent = 'Creating checkout session...';
+      contentEl.textContent = 'Checkout sessiyası yaradılır...';
       
       try {
         const response = await fetch('/api/billing/checkout', {
@@ -1552,8 +1552,8 @@
         
         if (response.ok && data.url) {
           contentEl.className = 'success';
-          // Optionally open checkout in new tab
-          if (confirm('Checkout session created! Open Stripe checkout in new tab?')) {
+          // İstəyə görə checkout-u yeni vərəqdə aç
+          if (confirm('Checkout sessiyası yaradıldı! Stripe checkout-u yeni vərəqdə açmaq istəyirsiniz?')) {
             window.open(data.url, '_blank');
           }
         } else {
@@ -1571,7 +1571,7 @@
       }
     }
 
-    // Admin Panel JavaScript
+    // Admin panel JavaScript-i
     class AdminPanel {
       constructor() {
         this.currentUser = null;
@@ -1608,7 +1608,7 @@
         const registerSection = document.getElementById('register-section');
 
         if (this.currentUser) {
-          statusEl.innerHTML = '<div class="status-indicator status-online"></div><span>Logged in</span>';
+          statusEl.innerHTML = '<div class="status-indicator status-online"></div><span>Daxil olundu</span>';
           userInfoEl.classList.remove('hidden');
           document.getElementById('user-name').textContent = this.currentUser.email;
           document.getElementById('user-email').textContent = this.currentUser.email;
@@ -1616,38 +1616,38 @@
           logoutBtn.classList.remove('hidden');
           loginSection.style.display = 'none';
           registerSection.style.display = 'none';
-          // Load API keys when logged in
+          // Hesaba daxil olunduqda API açarlarını yüklə
           this.loadApiKeys();
         } else {
-          statusEl.innerHTML = '<div class="status-indicator status-offline"></div><span>Not logged in</span>';
+          statusEl.innerHTML = '<div class="status-indicator status-offline"></div><span>Hesaba daxil olunmayıb</span>';
           userInfoEl.classList.add('hidden');
           logoutBtn.classList.add('hidden');
           loginSection.style.display = 'block';
           registerSection.style.display = 'block';
-          // Clear API keys when not logged in
-          document.getElementById('keys-container').innerHTML = '<p>Please log in to manage API keys.</p>';
+          // Daxil olunmadıqda API açarlarını təmizlə
+          document.getElementById('keys-container').innerHTML = '<p>API açarlarını idarə etmək üçün daxil olun.</p>';
         }
       }
 
       bindEvents() {
-        // Login form
+        // Giriş formu
         document.getElementById('login-form').addEventListener('submit', (e) => {
           e.preventDefault();
           this.handleLogin();
         });
 
-        // Register form
+        // Qeydiyyat formu
         document.getElementById('register-form').addEventListener('submit', (e) => {
           e.preventDefault();
           this.handleRegister();
         });
 
-        // Logout button
+        // Çıxış düyməsi
         document.getElementById('logout-btn').addEventListener('click', () => {
           this.handleLogout();
         });
 
-        // API Key management
+        // API açarının idarə edilməsi
         document.getElementById('create-key-btn').addEventListener('click', () => {
           this.showCreateKeyForm();
         });
@@ -1664,17 +1664,17 @@
           this.loadApiKeys();
         });
 
-        // Test analysis button
+        // Təhlil sınağı düyməsi
         document.getElementById('test-analyze-btn').addEventListener('click', () => {
           this.testAnalysis();
         });
 
-        // Usage tracking buttons
+        // İstifadə izləmə düymələri
         document.getElementById('load-usage-btn').addEventListener('click', loadUsage);
         document.getElementById('load-limits-btn').addEventListener('click', loadLimits);
         document.getElementById('load-history-btn').addEventListener('click', loadHistory);
 
-        // Billing management buttons
+        // Ödəniş düymələri
         document.getElementById('load-plans-btn').addEventListener('click', loadPlans);
         document.getElementById('load-subscription-btn').addEventListener('click', loadSubscription);
         document.getElementById('test-checkout-btn').addEventListener('click', testCheckout);
@@ -1697,14 +1697,14 @@
           if (response.ok) {
             this.currentUser = await response.json();
             this.updateUserStatus();
-            this.showMessage('Login successful!', 'success');
+            this.showMessage('Giriş uğurla tamamlandı!', 'success');
             document.getElementById('login-form').reset();
           } else {
             const error = await response.json();
-            this.showMessage(`Login failed: ${error.message}`, 'danger');
+            this.showMessage(`Giriş uğursuz oldu: ${error.message}`, 'danger');
           }
         } catch (error) {
-          this.showMessage(`Login error: ${error.message}`, 'danger');
+          this.showMessage(`Giriş zamanı səhv: ${error.message}`, 'danger');
         }
       }
 
@@ -1723,14 +1723,14 @@
           });
 
           if (response.ok) {
-            this.showMessage('Registration successful! You can now login.', 'success');
+            this.showMessage('Qeydiyyat uğurla tamamlandı! İndi daxil ola bilərsiniz.', 'success');
             document.getElementById('register-form').reset();
           } else {
             const error = await response.json();
-            this.showMessage(`Registration failed: ${error.message}`, 'danger');
+            this.showMessage(`Qeydiyyat alınmadı: ${error.message}`, 'danger');
           }
         } catch (error) {
-          this.showMessage(`Registration error: ${error.message}`, 'danger');
+          this.showMessage(`Qeydiyyat zamanı səhv: ${error.message}`, 'danger');
         }
       }
 
@@ -1739,9 +1739,9 @@
           await fetch('/api/auth/logout', { method: 'POST' });
           this.currentUser = null;
           this.updateUserStatus();
-          this.showMessage('Logged out successfully!', 'info');
+          this.showMessage('Çıxış uğurla tamamlandı!', 'info');
         } catch (error) {
-          this.showMessage(`Logout error: ${error.message}`, 'danger');
+          this.showMessage(`Çıxış zamanı səhv: ${error.message}`, 'danger');
         }
       }
 
@@ -1751,21 +1751,21 @@
         const apiKey = document.getElementById('test-api-key').value;
 
         if (!url) {
-          this.showMessage('Please enter a URL to test', 'danger');
+          this.showMessage('Zəhmət olmasa sınaq üçün URL daxil edin', 'danger');
           return;
         }
 
         const btn = document.getElementById('test-analyze-btn');
         const originalText = btn.textContent;
         btn.disabled = true;
-        btn.textContent = 'Analyzing...';
+        btn.textContent = 'Təhlil olunur...';
 
         try {
           const headers = {
             'Content-Type': 'application/json',
           };
           
-          // Add API key if provided
+          // Əgər göstərilibsə API açarını əlavə et
           if (apiKey) {
             headers['Authorization'] = `Bearer ${apiKey}`;
           }
@@ -1782,25 +1782,25 @@
             document.getElementById('test-result').classList.remove('hidden');
             document.getElementById('test-result-content').textContent = JSON.stringify(result, null, 2);
             document.getElementById('test-result-content').className = 'success';
-            this.showMessage('Analysis completed successfully!', 'success');
+            this.showMessage('Təhlil uğurla başa çatdı!', 'success');
           } else {
             document.getElementById('test-result').classList.remove('hidden');
             document.getElementById('test-result-content').textContent = JSON.stringify(result, null, 2);
             document.getElementById('test-result-content').className = 'error';
-            this.showMessage(`Analysis failed: ${result.message || 'Unknown error'}`, 'danger');
+            this.showMessage(`Təhlil alınmadı: ${result.message || 'Naməlum səhv'}`, 'danger');
           }
         } catch (error) {
           document.getElementById('test-result').classList.remove('hidden');
           document.getElementById('test-result-content').textContent = JSON.stringify({error: error.message}, null, 2);
           document.getElementById('test-result-content').className = 'error';
-          this.showMessage(`Analysis error: ${error.message}`, 'danger');
+          this.showMessage(`Təhlil zamanı səhv: ${error.message}`, 'danger');
         } finally {
           btn.disabled = false;
           btn.textContent = originalText;
         }
       }
 
-      // API Key Management Methods
+      // API açarlarının idarəetmə metodları
       showCreateKeyForm() {
         document.getElementById('create-key-form').classList.remove('hidden');
         document.getElementById('key-name').focus();
@@ -1820,7 +1820,7 @@
           .filter(p => p);
 
         if (!name) {
-          this.showMessage('Please enter a key name', 'danger');
+          this.showMessage('Zəhmət olmasa açarın adını daxil edin', 'danger');
           return;
         }
 
@@ -1836,17 +1836,17 @@
           const result = await response.json();
           
           if (response.ok) {
-            this.showMessage('API key created successfully!', 'success');
+            this.showMessage('API açarı uğurla yaradıldı!', 'success');
             this.hideCreateKeyForm();
             this.loadApiKeys();
-            
-            // Show the new key to the user
-            this.showMessage(`New API Key: ${result.apiKey.key}`, 'info');
+
+            // Yeni açarı istifadəçiyə göstər
+            this.showMessage(`Yeni API açarı: ${result.apiKey.key}`, 'info');
           } else {
-            this.showMessage(`Failed to create API key: ${result.message}`, 'danger');
+            this.showMessage(`API açarı yaratmaq alınmadı: ${result.message}`, 'danger');
           }
         } catch (error) {
-          this.showMessage(`Error creating API key: ${error.message}`, 'danger');
+          this.showMessage(`API açarı yaradılarkən səhv: ${error.message}`, 'danger');
         }
       }
 
@@ -1856,22 +1856,22 @@
         try {
           const response = await fetch('/api/keys/list');
           const result = await response.json();
-          
+
           if (response.ok) {
             this.displayApiKeys(result.apiKeys);
           } else {
-            document.getElementById('keys-container').innerHTML = '<p>Failed to load API keys.</p>';
+            document.getElementById('keys-container').innerHTML = '<p>API açarları yüklənmədi.</p>';
           }
         } catch (error) {
-          document.getElementById('keys-container').innerHTML = '<p>Error loading API keys.</p>';
+          document.getElementById('keys-container').innerHTML = '<p>API açarları yüklənərkən səhv baş verdi.</p>';
         }
       }
 
       displayApiKeys(keys) {
         const container = document.getElementById('keys-container');
-        
+
         if (!keys || keys.length === 0) {
-          container.innerHTML = '<p>No API keys found. Create one to get started.</p>';
+          container.innerHTML = '<p>API açarı tapılmadı. Başlamaq üçün bir açar yaradın.</p>';
           return;
         }
 
@@ -1879,14 +1879,14 @@
           <div class="api-key-item">
             <div class="api-key-header">
               <h5>${key.name}</h5>
-              <button class="btn btn-danger" onclick="window.adminPanel.revokeKey('${key.id}')">Revoke</button>
+              <button class="btn btn-danger" onclick="window.adminPanel.revokeKey('${key.id}')">Ləğv et</button>
             </div>
             <div class="api-key-details">
               <strong>ID:</strong> ${key.id}<br>
-              <strong>Permissions:</strong> ${key.permissions.join(', ')}<br>
-              <strong>Created:</strong> ${new Date(key.createdAt).toLocaleString()}<br>
-              <strong>Last Used:</strong> ${key.lastUsed ? new Date(key.lastUsed).toLocaleString() : 'Never'}<br>
-              <strong>Status:</strong> ${key.isActive ? 'Active' : 'Inactive'}
+              <strong>İcazələr:</strong> ${key.permissions.join(', ')}<br>
+              <strong>Yaradılıb:</strong> ${new Date(key.createdAt).toLocaleString()}<br>
+              <strong>Son istifadə:</strong> ${key.lastUsed ? new Date(key.lastUsed).toLocaleString() : 'Heç vaxt'}<br>
+              <strong>Status:</strong> ${key.isActive ? 'Aktiv' : 'Passiv'}
             </div>
           </div>
         `).join('');
@@ -1895,7 +1895,7 @@
       }
 
       async revokeKey(keyId) {
-        if (!confirm('Are you sure you want to revoke this API key? This action cannot be undone.')) {
+        if (!confirm('Bu API açarını ləğv etmək istədiyinizə əminsiniz? Bu əməliyyatı geri qaytarmaq mümkün deyil.')) {
           return;
         }
 
@@ -1907,13 +1907,13 @@
           const result = await response.json();
           
           if (response.ok) {
-            this.showMessage('API key revoked successfully!', 'success');
+            this.showMessage('API açarı uğurla ləğv edildi!', 'success');
             this.loadApiKeys();
           } else {
-            this.showMessage(`Failed to revoke API key: ${result.message}`, 'danger');
+            this.showMessage(`API açarını ləğv etmək alınmadı: ${result.message}`, 'danger');
           }
         } catch (error) {
-          this.showMessage(`Error revoking API key: ${error.message}`, 'danger');
+          this.showMessage(`API açarını ləğv edərkən səhv: ${error.message}`, 'danger');
         }
       }
 
@@ -1930,7 +1930,7 @@
       }
     }
 
-    // Initialize admin panel when DOM is loaded
+    // DOM yükləndikdə admin panelini işə sal
     document.addEventListener('DOMContentLoaded', () => {
       window.adminPanel = new AdminPanel();
     });
