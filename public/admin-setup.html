@@ -134,6 +134,19 @@
       display: none !important;
     }
     
+    #debug-content {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    
     .user-info {
       background: #f8f9fa;
       padding: 1rem;
@@ -188,6 +201,15 @@
       </button>
     </form>
 
+    <button class="btn btn-secondary" id="debug-btn" style="margin-top: 1rem;">
+      Veritabanını Yoxla
+    </button>
+
+    <div id="debug-results" class="user-info hidden" style="margin-top: 1rem;">
+      <h3>Debug Nəticələri</h3>
+      <pre id="debug-content"></pre>
+    </div>
+
     <div style="text-align: center; margin-top: 1rem;">
       <a href="/admin-login.html" style="color: #3b82f6; text-decoration: none;">Admin Paneline Daxil Ol</a>
     </div>
@@ -205,8 +227,53 @@
           e.preventDefault();
           this.handlePromote();
         });
+
+        // Debug button
+        document.getElementById('debug-btn').addEventListener('click', () => {
+          this.debugDatabase();
+        });
       }
 
+      async debugDatabase() {
+        const email = document.getElementById('email').value;
+        const adminToken = document.getElementById('admin-token').value;
+        const debugBtn = document.getElementById('debug-btn');
+
+        if (!email || !adminToken) {
+          this.showMessage('Zəhmət olmasa e-poçt və admin token daxil edin', 'error');
+          return;
+        }
+
+        // Disable button and show loading
+        debugBtn.disabled = true;
+        debugBtn.textContent = 'Yoxlanılır...';
+
+        try {
+          const response = await fetch('/api/debug-database', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, adminToken }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            document.getElementById('debug-content').textContent = JSON.stringify(data, null, 2);
+            document.getElementById('debug-results').classList.remove('hidden');
+            this.showMessage('Debug məlumatları yükləndi', 'info');
+          } else {
+            const error = await response.json();
+            this.showMessage(`Debug xətası: ${error.message}`, 'error');
+          }
+        } catch (error) {
+          this.showMessage(`Debug xətası: ${error.message}`, 'error');
+        } finally {
+          // Re-enable button
+          debugBtn.disabled = false;
+          debugBtn.textContent = 'Veritabanını Yoxla';
+        }
+      }
 
       async handlePromote() {
         const email = document.getElementById('email').value;
