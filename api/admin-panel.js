@@ -1,4 +1,5 @@
-import { requireAuth } from '../lib/auth.js';
+import { getSessionFromRequest } from '../lib/auth.js';
+import { kv } from '@vercel/kv';
 
 export default async function handler(req, res) {
   // Only allow GET requests
@@ -7,11 +8,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Check if user is authenticated and get full user data
-    const user = await requireAuth(req, res);
-    
+    // Check if user is authenticated
+    const session = getSessionFromRequest(req);
+    if (!session?.sub) {
+      return res.redirect(302, '/admin-login.html');
+    }
+
+    // Get full user data from database
+    const user = await kv.get(`user:id:${session.sub}`);
     if (!user) {
-      // Redirect to admin login page if not authenticated
       return res.redirect(302, '/admin-login.html');
     }
 
