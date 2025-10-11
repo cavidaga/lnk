@@ -263,6 +263,7 @@
                 <select id="filter-plan">
                   <option value="">Bütün planlar</option>
                   <option value="free">Pulsuz</option>
+                  <option value="basic">Əsas</option>
                   <option value="pro">Pro</option>
                   <option value="enterprise">Enterprise</option>
                 </select>
@@ -299,6 +300,7 @@
                 <label for="new-user-plan">Plan</label>
                 <select id="new-user-plan">
                   <option value="free">Pulsuz</option>
+                  <option value="basic">Əsas</option>
                   <option value="pro">Pro</option>
                   <option value="enterprise">Enterprise</option>
                 </select>
@@ -323,6 +325,10 @@
               <div class="user-info">
                 <h4>Pulsuz Plan</h4>
                 <p id="free-users">-</p>
+              </div>
+              <div class="user-info">
+                <h4>Əsas Plan</h4>
+                <p id="basic-users">-</p>
               </div>
               <div class="user-info">
                 <h4>Pro Plan</h4>
@@ -598,8 +604,8 @@
 
       async editUser(userId) {
         // Simple edit - just change plan for now
-        const newPlan = prompt('Yeni plan (free/pro/enterprise):');
-        if (!newPlan || !['free', 'pro', 'enterprise'].includes(newPlan)) return;
+        const newPlan = prompt('Yeni plan (free/basic/pro/enterprise):');
+        if (!newPlan || !['free', 'basic', 'pro', 'enterprise'].includes(newPlan)) return;
 
         try {
           const response = await fetch(`/api/admin/user/${userId}`, {
@@ -652,12 +658,14 @@
             const stats = {
               total: users.length,
               free: users.filter(u => u.plan === 'free').length,
+              basic: users.filter(u => u.plan === 'basic').length,
               pro: users.filter(u => u.plan === 'pro').length,
               enterprise: users.filter(u => u.plan === 'enterprise').length
             };
 
             document.getElementById('total-users').textContent = stats.total;
             document.getElementById('free-users').textContent = stats.free;
+            document.getElementById('basic-users').textContent = stats.basic;
             document.getElementById('pro-users').textContent = stats.pro;
             document.getElementById('enterprise-users').textContent = stats.enterprise;
           }

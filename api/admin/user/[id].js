@@ -19,6 +19,7 @@ async function checkAdminAccess(user) {
     return true;
   }
   
+  
   // Check if this is the first user (super admin) - only if no ADMIN_EMAIL is set
   if (!process.env.ADMIN_EMAIL) {
     const allUsers = await kv.keys('user:id:*');
