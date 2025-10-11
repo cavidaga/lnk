@@ -205,7 +205,6 @@ async function getArchiveMdUrl(originalUrl) {
     // Note: This is a simplified approach - archive.md's actual API is more complex
     try {
       const archiveCreateUrl = `https://archive.md/?run=1&url=${encodeURIComponent(originalUrl)}`;
-      console.log(`Attempting to create archive.md for: ${originalUrl}`);
       
       // Make a request to create an archive
       const response = await fetch(archiveCreateUrl, {
