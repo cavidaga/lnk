@@ -76,7 +76,7 @@
 
         <!-- AZ content -->
         <section id="policy-az" lang="az" data-lang="az">
-          <p class="small muted"><strong>Son yenilənmə:</strong> 5 sentyabr 2025</p>
+          <p class="small muted"><strong>Son yenilənmə:</strong> 11 oktyabr 2025</p>
 
           <h2 id="biz-kimik">1) Biz kimik</h2>
           <p><strong>İdarəçi:</strong> Cavid Ağa • <a id="contact-link" href="/about.html#contact">Əlaqə</a></p>
@@ -86,24 +86,28 @@
             <li><strong>Texniki məlumatlar:</strong> Hostinq/CDN saytın işləməsi və təhlükəsizliyi üçün IP ünvanı, brauzer agenti, tarix/vaxt və tələb olunan URL-ləri qısa müddətlik server jurnalında emal edə bilər.</li>
             <li><strong>Təhlil (kukisiz):</strong> Trafiki ölçmək üçün <strong>Vercel Web Analytics</strong>-dən istifadə edirik; kukilərdən istifadə etmir, sorğudan törədilmiş qısaömürlü identifikatorlar yaradır və anonimləşdirir. Həmçinin <strong>Vercel Speed Insights</strong> ilə Core Web Vitals metriklərini izləyə bilərik; bu göstəricilər şəxsiyyət və ya IP ilə əlaqələndirilmir.</li>
             <li><strong>Şriftlər:</strong> <em>Google Fonts</em> (fonts.googleapis.com/gstatic) yazı tiplərini çatdırmaq üçün IP və brauzer məlumatlarınızı ala bilər; adətən kuki qoymur.</li>
-            <li><strong>Əlaqə vasitələri:</strong> Bizə email və ya forma ilə yazsanız, verdiyiniz məlumatlar sorğunuza cavab vermək üçün emal olunur. (Hazırda: <em>Formspree</em> inteqrasiyası “Haqqımızda” səhifəsində.)</li>
+            <li><strong>İstifadəçi qeydiyyatı:</strong> API istifadəsi üçün təkmilləşdirici hesabı yaratdıqda e-poçt ünvanı, şifrə (şifrələnmiş formada) və şirkət məlumatlarını toplayırıq. Bu məlumatlar hesab idarəetməsi və API açarı yaratmaq üçün lazımdır.</li>
+            <li><strong>API istifadəsi:</strong> API açarı ilə edilən sorğuları izləyirik (IP ünvanı, sorğu vaxtı, istifadə olunan funksiyalar). Bu məlumatlar sürət limitlərinin tətbiqi və istifadə statistikalarının yaradılması üçün lazımdır.</li>
+            <li><strong>Əlaqə vasitələri:</strong> Bizə email və ya forma ilə yazsanız, verdiyiniz məlumatlar sorğunuza cavab vermək üçün emal olunur. (Hazırda: <em>Formspree</em> inteqrasiyası "Haqqımızda" və "API sənədləri" səhifələrində.)</li>
           </ul>
 
           <h2 id="huquqi-esaslar-gdpr-6">3) Hüquqi əsaslar (GDPR Maddə 6)</h2>
           <ul>
-            <li><strong>Legitim maraqlar (6(1)(f)):</strong> saytın işləməsi, təhlükəsizlik, performansın yaxşılaşdırılması.</li>
-            <li><strong>Müqavilə (6(1)(b)):</strong> sorğunuza cavab vermək.</li>
+            <li><strong>Legitim maraqlar (6(1)(f)):</strong> saytın işləməsi, təhlükəsizlik, performansın yaxşılaşdırılması, API istifadəsinin izlənilməsi.</li>
+            <li><strong>Müqavilə (6(1)(b)):</strong> sorğunuza cavab vermək, API xidməti təmin etmək.</li>
             <li><strong>Razılıq (6(1)(a)):</strong> yalnız açıq şəkildə tələb edilərsə (hazırda analitika üçün tələb olunmur).</li>
           </ul>
 
           <h2 id="kukiler-ve-oxsar-texnologiyalar">4) Kukilər və oxşar texnologiyalar</h2>
-          <p>Ziyarətçilər üçün <strong>qeyri-zəruri kukilər</strong> qoymuruq. Admin/daxil olmuş istifadəçilər üçün <em>zəruri sessiya/auth kukiləri</em> ola bilər. Analitika <strong>kukisiz</strong> olduğundan əvvəlcədən razılıq bannerinə ehtiyac yoxdur.</p>
-          <p><strong>Funksional saxlama:</strong> Geri bildirim funksiyası və analiz tarixçəsi üçün brauzerinizin lokal saxlama (localStorage) funksiyasından istifadə edirik. Bu məlumatlar yalnız sizin cihazınızda saxlanılır və şəxsi məlumat toplamır. Gələcəkdə qeyri-zəruri kuki istifadə edən alətlər əlavə etsək, əvvəlcədən razılıq alacağıq və bu bölməni yeniləyəcəyik.</p>
+          <p>Ziyarətçilər üçün <strong>qeyri-zəruri kukilər</strong> qoymuruq. Təkmilləşdirici hesabları və admin/daxil olmuş istifadəçilər üçün <em>zəruri sessiya/auth kukiləri</em> ola bilər. Analitika <strong>kukisiz</strong> olduğundan əvvəlcədən razılıq bannerinə ehtiyac yoxdur.</p>
+          <p><strong>Funksional saxlama:</strong> Geri bildirim funksiyası, analiz tarixçəsi və təkmilləşdirici paneli üçün brauzerinizin lokal saxlama (localStorage) funksiyasından istifadə edirik. Bu məlumatlar yalnız sizin cihazınızda saxlanılır və şəxsi məlumat toplamır. Gələcəkdə qeyri-zəruri kuki istifadə edən alətlər əlavə etsək, əvvəlcədən razılıq alacağıq və bu bölməni yeniləyəcəyik.</p>
 
           <h2 id="saxlama-muddeti">5) Saxlama müddəti</h2>
           <ul>
             <li><strong>Server/CDN jurnalları:</strong> <u>30 gün saxlanılır</u>, sonra silinir və ya anonimləşdirilir.</li>
             <li><strong>Analitika:</strong> Vercel tərəfindən aqreqat/anonim formada saxlanılır; Web Analytics-də qısaömürlü identifikatorlar təqr. 24 saatdan sonra silinir.</li>
+            <li><strong>Təkmilləşdirici hesabları:</strong> Hesab aktiv olduğu müddətcə saxlanılır. Hesab silindikdə 30 gün sonra məlumatlar tamamilə silinir.</li>
+            <li><strong>API istifadə məlumatları:</strong> İstifadə statistikaları və sorğu jurnalları 90 gün saxlanılır, sonra anonimləşdirilir.</li>
             <li><strong>Yazışmalar:</strong> sorğunuza cavab vermək və qeydiyyat məqsədi ilə lazım olduğu qədər saxlanılır.</li>
           </ul>
 
@@ -126,7 +130,7 @@
 
         <!-- EN content -->
         <section id="policy-en" lang="en" data-lang="en" hidden>
-          <p class="small muted"><strong>Last updated:</strong> 5 September 2025</p>
+          <p class="small muted"><strong>Last updated:</strong> 11 October 2025</p>
 
           <h2 id="who-we-are">1) Who we are</h2>
           <p><strong>Controller:</strong> Javid Agha • <a id="contact-link" href="/about.html#contact">Contact</a></p>
@@ -134,26 +138,30 @@
           <h2 id="what-we-collect-and-why">2) What we collect and why</h2>
           <ul>
             <li><strong>Technical data:</strong> Our hosting/CDN may temporarily process your IP address, user agent, timestamp, and requested URLs in server/security logs to operate and secure the site.</li>
-            <li><strong>Analytics (cookieless):</strong> We use <strong>Vercel Web Analytics</strong> (no cookies, short-lived request-derived identifiers, anonymised). We may also use <strong>Vercel Speed Insights</strong> for Core Web Vitals; metrics aren’t tied to an individual or IP.</li>
+            <li><strong>Analytics (cookieless):</strong> We use <strong>Vercel Web Analytics</strong> (no cookies, short-lived request-derived identifiers, anonymised). We may also use <strong>Vercel Speed Insights</strong> for Core Web Vitals; metrics aren't tied to an individual or IP.</li>
             <li><strong>Fonts:</strong> <em>Google Fonts</em> (fonts.googleapis.com/gstatic) delivers typography; Google may receive your IP and browser details; typically no cookies are set.</li>
-            <li><strong>Contact channels:</strong> If you email or use a form, we process the data you provide to reply. (Currently: <em>Formspree</em> integration on the About page.)</li>
+            <li><strong>User registration:</strong> When creating a developer account for API use, we collect email address, password (encrypted), and company information. This data is necessary for account management and API key creation.</li>
+            <li><strong>API usage:</strong> We track API requests made with API keys (IP address, request time, functions used). This data is necessary for rate limiting enforcement and usage statistics generation.</li>
+            <li><strong>Contact channels:</strong> If you email or use a form, we process the data you provide to reply. (Currently: <em>Formspree</em> integration on the About and API documentation pages.)</li>
           </ul>
 
           <h2 id="legal-bases-gdpr">3) Legal bases (GDPR Art. 6)</h2>
           <ul>
-            <li><strong>Legitimate interests (6(1)(f)):</strong> running, securing, and improving the site.</li>
-            <li><strong>Contract (6(1)(b)):</strong> responding to your request.</li>
+            <li><strong>Legitimate interests (6(1)(f)):</strong> running, securing, and improving the site, monitoring API usage.</li>
+            <li><strong>Contract (6(1)(b)):</strong> responding to your request, providing API services.</li>
             <li><strong>Consent (6(1)(a)):</strong> only if explicitly requested (not used for analytics now).</li>
           </ul>
 
           <h2 id="cookies-and-similar-technologies">4) Cookies & similar technologies</h2>
-          <p>We do <strong>not set non-essential cookies</strong> for visitors. Admin/logged-in areas may use <em>strictly necessary</em> session/auth cookies. Because analytics is <strong>cookieless</strong>, a prior-consent banner is not required.</p>
-          <p><strong>Functional storage:</strong> For the feedback feature, we use your browser's local storage (localStorage) functionality. This data is only stored on your device and does not collect personal information. If we later add tools that set non-essential cookies, we'll obtain consent first and update this notice.</p>
+          <p>We do <strong>not set non-essential cookies</strong> for visitors. Developer accounts and admin/logged-in areas may use <em>strictly necessary</em> session/auth cookies. Because analytics is <strong>cookieless</strong>, a prior-consent banner is not required.</p>
+          <p><strong>Functional storage:</strong> For the feedback feature, analysis history, and developer panel, we use your browser's local storage (localStorage) functionality. This data is only stored on your device and does not collect personal information. If we later add tools that set non-essential cookies, we'll obtain consent first and update this notice.</p>
 
           <h2 id="retention">5) Retention</h2>
           <ul>
             <li><strong>Server/CDN logs:</strong> <u>retained for 30 days</u>, then deleted or anonymised.</li>
             <li><strong>Analytics:</strong> aggregate/anonymous with short-lived identifiers (~24h) by Vercel.</li>
+            <li><strong>Developer accounts:</strong> Retained while account is active. Data is completely deleted 30 days after account deletion.</li>
+            <li><strong>API usage data:</strong> Usage statistics and request logs are retained for 90 days, then anonymised.</li>
             <li><strong>Correspondence:</strong> retained as needed to address your request and for record-keeping.</li>
           </ul>
 
