@@ -63,7 +63,6 @@ async function handler(req, res) {
 
 // Export with authentication required
 export default withAuth(handler, { 
-  require: 'any', // Accepts both session and API key
-  permission: 'recent-analyses', // Requires recent-analyses permission for API keys
+  require: 'optional', // Public endpoint; auth not required
   rateLimit: true // Apply rate limiting
 });
