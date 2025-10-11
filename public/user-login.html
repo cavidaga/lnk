@@ -297,6 +297,25 @@
           </button>
         </form>
 
+        <!-- 2FA Verification Form (hidden by default) -->
+        <form id="2fa-form" class="hidden">
+          <div class="form-group">
+            <label for="2fa-code">2FA Doğrulama Kodu</label>
+            <input type="text" id="2fa-code" placeholder="000000" maxlength="6" required>
+            <small>Authenticator tətbiqindəki 6 rəqəmli kodu daxil edin</small>
+          </div>
+          <div class="form-group">
+            <label for="backup-code">Və ya Backup Kodu</label>
+            <input type="text" id="backup-code" placeholder="Backup kodu">
+            <small>Əgər telefonunuz yoxdursa, backup kodlarından birini istifadə edin</small>
+          </div>
+          <button type="submit" class="btn btn-primary" id="2fa-submit-btn">
+            <span id="2fa-submit-text">Doğrula</span>
+            <span id="2fa-submit-loading" class="loading hidden">Doğrulanır...</span>
+          </button>
+          <button type="button" class="btn btn-secondary" id="back-to-login-btn">Geri</button>
+        </form>
+
         <div class="auth-links">
           <p>Hesabınız yoxdur? <a href="/user-register.html">Qeydiyyatdan keçin</a></p>
           <p><a href="/reset-password.html">Şifrəni unutmusunuz?</a></p>
@@ -324,6 +343,8 @@
         console.log('Not logged in');
       }
     }
+
+    let pendingEmail = null;
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -360,13 +381,22 @@
         const data = await response.json();
         
         if (response.ok) {
-          successDiv.textContent = 'Uğurla daxil oldunuz! Yönləndirilirsiniz...';
-          successDiv.classList.remove('hidden');
-          
-          // Redirect to dashboard after 1 second
-          setTimeout(() => {
-            window.location.href = '/user-dashboard.html';
-          }, 1000);
+          if (data.requiresTwoFactor) {
+            // Show 2FA form
+            pendingEmail = data.email;
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('2fa-form').classList.remove('hidden');
+            errorDiv.textContent = data.message;
+            errorDiv.classList.remove('hidden');
+          } else {
+            successDiv.textContent = 'Uğurla daxil oldunuz! Yönləndirilirsiniz...';
+            successDiv.classList.remove('hidden');
+            
+            // Redirect to dashboard after 1 second
+            setTimeout(() => {
+              window.location.href = '/user-dashboard.html';
+            }, 1000);
+          }
         } else {
           errorDiv.textContent = data.message || 'Daxil olma xətası';
           errorDiv.classList.remove('hidden');
@@ -380,6 +410,78 @@
         submitText.classList.remove('hidden');
         submitLoading.classList.add('hidden');
       }
+    });
+
+    // 2FA form submission
+    document.getElementById('2fa-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('2fa-submit-btn');
+      const submitText = document.getElementById('2fa-submit-text');
+      const submitLoading = document.getElementById('2fa-submit-loading');
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      
+      // Hide previous messages
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      submitText.classList.add('hidden');
+      submitLoading.classList.remove('hidden');
+      
+      const formData = {
+        email: pendingEmail,
+        token: document.getElementById('2fa-code').value.trim(),
+        backupCode: document.getElementById('backup-code').value.trim()
+      };
+      
+      try {
+        const response = await fetch('/api/auth/2fa/verify-login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          successDiv.textContent = 'Uğurla daxil oldunuz! Yönləndirilirsiniz...';
+          successDiv.classList.remove('hidden');
+          
+          // Redirect to dashboard after 1 second
+          setTimeout(() => {
+            window.location.href = '/user-dashboard.html';
+          }, 1000);
+        } else {
+          errorDiv.textContent = data.message || 'Doğrulama xətası';
+          errorDiv.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorDiv.textContent = 'Şəbəkə xətası: ' + error.message;
+        errorDiv.classList.remove('hidden');
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitText.classList.remove('hidden');
+        submitLoading.classList.add('hidden');
+      }
+    });
+
+    // Back to login button
+    document.getElementById('back-to-login-btn').addEventListener('click', () => {
+      document.getElementById('2fa-form').classList.add('hidden');
+      document.getElementById('login-form').classList.remove('hidden');
+      document.getElementById('error-message').classList.add('hidden');
+      pendingEmail = null;
+    });
+
+    // Auto-format 2FA code input
+    document.getElementById('2fa-code').addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
     });
 
     // Check auth status on page load

@@ -489,6 +489,17 @@
                 <button id="save-password" class="btn btn-primary">Şifrəni yenilə</button>
                 <div id="password-change-msg" class="error-message hidden" style="margin-top:.75rem"></div>
               </div>
+              <div class="stat-card" style="text-align:left;">
+                <h3>İki Mərhələli Doğrulama (2FA)</h3>
+                <div id="2fa-status">
+                  <p id="2fa-status-text">Yüklənir...</p>
+                </div>
+                <div id="2fa-actions">
+                  <button id="enable-2fa-btn" class="btn btn-primary hidden">2FA Aktiv Et</button>
+                  <button id="disable-2fa-btn" class="btn btn-danger hidden">2FA Deaktiv Et</button>
+                </div>
+                <div id="2fa-msg" class="error-message hidden" style="margin-top:.75rem"></div>
+              </div>
             </div>
           </div>
           <div class="dashboard-header">
@@ -820,6 +831,77 @@
         }
       } catch {}
     })();
+
+    // 2FA Management
+    async function load2FAStatus() {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const data = await response.json();
+          const user = data.user;
+          const statusText = document.getElementById('2fa-status-text');
+          const enableBtn = document.getElementById('enable-2fa-btn');
+          const disableBtn = document.getElementById('disable-2fa-btn');
+          
+          if (user.twoFactorEnabled) {
+            statusText.textContent = '✅ 2FA aktivdir - Hesabınız əlavə təhlükəsizlik qatı ilə qorunur';
+            statusText.style.color = '#16a34a';
+            enableBtn.classList.add('hidden');
+            disableBtn.classList.remove('hidden');
+          } else {
+            statusText.textContent = '❌ 2FA deaktivdir - Hesabınızı əlavə təhlükəsizlik üçün aktiv edin';
+            statusText.style.color = '#dc2626';
+            enableBtn.classList.remove('hidden');
+            disableBtn.classList.add('hidden');
+          }
+        }
+      } catch (error) {
+        console.error('2FA status load error:', error);
+        document.getElementById('2fa-status-text').textContent = 'Xəta: Status yüklənə bilmədi';
+      }
+    }
+
+    // Enable 2FA
+    document.getElementById('enable-2fa-btn').addEventListener('click', () => {
+      window.location.href = '/2fa-setup.html';
+    });
+
+    // Disable 2FA
+    document.getElementById('disable-2fa-btn').addEventListener('click', async () => {
+      const password = prompt('2FA-nı deaktiv etmək üçün şifrənizi daxil edin:');
+      if (!password) return;
+
+      const msg = document.getElementById('2fa-msg');
+      msg.classList.add('hidden');
+
+      try {
+        const response = await fetch('/api/auth/2fa/disable', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          msg.style.background = '#f0fdf4';
+          msg.style.color = '#16a34a';
+          msg.style.borderColor = '#bbf7d0';
+          msg.textContent = '2FA uğurla deaktiv edildi';
+          msg.classList.remove('hidden');
+          load2FAStatus(); // Reload status
+        } else {
+          msg.textContent = data.message || '2FA deaktiv edilə bilmədi';
+          msg.classList.remove('hidden');
+        }
+      } catch (error) {
+        msg.textContent = 'Xəta: ' + error.message;
+        msg.classList.remove('hidden');
+      }
+    });
+
+    // Load 2FA status on page load
+    load2FAStatus();
   </script>
 </body>
 </html>

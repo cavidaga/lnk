@@ -164,6 +164,22 @@
           <button type="submit" class="btn" id="login-btn">Daxil ol</button>
         </form>
 
+        <!-- 2FA Verification Form (hidden by default) -->
+        <form id="2fa-form" class="hidden">
+          <div class="form-group">
+            <label for="2fa-code">2FA Doğrulama Kodu</label>
+            <input type="text" id="2fa-code" placeholder="000000" maxlength="6" required>
+            <small>Authenticator tətbiqindəki 6 rəqəmli kodu daxil edin</small>
+          </div>
+          <div class="form-group">
+            <label for="backup-code">Və ya Backup Kodu</label>
+            <input type="text" id="backup-code" placeholder="Backup kodu">
+            <small>Əgər telefonunuz yoxdursa, backup kodlarından birini istifadə edin</small>
+          </div>
+          <button type="submit" class="btn" id="2fa-submit-btn">Doğrula</button>
+          <button type="button" class="btn btn-secondary" id="back-to-login-btn">Geri</button>
+        </form>
+
     <div class="register-link">
       <p>Hesabınız yoxdur? <a href="/dev-register.html">Təkmilləşdirici Qeydiyyatı</a></p>
       <p><a href="/reset-password.html">Şifrəni unutmusunuz?</a></p>
@@ -174,6 +190,8 @@
 
   <script src="/static/layout.js"></script>
   <script>
+    let pendingEmail = null;
+
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       
@@ -194,12 +212,22 @@
           body: JSON.stringify({ email, password })
         });
         
+        const data = await response.json();
+        
         if (response.ok) {
-          // Login successful - redirect to dev panel
-          window.location.href = '/dev';
+          if (data.requiresTwoFactor) {
+            // Show 2FA form
+            pendingEmail = data.email;
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('2fa-form').classList.remove('hidden');
+            errorEl.textContent = data.message;
+            errorEl.classList.remove('hidden');
+          } else {
+            // Login successful - redirect to dev panel
+            window.location.href = '/dev';
+          }
         } else {
-          const error = await response.json();
-          errorEl.textContent = error.message || 'Giriş uğursuz oldu';
+          errorEl.textContent = data.message || 'Giriş uğursuz oldu';
           errorEl.classList.remove('hidden');
         }
       } catch (error) {
@@ -209,6 +237,62 @@
         loginBtn.disabled = false;
         loginBtn.textContent = 'Daxil ol';
       }
+    });
+
+    // 2FA form submission
+    document.getElementById('2fa-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('2fa-submit-btn');
+      const errorEl = document.getElementById('error-message');
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Doğrulanır...';
+      errorEl.classList.add('hidden');
+      
+      const formData = {
+        email: pendingEmail,
+        token: document.getElementById('2fa-code').value.trim(),
+        backupCode: document.getElementById('backup-code').value.trim()
+      };
+      
+      try {
+        const response = await fetch('/api/auth/2fa/verify-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Login successful - redirect to dev panel
+          window.location.href = '/dev';
+        } else {
+          errorEl.textContent = data.message || 'Doğrulama xətası';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorEl.textContent = 'Xəta: ' + error.message;
+        errorEl.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Doğrula';
+      }
+    });
+
+    // Back to login button
+    document.getElementById('back-to-login-btn').addEventListener('click', () => {
+      document.getElementById('2fa-form').classList.add('hidden');
+      document.getElementById('login-form').classList.remove('hidden');
+      document.getElementById('error-message').classList.add('hidden');
+      pendingEmail = null;
+    });
+
+    // Auto-format 2FA code input
+    document.getElementById('2fa-code').addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
     });
 
     // Check if redirected from login required or pending status

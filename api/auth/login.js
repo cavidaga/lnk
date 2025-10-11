@@ -40,6 +40,17 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: true, message: 'Invalid credentials' });
     }
 
+    // Check if 2FA is enabled
+    if (user.twoFactorEnabled) {
+      // Return a special response indicating 2FA is required
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      return res.status(200).json({
+        requiresTwoFactor: true,
+        message: 'Please enter your 2FA code to complete login',
+        email: user.email
+      });
+    }
+
     const token = issueJwt(user);
     const cookie = buildSessionCookie(token);
     res.setHeader('Set-Cookie', cookie);
@@ -50,7 +61,8 @@ export default async function handler(req, res) {
         email: user.email,
         plan: user.plan || 'free',
         role: user.role || null,
-        isAdmin: user.isAdmin === true
+        isAdmin: user.isAdmin === true,
+        twoFactorEnabled: user.twoFactorEnabled || false
       }
     });
   } catch (e) {

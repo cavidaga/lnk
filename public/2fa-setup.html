@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2FA Quraşdırma - LNK</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+  <style>
+    .setup-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+    
+    .step {
+      display: none;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    .step.active {
+      display: block;
+    }
+    
+    .qr-code {
+      text-align: center;
+      margin: 2rem 0;
+    }
+    
+    .qr-code img {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      background: white;
+    }
+    
+    .manual-key {
+      background: var(--bg-secondary);
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: monospace;
+      word-break: break-all;
+      margin: 1rem 0;
+      border: 1px solid var(--border-color);
+    }
+    
+    .verification-input {
+      text-align: center;
+      font-size: 1.5rem;
+      letter-spacing: 0.5rem;
+      padding: 1rem;
+      width: 200px;
+      margin: 0 auto;
+      display: block;
+    }
+    
+    .backup-codes {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .backup-codes h3 {
+      color: var(--warning-text);
+      margin-top: 0;
+    }
+    
+    .backup-codes-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    
+    .backup-code {
+      background: white;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-family: monospace;
+      text-align: center;
+      border: 1px solid var(--warning-border);
+    }
+    
+    .warning {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      color: var(--warning-text);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    
+    .success {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      color: var(--success-text);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    
+    .error {
+      background: var(--error-bg);
+      border: 1px solid var(--error-border);
+      color: var(--error-text);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    
+    .step-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--border-color);
+      margin: 0 0.5rem;
+      transition: background 0.3s ease;
+    }
+    
+    .step-dot.active {
+      background: var(--primary);
+    }
+    
+    .step-dot.completed {
+      background: var(--success);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <main>
+      <div class="setup-container">
+        <h1>İki Mərhələli Doğrulama (2FA) Quraşdırma</h1>
+        
+        <div class="step-indicator">
+          <div class="step-dot active" id="step1-dot"></div>
+          <div class="step-dot" id="step2-dot"></div>
+          <div class="step-dot" id="step3-dot"></div>
+        </div>
+        
+        <!-- Step 1: Setup -->
+        <div class="step active" id="step1">
+          <h2>1. Authenticator Tətbiqini Quraşdırın</h2>
+          <p>Telefonunuzda aşağıdakı tətbiqlərdən birini quraşdırın:</p>
+          <ul>
+            <li><strong>Google Authenticator</strong> (iOS/Android)</li>
+            <li><strong>Microsoft Authenticator</strong> (iOS/Android)</li>
+            <li><strong>Authy</strong> (iOS/Android)</li>
+            <li><strong>1Password</strong> (iOS/Android)</li>
+          </ul>
+          
+          <button class="btn" id="generate-qr-btn">QR Kod Yarat</button>
+          
+          <div id="qr-section" class="hidden">
+            <div class="qr-code">
+              <img id="qr-image" alt="QR Code">
+            </div>
+            
+            <p><strong>QR kodu tətbiqdə skan edin və ya aşağıdakı kodu əl ilə daxil edin:</strong></p>
+            <div class="manual-key" id="manual-key"></div>
+            
+            <button class="btn" id="verify-setup-btn">Növbəti Addım</button>
+          </div>
+        </div>
+        
+        <!-- Step 2: Verification -->
+        <div class="step" id="step2">
+          <h2>2. Doğrulama Kodunu Daxil Edin</h2>
+          <p>Authenticator tətbiqində göstərilən 6 rəqəmli kodu daxil edin:</p>
+          
+          <input type="text" 
+                 id="verification-code" 
+                 class="verification-input" 
+                 placeholder="000000" 
+                 maxlength="6"
+                 pattern="[0-9]{6}">
+          
+          <div class="warning">
+            <strong>Diqqət:</strong> Kodlar hər 30 saniyədə bir dəyişir. Əgər kod işləmirsə, gözləyin və yeni kodu daxil edin.
+          </div>
+          
+          <div class="error hidden" id="verification-error"></div>
+          
+          <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn" id="verify-code-btn">Doğrula</button>
+            <button class="btn btn-secondary" id="back-to-setup-btn">Geri</button>
+          </div>
+        </div>
+        
+        <!-- Step 3: Backup Codes -->
+        <div class="step" id="step3">
+          <h2>3. Backup Kodları Saxlayın</h2>
+          <div class="backup-codes">
+            <h3>⚠️ Vacib: Bu kodları təhlükəsiz yerdə saxlayın!</h3>
+            <p>Əgər telefonunuzu itirsəniz və ya authenticator tətbiqinə daxil ola bilməsəniz, bu kodlardan istifadə edərək hesabınıza daxil ola bilərsiniz.</p>
+            
+            <div class="backup-codes-list" id="backup-codes-list"></div>
+            
+            <div class="warning">
+              <strong>Xəbərdarlıq:</strong> Bu kodları təhlükəsiz yerdə saxlayın və heç kimə göstərməyin. Hər kod yalnız bir dəfə istifadə oluna bilər.
+            </div>
+          </div>
+          
+          <div class="success">
+            <h3>✅ 2FA Uğurla Quraşdırıldı!</h2>
+            <p>İndi hesabınız əlavə təhlükəsizlik qatı ilə qorunur. Gələcəkdə daxil olarkən həm şifrənizi, həm də authenticator tətbiqindəki kodu daxil etməli olacaqsınız.</p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 2rem;">
+            <button class="btn" id="finish-setup-btn">Dashboard-a Keç</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/layout.js"></script>
+  <script>
+    let currentStep = 1;
+    let setupData = null;
+    
+    // Check if user is logged in
+    async function checkAuthStatus() {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (!response.ok) {
+          window.location.href = '/user-login.html';
+          return;
+        }
+        const user = await response.json();
+        if (!user.user) {
+          window.location.href = '/user-login.html';
+          return;
+        }
+      } catch (error) {
+        window.location.href = '/user-login.html';
+      }
+    }
+    
+    function showStep(stepNumber) {
+      // Hide all steps
+      document.querySelectorAll('.step').forEach(step => {
+        step.classList.remove('active');
+      });
+      
+      // Update step indicators
+      document.querySelectorAll('.step-dot').forEach((dot, index) => {
+        dot.classList.remove('active', 'completed');
+        if (index + 1 === stepNumber) {
+          dot.classList.add('active');
+        } else if (index + 1 < stepNumber) {
+          dot.classList.add('completed');
+        }
+      });
+      
+      // Show current step
+      document.getElementById(`step${stepNumber}`).classList.add('active');
+      currentStep = stepNumber;
+    }
+    
+    // Generate QR code
+    document.getElementById('generate-qr-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('generate-qr-btn');
+      const qrSection = document.getElementById('qr-section');
+      
+      btn.disabled = true;
+      btn.textContent = 'Yaradılır...';
+      
+      try {
+        const response = await fetch('/api/auth/2fa/setup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          setupData = data;
+          document.getElementById('qr-image').src = data.qrCode;
+          document.getElementById('manual-key').textContent = data.manualEntryKey;
+          qrSection.classList.remove('hidden');
+          btn.textContent = 'QR Kod Yarat';
+        } else {
+          alert('Xəta: ' + (data.message || 'Naməlum xəta'));
+          btn.disabled = false;
+          btn.textContent = 'QR Kod Yarat';
+        }
+      } catch (error) {
+        alert('Xəta: ' + error.message);
+        btn.disabled = false;
+        btn.textContent = 'QR Kod Yarat';
+      }
+    });
+    
+    // Verify setup
+    document.getElementById('verify-setup-btn').addEventListener('click', () => {
+      showStep(2);
+    });
+    
+    // Back to setup
+    document.getElementById('back-to-setup-btn').addEventListener('click', () => {
+      showStep(1);
+    });
+    
+    // Verify code
+    document.getElementById('verify-code-btn').addEventListener('click', async () => {
+      const code = document.getElementById('verification-code').value.trim();
+      const errorDiv = document.getElementById('verification-error');
+      
+      if (!code || code.length !== 6) {
+        errorDiv.textContent = '6 rəqəmli kod daxil edin';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      const btn = document.getElementById('verify-code-btn');
+      btn.disabled = true;
+      btn.textContent = 'Doğrulanır...';
+      errorDiv.classList.add('hidden');
+      
+      try {
+        const response = await fetch('/api/auth/2fa/verify-setup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ token: code })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Show backup codes
+          const backupCodesList = document.getElementById('backup-codes-list');
+          backupCodesList.innerHTML = '';
+          
+          data.backupCodes.forEach(code => {
+            const codeDiv = document.createElement('div');
+            codeDiv.className = 'backup-code';
+            codeDiv.textContent = code;
+            backupCodesList.appendChild(codeDiv);
+          });
+          
+          showStep(3);
+        } else {
+          errorDiv.textContent = data.message || 'Yanlış kod';
+          errorDiv.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorDiv.textContent = 'Xəta: ' + error.message;
+        errorDiv.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Doğrula';
+      }
+    });
+    
+    // Finish setup
+    document.getElementById('finish-setup-btn').addEventListener('click', () => {
+      window.location.href = '/user-dashboard.html';
+    });
+    
+    // Auto-format verification code input
+    document.getElementById('verification-code').addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+    });
+    
+    // Check auth status on page load
+    checkAuthStatus();
+  </script>
+</body>
+</html>

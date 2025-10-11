@@ -49,6 +49,17 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: true, message: 'Invalid credentials' });
     }
 
+    // Check if 2FA is enabled
+    if (user.twoFactorEnabled) {
+      // Return a special response indicating 2FA is required
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      return res.status(200).json({
+        requiresTwoFactor: true,
+        message: 'Please enter your 2FA code to complete login',
+        email: user.email
+      });
+    }
+
     // Update last login time
     const updatedUser = {
       ...user,
@@ -68,7 +79,8 @@ export default async function handler(req, res) {
         plan: updatedUser.plan || 'free',
         role: updatedUser.role || 'user',
         isAdmin: updatedUser.isAdmin === true,
-        analysisCount: updatedUser.analysisCount || 0
+        analysisCount: updatedUser.analysisCount || 0,
+        twoFactorEnabled: updatedUser.twoFactorEnabled || false
       }
     });
   } catch (e) {
