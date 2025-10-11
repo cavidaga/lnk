@@ -37,6 +37,12 @@
       border: 1px solid #e5e7eb;
     }
 
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
     .auth-header {
       text-align: center;
       margin-bottom: 2rem;
@@ -157,32 +163,17 @@
       display: none;
     }
 
-    .user-info {
-      background: #f8f9fa;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-
-    .user-info h3 {
-      color: #1f2937;
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
-    }
-
-    .user-info p {
-      color: #6b7280;
-      font-size: 0.875rem;
-      margin: 0.25rem 0;
-    }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <main>
-      <div class="auth-container">
+  <a class="skip-link" href="#main">Mündəricata keç</a>
+  <div class="wrap">
+    <div id="site-header"></div>
+
+    <main id="main" aria-labelledby="app-title">
+      <div class="container">
+        <div class="auth-container">
         <div class="auth-header">
           <h1>🔐 Daxil ol</h1>
           <p>Hesabınıza daxil olun və analiz tarixçənizi görün</p>
@@ -191,12 +182,6 @@
         <div id="error-message" class="error-message hidden"></div>
         <div id="success-message" class="success-message hidden"></div>
 
-        <!-- User info (shown after login) -->
-        <div id="user-info" class="user-info hidden">
-          <h3 id="welcome-text">Xoş gəlmisiniz!</h3>
-          <p id="user-details"></p>
-          <p id="analysis-count"></p>
-        </div>
 
         <form id="login-form">
           <div class="form-group">
@@ -220,6 +205,7 @@
           <p><a href="/">Ana səhifəyə qayıt</a></p>
         </div>
       </div>
+      </div>
     </main>
   </div>
 
@@ -232,34 +218,13 @@
         if (response.ok) {
           const user = await response.json();
           if (user.user && user.user.role === 'user') {
-            showUserInfo(user.user);
+            // Redirect to dashboard if already logged in
+            window.location.href = '/user-dashboard.html';
           }
         }
       } catch (error) {
         console.log('Not logged in');
       }
-    }
-
-    function showUserInfo(user) {
-      document.getElementById('login-form').classList.add('hidden');
-      document.getElementById('user-info').classList.remove('hidden');
-      
-      document.getElementById('welcome-text').textContent = `Xoş gəlmisiniz, ${user.username || user.email}!`;
-      document.getElementById('user-details').textContent = `E-poçt: ${user.email}`;
-      document.getElementById('analysis-count').textContent = `Analiz sayı: ${user.analysisCount || 0}`;
-      
-      // Add logout button
-      const logoutBtn = document.createElement('button');
-      logoutBtn.className = 'btn btn-secondary';
-      logoutBtn.textContent = 'Çıxış';
-      logoutBtn.onclick = () => {
-        fetch('/api/auth/logout', { method: 'POST' })
-          .then(() => {
-            window.location.reload();
-          });
-      };
-      
-      document.getElementById('user-info').appendChild(logoutBtn);
     }
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -297,11 +262,13 @@
         const data = await response.json();
         
         if (response.ok) {
-          successDiv.textContent = 'Uğurla daxil oldunuz!';
+          successDiv.textContent = 'Uğurla daxil oldunuz! Yönləndirilirsiniz...';
           successDiv.classList.remove('hidden');
           
-          // Show user info
-          showUserInfo(data.user);
+          // Redirect to dashboard after 1 second
+          setTimeout(() => {
+            window.location.href = '/user-dashboard.html';
+          }, 1000);
         } else {
           errorDiv.textContent = data.message || 'Daxil olma xətası';
           errorDiv.classList.remove('hidden');

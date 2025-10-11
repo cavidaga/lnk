@@ -37,6 +37,12 @@
       border: 1px solid #e5e7eb;
     }
 
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
     .auth-header {
       text-align: center;
       margin-bottom: 2rem;
@@ -160,9 +166,13 @@
 </head>
 
 <body>
-  <div class="container">
-    <main>
-      <div class="auth-container">
+  <a class="skip-link" href="#main">Mündəricata keç</a>
+  <div class="wrap">
+    <div id="site-header"></div>
+
+    <main id="main" aria-labelledby="app-title">
+      <div class="container">
+        <div class="auth-container">
         <div class="auth-header">
           <h1>👤 Qeydiyyat</h1>
           <p>Hesab yaradın və analiz tarixçənizi izləyin</p>
@@ -197,6 +207,7 @@
           <p>Artıq hesabınız var? <a href="/user-login.html">Daxil olun</a></p>
           <p><a href="/">Ana səhifəyə qayıt</a></p>
         </div>
+      </div>
       </div>
     </main>
   </div>

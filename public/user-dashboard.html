@@ -33,6 +33,12 @@
       padding: 0 1rem;
     }
 
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
     .dashboard-header {
       background: white;
       border-radius: 12px;
@@ -266,9 +272,13 @@
 </head>
 
 <body>
-  <div class="container">
-    <main>
-      <div class="dashboard-container">
+  <a class="skip-link" href="#main">Mündəricata keç</a>
+  <div class="wrap">
+    <div id="site-header"></div>
+
+    <main id="main" aria-labelledby="app-title">
+      <div class="container">
+        <div class="dashboard-container">
         <!-- Auth required message -->
         <div id="auth-required" class="auth-required hidden">
           <h2>🔐 Daxil olmaq lazımdır</h2>
@@ -321,6 +331,7 @@
             </div>
           </div>
         </div>
+      </div>
       </div>
     </main>
   </div>
