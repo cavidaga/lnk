@@ -12,7 +12,7 @@
   --accent-2: var(--red-dark);
   --danger:#ff5a52;
   --warning-color:#ff9800;
-  --warning-text: var(--navy);
+  --warning-text: #1f2937;
   --shadow: 0 10px 30px rgba(0,0,0,.35);
   --ring: 0 0 0 3px rgba(255, 0, 0, .35);
   --grid: rgba(255,255,255,.08);
@@ -78,7 +78,7 @@
   --accent-2: var(--red-dark);
   --danger:#ff5a52;
   --warning-color:#ff9800;
-  --warning-text: var(--navy);
+  --warning-text: #1f2937;
   --shadow: 0 10px 30px rgba(0,0,0,.35);
   --ring: 0 0 0 3px rgba(255, 0, 0, .35);
   --grid: rgba(255,255,255,.08); /* bias chart grid on dark */
@@ -1150,6 +1150,10 @@ footer.site-footer{
     background: var(--accent) !important;
     color: white !important;
   }
+  
+  .warning {
+    color: #1f2937 !important;
+  }
 }
 
 /* Manual dark theme override */
@@ -1191,6 +1195,10 @@ footer.site-footer{
 
 .theme-dark .muted {
   color: #a0a9c0 !important;
+}
+
+.theme-dark .warning {
+  color: #1f2937 !important;
 }
 
 /* Footer link buttons */
