@@ -1233,7 +1233,7 @@
         </div>
 
         <!-- Protected Endpoints Testing -->
-        <div class="admin-section">
+        <div class="admin-section" id="protected-test-section">
           <h2>Qorunan endpointlərin sınanması</h2>
           <div class="admin-content">
             <div class="form-group">
@@ -1263,6 +1263,11 @@
   <script>
     // Qorunan endpointləri sına funksiyası
     async function testProtectedEndpoint(endpoint) {
+      if (!window.adminPanel?.currentUser) {
+        alert('Qorunan endpointləri sınaq üçün daxil olun.');
+        return;
+      }
+
       const apiKey = document.getElementById('protected-api-key').value;
       const resultEl = document.getElementById('protected-test-result');
       const contentEl = document.getElementById('protected-test-result-content');
@@ -1316,6 +1321,11 @@
 
     // İstifadənin izlənməsi funksiyaları
     async function loadUsage() {
+      if (!window.adminPanel?.currentUser) {
+        alert('İstifadə məlumatlarını görmək üçün daxil olun.');
+        return;
+      }
+
       const period = document.getElementById('usage-period').value;
       const resultEl = document.getElementById('usage-result');
       const usageUI = document.getElementById('usage-ui');
@@ -1423,6 +1433,11 @@
     }
 
     async function loadLimits() {
+      if (!window.adminPanel?.currentUser) {
+        alert('Limitləri görmək üçün daxil olun.');
+        return;
+      }
+
       const resultEl = document.getElementById('usage-result');
       const usageUI = document.getElementById('usage-ui');
       const usageDashboard = document.getElementById('usage-dashboard');
@@ -1553,6 +1568,11 @@
     }
 
     async function loadHistory() {
+      if (!window.adminPanel?.currentUser) {
+        alert('Tarixçəni görmək üçün daxil olun.');
+        return;
+      }
+
       const period = document.getElementById('usage-period').value;
       const resultEl = document.getElementById('usage-result');
       const usageUI = document.getElementById('usage-ui');
@@ -1629,6 +1649,11 @@
 
     // Ödənişlərin idarə edilməsi funksiyaları
     async function loadPlans() {
+      if (!window.adminPanel?.currentUser) {
+        alert('Planları görmək üçün daxil olun.');
+        return;
+      }
+
       const resultEl = document.getElementById('billing-result');
       const plansUI = document.getElementById('plans-ui');
       const plansContainer = document.getElementById('plans-container');
@@ -1772,6 +1797,11 @@
     }
 
     async function loadSubscription() {
+      if (!window.adminPanel?.currentUser) {
+        alert('Abunəliyi görmək üçün daxil olun.');
+        return;
+      }
+
       const resultEl = document.getElementById('billing-result');
       const subscriptionUI = document.getElementById('subscription-ui');
       const subscriptionContainer = document.getElementById('subscription-container');
@@ -2154,6 +2184,11 @@
       }
 
       async testAnalysis() {
+        if (!this.currentUser) {
+          this.showMessage('API sınağı üçün daxil olun.', 'danger');
+          return;
+        }
+
         const url = document.getElementById('test-url').value;
         const modelType = document.getElementById('test-model').value;
         const apiKey = document.getElementById('test-api-key').value;
