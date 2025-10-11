@@ -1199,12 +1199,25 @@
     
     function renderLimitsUI(data) {
       const dashboard = document.getElementById('usage-dashboard');
-      const { plan, limits, currentUsage, canMakeRequest, exceeded } = data;
+      const { plan, limits = {}, currentUsage = {}, canMakeRequest = false, exceeded = {} } = data;
       
-      const requestPercentage = limits.maxRequestsPerMonth > 0 ? 
-        (currentUsage.requests / limits.maxRequestsPerMonth) * 100 : 0;
-      const costPercentage = limits.maxCostPerMonth > 0 ? 
-        (currentUsage.cost / limits.maxCostPerMonth) * 100 : 0;
+      // Provide fallback values if data is missing
+      const safeLimits = {
+        maxRequestsPerMonth: limits.maxRequestsPerMonth || 0,
+        maxCostPerMonth: limits.maxCostPerMonth || 0,
+        costPerRequest: limits.costPerRequest || 0
+      };
+      
+      const safeCurrentUsage = {
+        requests: currentUsage.requests || 0,
+        cost: currentUsage.cost || 0,
+        costDollars: currentUsage.costDollars || '0.00'
+      };
+      
+      const requestPercentage = safeLimits.maxRequestsPerMonth > 0 ? 
+        (safeCurrentUsage.requests / safeLimits.maxRequestsPerMonth) * 100 : 0;
+      const costPercentage = safeLimits.maxCostPerMonth > 0 ? 
+        (safeCurrentUsage.cost / safeLimits.maxCostPerMonth) * 100 : 0;
       
       const requestStatus = requestPercentage >= 90 ? 'danger' : requestPercentage >= 70 ? 'warning' : '';
       const costStatus = costPercentage >= 90 ? 'danger' : costPercentage >= 70 ? 'warning' : '';
@@ -1215,11 +1228,11 @@
           <div class="limit-status">
             <div class="status-dot ${requestStatus}"></div>
             <div class="limit-text">
-              <span class="limit-usage">${currentUsage.requests}</span> /
-              ${limits.maxRequestsPerMonth === -1 ? 'Limitsiz' : limits.maxRequestsPerMonth.toLocaleString()} sorğu
+              <span class="limit-usage">${safeCurrentUsage.requests}</span> /
+              ${safeLimits.maxRequestsPerMonth === -1 ? 'Limitsiz' : safeLimits.maxRequestsPerMonth.toLocaleString()} sorğu
             </div>
           </div>
-          ${limits.maxRequestsPerMonth > 0 ? `
+          ${safeLimits.maxRequestsPerMonth > 0 ? `
             <div class="progress-bar">
               <div class="progress-fill ${requestStatus}" style="width: ${Math.min(requestPercentage, 100)}%"></div>
             </div>
@@ -1234,11 +1247,11 @@
           <div class="limit-status">
             <div class="status-dot ${costStatus}"></div>
             <div class="limit-text">
-              <span class="limit-usage">$${currentUsage.costDollars}</span> /
-              ${limits.maxCostPerMonth === -1 ? 'Limitsiz' : `$${limits.maxCostPerMonth.toFixed(2)}`} xərc
+              <span class="limit-usage">$${safeCurrentUsage.costDollars}</span> /
+              ${safeLimits.maxCostPerMonth === -1 ? 'Limitsiz' : `$${safeLimits.maxCostPerMonth.toFixed(2)}`} xərc
             </div>
           </div>
-          ${limits.maxCostPerMonth > 0 ? `
+          ${safeLimits.maxCostPerMonth > 0 ? `
             <div class="progress-bar">
               <div class="progress-fill ${costStatus}" style="width: ${Math.min(costPercentage, 100)}%"></div>
             </div>
@@ -1251,8 +1264,8 @@
         <div class="limit-card">
           <h4>Planın təfərrüatları</h4>
           <div class="limit-text">
-            <strong>Cari plan:</strong> ${plan}<br>
-            <strong>Bir sorğu üçün xərc:</strong> $${limits.costPerRequest.toFixed(4)}<br>
+            <strong>Cari plan:</strong> ${plan || 'Naməlum'}<br>
+            <strong>Bir sorğu üçün xərc:</strong> $${safeLimits.costPerRequest.toFixed(4)}<br>
             <strong>Status:</strong> ${canMakeRequest ? 'Aktiv' : 'Məhdud'}
           </div>
         </div>
