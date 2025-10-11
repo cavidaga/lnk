@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 
     // User is authenticated and is admin, serve the admin panel
     const fs = await import('fs');
-    const adminPanelPath = fileURLToPath(new URL('../../admin-panel.html', import.meta.url));
+    const adminPanelPath = fileURLToPath(new URL('../admin-panel.html', import.meta.url));
     const adminPanelContent = fs.readFileSync(adminPanelPath, 'utf8');
     
     // Set content type and serve the HTML

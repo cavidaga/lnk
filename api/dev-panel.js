@@ -29,7 +29,7 @@ export default async function handler(req, res) {
 
     // User is authenticated, serve the dev panel
     const fs = await import('fs');
-    const devPanelPath = fileURLToPath(new URL('../../dev-panel.html', import.meta.url));
+    const devPanelPath = fileURLToPath(new URL('../dev-panel.html', import.meta.url));
     const devPanelContent = fs.readFileSync(devPanelPath, 'utf8');
     
     // Set content type and serve the HTML
