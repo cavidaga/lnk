@@ -551,6 +551,25 @@
         window.location.href = '/user-login.html';
       }
     });
+
+    // Hide plan card for non-developer users
+    (async () => {
+      try {
+        const resp = await fetch('/api/auth/me');
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const user = data && data.user ? data.user : null;
+        if (!user) return;
+        const isBasicUser = (user.role === 'user') && (!user.plan || user.plan === 'free');
+        if (isBasicUser) {
+          const planEl = document.getElementById('user-plan');
+          if (planEl && planEl.closest) {
+            const card = planEl.closest('.stat-card');
+            if (card) card.style.display = 'none';
+          }
+        }
+      } catch {}
+    })();
   </script>
 </body>
 </html>
