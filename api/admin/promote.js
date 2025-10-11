@@ -5,28 +5,31 @@ export const config = { runtime: 'nodejs' };
 
 // Admin access check function
 async function checkAdminAccess(user) {
-  // Check if user has admin role or is the first user (super admin)
+  console.log('Checking admin access for user:', user.email);
+  
+  // Check if user has admin role
   if (user.role === 'admin' || user.isAdmin === true) {
+    console.log('User has admin role');
     return true;
   }
   
-  // Check if this is the first user (super admin)
-  const allUsers = await kv.keys('user:id:*');
-  if (allUsers.length === 1) {
-    // First user is automatically admin
-    return true;
-  }
-  
-  // Check against environment variable
+  // Check against environment variable (primary admin check)
   if (process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL) {
+    console.log('User matches ADMIN_EMAIL');
     return true;
   }
   
-  // Check if user email contains admin keywords (for development)
-  if (user.email.includes('admin') || user.email.includes('cavid')) {
-    return true;
+  // Check if this is the first user (super admin) - only if no ADMIN_EMAIL is set
+  if (!process.env.ADMIN_EMAIL) {
+    const allUsers = await kv.keys('user:id:*');
+    console.log('Total users:', allUsers.length);
+    if (allUsers.length === 1) {
+      console.log('First user - granting admin access (no ADMIN_EMAIL set)');
+      return true;
+    }
   }
   
+  console.log('User does not have admin access');
   return false;
 }
 
