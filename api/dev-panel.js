@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     const fs = await import('fs');
     const path = await import('path');
     
-    const devPanelPath = path.join(process.cwd(), 'public', 'dev.html');
+    const devPanelPath = path.join(process.cwd(), 'public', 'dev-panel.html');
     const devPanelContent = fs.readFileSync(devPanelPath, 'utf8');
     
     // Set content type and serve the HTML

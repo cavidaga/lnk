@@ -4,7 +4,6 @@
     { "source": "/analysis/:hash", "destination": "/api/analysis-html?hash=:hash" },
     { "source": "/documentation", "destination": "/documentation.html" },
     { "source": "/dev", "destination": "/api/dev-panel" },
-    { "source": "/dev.html", "destination": "/api/dev-panel" },
     { "source": "/admin", "destination": "/admin.html" }
   ],
   "functions": {

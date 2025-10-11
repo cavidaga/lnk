@@ -15,8 +15,8 @@ export default async function handler(req, res) {
       return;
     }
 
-    // User is authenticated - redirect to the actual dev.html
-    res.setHeader('Location', '/dev.html');
+    // User is authenticated - redirect to the protected dev panel
+    res.setHeader('Location', '/dev');
     res.status(302).end();
     
   } catch (error) {
