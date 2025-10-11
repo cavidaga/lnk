@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Paneli - LNK.az</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    
+    .login-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .login-header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: #1f2937;
+    }
+    
+    .login-header p {
+      color: #6b7280;
+    }
+    
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #1f2937;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #1f2937;
+      font-size: 1rem;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn:hover {
+      background: #2563eb;
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .register-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #6b7280;
+    }
+    
+    .register-link a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <h1>👑 Admin Paneli</h1>
+      <p>İstifadəçi idarəetməsi və sistem konfiqurasiyası</p>
+    </div>
+
+    <div id="error-message" class="error-message hidden"></div>
+    <div id="success-message" class="success-message hidden"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label for="email">E-poçt</label>
+        <input type="email" id="email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Şifrə</label>
+        <input type="password" id="password" required>
+      </div>
+      
+      <button type="submit" class="btn" id="login-btn">
+        Daxil ol
+      </button>
+    </form>
+
+    <div class="register-link">
+      <p>Hesabınız yoxdur? <a href="/admin-register.html">Qeydiyyatdan keçin</a></p>
+    </div>
+  </div>
+
+  <script>
+    class AdminLogin {
+      constructor() {
+        this.init();
+      }
+
+      init() {
+        // Login form
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleLogin();
+        });
+
+        // Check if redirected from login required or access denied
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('login') === 'required') {
+          document.getElementById('error-message').textContent = 'Bu səhifəyə daxil olmaq üçün giriş edin';
+          document.getElementById('error-message').classList.remove('hidden');
+        } else if (urlParams.get('error') === 'access_denied') {
+          document.getElementById('error-message').textContent = 'Bu səhifəyə daxil olmaq üçün admin icazəsi tələb olunur';
+          document.getElementById('error-message').classList.remove('hidden');
+        }
+      }
+
+      async handleLogin() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const loginBtn = document.getElementById('login-btn');
+
+        // Disable button and show loading
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'Daxil olunur...';
+
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+          });
+
+          if (response.ok) {
+            // Check if user is admin
+            const userData = await response.json();
+            if (userData.user && userData.user.role === 'admin') {
+              this.showMessage('Uğurla daxil oldunuz! Admin paneline yönləndirilirsiniz...', 'success');
+              setTimeout(() => {
+                window.location.href = '/admin';
+              }, 1500);
+            } else {
+              this.showMessage('Bu səhifəyə daxil olmaq üçün admin icazəsi tələb olunur.', 'error');
+            }
+          } else {
+            const error = await response.json();
+            this.showMessage(`Giriş uğursuz oldu: ${error.message}`, 'error');
+          }
+        } catch (error) {
+          this.showMessage(`Giriş zamanı səhv: ${error.message}`, 'error');
+        } finally {
+          // Re-enable button
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Daxil ol';
+        }
+      }
+
+      showMessage(message, type) {
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+        
+        // Hide both messages first
+        errorDiv.classList.add('hidden');
+        successDiv.classList.add('hidden');
+        
+        if (type === 'error') {
+          errorDiv.textContent = message;
+          errorDiv.classList.remove('hidden');
+        } else {
+          successDiv.textContent = message;
+          successDiv.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Initialize when page loads
+    new AdminLogin();
+  </script>
+</body>
+</html>

@@ -454,8 +454,8 @@
       async handleLogout() {
         try {
           await fetch('/api/auth/logout', { method: 'POST' });
-          this.currentUser = null;
-          this.showLoginForm();
+          // Redirect to admin login page after logout
+          window.location.href = '/admin-login.html';
         } catch (error) {
           console.error('Logout error:', error);
         }
