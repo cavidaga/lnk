@@ -2,6 +2,7 @@ import { kv } from '@vercel/kv';
 import crypto from 'crypto';
 import { findUserByEmail } from '../../lib/auth.js';
 import { sendMail } from '../../lib/email.js';
+import { passwordResetHtml } from '../../lib/email-templates.js';
 
 export const config = { runtime: 'nodejs' };
 
@@ -50,7 +51,7 @@ export default async function handler(req, res) {
         to: email,
         subject: 'Parolun sıfırlanması • LNK.az',
         text: `Parolunuzu sıfırlamaq üçün bu linkdən istifadə edin (1 saat etibarlıdır): ${link}`,
-        html: `<p>Parolunuzu sıfırlamaq üçün <a href="${link}">bu linkə</a> klikləyin. Link 1 saat etibarlıdır.</p><p>Əgər bu istəyi siz etməmisinizsə, bu məktubu nəzərə almayın.</p>`
+        html: passwordResetHtml(link)
       });
     }
 
@@ -62,4 +63,3 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true }); // still generic
   }
 }
-
