@@ -1203,7 +1203,7 @@ footer.site-footer{
   .warning,
   .warning *,
   .warning strong {
-    color: #1f2937 !important;
+    color: #ffffff !important;
   }
   
   /* Dark mode link colors */
@@ -1219,7 +1219,7 @@ footer.site-footer{
 .theme-dark .warning,
 .theme-dark .warning *,
 .theme-dark .warning strong {
-  color: #1f2937 !important;
+  color: #ffffff !important;
 }
 
 .theme-dark a {
