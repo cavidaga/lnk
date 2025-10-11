@@ -45,11 +45,11 @@
     .login-header h1 {
       font-size: 1.8rem;
       margin-bottom: 0.5rem;
-      color: #1f2937;
+      color: var(--text);
     }
     
     .login-header p {
-      color: #6b7280;
+      color: var(--muted);
     }
     
     .error-message {
@@ -77,30 +77,30 @@
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 500;
-      color: #1f2937;
+      color: var(--text);
     }
     
     .form-group input {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid #d1d5db;
+      border: 1px solid var(--border);
       border-radius: 8px;
-      background: #ffffff;
-      color: #1f2937;
+      background: var(--bg);
+      color: var(--text);
       font-size: 1rem;
     }
     
     .form-group input:focus {
       outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);
     }
     
     
     .btn {
       width: 100%;
       padding: 0.75rem;
-      background: #3b82f6;
+      background: var(--accent);
       color: white;
       border: none;
       border-radius: 8px;
@@ -111,7 +111,7 @@
     }
     
     .btn:hover {
-      background: #2563eb;
+      background: var(--accent-2);
     }
     
     .btn:disabled {
@@ -122,11 +122,11 @@
     .register-link {
       text-align: center;
       margin-top: 1.5rem;
-      color: #6b7280;
+      color: var(--muted);
     }
     
     .register-link a {
-      color: #3b82f6;
+      color: var(--accent);
       text-decoration: none;
     }
     
@@ -134,15 +134,6 @@
       text-decoration: underline;
     }
     
-    @media (prefers-color-scheme: dark) {
-      .register-link a {
-        color: #60a5fa;
-      }
-      
-      .register-link a:hover {
-        color: #93c5fd;
-      }
-    }
     
     .hidden {
       display: none !important;
