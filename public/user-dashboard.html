@@ -291,10 +291,15 @@
 
         <!-- Dashboard content -->
         <div id="dashboard-content" class="hidden">
-          <div style="text-align: right; margin: 0 0 1rem 0;">
-            <button id="logout-btn" class="btn">Çıxış</button>
+          <div style="margin: 0 0 1rem 0; display: flex; justify-content: flex-end; gap: .5rem;">
+            <button id="settings-btn" class="btn" aria-label="Ayarlar" title="Ayarlar" style="padding:.5rem .6rem">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c0 .66.39 1.25 1 1.51.3.13.63.2.97.2H21a2 2 0 1 1 0 4h-.09c-.34 0-.67.07-.97.2-.61.26-1 .85-1 1.51z"></path></svg>
+            </button>
+            <button id="logout-btn" class="btn" aria-label="Çıxış" title="Çıxış" style="padding:.5rem .6rem">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
           </div>
-          <div class="analyses-section" style="margin-bottom: 1.5rem;">
+          <div id="account-settings" class="analyses-section hidden" style="margin-bottom: 1.5rem;">
             <div class="analyses-header">
               <h2>Hesab ayarları</h2>
             </div>
@@ -582,6 +587,13 @@
           await fetch('/api/auth/logout', { method: 'POST' });
         } catch {}
         window.location.href = '/user-login.html';
+      }
+      if (target && target.id === 'settings-btn') {
+        const panel = document.getElementById('account-settings');
+        if (panel) {
+          if (panel.classList.contains('hidden')) panel.classList.remove('hidden');
+          else panel.classList.add('hidden');
+        }
       }
       if (target && target.id === 'save-email') {
         const msg = document.getElementById('email-change-msg');
