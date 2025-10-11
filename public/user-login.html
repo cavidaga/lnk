@@ -217,8 +217,8 @@
         const response = await fetch('/api/auth/me');
         if (response.ok) {
           const user = await response.json();
-          if (user.user && user.user.role === 'user') {
-            // Redirect to dashboard if already logged in
+          if (user.user) {
+            // Redirect to dashboard if already logged in (any role)
             window.location.href = '/user-dashboard.html';
           }
         }
@@ -251,7 +251,7 @@
       };
       
       try {
-        const response = await fetch('/api/auth/login-user', {
+        const response = await fetch('/api/auth/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

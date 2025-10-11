@@ -362,7 +362,7 @@
           const response = await fetch('/api/auth/me');
           if (response.ok) {
             const data = await response.json();
-            if (data.user && data.user.role === 'user') {
+            if (data.user) {
               this.user = data.user;
               document.getElementById('dashboard-content').classList.remove('hidden');
               document.getElementById('auth-required').classList.add('hidden');
