@@ -1,5 +1,6 @@
 import { getSessionFromRequest } from '../lib/auth.js';
 import { kv } from '@vercel/kv';
+import { fileURLToPath } from 'url';
 
 export default async function handler(req, res) {
   // Only allow GET requests
@@ -11,13 +12,19 @@ export default async function handler(req, res) {
     // Check if user is authenticated
     const session = getSessionFromRequest(req);
     if (!session?.sub) {
-      return res.redirect(302, '/admin-login.html');
+      res.statusCode = 302;
+      res.setHeader('Location', '/admin-login.html');
+      res.end();
+      return;
     }
 
     // Get full user data from database
     const user = await kv.get(`user:id:${session.sub}`);
     if (!user) {
-      return res.redirect(302, '/admin-login.html');
+      res.statusCode = 302;
+      res.setHeader('Location', '/admin-login.html');
+      res.end();
+      return;
     }
 
     // Check if user is admin
@@ -27,14 +34,15 @@ export default async function handler(req, res) {
 
     if (!isAdmin) {
       // Redirect to admin login with error message
-      return res.redirect(302, '/admin-login.html?error=access_denied');
+      res.statusCode = 302;
+      res.setHeader('Location', '/admin-login.html?error=access_denied');
+      res.end();
+      return;
     }
 
     // User is authenticated and is admin, serve the admin panel
     const fs = await import('fs');
-    const path = await import('path');
-    
-    const adminPanelPath = path.join(process.cwd(), 'admin-panel.html');
+    const adminPanelPath = fileURLToPath(new URL('../../admin-panel.html', import.meta.url));
     const adminPanelContent = fs.readFileSync(adminPanelPath, 'utf8');
     
     // Set content type and serve the HTML

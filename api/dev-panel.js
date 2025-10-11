@@ -1,5 +1,6 @@
 import { getSessionFromRequest } from '../lib/auth.js';
 import { kv } from '@vercel/kv';
+import { fileURLToPath } from 'url';
 
 export default async function handler(req, res) {
   // Only allow GET requests
@@ -11,20 +12,24 @@ export default async function handler(req, res) {
     // Check if user is authenticated
     const session = getSessionFromRequest(req);
     if (!session?.sub) {
-      return res.redirect(302, '/dev-login.html');
+      res.statusCode = 302;
+      res.setHeader('Location', '/dev-login.html');
+      res.end();
+      return;
     }
 
     // Get full user data from database
     const user = await kv.get(`user:id:${session.sub}`);
     if (!user) {
-      return res.redirect(302, '/dev-login.html');
+      res.statusCode = 302;
+      res.setHeader('Location', '/dev-login.html');
+      res.end();
+      return;
     }
 
     // User is authenticated, serve the dev panel
     const fs = await import('fs');
-    const path = await import('path');
-    
-    const devPanelPath = path.join(process.cwd(), 'dev-panel.html');
+    const devPanelPath = fileURLToPath(new URL('../../dev-panel.html', import.meta.url));
     const devPanelContent = fs.readFileSync(devPanelPath, 'utf8');
     
     // Set content type and serve the HTML
