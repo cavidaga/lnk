@@ -344,6 +344,19 @@
             </div>
           </div>
         </div>
+
+        <!-- Pending Developer Requests -->
+        <div class="admin-section" id="pending-developers-section">
+          <h2>Gözləyən Developer Müraciətləri</h2>
+          <div class="admin-content">
+            <div id="pending-developers-list">
+              <p>Yüklənir...</p>
+            </div>
+            <div style="margin-top: 1rem;">
+              <button id="load-pending-btn" class="btn btn-primary">Müraciətləri yenilə</button>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -399,6 +412,11 @@
           this.loadStats();
         });
 
+        // Load pending developers
+        document.getElementById('load-pending-btn').addEventListener('click', () => {
+          this.loadPendingDevelopers();
+        });
+
         // Search and filter
         document.getElementById('search-users').addEventListener('input', () => {
           this.filterUsers();
@@ -416,6 +434,8 @@
             const user = await response.json();
             this.currentUser = user;
             this.showAdminInterface();
+            // Load initial data
+            this.loadPendingDevelopers();
           } else {
             this.showLoginForm();
           }
@@ -734,6 +754,86 @@
         successDiv.textContent = message;
         container.insertBefore(successDiv, container.firstChild);
         setTimeout(() => successDiv.remove(), 5000);
+      }
+
+      async loadPendingDevelopers() {
+        try {
+          const response = await fetch('/api/admin/pending-developers');
+          if (response.ok) {
+            const data = await response.json();
+            this.renderPendingDevelopers(data.pendingRequests);
+          } else {
+            this.showError('Müraciətlər yüklənə bilmədi');
+          }
+        } catch (error) {
+          this.showError('Xəta: ' + error.message);
+        }
+      }
+
+      renderPendingDevelopers(requests) {
+        const container = document.getElementById('pending-developers-list');
+        
+        if (requests.length === 0) {
+          container.innerHTML = '<p>Gözləyən müraciət yoxdur.</p>';
+          return;
+        }
+
+        container.innerHTML = requests.map(request => `
+          <div class="user-card" style="margin-bottom: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 8px;">
+            <h4>${request.email}</h4>
+            <p><strong>Şirkət:</strong> ${request.company || 'Təyin edilməyib'}</p>
+            <p><strong>API istifadə məqsədi:</strong> ${request.reason}</p>
+            <p><strong>Müraciət tarixi:</strong> ${new Date(request.requestedAt).toLocaleDateString('az-AZ')}</p>
+            <div class="user-actions" style="margin-top: 1rem;">
+              <button class="btn btn-sm btn-success" onclick="adminPanel.approveDeveloper('${request.id}')">Təsdiqlə</button>
+              <button class="btn btn-sm btn-danger" onclick="adminPanel.rejectDeveloper('${request.id}')">Rədd et</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      async approveDeveloper(developerId) {
+        if (!confirm('Bu developer müraciətini təsdiqləmək istədiyinizə əminsiniz?')) return;
+
+        try {
+          const response = await fetch('/api/admin/approve-developer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ developerId, action: 'approve' })
+          });
+
+          if (response.ok) {
+            this.showSuccess('Developer təsdiqləndi');
+            this.loadPendingDevelopers();
+          } else {
+            const error = await response.json();
+            this.showError('Təsdiqləmə uğursuz: ' + error.message);
+          }
+        } catch (error) {
+          this.showError('Xəta: ' + error.message);
+        }
+      }
+
+      async rejectDeveloper(developerId) {
+        if (!confirm('Bu developer müraciətini rədd etmək istədiyinizə əminsiniz?')) return;
+
+        try {
+          const response = await fetch('/api/admin/approve-developer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ developerId, action: 'reject' })
+          });
+
+          if (response.ok) {
+            this.showSuccess('Developer müraciəti rədd edildi');
+            this.loadPendingDevelopers();
+          } else {
+            const error = await response.json();
+            this.showError('Rədd etmə uğursuz: ' + error.message);
+          }
+        } catch (error) {
+          this.showError('Xəta: ' + error.message);
+        }
       }
     }
 
