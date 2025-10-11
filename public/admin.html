@@ -828,14 +828,14 @@
               <div class="api-subsection">
                 <h3>API açarlarının idarə edilməsi</h3>
                 <div class="button-group">
-                  <a id="create-key-btn" class="radial-item" data-tooltip="Yeni API açarı yarat" aria-label="Yeni API açarı yarat" href="#">
+                  <a id="create-key-btn" class="radial-item" data-tooltip="Yeni API açarı yarat" aria-label="Yeni API açarı yarat" href="#" onclick="event.preventDefault()">
                     <svg width="800px" height="800px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
                       <path d="M512 512m-448 0a448 448 0 1 0 896 0 448 448 0 1 0-896 0Z" fill="currentColor"/>
                       <path d="M448 298.666667h128v426.666666h-128z" fill="#FFFFFF"/>
                       <path d="M298.666667 448h426.666666v128H298.666667z" fill="#FFFFFF"/>
                     </svg>
                   </a>
-                  <a id="refresh-keys-btn" class="radial-item" data-tooltip="Siyahını yenilə" aria-label="Siyahını yenilə" href="#">
+                  <a id="refresh-keys-btn" class="radial-item" data-tooltip="Siyahını yenilə" aria-label="Siyahını yenilə" href="#" onclick="event.preventDefault()">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8M3 3v5h5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16M21 21v-5h-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -854,14 +854,14 @@
                     <small>Mövcud icazələr: analyze, get-analysis, statistics, site-averages, recent-analyses, usage, billing</small>
                   </div>
                   <div class="button-group">
-                    <a id="submit-key-btn" class="radial-item" data-tooltip="Açar yarat" aria-label="Açar yarat" href="#">
+                    <a id="submit-key-btn" class="radial-item" data-tooltip="Açar yarat" aria-label="Açar yarat" href="#" onclick="event.preventDefault()">
                       <svg width="800px" height="800px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
                         <path d="M512 512m-448 0a448 448 0 1 0 896 0 448 448 0 1 0-896 0Z" fill="currentColor"/>
                         <path d="M448 298.666667h128v426.666666h-128z" fill="#FFFFFF"/>
                         <path d="M298.666667 448h426.666666v128H298.666667z" fill="#FFFFFF"/>
                       </svg>
                     </a>
-                    <a id="cancel-key-btn" class="radial-item" data-tooltip="Ləğv et" aria-label="Ləğv et" href="#">
+                    <a id="cancel-key-btn" class="radial-item" data-tooltip="Ləğv et" aria-label="Ləğv et" href="#" onclick="event.preventDefault()">
                       <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                         <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                       </svg>
@@ -899,7 +899,7 @@
                     <input type="password" id="test-api-key" placeholder="lnk_... (sesiyanı istifadə etmək üçün boş saxlayın)">
                   </div>
                 </div>
-                <a id="test-analyze-btn" class="radial-item" data-tooltip="Təhlili sına" aria-label="Təhlili sına" href="#">
+                <a id="test-analyze-btn" class="radial-item" data-tooltip="Təhlili sına" aria-label="Təhlili sına" href="#" onclick="event.preventDefault()">
                   <svg width="800px" height="800px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
                     <path d="M512 512m-448 0a448 448 0 1 0 896 0 448 448 0 1 0-896 0Z" fill="currentColor"/>
                     <path d="M448 298.666667h128v426.666666h-128z" fill="#FFFFFF"/>
@@ -932,19 +932,19 @@
                   </select>
                 </div>
                 <div class="button-group">
-                  <a id="load-usage-btn" class="radial-item" data-tooltip="İstifadəmi yüklə" aria-label="İstifadəmi yüklə" href="#">
+                  <a id="load-usage-btn" class="radial-item" data-tooltip="İstifadəmi yüklə" aria-label="İstifadəmi yüklə" href="#" onclick="event.preventDefault()">
                     <svg width="800px" height="800px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
                       <path d="M512 512m-448 0a448 448 0 1 0 896 0 448 448 0 1 0-896 0Z" fill="currentColor"/>
                       <path d="M448 298.666667h128v426.666666h-128z" fill="#FFFFFF"/>
                       <path d="M298.666667 448h426.666666v128H298.666667z" fill="#FFFFFF"/>
                     </svg>
                   </a>
-                  <a id="load-limits-btn" class="radial-item" data-tooltip="Limitləri yüklə" aria-label="Limitləri yüklə" href="#">
+                  <a id="load-limits-btn" class="radial-item" data-tooltip="Limitləri yüklə" aria-label="Limitləri yüklə" href="#" onclick="event.preventDefault()">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M9 19c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H9zM9 7v10h6V7H9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </a>
-                  <a id="load-history-btn" class="radial-item" data-tooltip="Tarixçəni yüklə" aria-label="Tarixçəni yüklə" href="#">
+                  <a id="load-history-btn" class="radial-item" data-tooltip="Tarixçəni yüklə" aria-label="Tarixçəni yüklə" href="#" onclick="event.preventDefault()">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -970,24 +970,24 @@
               <div class="billing-subsection">
                 <h3>Ödənişlərin idarə edilməsi</h3>
                 <div class="button-group">
-                  <a id="load-plans-btn" class="radial-item" data-tooltip="Planları yüklə" aria-label="Planları yüklə" href="#">
+                  <a id="load-plans-btn" class="radial-item" data-tooltip="Planları yüklə" aria-label="Planları yüklə" href="#" onclick="event.preventDefault()">
                     <svg width="800px" height="800px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg">
                       <path d="M512 512m-448 0a448 448 0 1 0 896 0 448 448 0 1 0-896 0Z" fill="currentColor"/>
                       <path d="M448 298.666667h128v426.666666h-128z" fill="#FFFFFF"/>
                       <path d="M298.666667 448h426.666666v128H298.666667z" fill="#FFFFFF"/>
                     </svg>
                   </a>
-                  <a id="load-subscription-btn" class="radial-item" data-tooltip="Abunəliyi yüklə" aria-label="Abunəliyi yüklə" href="#">
+                  <a id="load-subscription-btn" class="radial-item" data-tooltip="Abunəliyi yüklə" aria-label="Abunəliyi yüklə" href="#" onclick="event.preventDefault()">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </a>
-                  <a id="test-checkout-btn" class="radial-item" data-tooltip="Ödəniş sınağı (Tezliklə)" aria-label="Ödəniş sınağı (Tezliklə)" href="#">
+                  <a id="test-checkout-btn" class="radial-item" data-tooltip="Ödəniş sınağı (Tezliklə)" aria-label="Ödəniş sınağı (Tezliklə)" href="#" onclick="event.preventDefault()">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </a>
-                  <a id="billing-portal-btn" class="radial-item" data-tooltip="Ödənişləri idarə et (Tezliklə)" aria-label="Ödənişləri idarə et (Tezliklə)" href="#">
+                  <a id="billing-portal-btn" class="radial-item" data-tooltip="Ödənişləri idarə et (Tezliklə)" aria-label="Ödənişləri idarə et (Tezliklə)" href="#" onclick="event.preventDefault()">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
@@ -2065,7 +2065,7 @@
           <div class="api-key-item">
             <div class="api-key-header">
               <h5>${key.name}</h5>
-              <a class="radial-item" onclick="window.adminPanel.revokeKey('${key.id}')" data-tooltip="Ləğv et" aria-label="Ləğv et" href="#">
+              <a class="radial-item" onclick="event.preventDefault(); window.adminPanel.revokeKey('${key.id}')" data-tooltip="Ləğv et" aria-label="Ləğv et" href="#">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
