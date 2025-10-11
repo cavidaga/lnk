@@ -540,6 +540,17 @@
 
     // Initialize dashboard when page loads
     new UserDashboard();
+
+    // Global handler for logout button (event delegation)
+    document.addEventListener('click', async (e) => {
+      const target = e.target;
+      if (target && target.id === 'logout-btn') {
+        try {
+          await fetch('/api/auth/logout', { method: 'POST' });
+        } catch {}
+        window.location.href = '/user-login.html';
+      }
+    });
   </script>
 </body>
 </html>
