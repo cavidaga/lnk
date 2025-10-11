@@ -35,17 +35,250 @@
       background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
       color: white;
       border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(220, 53, 69, 0.3);
     }
     
     .admin-header h1 {
       font-size: 1.8rem;
       margin-bottom: 0.5rem;
       font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
     
     .admin-header p {
       font-size: 1.2rem;
       opacity: 0.9;
+    }
+
+    .admin-section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+
+    .admin-section h2 {
+      color: #1f2937;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .user-info {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+      text-align: center;
+    }
+
+    .user-info h4 {
+      color: #6b7280;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .user-info p {
+      color: #1f2937;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .user-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .user-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .user-card h4 {
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .user-card p {
+      color: #6b7280;
+      margin-bottom: 0.25rem;
+      font-size: 0.875rem;
+    }
+
+    .user-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+
+    .btn-warning {
+      background: #f59e0b;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #d97706;
+    }
+
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    .plan-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .plan-free { background: #f3f4f6; color: #374151; }
+    .plan-basic { background: #dbeafe; color: #1e40af; }
+    .plan-pro { background: #fef3c7; color: #d97706; }
+    .plan-enterprise { background: #e0e7ff; color: #5b21b6; }
+
+    .error {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+      margin-bottom: 1rem;
+    }
+
+    .success {
+      background: #f0fdf4;
+      color: #16a34a;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #bbf7d0;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .stats-divider {
+      border-top: 2px solid #e5e7eb;
+      margin: 1.5rem 0;
+      position: relative;
+    }
+
+    .stats-divider::before {
+      content: "Developer Statistikaları";
+      position: absolute;
+      top: -0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 0 1rem;
+      color: #6b7280;
+      font-size: 0.875rem;
+      font-weight: 500;
     }
     
     .admin-section {
@@ -251,7 +484,7 @@
 
         <!-- User Management -->
         <div class="admin-section" id="user-management-section">
-          <h2>İstifadəçi İdarəetməsi</h2>
+          <h2>👥 İstifadəçi İdarəetməsi</h2>
           <div class="admin-content">
             <div class="form-row">
               <div class="form-group">
@@ -271,8 +504,8 @@
             </div>
             
             <div class="button-group" style="margin: 1rem 0;">
-              <button id="load-users-btn" class="btn btn-primary">İstifadəçiləri yüklə</button>
-              <button id="create-user-btn" class="btn btn-success">Yeni istifadəçi yarat</button>
+              <button id="load-users-btn" class="btn btn-primary">📥 İstifadəçiləri yüklə</button>
+              <button id="create-user-btn" class="btn btn-success">➕ Yeni istifadəçi yarat</button>
             </div>
 
             <div id="users-container">
@@ -283,7 +516,7 @@
 
         <!-- Create User Form -->
         <div class="admin-section" id="create-user-section">
-          <h2>Yeni İstifadəçi Yarat</h2>
+          <h2>➕ Yeni İstifadəçi Yarat</h2>
           <div class="admin-content">
             <form id="create-user-form">
               <div class="form-row">
@@ -306,8 +539,8 @@
                 </select>
               </div>
               <div class="button-group">
-                <button type="submit" class="btn btn-success">İstifadəçi yarat</button>
-                <button type="button" id="cancel-create-user" class="btn btn-secondary">Ləğv et</button>
+                <button type="submit" class="btn btn-success">✨ İstifadəçi yarat</button>
+                <button type="button" id="cancel-create-user" class="btn btn-secondary">❌ Ləğv et</button>
               </div>
             </form>
           </div>
@@ -315,45 +548,64 @@
 
         <!-- System Statistics -->
         <div class="admin-section" id="stats-section">
-          <h2>Sistem Statistikaları</h2>
+          <h2>📊 Sistem Statistikaları</h2>
           <div class="admin-content">
             <div class="form-row">
               <div class="user-info">
-                <h4>Ümumi İstifadəçilər</h4>
+                <h4>👥 Ümumi İstifadəçilər</h4>
                 <p id="total-users">-</p>
               </div>
               <div class="user-info">
-                <h4>Pulsuz Plan</h4>
+                <h4>🆓 Pulsuz Plan</h4>
                 <p id="free-users">-</p>
               </div>
               <div class="user-info">
-                <h4>Əsas Plan</h4>
+                <h4>⭐ Əsas Plan</h4>
                 <p id="basic-users">-</p>
               </div>
               <div class="user-info">
-                <h4>Pro Plan</h4>
+                <h4>💎 Pro Plan</h4>
                 <p id="pro-users">-</p>
               </div>
               <div class="user-info">
-                <h4>Enterprise Plan</h4>
+                <h4>🏢 Enterprise Plan</h4>
                 <p id="enterprise-users">-</p>
               </div>
             </div>
+            <div class="stats-divider"></div>
+            <div class="form-row" id="dev-stats">
+              <div class="user-info">
+                <h4>🔧 Developerlər</h4>
+                <p id="total-developers">-</p>
+              </div>
+              <div class="user-info">
+                <h4>✅ Təsdiqlənmiş</h4>
+                <p id="approved-developers">-</p>
+              </div>
+              <div class="user-info">
+                <h4>⏳ Gözləyən</h4>
+                <p id="pending-developers">-</p>
+              </div>
+              <div class="user-info">
+                <h4>❌ Rədd edilmiş</h4>
+                <p id="rejected-developers">-</p>
+              </div>
+            </div>
             <div style="margin-top: 1rem;">
-              <button id="load-stats-btn" class="btn btn-primary">Statistikaları yenilə</button>
+              <button id="load-stats-btn" class="btn btn-primary">🔄 Statistikaları yenilə</button>
             </div>
           </div>
         </div>
 
         <!-- Pending Developer Requests -->
         <div class="admin-section" id="pending-developers-section">
-          <h2>Gözləyən Developer Müraciətləri</h2>
+          <h2>⏳ Gözləyən Developer Müraciətləri</h2>
           <div class="admin-content">
             <div id="pending-developers-list">
               <p>Yüklənir...</p>
             </div>
             <div style="margin-top: 1rem;">
-              <button id="load-pending-btn" class="btn btn-primary">Müraciətləri yenilə</button>
+              <button id="load-pending-btn" class="btn btn-primary">📋 Müraciətləri yenilə</button>
             </div>
           </div>
         </div>
@@ -435,6 +687,7 @@
             this.currentUser = user;
             this.showAdminInterface();
             // Load initial data
+            this.loadStats();
             this.loadPendingDevelopers();
           } else {
             this.showLoginForm();
@@ -522,25 +775,25 @@
       renderUsers() {
         const container = document.getElementById('users-container');
         if (this.users.length === 0) {
-          container.innerHTML = '<div class="loading">İstifadəçi tapılmadı</div>';
+          container.innerHTML = '<div class="loading">🔍 İstifadəçi tapılmadı</div>';
           return;
         }
 
         const html = this.users.map(user => `
           <div class="user-card">
-            <h4>${user.email}</h4>
-            <p><strong>ID:</strong> ${user.id}</p>
-            <p><strong>Plan:</strong> <span class="plan-badge plan-${user.plan}">${user.plan}</span></p>
-            <p><strong>Yaradılıb:</strong> ${new Date(user.createdAt).toLocaleDateString('az-AZ')}</p>
-            ${user.planUpdatedAt ? `<p><strong>Plan yeniləndi:</strong> ${new Date(user.planUpdatedAt).toLocaleDateString('az-AZ')}</p>` : ''}
-            ${user.role ? `<p><strong>Rol:</strong> <span class="plan-badge plan-${user.role === 'admin' ? 'enterprise' : 'free'}">${user.role === 'admin' ? 'Admin' : 'İstifadəçi'}</span></p>` : ''}
+            <h4>👤 ${user.email}</h4>
+            <p><strong>🆔 ID:</strong> ${user.id}</p>
+            <p><strong>📋 Plan:</strong> <span class="plan-badge plan-${user.plan}">${user.plan}</span></p>
+            <p><strong>📅 Yaradılıb:</strong> ${new Date(user.createdAt).toLocaleDateString('az-AZ')}</p>
+            ${user.planUpdatedAt ? `<p><strong>🔄 Plan yeniləndi:</strong> ${new Date(user.planUpdatedAt).toLocaleDateString('az-AZ')}</p>` : ''}
+            ${user.role ? `<p><strong>👑 Rol:</strong> <span class="plan-badge plan-${user.role === 'admin' ? 'enterprise' : 'free'}">${user.role === 'admin' ? '👑 Admin' : user.role === 'developer' ? '🔧 Developer' : '👤 İstifadəçi'}</span></p>` : ''}
             <div class="user-actions">
-              <button class="btn btn-sm btn-primary" onclick="adminPanel.editUser('${user.id}')">Redaktə et</button>
+              <button class="btn btn-sm btn-primary" onclick="adminPanel.editUser('${user.id}')">✏️ Redaktə et</button>
               ${user.role === 'admin' ? 
-                `<button class="btn btn-sm btn-warning" onclick="adminPanel.demoteUser('${user.id}')">Admin hüququnu ləğv et</button>` :
-                `<button class="btn btn-sm btn-success" onclick="adminPanel.promoteUser('${user.id}')">Admin et</button>`
+                `<button class="btn btn-sm btn-warning" onclick="adminPanel.demoteUser('${user.id}')">⬇️ Admin hüququnu ləğv et</button>` :
+                `<button class="btn btn-sm btn-success" onclick="adminPanel.promoteUser('${user.id}')">👑 Admin et</button>`
               }
-              <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteUser('${user.id}')">Sil</button>
+              <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteUser('${user.id}')">🗑️ Sil</button>
             </div>
           </div>
         `).join('');
@@ -561,25 +814,25 @@
 
         const container = document.getElementById('users-container');
         if (filtered.length === 0) {
-          container.innerHTML = '<div class="loading">Axtarış nəticəsi tapılmadı</div>';
+          container.innerHTML = '<div class="loading">🔍 Axtarış nəticəsi tapılmadı</div>';
           return;
         }
 
         const html = filtered.map(user => `
           <div class="user-card">
-            <h4>${user.email}</h4>
-            <p><strong>ID:</strong> ${user.id}</p>
-            <p><strong>Plan:</strong> <span class="plan-badge plan-${user.plan}">${user.plan}</span></p>
-            <p><strong>Yaradılıb:</strong> ${new Date(user.createdAt).toLocaleDateString('az-AZ')}</p>
-            ${user.planUpdatedAt ? `<p><strong>Plan yeniləndi:</strong> ${new Date(user.planUpdatedAt).toLocaleDateString('az-AZ')}</p>` : ''}
-            ${user.role ? `<p><strong>Rol:</strong> <span class="plan-badge plan-${user.role === 'admin' ? 'enterprise' : 'free'}">${user.role === 'admin' ? 'Admin' : 'İstifadəçi'}</span></p>` : ''}
+            <h4>👤 ${user.email}</h4>
+            <p><strong>🆔 ID:</strong> ${user.id}</p>
+            <p><strong>📋 Plan:</strong> <span class="plan-badge plan-${user.plan}">${user.plan}</span></p>
+            <p><strong>📅 Yaradılıb:</strong> ${new Date(user.createdAt).toLocaleDateString('az-AZ')}</p>
+            ${user.planUpdatedAt ? `<p><strong>🔄 Plan yeniləndi:</strong> ${new Date(user.planUpdatedAt).toLocaleDateString('az-AZ')}</p>` : ''}
+            ${user.role ? `<p><strong>👑 Rol:</strong> <span class="plan-badge plan-${user.role === 'admin' ? 'enterprise' : 'free'}">${user.role === 'admin' ? '👑 Admin' : user.role === 'developer' ? '🔧 Developer' : '👤 İstifadəçi'}</span></p>` : ''}
             <div class="user-actions">
-              <button class="btn btn-sm btn-primary" onclick="adminPanel.editUser('${user.id}')">Redaktə et</button>
+              <button class="btn btn-sm btn-primary" onclick="adminPanel.editUser('${user.id}')">✏️ Redaktə et</button>
               ${user.role === 'admin' ? 
-                `<button class="btn btn-sm btn-warning" onclick="adminPanel.demoteUser('${user.id}')">Admin hüququnu ləğv et</button>` :
-                `<button class="btn btn-sm btn-success" onclick="adminPanel.promoteUser('${user.id}')">Admin et</button>`
+                `<button class="btn btn-sm btn-warning" onclick="adminPanel.demoteUser('${user.id}')">⬇️ Admin hüququnu ləğv et</button>` :
+                `<button class="btn btn-sm btn-success" onclick="adminPanel.promoteUser('${user.id}')">👑 Admin et</button>`
               }
-              <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteUser('${user.id}')">Sil</button>
+              <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteUser('${user.id}')">🗑️ Sil</button>
             </div>
           </div>
         `).join('');
@@ -756,6 +1009,34 @@
         setTimeout(() => successDiv.remove(), 5000);
       }
 
+      async loadStats() {
+        try {
+          const response = await fetch('/api/admin/statistics');
+          if (response.ok) {
+            const stats = await response.json();
+            this.renderStats(stats);
+          } else {
+            this.showError('Statistikalar yüklənə bilmədi');
+          }
+        } catch (error) {
+          this.showError('Xəta: ' + error.message);
+        }
+      }
+
+      renderStats(stats) {
+        document.getElementById('total-users').textContent = stats.total;
+        document.getElementById('free-users').textContent = stats.free;
+        document.getElementById('basic-users').textContent = stats.basic;
+        document.getElementById('pro-users').textContent = stats.pro;
+        document.getElementById('enterprise-users').textContent = stats.enterprise;
+        
+        // Developer statistics
+        document.getElementById('total-developers').textContent = stats.developers;
+        document.getElementById('approved-developers').textContent = stats.approvedDevelopers;
+        document.getElementById('pending-developers').textContent = stats.pendingDevelopers;
+        document.getElementById('rejected-developers').textContent = stats.rejectedDevelopers;
+      }
+
       async loadPendingDevelopers() {
         try {
           const response = await fetch('/api/admin/pending-developers');
@@ -774,19 +1055,19 @@
         const container = document.getElementById('pending-developers-list');
         
         if (requests.length === 0) {
-          container.innerHTML = '<p>Gözləyən müraciət yoxdur.</p>';
+          container.innerHTML = '<p>✅ Gözləyən müraciət yoxdur.</p>';
           return;
         }
 
         container.innerHTML = requests.map(request => `
           <div class="user-card" style="margin-bottom: 1rem; padding: 1rem; border: 1px solid #ddd; border-radius: 8px;">
-            <h4>${request.email}</h4>
-            <p><strong>Şirkət:</strong> ${request.company || 'Təyin edilməyib'}</p>
-            <p><strong>API istifadə məqsədi:</strong> ${request.reason}</p>
-            <p><strong>Müraciət tarixi:</strong> ${new Date(request.requestedAt).toLocaleDateString('az-AZ')}</p>
+            <h4>🔧 ${request.email}</h4>
+            <p><strong>🏢 Şirkət:</strong> ${request.company || 'Təyin edilməyib'}</p>
+            <p><strong>💡 API istifadə məqsədi:</strong> ${request.reason}</p>
+            <p><strong>📅 Müraciət tarixi:</strong> ${new Date(request.requestedAt).toLocaleDateString('az-AZ')}</p>
             <div class="user-actions" style="margin-top: 1rem;">
-              <button class="btn btn-sm btn-success" onclick="adminPanel.approveDeveloper('${request.id}')">Təsdiqlə</button>
-              <button class="btn btn-sm btn-danger" onclick="adminPanel.rejectDeveloper('${request.id}')">Rədd et</button>
+              <button class="btn btn-sm btn-success" onclick="adminPanel.approveDeveloper('${request.id}')">✅ Təsdiqlə</button>
+              <button class="btn btn-sm btn-danger" onclick="adminPanel.rejectDeveloper('${request.id}')">❌ Rədd et</button>
             </div>
           </div>
         `).join('');
@@ -805,6 +1086,7 @@
           if (response.ok) {
             this.showSuccess('Developer təsdiqləndi');
             this.loadPendingDevelopers();
+            this.loadStats();
           } else {
             const error = await response.json();
             this.showError('Təsdiqləmə uğursuz: ' + error.message);
@@ -827,6 +1109,7 @@
           if (response.ok) {
             this.showSuccess('Developer müraciəti rədd edildi');
             this.loadPendingDevelopers();
+            this.loadStats();
           } else {
             const error = await response.json();
             this.showError('Rədd etmə uğursuz: ' + error.message);
