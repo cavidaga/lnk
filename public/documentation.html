@@ -310,6 +310,16 @@
       color: var(--warning-text);
     }
     
+    @media (prefers-color-scheme: dark) {
+      .warning {
+        color: #1f2937 !important;
+      }
+    }
+    
+    .theme-dark .warning {
+      color: #1f2937 !important;
+    }
+    
     .info {
       background: color-mix(in oklab, var(--accent) 10%, var(--panel) 90%);
       border: 1px solid var(--accent);

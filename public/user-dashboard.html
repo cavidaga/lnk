@@ -268,6 +268,165 @@
       justify-content: center;
       flex-wrap: wrap;
     }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .dashboard-header {
+        background: var(--card) !important;
+        border-color: var(--border) !important;
+      }
+      
+      .dashboard-header h1 {
+        color: var(--text) !important;
+      }
+      
+      .dashboard-header p {
+        color: var(--muted) !important;
+      }
+      
+      .stat-card {
+        background: var(--card) !important;
+        border-color: var(--border) !important;
+      }
+      
+      .stat-card h3 {
+        color: var(--muted) !important;
+      }
+      
+      .stat-card p {
+        color: var(--text) !important;
+      }
+      
+      .analyses-section {
+        background: var(--card) !important;
+        border-color: var(--border) !important;
+      }
+      
+      .analyses-header h2 {
+        color: var(--text) !important;
+      }
+      
+      .analysis-item {
+        background: var(--panel) !important;
+        border-color: var(--border) !important;
+      }
+      
+      .analysis-item:hover {
+        background: var(--bg) !important;
+      }
+      
+      .analysis-item h3 {
+        color: var(--text) !important;
+      }
+      
+      .analysis-item p {
+        color: var(--muted) !important;
+      }
+      
+      .meta-item {
+        color: var(--muted) !important;
+      }
+      
+      .auth-required h2 {
+        color: var(--text) !important;
+      }
+      
+      .auth-required p {
+        color: var(--muted) !important;
+      }
+      
+      .error-message {
+        background: #2d1b1b !important;
+        color: #fca5a5 !important;
+        border-color: #7f1d1d !important;
+      }
+      
+      .empty-state h3 {
+        color: var(--text) !important;
+      }
+      
+      .empty-state {
+        color: var(--muted) !important;
+      }
+    }
+    
+    .theme-dark .dashboard-header {
+      background: var(--card) !important;
+      border-color: var(--border) !important;
+    }
+    
+    .theme-dark .dashboard-header h1 {
+      color: var(--text) !important;
+    }
+    
+    .theme-dark .dashboard-header p {
+      color: var(--muted) !important;
+    }
+    
+    .theme-dark .stat-card {
+      background: var(--card) !important;
+      border-color: var(--border) !important;
+    }
+    
+    .theme-dark .stat-card h3 {
+      color: var(--muted) !important;
+    }
+    
+    .theme-dark .stat-card p {
+      color: var(--text) !important;
+    }
+    
+    .theme-dark .analyses-section {
+      background: var(--card) !important;
+      border-color: var(--border) !important;
+    }
+    
+    .theme-dark .analyses-header h2 {
+      color: var(--text) !important;
+    }
+    
+    .theme-dark .analysis-item {
+      background: var(--panel) !important;
+      border-color: var(--border) !important;
+    }
+    
+    .theme-dark .analysis-item:hover {
+      background: var(--bg) !important;
+    }
+    
+    .theme-dark .analysis-item h3 {
+      color: var(--text) !important;
+    }
+    
+    .theme-dark .analysis-item p {
+      color: var(--muted) !important;
+    }
+    
+    .theme-dark .meta-item {
+      color: var(--muted) !important;
+    }
+    
+    .theme-dark .auth-required h2 {
+      color: var(--text) !important;
+    }
+    
+    .theme-dark .auth-required p {
+      color: var(--muted) !important;
+    }
+    
+    .theme-dark .error-message {
+      background: #2d1b1b !important;
+      color: #fca5a5 !important;
+      border-color: #7f1d1d !important;
+    }
+    
+    .theme-dark .empty-state h3 {
+      color: var(--text) !important;
+    }
+    
+    .theme-dark .empty-state {
+      color: var(--muted) !important;
+    }
   </style>
 </head>
 

@@ -162,6 +162,103 @@
     .hidden {
       display: none;
     }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .auth-container {
+        background: var(--card) !important;
+        border-color: var(--border) !important;
+      }
+      
+      .auth-header h1 {
+        color: var(--text) !important;
+      }
+      
+      .auth-header p {
+        color: var(--muted) !important;
+      }
+      
+      .form-group label {
+        color: var(--text) !important;
+      }
+      
+      .form-group input {
+        background: var(--bg) !important;
+        color: var(--text) !important;
+        border-color: var(--border) !important;
+      }
+      
+      .form-group input:focus {
+        border-color: var(--accent) !important;
+      }
+      
+      .auth-links {
+        border-color: var(--border) !important;
+      }
+      
+      .auth-links a {
+        color: var(--accent) !important;
+      }
+      
+      .error-message {
+        background: #2d1b1b !important;
+        color: #fca5a5 !important;
+        border-color: #7f1d1d !important;
+      }
+      
+      .success-message {
+        background: #1b2d1b !important;
+        color: #86efac !important;
+        border-color: #166534 !important;
+      }
+    }
+    
+    .theme-dark .auth-container {
+      background: var(--card) !important;
+      border-color: var(--border) !important;
+    }
+    
+    .theme-dark .auth-header h1 {
+      color: var(--text) !important;
+    }
+    
+    .theme-dark .auth-header p {
+      color: var(--muted) !important;
+    }
+    
+    .theme-dark .form-group label {
+      color: var(--text) !important;
+    }
+    
+    .theme-dark .form-group input {
+      background: var(--bg) !important;
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+    }
+    
+    .theme-dark .form-group input:focus {
+      border-color: var(--accent) !important;
+    }
+    
+    .theme-dark .auth-links {
+      border-color: var(--border) !important;
+    }
+    
+    .theme-dark .auth-links a {
+      color: var(--accent) !important;
+    }
+    
+    .theme-dark .error-message {
+      background: #2d1b1b !important;
+      color: #fca5a5 !important;
+      border-color: #7f1d1d !important;
+    }
+    
+    .theme-dark .success-message {
+      background: #1b2d1b !important;
+      color: #86efac !important;
+      border-color: #166534 !important;
+    }
 
   </style>
 </head>

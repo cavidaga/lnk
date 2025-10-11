@@ -1193,6 +1193,36 @@ footer.site-footer{
   color: #a0a9c0 !important;
 }
 
+/* Footer link buttons */
+.footer-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.footer-link-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.footer-link-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 /* Footer icons: ICON-ONLY + tooltips */
 .footer-icons{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
 .footer-icons a{
