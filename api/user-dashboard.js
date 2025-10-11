@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     const dashboardPath = fileURLToPath(new URL('../public/user-dashboard.html', import.meta.url));
     let html = fs.readFileSync(dashboardPath, 'utf8');
 
-    // For regular users (non-admin, non-developer), remove the Plan card SSR-side
+    // For regular users (non-admin, non-təkmilləşdirici), remove the Plan card SSR-side
     const role = user.role || (user.isAdmin ? 'admin' : 'user');
     const isBasicUser = role === 'user' && (user.plan === 'free' || !user.plan);
     if (isBasicUser) {

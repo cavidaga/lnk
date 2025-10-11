@@ -190,6 +190,101 @@
       line-height: 1.4;
       border: 1px solid #30363d;
       box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+      position: relative;
+    }
+    
+    .code-block-container {
+      position: relative;
+    }
+    
+    .copy-button {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: #30363d;
+      color: #00ff00;
+      border: 1px solid #00ff00;
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+      z-index: 10;
+    }
+    
+    .copy-button:hover {
+      opacity: 1;
+    }
+    
+    .copy-button.copied {
+      background: #00ff00;
+      color: #0d1117;
+    }
+    
+    /* Support form styling */
+    .support-form {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    
+    .support-form .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .support-form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .support-form input,
+    .support-form select,
+    .support-form textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    
+    .support-form input:focus,
+    .support-form select:focus,
+    .support-form textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+    }
+    
+    .support-form small {
+      display: block;
+      margin-top: 0.25rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    
+    .support-form .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .support-form .btn:hover {
+      background: var(--accent-2);
+      transform: translateY(-1px);
     }
     
     .response-example {
@@ -384,7 +479,7 @@
           <strong>Mündəricat</strong>
           <ul>
             <li><a href="#overview">Ümumi baxış</a></li>
-            <li><a href="#developer-registration">Developer qeydiyyatı</a></li>
+            <li><a href="#developer-registration">Təkmilləşdirici qeydiyyatı</a></li>
             <li><a href="#api-plans">API planları və limitlər</a></li>
             <li><a href="#authentication">Autentifikasiya</a></li>
             <li><a href="#rate-limits">Sürət limitləri</a></li>
@@ -401,24 +496,19 @@
           <h2>Ümumi baxış</h2>
           <div class="api-endpoint">
             <p>LNK.az media qərəzini və etibarlılığını təhlil etmək üçün geniş imkanlara malik API təqdim edir. API xəbər məqalələrini qiymətləndirmək və etibarlılıq göstəriciləri, siyasi qərəz analizi və mənbə istinadları daxil olmaqla ətraflı təhlil təmin etmək üçün qabaqcıl süni intellekt modellərindən istifadə edir.</p>
-
             <div class="info">
               <strong>Əsas URL:</strong> <code>https://lnk.az/api</code>
-            </div>
-
-            <div class="warning">
-              <strong>Qeyd:</strong> Bu sənəd yalnız daxili istifadə üçündür. Bu URL-i ictimaiyyətlə paylaşmayın.
             </div>
           </div>
         </section>
 
         <section id="developer-registration">
-          <h2>Developer qeydiyyatı</h2>
+          <h2>Təkmilləşdirici qeydiyyatı</h2>
           <div class="api-endpoint">
             <p>API istifadəsi üçün developer hesabı yaratmaq lazımdır. Qeydiyyat prosesi sadə və sürətlidir.</p>
             
             <div class="info">
-              <strong>Qeydiyyat linki:</strong> <a href="/dev-register.html" target="_blank">Developer qeydiyyatı</a>
+              <strong>Qeydiyyat linki:</strong> <a href="/dev-register.html" target="_blank">Təkmilləşdirici qeydiyyatı</a>
             </div>
 
             <h3>Qeydiyyat addımları</h3>
@@ -433,7 +523,7 @@
               <strong>Vacib:</strong> Qeydiyyat zamanı düzgün və etibarlı məlumatlar daxil edin. Yalnış məlumatlar təsdiqlənməni gecikdirə bilər.
             </div>
 
-            <h3>Developer paneli</h3>
+            <h3>Təkmilləşdirici paneli</h3>
             <p>Təsdiqləndikdən sonra aşağıdakı imkanlara malik olacaqsınız:</p>
             <ul>
               <li><strong>API açarları idarəetməsi:</strong> Yeni açarlar yaradın, mövcud açarları silin və ya yeniləyin</li>
@@ -444,7 +534,7 @@
             </ul>
 
             <div class="info">
-              <strong>Developer paneli:</strong> <a href="/dev" target="_blank">Developer paneli</a>
+              <strong>Təkmilləşdirici paneli:</strong> <a href="/dev" target="_blank">Təkmilləşdirici paneli</a>
             </div>
           </div>
         </section>
@@ -491,7 +581,7 @@
                   <li>Çoxlu API açarları</li>
                   <li>Real vaxt statistikaları</li>
                   <li>Prioritet dəstək</li>
-                  <li>Webhook dəstəyi</li>
+                  <li>Geri-çağırış ünvanı dəstəyi</li>
                 </ul>
               </div>
 
@@ -500,8 +590,8 @@
                 <div class="plan-price">Müqavilə əsasında</div>
                 <ul>
                   <li>Limitsiz sorğu</li>
-                  <li>Xüsusi API endpointləri</li>
-                  <li>Dedicated dəstək</li>
+                  <li>Xüsusi API ucnöqtələri</li>
+                  <li>Xüsusi dəstək</li>
                   <li>SLA zəmanəti</li>
                   <li>Xüsusi inteqrasiya</li>
                   <li>24/7 texniki dəstək</li>
@@ -557,7 +647,7 @@
                   <td>✅</td>
                 </tr>
                 <tr>
-                  <td>Webhook dəstəyi</td>
+                  <td>Geri-çağırış ünvanı dəstəyi</td>
                   <td>❌</td>
                   <td>❌</td>
                   <td>✅</td>
@@ -594,8 +684,8 @@
 
             <h3>API açarı əldə etmə</h3>
             <ol>
-              <li>Developer hesabınızı yaradın və təsdiqləndiyindən əmin olun</li>
-              <li>Developer panelinə daxil olun</li>
+              <li>Təkmilləşdirici hesabınızı yaradın və təsdiqləndiyindən əmin olun</li>
+              <li>Təkmilləşdirici panelinə daxil olun</li>
               <li>"API açarları" bölməsindən yeni açar yaradın</li>
               <li>Açarı təhlükəsiz yerdə saxlayın</li>
             </ol>
@@ -605,17 +695,23 @@
 
             <div class="example">
               <h4>Header ilə (tövsiyə olunan)</h4>
-              <div class="code-block">curl -X POST https://lnk.az/api/analyze \
+              <div class="code-block-container">
+                <div class="code-block">curl -X POST https://lnk.az/api/analyze \
   -H "Content-Type: application/json" \
   -H "X-API-Key: your-api-key-here" \
   -d '{"url": "https://example.com/news-article"}'</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
             </div>
 
             <div class="example">
               <h4>Query parametri ilə</h4>
-              <div class="code-block">curl -X POST "https://lnk.az/api/analyze?api_key=your-api-key-here" \
+              <div class="code-block-container">
+                <div class="code-block">curl -X POST "https://lnk.az/api/analyze?api_key=your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://example.com/news-article"}'</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
             </div>
 
             <div class="warning">
@@ -705,7 +801,7 @@
               <span class="endpoint-url">/api/analyze</span>
             </div>
             <div class="endpoint-description">
-              Xəbər məqaləsini qərəz və etibarlılıq baxımından təhlil edin. Bu, əsas API endpointidir.
+              Xəbər məqaləsini qərəz və etibarlılıq baxımından təhlil edin. Bu, əsas API ucnöqtəsidir.
             </div>
             
             <div class="parameters">
@@ -738,17 +834,21 @@
             
             <div class="example">
               <h4>Nümunə sorğu</h4>
-              <div class="code-block">curl -X POST https://lnk.az/api/analyze \
+              <div class="code-block-container">
+                <div class="code-block">curl -X POST https://lnk.az/api/analyze \
   -H "Content-Type: application/json" \
   -d '{
     "url": "https://example.com/news-article",
     "modelType": "auto"
   }'</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
             </div>
             
             <div class="response-example">
               <h4>Nümunə cavab</h4>
-              <div class="code-block">{
+              <div class="code-block-container">
+                <div class="code-block">{
   "hash": "abc123def456",
   "meta": {
     "article_type": "xəbər",
@@ -776,6 +876,8 @@
   "is_advertisement": false,
   "analyzed_at": "2025-01-16T10:35:00Z"
 }</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
             </div>
           </div>
 
@@ -826,11 +928,14 @@
             
             <div class="response-example">
               <h4>Nümunə cavab</h4>
-              <div class="code-block">{
+              <div class="code-block-container">
+                <div class="code-block">{
   "total_analyses": 1250,
   "recent_analyses": 15,
   "timestamp": "2025-01-16T10:35:00Z"
 }</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
             </div>
           </div>
 
@@ -911,7 +1016,8 @@
           <h2>Cavab formatları</h2>
           <div class="api-endpoint">
             <h3>Təhlil cavabı sxemi</h3>
-            <div class="code-block">{
+            <div class="code-block-container">
+              <div class="code-block">{
   "hash": "string",           // Unikal təhlil ID-si
   "meta": {
     "article_type": "string", // "xəbər", "rəy", "analitika" və s.
@@ -960,6 +1066,8 @@
   "modelUsed": "string",      // İstifadə olunan AI modeli
   "contentSource": "string"   // "Live", "Archive.org", "Archive.md" və s.
 }</div>
+              <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+            </div>
           </div>
         </section>
 
@@ -1012,7 +1120,8 @@
           
           <div class="api-endpoint">
             <h3>JavaScript/Node.js</h3>
-            <div class="code-block">// API açarınızı təyin edin
+            <div class="code-block-container">
+              <div class="code-block">// API açarınızı təyin edin
 const API_KEY = process.env.LNK_API_KEY || 'your-api-key-here';
 
 // Məqaləni təhlil et
@@ -1040,11 +1149,14 @@ console.log('Qərəz:', analysis.scores.political_establishment_bias.value);
 const siteStats = await fetch(`https://lnk.az/api/site-averages?host=oxu.az&api_key=${API_KEY}`);
 const stats = await siteStats.json();
 console.log('Orta etibarlılıq:', stats.avg_rel);</div>
+              <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+            </div>
           </div>
 
           <div class="api-endpoint">
             <h3>Python</h3>
-            <div class="code-block">import requests
+            <div class="code-block-container">
+              <div class="code-block">import requests
 import os
 
 # API açarınızı təyin edin
@@ -1073,11 +1185,14 @@ analyses = recent.json()
 for analysis in analyses:
     print(f"Başlıq: {analysis['title']}")
     print(f"Nəşr: {analysis['publication']}")</div>
+              <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+            </div>
           </div>
 
           <div class="api-endpoint">
             <h3>cURL</h3>
-            <div class="code-block"># API açarınızı təyin edin
+            <div class="code-block-container">
+              <div class="code-block"># API açarınızı təyin edin
 export LNK_API_KEY="your-api-key-here"
 
 # Məqaləni təhlil et
@@ -1094,14 +1209,79 @@ curl "https://lnk.az/api/statistics?api_key=$LNK_API_KEY"
 
 # Sayt üzrə ortalamaları əldə et
 curl "https://lnk.az/api/site-averages?host=oxu.az&api_key=$LNK_API_KEY"</div>
+              <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2>Terminologiya qeydləri</h2>
+          <div class="api-endpoint">
+            <p>Bu sənəddə istifadə olunan bəzi terminlər bizim təklif etdiyimiz Azərbaycan dilində neologizmlərdir:</p>
+            <ul>
+              <li><strong>Ucnöqtə (endpoint):</strong> API-nin müəyyən funksiyasını yerinə yetirən URL ünvanı</li>
+              <li><strong>Geri-çağırış ünvanı (webhook):</strong> Server tərəfindən avtomatik olaraq məlumat göndərilən URL ünvanı</li>
+              <li><strong>Mühit dəyişənləri (environment variables):</strong> Proqram təminatının konfiqurasiyası üçün istifadə olunan dəyişənlər</li>
+            </ul>
           </div>
         </section>
 
         <section>
           <h2>Dəstək</h2>
           <div class="api-endpoint">
-            <p>API ilə bağlı sual və ya problemlər üçün xahiş edirik daxili şəkildə inkişaf komandası ilə əlaqə saxlayın.</p>
-            <p><strong>Son Yenilənmə:</strong> 16 yanvar 2025</p>
+            <p>API ilə bağlı sual və ya problemlər üçün aşağıdakı formu doldurun. Texniki dəstək komandamız 24 saat ərzində cavab verəcək.</p>
+            
+            <form action="https://formspree.io/f/xkgqqajd" method="POST" class="support-form">
+              <div class="form-group">
+                <label for="developer-email">E-poçt ünvanı *</label>
+                <input type="email" id="developer-email" name="email" required placeholder="developer@example.com">
+              </div>
+              
+              <div class="form-group">
+                <label for="api-key">API Açarı (opsional)</label>
+                <input type="text" id="api-key" name="api_key" placeholder="lnk_...">
+                <small>Probleminizi daha sürətlə həll etmək üçün API açarınızı paylaşa bilərsiniz</small>
+              </div>
+              
+              <div class="form-group">
+                <label for="issue-type">Problemin növü *</label>
+                <select id="issue-type" name="issue_type" required>
+                  <option value="">Seçin...</option>
+                  <option value="api-error">API səhvi</option>
+                  <option value="authentication">Autentifikasiya problemi</option>
+                  <option value="rate-limit">Sürət limiti problemi</option>
+                  <option value="response-format">Cavab formatı problemi</option>
+                  <option value="integration">İnteqrasiya problemi</option>
+                  <option value="billing">Ödəniş problemi</option>
+                  <option value="feature-request">Xüsusiyyət tələbi</option>
+                  <option value="other">Digər</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="subject">Mövzu *</label>
+                <input type="text" id="subject" name="subject" required placeholder="API səhvi: 500 Internal Server Error">
+              </div>
+              
+              <div class="form-group">
+                <label for="description">Təfərrüatlı təsvir *</label>
+                <textarea id="description" name="description" required rows="6" placeholder="Problemin təfərrüatlı təsvirini yazın. Əgər mümkündürsə, səhvin tam mətnini və ya sorğu nümunəsini əlavə edin."></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label for="code-example">Kod nümunəsi (opsional)</label>
+                <textarea id="code-example" name="code_example" rows="4" placeholder="// Problemin yarandığı kod nümunəsi"></textarea>
+              </div>
+              
+              <div class="form-group">
+                <label for="browser-info">Brauzer və sistem məlumatları (opsional)</label>
+                <input type="text" id="browser-info" name="browser_info" placeholder="Chrome 120, Windows 11, Node.js 18">
+              </div>
+              
+              <button type="submit" class="btn">Dəstək tələbi göndər</button>
+            </form>
+            
+            <p><strong>Son Yenilənmə:</strong> 11 oktyabr 2025</p>
           </div>
         </section>
 
@@ -1111,5 +1291,42 @@ curl "https://lnk.az/api/site-averages?host=oxu.az&api_key=$LNK_API_KEY"</div>
   </div>
 
   <script src="/static/layout.js" defer></script>
+  <script>
+    function copyCode(button) {
+      const codeBlock = button.previousElementSibling;
+      const text = codeBlock.textContent;
+      
+      navigator.clipboard.writeText(text).then(function() {
+        // Show success feedback
+        const originalText = button.textContent;
+        button.textContent = 'Kopyalandı!';
+        button.classList.add('copied');
+        
+        // Reset after 2 seconds
+        setTimeout(function() {
+          button.textContent = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      }).catch(function(err) {
+        console.error('Kopyalama xətası: ', err);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        const originalText = button.textContent;
+        button.textContent = 'Kopyalandı!';
+        button.classList.add('copied');
+        
+        setTimeout(function() {
+          button.textContent = originalText;
+          button.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
 </body>
 </html>

@@ -8,7 +8,7 @@ async function handler(req, res) {
   try {
     console.log('Statistics API called');
     
-    // Try to get the total count from a dedicated counter
+    // Try to get the total count from a xüsusi counter
     let totalCount = await kv.get('total_analyses_count');
     
     // If no counter exists, initialize it with a reasonable estimate

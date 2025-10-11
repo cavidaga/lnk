@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: true, message: 'Invalid credentials' });
     }
 
-    // Check if user is a regular user (not developer/admin)
+    // Check if user is a regular user (not təkmilləşdirici/admin)
     if (user.role && user.role !== 'user') {
       await new Promise(r => setTimeout(r, 300));
       return res.status(401).json({ error: true, message: 'Invalid credentials' });
