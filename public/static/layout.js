@@ -225,12 +225,12 @@
           </a>
         </div>
 
-        <div class="small muted">© <span id="y"></span> LNK.AZ — Made by <a class="muted" href="https://cavid.info" target="_blank" rel="noopener">cavid.info</a></div>
         <div class="footer-row" style="margin:12px 0; display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
           <a href="/documentation" class="muted">Sənədlər</a>
           <span class="muted" aria-hidden="true">•</span>
           <a href="/dev" class="muted">Developer</a>
         </div>
+        <div class="small muted">© <span id="y"></span> LNK.AZ — Made by <a class="muted" href="https://cavid.info" target="_blank" rel="noopener">cavid.info</a></div>
       </footer>
     `;
   }
