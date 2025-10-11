@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="az" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <title>LNK.az Developer Login</title>
+  <meta name="description" content="LNK.az Developer Paneli - Daxil ol" />
+  <meta name="theme-color" content="#0c0d12">
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="/static/favicon-dark.svg"  media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="/static/styles.css">
+  
+  <style>
+    .login-container {
+      max-width: 400px;
+      margin: 4rem auto;
+      padding: 2rem;
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .login-header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    
+    .login-header p {
+      color: var(--muted);
+    }
+    
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      font-size: 1rem;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn:hover {
+      background: var(--primary-hover);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .register-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: var(--muted);
+    }
+    
+    .register-link a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="site-header"></div>
+    <main id="main" role="main">
+      <div class="login-container">
+        <div class="login-header">
+          <h1>🔧 Developer Paneli</h1>
+          <p>API test və idarəetmə interfeysi</p>
+        </div>
+
+        <div id="error-message" class="error-message hidden"></div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">E-poçt</label>
+            <input type="email" id="email" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Şifrə</label>
+            <input type="password" id="password" required>
+          </div>
+          <button type="submit" class="btn" id="login-btn">Daxil ol</button>
+        </form>
+
+        <div class="register-link">
+          <p>Hesabınız yoxdur? <a href="/dev-register.html">Qeydiyyatdan keçin</a></p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/layout.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const loginBtn = document.getElementById('login-btn');
+      const errorEl = document.getElementById('error-message');
+      
+      // Show loading state
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Daxil olunur...';
+      errorEl.classList.add('hidden');
+      
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        if (response.ok) {
+          // Login successful - redirect to dev panel
+          window.location.href = '/dev';
+        } else {
+          const error = await response.json();
+          errorEl.textContent = error.message || 'Giriş uğursuz oldu';
+          errorEl.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorEl.textContent = 'Xəta: ' + error.message;
+        errorEl.classList.remove('hidden');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Daxil ol';
+      }
+    });
+
+    // Check if redirected from login required
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('login') === 'required') {
+      document.getElementById('error-message').textContent = 'Bu səhifəyə daxil olmaq üçün giriş edin';
+      document.getElementById('error-message').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
