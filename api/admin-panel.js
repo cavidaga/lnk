@@ -1,4 +1,4 @@
-import { getSessionFromRequest } from '../lib/auth.js';
+import { requireAuth } from '../lib/auth.js';
 
 export default async function handler(req, res) {
   // Only allow GET requests
@@ -7,16 +7,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Check if user is authenticated
-    const session = await getSessionFromRequest(req);
+    // Check if user is authenticated and get full user data
+    const user = await requireAuth(req, res);
     
-    if (!session || !session.user) {
+    if (!user) {
       // Redirect to admin login page if not authenticated
       return res.redirect(302, '/admin-login.html');
     }
 
     // Check if user is admin
-    const user = session.user;
     const isAdmin = user.role === 'admin' || 
                    user.isAdmin === true || 
                    user.email === process.env.ADMIN_EMAIL;
