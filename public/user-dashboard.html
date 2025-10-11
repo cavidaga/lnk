@@ -491,8 +491,8 @@
               </div>
               <div class="stat-card" style="text-align:left;">
                 <h3>İki Mərhələli Doğrulama (2FA)</h3>
-                <div id="2fa-status">
-                  <p id="2fa-status-text">Yüklənir...</p>
+                <div id="2fa-status" style="margin-bottom: 1rem;">
+                  <p id="2fa-status-text" style="margin: 0; font-size: 14px; font-weight: 500;">Yüklənir...</p>
                 </div>
                 <div id="2fa-actions">
                   <button id="enable-2fa-btn" class="btn btn-primary hidden">2FA Aktiv Et</button>
@@ -844,13 +844,15 @@
           const disableBtn = document.getElementById('disable-2fa-btn');
           
           if (user.twoFactorEnabled) {
-            statusText.textContent = '✅ 2FA aktivdir - Hesabınız əlavə təhlükəsizlik qatı ilə qorunur';
+            statusText.textContent = '✅ 2FA aktivdir';
             statusText.style.color = '#16a34a';
+            statusText.style.fontSize = '14px';
             enableBtn.classList.add('hidden');
             disableBtn.classList.remove('hidden');
           } else {
-            statusText.textContent = '❌ 2FA deaktivdir - Hesabınızı əlavə təhlükəsizlik üçün aktiv edin';
-            statusText.style.color = '#dc2626';
+            statusText.textContent = '2FA deaktivdir';
+            statusText.style.color = '#6b7280';
+            statusText.style.fontSize = '14px';
             enableBtn.classList.remove('hidden');
             disableBtn.classList.add('hidden');
           }
@@ -902,6 +904,17 @@
 
     // Load 2FA status on page load
     load2FAStatus();
+    
+    // Refresh 2FA status when returning from setup page
+    if (window.location.search.includes('2fa=setup-complete')) {
+      setTimeout(() => {
+        load2FAStatus();
+        // Remove the parameter from URL
+        const url = new URL(window.location);
+        url.searchParams.delete('2fa');
+        window.history.replaceState({}, '', url);
+      }, 1000);
+    }
   </script>
 </body>
 </html>

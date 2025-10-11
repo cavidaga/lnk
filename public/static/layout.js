@@ -111,7 +111,7 @@
             <span class="label">Qeydiyyat</span>
           </a>
 
-          <a href="/user-dashboard.html" class="radial-item nav-link" data-tooltip="Panel" aria-label="İstifadəçi paneli" data-angle="324">
+          <a href="/user-dashboard.html" class="radial-item nav-link" data-tooltip="İstifadəçi Paneli" aria-label="İstifadəçi paneli" data-angle="324">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <rect x="14" y="3" width="7" height="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>

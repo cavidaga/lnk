@@ -7,13 +7,36 @@
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/styles.css">
   <style>
+    /* Prevent layout.js from affecting this page */
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: var(--bg, #f8fafc);
+    }
+    
+    .container {
+      max-width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    main {
+      padding: 2rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
     .setup-container {
       max-width: 600px;
-      margin: 2rem auto;
+      width: 100%;
+      margin: 0 auto;
       padding: 2rem;
-      background: var(--card-bg);
+      background: var(--card-bg, white);
       border-radius: 12px;
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow, 0 4px 16px rgba(0, 0, 0, 0.1));
     }
     
     .step {
@@ -142,7 +165,79 @@
     }
     
     .step-dot.completed {
-      background: var(--success);
+      background: var(--success, #10b981);
+    }
+    
+    /* Button styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--primary, #3b82f6);
+      color: white;
+    }
+    
+    .btn:hover {
+      background: var(--primary-hover, #2563eb);
+      transform: translateY(-1px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn-secondary {
+      background: var(--secondary, #6b7280);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: var(--secondary-hover, #4b5563);
+    }
+    
+    /* Form styles */
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text, #1f2937);
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border, #d1d5db);
+      border-radius: 8px;
+      font-size: 1rem;
+      background: var(--input-bg, white);
+      color: var(--text, #1f2937);
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary, #3b82f6);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-group small {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.875rem;
+      color: var(--muted, #6b7280);
     }
   </style>
 </head>
@@ -227,7 +322,7 @@
           </div>
           
           <div style="text-align: center; margin-top: 2rem;">
-            <button class="btn" id="finish-setup-btn">Dashboard-a Keç</button>
+            <button class="btn" id="finish-setup-btn">İstifadəçi Panelinə Keç</button>
           </div>
         </div>
       </div>
@@ -379,7 +474,7 @@
     
     // Finish setup
     document.getElementById('finish-setup-btn').addEventListener('click', () => {
-      window.location.href = '/user-dashboard.html';
+      window.location.href = '/user-dashboard.html?2fa=setup-complete';
     });
     
     // Auto-format verification code input
