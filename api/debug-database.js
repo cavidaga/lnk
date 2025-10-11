@@ -19,8 +19,11 @@ export default async function handler(req, res) {
 
     // Try different key formats
     const possibleKeys = [
+      `user:email:${email}`,
       `user:${email}`,
+      `user:email:${email.toLowerCase()}`,
       `user:${email.toLowerCase()}`,
+      `user:email:${email.toUpperCase()}`,
       `user:${email.toUpperCase()}`,
       email,
       email.toLowerCase(),
@@ -33,7 +36,16 @@ export default async function handler(req, res) {
       try {
         const user = await kv.get(key);
         if (user) {
-          results[key] = user;
+          results[key] = {
+            found: true,
+            data: user,
+            keys: Object.keys(user),
+            role: user.role,
+            isAdmin: user.isAdmin,
+            email: user.email
+          };
+        } else {
+          results[key] = { found: false };
         }
       } catch (error) {
         results[key] = `Error: ${error.message}`;

@@ -17,9 +17,25 @@ export default async function handler(req, res) {
       return res.status(403).json({ message: 'Invalid admin token' });
     }
 
-    // Get user from database
-    const userKey = `user:${email}`;
-    const user = await kv.get(userKey);
+    // Get user from database - try different key formats
+    const possibleKeys = [
+      `user:email:${email}`,
+      `user:${email}`,
+      `user:email:${email.toLowerCase()}`,
+      `user:${email.toLowerCase()}`,
+      email
+    ];
+
+    let user = null;
+    let userKey = null;
+
+    for (const key of possibleKeys) {
+      user = await kv.get(key);
+      if (user) {
+        userKey = key;
+        break;
+      }
+    }
 
     if (!user) {
       return res.status(404).json({ message: 'User not found. Please register first.' });
