@@ -72,6 +72,16 @@
             </svg>
             <span class="label">Metodologiya</span>
           </a>
+
+          <!-- Documentation -->
+          <a href="/documentation" class="radial-item nav-link" data-tooltip="Sənədlər" aria-label="Sənədlər" data-angle="180">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M8 4h8l4 4v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 4v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10 13h6M10 17h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="label">Sənədlər</span>
+          </a>
           
           <a href="/privacy.html" class="radial-item nav-link" data-tooltip="Məxfilik" aria-label="Məxfilik" data-angle="216">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -91,6 +101,21 @@
           </a>
 
           <!-- User login/register links -->
+          <!-- Developer and Admin shortcuts -->
+          <a href="/dev" class="radial-item nav-link" data-tooltip="Developer" aria-label="Developer" data-angle="270">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M8 16l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="label">Developer</span>
+          </a>
+          <a href="/admin" class="radial-item nav-link" data-tooltip="Admin" aria-label="Admin" data-angle="282">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 8v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="label">Admin</span>
+          </a>
           <a href="/user-login.html" class="radial-item nav-link" data-tooltip="Daxil ol" aria-label="Daxil ol" data-angle="288">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
