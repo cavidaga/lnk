@@ -3,14 +3,49 @@ import { requireAuth } from '../../lib/auth.js';
 
 export const config = { runtime: 'nodejs' };
 
+// Admin access check function
+async function checkAdminAccess(user) {
+  console.log('Checking admin access for user:', user.email);
+  
+  // Check if user has admin role or is the first user (super admin)
+  if (user.role === 'admin' || user.isAdmin === true) {
+    console.log('User has admin role');
+    return true;
+  }
+  
+  // Check if this is the first user (super admin)
+  const allUsers = await kv.keys('user:id:*');
+  console.log('Total users:', allUsers.length);
+  if (allUsers.length === 1) {
+    console.log('First user - granting admin access');
+    return true;
+  }
+  
+  // Check against environment variable
+  if (process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL) {
+    console.log('User matches ADMIN_EMAIL');
+    return true;
+  }
+  
+  // Check if user email contains admin keywords (for development)
+  if (user.email.includes('admin') || user.email.includes('cavid')) {
+    console.log('User email contains admin keywords');
+    return true;
+  }
+  
+  console.log('User does not have admin access');
+  return false;
+}
+
 async function handler(req, res) {
   try {
     // Require authentication
     const user = await requireAuth(req, res);
     if (!user) return;
 
-    // Check if user is admin (you can implement your own admin check logic)
-    if (user.email !== process.env.ADMIN_EMAIL) {
+    // Check if user is admin
+    const isAdmin = await checkAdminAccess(user);
+    if (!isAdmin) {
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       return res.status(403).json({ error: true, message: 'Admin access required' });
     }

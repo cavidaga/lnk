@@ -507,8 +507,13 @@
             <p><strong>Plan:</strong> <span class="plan-badge plan-${user.plan}">${user.plan}</span></p>
             <p><strong>Yaradılıb:</strong> ${new Date(user.createdAt).toLocaleDateString('az-AZ')}</p>
             ${user.planUpdatedAt ? `<p><strong>Plan yeniləndi:</strong> ${new Date(user.planUpdatedAt).toLocaleDateString('az-AZ')}</p>` : ''}
+            ${user.role ? `<p><strong>Rol:</strong> <span class="plan-badge plan-${user.role === 'admin' ? 'enterprise' : 'free'}">${user.role === 'admin' ? 'Admin' : 'İstifadəçi'}</span></p>` : ''}
             <div class="user-actions">
               <button class="btn btn-sm btn-primary" onclick="adminPanel.editUser('${user.id}')">Redaktə et</button>
+              ${user.role === 'admin' ? 
+                `<button class="btn btn-sm btn-warning" onclick="adminPanel.demoteUser('${user.id}')">Admin hüququnu ləğv et</button>` :
+                `<button class="btn btn-sm btn-success" onclick="adminPanel.promoteUser('${user.id}')">Admin et</button>`
+              }
               <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteUser('${user.id}')">Sil</button>
             </div>
           </div>
@@ -541,8 +546,13 @@
             <p><strong>Plan:</strong> <span class="plan-badge plan-${user.plan}">${user.plan}</span></p>
             <p><strong>Yaradılıb:</strong> ${new Date(user.createdAt).toLocaleDateString('az-AZ')}</p>
             ${user.planUpdatedAt ? `<p><strong>Plan yeniləndi:</strong> ${new Date(user.planUpdatedAt).toLocaleDateString('az-AZ')}</p>` : ''}
+            ${user.role ? `<p><strong>Rol:</strong> <span class="plan-badge plan-${user.role === 'admin' ? 'enterprise' : 'free'}">${user.role === 'admin' ? 'Admin' : 'İstifadəçi'}</span></p>` : ''}
             <div class="user-actions">
               <button class="btn btn-sm btn-primary" onclick="adminPanel.editUser('${user.id}')">Redaktə et</button>
+              ${user.role === 'admin' ? 
+                `<button class="btn btn-sm btn-warning" onclick="adminPanel.demoteUser('${user.id}')">Admin hüququnu ləğv et</button>` :
+                `<button class="btn btn-sm btn-success" onclick="adminPanel.promoteUser('${user.id}')">Admin et</button>`
+              }
               <button class="btn btn-sm btn-danger" onclick="adminPanel.deleteUser('${user.id}')">Sil</button>
             </div>
           </div>
@@ -653,6 +663,50 @@
           }
         } catch (error) {
           console.error('Stats load error:', error);
+        }
+      }
+
+      async promoteUser(userId) {
+        if (!confirm('Bu istifadəçini admin etmək istədiyinizə əminsiniz?')) return;
+
+        try {
+          const response = await fetch('/api/admin/promote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, action: 'promote' })
+          });
+
+          if (response.ok) {
+            this.showSuccess('İstifadəçi admin edildi');
+            this.loadUsers();
+          } else {
+            const error = await response.json();
+            this.showError('Admin etmə uğursuz: ' + error.message);
+          }
+        } catch (error) {
+          this.showError('Xəta: ' + error.message);
+        }
+      }
+
+      async demoteUser(userId) {
+        if (!confirm('Bu istifadəçinin admin hüququnu ləğv etmək istədiyinizə əminsiniz?')) return;
+
+        try {
+          const response = await fetch('/api/admin/promote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, action: 'demote' })
+          });
+
+          if (response.ok) {
+            this.showSuccess('İstifadəçinin admin hüququ ləğv edildi');
+            this.loadUsers();
+          } else {
+            const error = await response.json();
+            this.showError('Admin hüququnu ləğv etmə uğursuz: ' + error.message);
+          }
+        } catch (error) {
+          this.showError('Xəta: ' + error.message);
         }
       }
 
