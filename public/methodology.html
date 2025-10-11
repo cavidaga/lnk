@@ -71,7 +71,10 @@
       <article>
         <h1>Metodologiya</h1>
         <p class="sub" style="margin-top:8px">
-          LNK.az məqalələrin etibarlılığını və qərəz meyllərini qiymətləndirmək üçün süni zəka və təbii dil emalı yanaşmasından istifadə edir. Aşağıda əsas anlayışlar, ballar, diaqnostik göstəricilər, analiz prosesi və məhdudiyyətlər sadə izah və nümunələrlə təqdim olunur. 
+          LNK.az məqalələrin etibarlılığını və qərəz meyllərini qiymətləndirmək üçün qabaqcıl süni zəka modelləri və təbii dil emalı yanaşmasından istifadə edir. Aşağıda əsas anlayışlar, ballar, diaqnostik göstəricilər, reklam aşkarlama, AI model seçimi, arxiv fallback mexanizmləri, analiz prosesi və məhdudiyyətlər sadə izah və nümunələrlə təqdim olunur. 
+        </p>
+        <p class="note" style="margin-top:8px">
+          <strong>Son yenilənmə:</strong> 11 oktyabr 2025
         </p>
 
         <nav class="toc" aria-label="Mündəricat">
@@ -79,6 +82,9 @@
           <ul>
             <li><a href="#reliability">Etibarlılıq</a></li>
             <li><a href="#political-bias">Siyasi hakimiyyət meyli</a></li>
+            <li><a href="#advertisement-detection">Reklam aşkarlama</a></li>
+            <li><a href="#ai-models">AI model seçimi</a></li>
+            <li><a href="#content-sources">Məzmun mənbələri</a></li>
             <li><a href="#diagnostics">Diaqnostik göstəricilər</a></li>
             <li><a href="#json-why">Niyə JSON?</a></li>
             <li><a href="#json-schema">JSON çıxarış sxemi</a></li>
@@ -148,6 +154,115 @@
             <li><strong>+5:</strong> Güclü iqtidaryönlü təqdimat — hakimiyyəti davamlı müsbət, legitimləşdirici və müdafiəedici şəkildə təqdim edir.</li>
           </ul>
           <p class="note">Qeyd: Bu bal müəllifin ümumi siyasi baxışını göstərmir; yalnız həmin konkret məqalədəki təqdimatı əks etdirir.</p>
+        </section>
+
+        <!-- ADVERTISEMENT DETECTION -->
+        <section id="advertisement-detection">
+          <h2>Reklam aşkarlama</h2>
+          <p>
+            LNK.az sistemi məqalələrin reklam və ya təbliğat xarakterli olub-olmadığını avtomatik aşkar edir. Bu funksiya etibarlılıq qiymətləndirməsində mühüm rol oynayır.
+          </p>
+          
+          <h3>Aşkarlanan reklam növləri</h3>
+          <ul>
+            <li><strong>Ödənişli reklamlar</strong> — korporativ elanlar və marka təbliği</li>
+            <li><strong>Press-relizlər</strong> — rəsmi korporativ bəyanatlar</li>
+            <li><strong>Sponsorlu məzmun</strong> — gizli reklam və ya təbliğat</li>
+            <li><strong>Korporativ elanlar</strong> — şirkət tərəfindən maliyyələşdirilən məzmun</li>
+          </ul>
+
+          <h3>Aşkarlama meyarları</h3>
+          <p>Sistem aşağıdakı göstəricilərə əsaslanaraq reklam aşkarlayır:</p>
+          <ul>
+            <li><strong>Korporativ dil</strong> — press-reliz üslubu və marka təbliği tonu</li>
+            <li><strong>Müstəqil yoxlama yoxluğu</strong> — tək tərəfli müsbət təqdimat</li>
+            <li><strong>Reklam göstəriciləri</strong> — məqsədli məlumatlandırma və təbliğat</li>
+            <li><strong>Mənbə şəffaflığı</strong> — mənbələrin açıq göstərilməməsi</li>
+          </ul>
+
+          <div class="kpi">
+            <strong>Reklam aşkarlananda etibarlılıq balı</strong>
+            <p>Reklam xarakterli məzmun avtomatik olaraq aşağı etibarlılıq balı alır, çünki ödənişli məzmunun özünə qarşı qərəzli olması təbii haldır. Bu, məzmunun yanlış olduğunu deyil, sadəcə müstəqil jurnalistika standartlarına uyğun olmadığını göstərir.</p>
+          </div>
+        </section>
+
+        <!-- AI MODELS -->
+        <section id="ai-models">
+          <h2>AI model seçimi</h2>
+          <p>
+            LNK.az müxtəlif Google Gemini modellərindən istifadə edir və məzmunun xarakterinə görə optimal modeli avtomatik seçir.
+          </p>
+
+          <h3>Mövcud modellər</h3>
+          <ul>
+            <li><strong>Gemini 2.5 Flash Lite</strong> — Qısa xəbərlər və sürətli təhlil üçün</li>
+            <li><strong>Gemini 2.5 Flash</strong> — Orta uzunluqlu məzmun üçün balanslı seçim</li>
+            <li><strong>Gemini 2.5 Pro</strong> — Analitik məqalələr və dərin təhlil üçün</li>
+          </ul>
+
+          <h3>Avtomatik model seçimi</h3>
+          <p>Sistem aşağıdakı amillərə əsaslanaraq model seçir:</p>
+          
+          <h4>Flash Lite üçün göstəricilər</h4>
+          <ul>
+            <li>Qısa məzmun (2000 simvoldan az)</li>
+            <li>Xəbər açar sözləri ("xəbər", "bildirir", "hadisə")</li>
+            <li>Son dəqiqə xəbərləri</li>
+            <li>Qısa paraqraflar və bullet pointlər</li>
+            <li>Tarix və vaxt göstəriciləri</li>
+          </ul>
+
+          <h4>Pro model üçün göstəricilər</h4>
+          <ul>
+            <li>Uzun məzmun (5000 simvoldan çox)</li>
+            <li>Analitik açar sözləri ("təhlil", "araşdırma", "müzakirə")</li>
+            <li>Rəy və fikir məqalələri</li>
+            <li>Çox bölməli struktur</li>
+            <li>İstinadlar və sitatlar</li>
+          </ul>
+
+          <div class="kpi">
+            <strong>Model performansı</strong>
+            <ul>
+              <li><em>Flash Lite:</em> 30 saniyəyə qədər, qısa məzmun üçün optimal</li>
+              <li><em>Flash:</em> 45 saniyəyə qədər, balanslı performans</li>
+              <li><em>Pro:</em> 90 saniyəyə qədər, mürəkkəb təhlil üçün ən yaxşı</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- CONTENT SOURCES -->
+        <section id="content-sources">
+          <h2>Məzmun mənbələri</h2>
+          <p>
+            LNK.az məqalələrə çatmaq üçün müxtəlif mənbələrdən istifadə edir. Əgər birinci mənbə bloklanıbsa, sistem avtomatik olaraq alternativ mənbələrə keçir.
+          </p>
+
+          <h3>Mənbə prioriteti</h3>
+          <ol>
+            <li><strong>Canlı mənbə</strong> — Orijinal URL-dən birbaşa məzmun əldə etmə</li>
+            <li><strong>Archive.org</strong> — Internet Archive-dən arxiv nüsxəsi</li>
+            <li><strong>Archive.md</strong> — Archive.md xidmətindən arxiv nüsxəsi</li>
+            <li><strong>Bloklanmış məzmun</strong> — Məhdud məlumat əsasında təhlil</li>
+          </ol>
+
+          <h3>Fallback mexanizmi</h3>
+          <p>Əgər mənbə bot mühafizəsi ilə qorunursa və ya əlçatan deyilsə:</p>
+          <ul>
+            <li>Sistem əvvəlcə Archive.org-də arxiv nüsxəsi axtarır</li>
+            <li>Archive.org tapılmazsa, Archive.md-də axtarır</li>
+            <li>Hər iki arxiv mənbəsi tapılmazsa, məhdud məlumat əsasında təhlil aparır</li>
+            <li>İstifadəçi nəticədə mənbənin statusu haqqında xəbərdarlıq alır</li>
+          </ul>
+
+          <div class="kpi">
+            <strong>Mənbə statusu xəbərdarlıqları</strong>
+            <ul>
+              <li><em>Yüksək təhlükə:</em> Mənbə bloklanıb, məhdud məlumat əsasında təhlil</li>
+              <li><em>Orta təhlükə:</em> Arxiv nüsxəsi istifadə olunub</li>
+              <li><em>Orta təhlükə:</em> Məzmun qısa olduğu üçün məhdud təhlil</li>
+            </ul>
+          </div>
         </section>
 
         <!-- DIAGNOSTICS -->
@@ -234,7 +349,12 @@
   "cited_sources": [
     { "name": "Dövlət Statistika Komitəsi", "role": "rəsmi qurum", "stance": "neytral" }
   ],
-  "human_summary": "Məqalənin əsas məzmununu və nəticələrini aydın, axıcı Azərbaycan dilində 2–4 cümlə ilə xülasə et."
+  "human_summary": "Məqalənin əsas məzmununu və nəticələrini aydın, axıcı Azərbaycan dilində 2–4 cümlə ilə xülasə et.",
+  "is_advertisement": true/false,
+  "advertisement_reason": "Reklam xarakterli olduğunu göstərən əsas amillər (məs. korporativ elan, marka təbliği, məqsədli məlumatlandırma)",
+  "analyzed_at": "2025-10-11T10:30:00Z",
+  "modelUsed": "gemini-2.5-flash-lite",
+  "contentSource": "Live | Archive.org | Archive.md | Blocked"
 }</code></pre>
         </section>
 
@@ -261,8 +381,26 @@
             Bu sistem fakt yoxlayıcı deyil; məqalədəki siqnalları və meylləri təsnifləşdirən alətdir. İroniya, sarkazm və mədəni istinadlar bəzən düzgün qiymətləndirilə bilməz.
             Dilin mürəkkəbliyi — məsələn, atalar sözləri və bədii ifadələr — təhlildə səhvlərə yol aça bilər. Model ən son xəbərləri dərhal bilmir; aktuallıqda gecikmələr mümkündür
             və yerli mədəni istinadlar yanlış başa düşülə bilər. Rəy və ya bioqrafik yazılarda istinadların azlığı səbəbindən etibarlılıq balı texniki olaraq aşağı görünə bilər.
-            Həmçinin, yeni və ya çox aktual hadisələr mənbəsiz təqdim olunarsa, sistem bunları “istinadsız iddia” kimi qəbul edəcək; bu, hadisənin gerçək olmadığını deyil,
+            Həmçinin, yeni və ya çox aktual hadisələr mənbəsiz təqdim olunarsa, sistem bunları "istinadsız iddia" kimi qəbul edəcək; bu, hadisənin gerçək olmadığını deyil,
             sadəcə məqalədə oxucu üçün yoxlana bilən istinadın göstərilmədiyini bildirir.
+          </p>
+
+          <h3>Reklam aşkarlama məhdudiyyətləri</h3>
+          <p>
+            Reklam aşkarlama sistemi korporativ dil və üslub göstəricilərinə əsaslanır. Bəzi gizli reklamlar və ya çox incə təbliğat üsulları aşkarlanmaya bilər.
+            Həmçinin, bəzi press-relizlər və korporativ bəyanatlar jurnalistika üslubunda yazıla bilər və sistem tərəfindən adi xəbər kimi qiymətləndirilə bilər.
+          </p>
+
+          <h3>AI model məhdudiyyətləri</h3>
+          <p>
+            Müxtəlif AI modellərinin performansı məzmunun mürəkkəbliyinə görə dəyişir. Flash Lite modeli qısa məzmun üçün optimal olsa da, mürəkkəb analitik məqalələrdə
+            bəzi nüansları qaçıra bilər. Pro model daha dərin təhlil təmin edir, lakin daha çox vaxt tələb edir.
+          </p>
+
+          <h3>Mənbə məhdudiyyətləri</h3>
+          <p>
+            Arxiv mənbələri (Archive.org, Archive.md) bəzən məqalənin tam versiyasını saxlamaya bilər. Bu halda təhlil məhdud məlumat əsasında aparılır və
+            nəticələr tam olmaya bilər. Həmçinin, bəzi mənbələr bot mühafizəsi ilə qorunur və heç bir arxiv mənbəsi tapılmaya bilər.
           </p>
         </section>
 
