@@ -205,6 +205,10 @@
       Veritabanını Yoxla
     </button>
 
+    <button class="btn btn-secondary" id="fix-user-btn" style="margin-top: 0.5rem;">
+      İstifadəçini Düzəlt və Admin Et
+    </button>
+
     <div id="debug-results" class="user-info hidden" style="margin-top: 1rem;">
       <h3>Debug Nəticələri</h3>
       <pre id="debug-content"></pre>
@@ -231,6 +235,11 @@
         // Debug button
         document.getElementById('debug-btn').addEventListener('click', () => {
           this.debugDatabase();
+        });
+
+        // Fix user button
+        document.getElementById('fix-user-btn').addEventListener('click', () => {
+          this.fixUser();
         });
       }
 
@@ -272,6 +281,46 @@
           // Re-enable button
           debugBtn.disabled = false;
           debugBtn.textContent = 'Veritabanını Yoxla';
+        }
+      }
+
+      async fixUser() {
+        const email = document.getElementById('email').value;
+        const adminToken = document.getElementById('admin-token').value;
+        const fixBtn = document.getElementById('fix-user-btn');
+
+        if (!email || !adminToken) {
+          this.showMessage('Zəhmət olmasa e-poçt və admin token daxil edin', 'error');
+          return;
+        }
+
+        // Disable button and show loading
+        fixBtn.disabled = true;
+        fixBtn.textContent = 'Düzəldilir...';
+
+        try {
+          const response = await fetch('/api/fix-user-admin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, adminToken }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            this.showMessage(`İstifadəçi uğurla düzəldildi və admin edildi: ${data.userByEmail.email}. İndi admin paneline daxil ola bilərsiniz!`, 'success');
+            document.getElementById('promote-form').reset();
+          } else {
+            const error = await response.json();
+            this.showMessage(`Xəta: ${error.message}`, 'error');
+          }
+        } catch (error) {
+          this.showMessage(`Xəta: ${error.message}`, 'error');
+        } finally {
+          // Re-enable button
+          fixBtn.disabled = false;
+          fixBtn.textContent = 'İstifadəçini Düzəlt və Admin Et';
         }
       }
 

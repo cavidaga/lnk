@@ -37,6 +37,17 @@ export default async function handler(req, res) {
       }
     }
 
+    // If we found a user by email but it's incomplete, try to find the full user record by ID
+    if (user && user.id && (!user.role || !user.isAdmin)) {
+      const userByIdKey = `user:id:${user.id}`;
+      const userById = await kv.get(userByIdKey);
+      if (userById && (userById.role || userById.isAdmin)) {
+        // Use the more complete user record
+        user = userById;
+        userKey = userByIdKey;
+      }
+    }
+
     if (!user) {
       return res.status(404).json({ message: 'User not found. Please register first.' });
     }
@@ -45,10 +56,28 @@ export default async function handler(req, res) {
     const updatedUser = {
       ...user,
       role: 'admin',
-      isAdmin: true
+      isAdmin: true,
+      // Ensure we have all required fields
+      email: user.email || email,
+      id: user.id
     };
 
     await kv.set(userKey, updatedUser);
+
+    // Also try to update by user ID if we have it
+    if (user.id) {
+      const userByIdKey = `user:id:${user.id}`;
+      const userById = await kv.get(userByIdKey);
+      if (userById) {
+        const updatedUserById = {
+          ...userById,
+          role: 'admin',
+          isAdmin: true,
+          email: userById.email || email
+        };
+        await kv.set(userByIdKey, updatedUserById);
+      }
+    }
 
     return res.json({ 
       message: 'User promoted to admin successfully',
