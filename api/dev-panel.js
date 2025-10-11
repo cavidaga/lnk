@@ -27,6 +27,20 @@ export default async function handler(req, res) {
       return;
     }
 
+    // Check if user is approved developer or admin
+    const isApproved = user.status === 'approved' || 
+                      user.role === 'admin' || 
+                      user.isAdmin === true ||
+                      user.email === process.env.ADMIN_EMAIL;
+
+    if (!isApproved) {
+      // Redirect to login with pending message
+      res.statusCode = 302;
+      res.setHeader('Location', '/dev-login.html?status=pending');
+      res.end();
+      return;
+    }
+
     // User is authenticated, serve the dev panel
     const fs = await import('fs');
     const devPanelPath = fileURLToPath(new URL('../dev-panel.html', import.meta.url));

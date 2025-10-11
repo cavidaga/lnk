@@ -155,9 +155,9 @@
           <button type="submit" class="btn" id="login-btn">Daxil ol</button>
         </form>
 
-        <div class="register-link">
-          <p>Hesabınız yoxdur? <a href="/dev-register.html">Qeydiyyatdan keçin</a></p>
-        </div>
+    <div class="register-link">
+      <p>Hesabınız yoxdur? <a href="/dev-register-simple.html">Developer Qeydiyyatı</a></p>
+    </div>
       </div>
     </main>
   </div>
@@ -201,10 +201,13 @@
       }
     });
 
-    // Check if redirected from login required
+    // Check if redirected from login required or pending status
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('login') === 'required') {
       document.getElementById('error-message').textContent = 'Bu səhifəyə daxil olmaq üçün giriş edin';
+      document.getElementById('error-message').classList.remove('hidden');
+    } else if (urlParams.get('status') === 'pending') {
+      document.getElementById('error-message').textContent = 'Developer hesabınız hələ təsdiqlənməyib. Zəhmət olmasa gözləyin və ya admin ilə əlaqə saxlayın.';
       document.getElementById('error-message').classList.remove('hidden');
     }
   </script>
