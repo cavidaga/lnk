@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Setup - LNK.az</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    
+    .setup-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    
+    .setup-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .setup-header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: #1f2937;
+    }
+    
+    .setup-header p {
+      color: #6b7280;
+    }
+    
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .info-message {
+      background: #d1ecf1;
+      color: #0c5460;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #bee5eb;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #1f2937;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #1f2937;
+      font-size: 1rem;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 0.75rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 1rem;
+    }
+    
+    .btn:hover {
+      background: #2563eb;
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+    }
+    
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+    .user-info {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #e9ecef;
+    }
+    
+    .user-info h3 {
+      margin-bottom: 0.5rem;
+      color: #1f2937;
+    }
+    
+    .user-info p {
+      margin-bottom: 0.25rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="setup-container">
+    <div class="setup-header">
+      <h1>🔧 Admin Setup</h1>
+      <p>Mövcud istifadəçini admin etmək</p>
+    </div>
+
+    <div id="error-message" class="error-message hidden"></div>
+    <div id="success-message" class="success-message hidden"></div>
+    <div id="info-message" class="info-message hidden"></div>
+
+    <div id="user-info" class="user-info hidden">
+      <h3>Mövcud İstifadəçi Məlumatları</h3>
+      <p><strong>E-poçt:</strong> <span id="user-email"></span></p>
+      <p><strong>Rol:</strong> <span id="user-role"></span></p>
+      <p><strong>Admin:</strong> <span id="user-is-admin"></span></p>
+      <p><strong>Admin E-poçt (ENV):</strong> <span id="admin-email"></span></p>
+    </div>
+
+    <form id="promote-form">
+      <div class="form-group">
+        <label for="email">E-poçt (admin etmək istədiyiniz istifadəçi)</label>
+        <input type="email" id="email" required placeholder="user@example.com">
+      </div>
+      
+      <button type="submit" class="btn" id="promote-btn">
+        Admin Et
+      </button>
+    </form>
+
+    <button class="btn btn-secondary" id="check-user-btn">
+      Mövcud İstifadəçi Məlumatlarını Yoxla
+    </button>
+
+    <div style="text-align: center; margin-top: 1rem;">
+      <a href="/admin-login.html" style="color: #3b82f6; text-decoration: none;">Admin Paneline Daxil Ol</a>
+    </div>
+  </div>
+
+  <script>
+    class AdminSetup {
+      constructor() {
+        this.init();
+      }
+
+      init() {
+        // Promote form
+        document.getElementById('promote-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handlePromote();
+        });
+
+        // Check user button
+        document.getElementById('check-user-btn').addEventListener('click', () => {
+          this.checkCurrentUser();
+        });
+      }
+
+      async checkCurrentUser() {
+        try {
+          const response = await fetch('/api/debug-user');
+          const data = await response.json();
+
+          if (data.authenticated) {
+            document.getElementById('user-email').textContent = data.user.email;
+            document.getElementById('user-role').textContent = data.user.role || 'undefined';
+            document.getElementById('user-is-admin').textContent = data.user.isAdmin ? 'Bəli' : 'Xeyr';
+            document.getElementById('admin-email').textContent = data.adminCheck.adminEmail || 'Təyin edilməyib';
+            document.getElementById('user-info').classList.remove('hidden');
+            
+            this.showMessage('İstifadəçi məlumatları yükləndi', 'info');
+          } else {
+            this.showMessage('Daxil olmamısınız. Zəhmət olmasa əvvəlcə daxil olun.', 'error');
+          }
+        } catch (error) {
+          this.showMessage(`Xəta: ${error.message}`, 'error');
+        }
+      }
+
+      async handlePromote() {
+        const email = document.getElementById('email').value;
+        const promoteBtn = document.getElementById('promote-btn');
+
+        // Disable button and show loading
+        promoteBtn.disabled = true;
+        promoteBtn.textContent = 'Admin edilir...';
+
+        try {
+          const response = await fetch('/api/promote-to-admin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            this.showMessage(`İstifadəçi uğurla admin edildi: ${data.user.email}`, 'success');
+            document.getElementById('promote-form').reset();
+          } else {
+            const error = await response.json();
+            this.showMessage(`Xəta: ${error.message}`, 'error');
+          }
+        } catch (error) {
+          this.showMessage(`Xəta: ${error.message}`, 'error');
+        } finally {
+          // Re-enable button
+          promoteBtn.disabled = false;
+          promoteBtn.textContent = 'Admin Et';
+        }
+      }
+
+      showMessage(message, type) {
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+        const infoDiv = document.getElementById('info-message');
+        
+        // Hide all messages first
+        errorDiv.classList.add('hidden');
+        successDiv.classList.add('hidden');
+        infoDiv.classList.add('hidden');
+        
+        if (type === 'error') {
+          errorDiv.textContent = message;
+          errorDiv.classList.remove('hidden');
+        } else if (type === 'success') {
+          successDiv.textContent = message;
+          successDiv.classList.remove('hidden');
+        } else {
+          infoDiv.textContent = message;
+          infoDiv.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Initialize when page loads
+    new AdminSetup();
+  </script>
+</body>
+</html>
