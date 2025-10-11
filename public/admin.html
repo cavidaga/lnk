@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex, nofollow" />
 
-  <title>LNK.az Admin Paneli</title>
-  <meta name="description" content="LNK.az Admin Paneli - Gizli autentifikasiya sınaq interfeysi" />
+  <title>LNK.az Developer Paneli</title>
+  <meta name="description" content="LNK.az Developer Paneli - API test və idarəetmə interfeysi" />
   <meta name="theme-color" content="#0c0d12">
   <meta name="color-scheme" content="light dark" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
@@ -115,40 +115,56 @@
       margin-bottom: 1rem;
     }
     
+    /* Button variants - extending main design system */
     .btn-primary {
-      background: var(--accent);
-      color: white;
+      background: linear-gradient(135deg,
+                   color-mix(in oklab, var(--accent) 90%, white 10%),
+                   color-mix(in oklab, var(--accent-2) 78%, black 22%));
+      color: #fff;
+      border: 0;
+      font-weight: 650;
     }
     
     .btn-primary:hover {
-      background: var(--accent-2);
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
     }
     
     .btn-danger {
-      background: var(--danger);
+      background: linear-gradient(135deg, var(--danger), #c82333);
       color: white;
+      border: 0;
+      font-weight: 650;
     }
     
     .btn-danger:hover {
-      background: #c82333;
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #c82333, #a01e2a);
     }
     
     .btn-success {
-      background: #28a745;
+      background: linear-gradient(135deg, #28a745, #218838);
       color: white;
+      border: 0;
+      font-weight: 650;
     }
     
     .btn-success:hover {
-      background: #218838;
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #218838, #1e7e34);
     }
     
     .btn-secondary {
-      background: var(--muted);
-      color: white;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-weight: 500;
     }
     
     .btn-secondary:hover {
-      background: #545b62;
+      transform: translateY(-1px);
+      background: var(--card);
+      border-color: var(--accent);
     }
     
     .btn:disabled {
@@ -156,6 +172,7 @@
       cursor: not-allowed;
       transform: none;
       color: var(--muted);
+      opacity: 0.6;
     }
     
     .alert {
@@ -658,7 +675,62 @@
       font-size: 0.9rem;
     }
     
+    /* Grid layouts for better organization */
+    .api-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    
+    .api-subsection {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    
+    .api-subsection h3 {
+      margin: 0 0 1rem 0;
+      color: var(--text);
+      font-size: 1.2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    
+    .usage-billing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+    
+    .usage-subsection,
+    .billing-subsection {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    
+    .usage-subsection h3,
+    .billing-subsection h3 {
+      margin: 0 0 1rem 0;
+      color: var(--text);
+      font-size: 1.2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
     /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .api-grid,
+      .usage-billing-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+    
     @media (max-width: 768px) {
       .plans-grid {
         grid-template-columns: 1fr;
@@ -684,8 +756,8 @@
     <main id="main" role="main">
       <div class="admin-panel">
         <div class="admin-header">
-          <h1>🔐 LNK.az Admin Paneli</h1>
-          <p>Gizli autentifikasiya sınaq interfeysi</p>
+          <h1>🔧 LNK.az Developer Paneli</h1>
+          <p>API test və idarəetmə interfeysi</p>
         </div>
 
         <!-- User Status -->
@@ -747,128 +819,136 @@
           </div>
         </div>
 
-        <!-- API Key Management -->
-        <div class="admin-section" id="api-keys-section">
-          <h2>API Açarlarının İdarə edilməsi</h2>
+        <!-- API Management & Testing -->
+        <div class="admin-section" id="api-section">
+          <h2>API idarəetməsi və sınağı</h2>
           <div class="admin-content">
-            <div class="button-group">
-              <button id="create-key-btn" class="btn btn-success">Yeni API Açarı Yarat</button>
-              <button id="refresh-keys-btn" class="btn btn-secondary">Siyahını yenilə</button>
-            </div>
+            <div class="api-grid">
+              <!-- API Key Management -->
+              <div class="api-subsection">
+                <h3>API Açarlarının idarə edilməsi</h3>
+                <div class="button-group">
+                  <button id="create-key-btn" class="btn btn-success">Yeni API Açarı Yarat</button>
+                  <button id="refresh-keys-btn" class="btn btn-secondary">Siyahını yenilə</button>
+                </div>
 
-            <div id="create-key-form" class="hidden" style="background: var(--panel); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border);">
-              <h4>Yeni API Açarı Yarat</h4>
-              <div class="form-group">
-                <label for="key-name">Açarın adı</label>
-                <input type="text" id="key-name" placeholder="API açarım">
-              </div>
-              <div class="form-group">
-                <label for="key-permissions">İcazələr (vergüllə ayırın)</label>
-                <input type="text" id="key-permissions" placeholder="analyze,get-analysis" value="analyze,get-analysis">
-                <small>Mövcud icazələr: analyze, get-analysis, statistics, site-averages, recent-analyses, usage, billing</small>
-              </div>
-              <div class="button-group">
-                <button id="submit-key-btn" class="btn btn-success">Açar yarat</button>
-                <button id="cancel-key-btn" class="btn btn-secondary">Ləğv et</button>
-              </div>
-            </div>
+                <div id="create-key-form" class="hidden" style="background: var(--panel); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border);">
+                  <h4>Yeni API Açarı Yarat</h4>
+                  <div class="form-group">
+                    <label for="key-name">Açarın adı</label>
+                    <input type="text" id="key-name" placeholder="API açarım">
+                  </div>
+                  <div class="form-group">
+                    <label for="key-permissions">İcazələr (vergüllə ayırın)</label>
+                    <input type="text" id="key-permissions" placeholder="analyze,get-analysis" value="analyze,get-analysis">
+                    <small>Mövcud icazələr: analyze, get-analysis, statistics, site-averages, recent-analyses, usage, billing</small>
+                  </div>
+                  <div class="button-group">
+                    <button id="submit-key-btn" class="btn btn-success">Açar yarat</button>
+                    <button id="cancel-key-btn" class="btn btn-secondary">Ləğv et</button>
+                  </div>
+                </div>
 
-            <div id="api-keys-list">
-              <h4>API Açarlarınız</h4>
-              <div id="keys-container">
-                <p>Yüklənir...</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- API Testing -->
-        <div class="admin-section">
-          <h2>API Sınağı</h2>
-          <div class="admin-content">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="test-url">Test URL-i</label>
-                <input type="url" id="test-url" placeholder="https://example.com/news-article">
-              </div>
-              <div class="form-group">
-                <label for="test-model">Model növü</label>
-                <select id="test-model">
-                  <option value="auto">Auto</option>
-                  <option value="flash-lite">Flash Lite</option>
-                  <option value="flash">Flash</option>
-                  <option value="pro">Pro</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="test-api-key">API açarı (istəyə görə)</label>
-              <input type="password" id="test-api-key" placeholder="lnk_... (sesiyanı istifadə etmək üçün boş saxlayın)">
-            </div>
-            <button id="test-analyze-btn" class="btn btn-primary">Təhlili sına</button>
-            <div id="test-result" class="test-result hidden">
-              <h4>Təhlil Nəticəsi:</h4>
-              <pre id="test-result-content"></pre>
-            </div>
-          </div>
-        </div>
-
-        <!-- Billing Management -->
-        <div class="admin-section" id="billing-section">
-          <h2>Ödənişlərin İdarə Edilməsi</h2>
-          <div class="admin-content">
-            <div class="button-group">
-              <button id="load-plans-btn" class="btn btn-primary">Planları yüklə</button>
-              <button id="load-subscription-btn" class="btn btn-secondary">Abunəliyi yüklə</button>
-              <button id="test-checkout-btn" class="btn btn-secondary" disabled>Ödəniş Sınağı (Tezliklə)</button>
-              <button id="billing-portal-btn" class="btn btn-secondary" disabled>Ödənişləri idarə et (Tezliklə)</button>
-            </div>
-            <div id="billing-result" class="hidden">
-              <div id="plans-ui" class="hidden">
-                <h4>Mövcud Planlar</h4>
-                <div id="plans-container" class="plans-grid"></div>
-              </div>
-              <div id="subscription-ui" class="hidden">
-                <h4>Abunəliyiniz</h4>
-                <div id="subscription-container"></div>
-              </div>
-              <div id="billing-json" class="test-result hidden">
-                <h4>Xam Məlumat:</h4>
-                <pre id="billing-result-content"></pre>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Usage Tracking -->
-        <div class="admin-section" id="usage-section">
-          <h2>İstifadənin İzlənməsi</h2>
-          <div class="admin-content">
-            <div class="form-group">
-              <label for="usage-period">Dövür</label>
-              <select id="usage-period">
-                <option value="day">Bu gün</option>
-                <option value="week">Bu həftə</option>
-                <option value="month" selected>Bu ay</option>
-              </select>
-            </div>
-            <div class="button-group">
-              <button id="load-usage-btn" class="btn btn-primary">İstifadəmi yüklə</button>
-              <button id="load-limits-btn" class="btn btn-secondary">Limitləri yüklə</button>
-              <button id="load-history-btn" class="btn btn-secondary">Tarixçəni yüklə</button>
-            </div>
-            <div id="usage-result" class="hidden">
-              <div id="usage-ui" class="hidden">
-                <h4>İstifadə Paneli</h4>
-                <div id="usage-dashboard" class="usage-dashboard"></div>
-                <div id="usage-history" class="usage-history hidden">
-                  <h4>Son Aktivlik</h4>
-                  <div id="history-container"></div>
+                <div id="api-keys-list">
+                  <h4>API Açarlarınız</h4>
+                  <div id="keys-container">
+                    <p>Yüklənir...</p>
+                  </div>
                 </div>
               </div>
-              <div id="usage-json" class="test-result hidden">
-                <h4>Xam Məlumat:</h4>
-                <pre id="usage-result-content"></pre>
+
+              <!-- API Testing -->
+              <div class="api-subsection">
+                <h3>API sınağı</h3>
+                <div class="form-group">
+                  <label for="test-url">Test URL-i</label>
+                  <input type="url" id="test-url" placeholder="https://example.com/news-article">
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="test-model">Model növü</label>
+                    <select id="test-model">
+                      <option value="auto">Auto</option>
+                      <option value="flash-lite">Flash Lite</option>
+                      <option value="flash">Flash</option>
+                      <option value="pro">Pro</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="test-api-key">API açarı (istəyə görə)</label>
+                    <input type="password" id="test-api-key" placeholder="lnk_... (sesiyanı istifadə etmək üçün boş saxlayın)">
+                  </div>
+                </div>
+                <button id="test-analyze-btn" class="btn btn-primary">Təhlili sına</button>
+                <div id="test-result" class="test-result hidden">
+                  <h4>Təhlil Nəticəsi:</h4>
+                  <pre id="test-result-content"></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Usage & Billing Management -->
+        <div class="admin-section" id="usage-billing-section">
+          <h2>İstifadə və ödəniş idarəetməsi</h2>
+          <div class="admin-content">
+            <div class="usage-billing-grid">
+              <!-- Usage Tracking -->
+              <div class="usage-subsection">
+                <h3>İstifadənin izlənməsi</h3>
+                <div class="form-group">
+                  <label for="usage-period">Dövür</label>
+                  <select id="usage-period">
+                    <option value="day">Bu gün</option>
+                    <option value="week">Bu həftə</option>
+                    <option value="month" selected>Bu ay</option>
+                  </select>
+                </div>
+                <div class="button-group">
+                  <button id="load-usage-btn" class="btn btn-primary">İstifadəmi yüklə</button>
+                  <button id="load-limits-btn" class="btn btn-secondary">Limitləri yüklə</button>
+                  <button id="load-history-btn" class="btn btn-secondary">Tarixçəni yüklə</button>
+                </div>
+                <div id="usage-result" class="hidden">
+                  <div id="usage-ui" class="hidden">
+                    <h4>İstifadə Paneli</h4>
+                    <div id="usage-dashboard" class="usage-dashboard"></div>
+                    <div id="usage-history" class="usage-history hidden">
+                      <h4>Son Aktivlik</h4>
+                      <div id="history-container"></div>
+                    </div>
+                  </div>
+                  <div id="usage-json" class="test-result hidden">
+                    <h4>Xam Məlumat:</h4>
+                    <pre id="usage-result-content"></pre>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Billing Management -->
+              <div class="billing-subsection">
+                <h3>Ödənişlərin idarə edilməsi</h3>
+                <div class="button-group">
+                  <button id="load-plans-btn" class="btn btn-primary">Planları yüklə</button>
+                  <button id="load-subscription-btn" class="btn btn-secondary">Abunəliyi yüklə</button>
+                  <button id="test-checkout-btn" class="btn btn-secondary" disabled>Ödəniş Sınağı (Tezliklə)</button>
+                  <button id="billing-portal-btn" class="btn btn-secondary" disabled>Ödənişləri idarə et (Tezliklə)</button>
+                </div>
+                <div id="billing-result" class="hidden">
+                  <div id="plans-ui" class="hidden">
+                    <h4>Mövcud Planlar</h4>
+                    <div id="plans-container" class="plans-grid"></div>
+                  </div>
+                  <div id="subscription-ui" class="hidden">
+                    <h4>Abunəliyiniz</h4>
+                    <div id="subscription-container"></div>
+                  </div>
+                  <div id="billing-json" class="test-result hidden">
+                    <h4>Xam Məlumat:</h4>
+                    <pre id="billing-result-content"></pre>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
