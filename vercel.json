@@ -3,6 +3,7 @@
   "rewrites": [
     { "source": "/analysis/:hash", "destination": "/api/analysis-html?hash=:hash" },
     { "source": "/documentation", "destination": "/documentation.html" },
+    { "source": "/dev", "destination": "/dev.html" },
     { "source": "/admin", "destination": "/admin.html" }
   ],
   "functions": {

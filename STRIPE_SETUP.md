@@ -57,7 +57,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 
 ## Testing
 
-1. **Visit** `/admin` → Billing Management
+1. **Visit** `/dev` → Billing Management
 2. **Click "Load Plans"** to see available plans
 3. **Click "Manage Billing"** to test Stripe portal
 4. **Use Stripe test cards** for testing payments

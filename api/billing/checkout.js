@@ -82,8 +82,8 @@ async function handler(req, res) {
     const session = await createCheckoutSession(
       user,
       planId,
-      successUrl || `${process.env.VERCEL_URL || 'http://localhost:3000'}/admin?success=true`,
-      cancelUrl || `${process.env.VERCEL_URL || 'http://localhost:3000'}/admin?canceled=true`
+      successUrl || `${process.env.VERCEL_URL || 'http://localhost:3000'}/dev?success=true`,
+      cancelUrl || `${process.env.VERCEL_URL || 'http://localhost:3000'}/dev?canceled=true`
     );
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');

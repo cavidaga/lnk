@@ -29,7 +29,7 @@ async function handler(req, res) {
     // Create billing portal session
     const session = await createBillingPortalSession(
       user,
-      returnUrl || `${process.env.VERCEL_URL || 'http://localhost:3000'}/admin`
+      returnUrl || `${process.env.VERCEL_URL || 'http://localhost:3000'}/dev`
     );
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
