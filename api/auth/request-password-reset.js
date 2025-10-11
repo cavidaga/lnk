@@ -51,7 +51,7 @@ export default async function handler(req, res) {
         to: email,
         subject: 'Parolun sıfırlanması • LNK.az',
         text: `Parolunuzu sıfırlamaq üçün bu linkdən istifadə edin (1 saat etibarlıdır): ${link}`,
-        html: passwordResetHtml(link)
+        html: passwordResetHtml(link, base)
       });
     }
 
