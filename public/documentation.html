@@ -296,6 +296,25 @@
       color: var(--muted);
     }
 
+    /* TOC styling to match methodology.html */
+    .toc { 
+      margin:16px 0 24px; 
+      padding:14px; 
+      border:1px solid var(--border); 
+      border-radius:10px; 
+      background:var(--panel) 
+    }
+    .toc a { 
+      text-decoration:none 
+    }
+    .toc ul { 
+      margin:0; 
+      padding-left:18px 
+    }
+    .toc li { 
+      margin:6px 0 
+    }
+
     /* Plan comparison styling */
     .plan-comparison {
       display: grid;
@@ -354,6 +373,34 @@
       font-weight: bold;
       margin-right: 0.5rem;
     }
+
+    .upcoming-badge {
+      background: #f59e0b;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .plan-card.upcoming {
+      opacity: 0.7;
+      position: relative;
+    }
+
+    .plan-card.upcoming::after {
+      content: "Tezliklə";
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: #f59e0b;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -362,12 +409,14 @@
     <main id="main" role="main">
       <div class="documentation">
         <div class="doc-header">
-          <h1>LNK.az API Sənədləri</h1>
-          <p>Tərtibatçılar üçün media qərəzi və etibarlılıq təhlili API-si</p>
+          <h1>API sənədləri</h1>
+          <p class="sub" style="margin-top:8px">
+            Tərtibatçılar üçün media qərəzi və etibarlılıq təhlili API-si
+          </p>
         </div>
 
-        <div class="toc">
-          <h3>Mündəricat</h3>
+        <nav class="toc" aria-label="Mündəricat">
+          <strong>Mündəricat</strong>
           <ul>
             <li><a href="#overview">Ümumi baxış</a></li>
             <li><a href="#developer-registration">Developer qeydiyyatı</a></li>
@@ -381,7 +430,7 @@
             <li><a href="#error-handling">Səhv idarəetməsi</a></li>
             <li><a href="#examples">Kod nümunələri</a></li>
           </ul>
-        </div>
+        </nav>
 
         <div class="api-section" id="overview">
           <h2>Ümumi baxış</h2>
@@ -454,8 +503,8 @@
                 </ul>
               </div>
 
-              <div class="plan-card">
-                <h4>⭐ Əsas plan</h4>
+              <div class="plan-card upcoming">
+                <h4>⭐ Əsas plan <span class="upcoming-badge">Tezliklə</span></h4>
                 <div class="plan-price">$29/ay</div>
                 <ul>
                   <li>Dəqiqədə 50 sorğu</li>
@@ -467,8 +516,8 @@
                 </ul>
               </div>
 
-              <div class="plan-card">
-                <h4>💎 Pro plan</h4>
+              <div class="plan-card upcoming">
+                <h4>💎 Pro plan <span class="upcoming-badge">Tezliklə</span></h4>
                 <div class="plan-price">$99/ay</div>
                 <ul>
                   <li>Dəqiqədə 200 sorğu</li>
@@ -481,8 +530,8 @@
                 </ul>
               </div>
 
-              <div class="plan-card">
-                <h4>🏢 Enterprise plan</h4>
+              <div class="plan-card upcoming">
+                <h4>🏢 Enterprise plan <span class="upcoming-badge">Tezliklə</span></h4>
                 <div class="plan-price">Müqavilə əsasında</div>
                 <ul>
                   <li>Limitsiz sorğu</li>
@@ -501,12 +550,19 @@
                 <tr>
                   <th>Xüsusiyyət</th>
                   <th>Pulsuz</th>
-                  <th>Əsas</th>
-                  <th>Pro</th>
-                  <th>Enterprise</th>
+                  <th>Əsas <span class="upcoming-badge">Tezliklə</span></th>
+                  <th>Pro <span class="upcoming-badge">Tezliklə</span></th>
+                  <th>Enterprise <span class="upcoming-badge">Tezliklə</span></th>
                 </tr>
               </thead>
               <tbody>
+                <tr>
+                  <td>Mövcudluq</td>
+                  <td>✅ Mövcud</td>
+                  <td>⏳ Tezliklə</td>
+                  <td>⏳ Tezliklə</td>
+                  <td>⏳ Tezliklə</td>
+                </tr>
                 <tr>
                   <td>API sorğu limiti</td>
                   <td>10/dəqiqə</td>
@@ -551,6 +607,10 @@
                 </tr>
               </tbody>
             </table>
+
+            <div class="info">
+              <strong>Plan mövcudluğu:</strong> Hazırda yalnız pulsuz plan mövcuddur. Digər planlar tezliklə istifadəyə veriləcək.
+            </div>
 
             <div class="info">
               <strong>Plan yeniləməsi:</strong> Hər zaman developer panelindən planınızı yeniləyə bilərsiniz. Yeniləmə dərhal təsir göstərir.
