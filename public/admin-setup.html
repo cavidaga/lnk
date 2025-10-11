@@ -209,6 +209,10 @@
       İstifadəçini Düzəlt və Admin Et
     </button>
 
+    <button class="btn btn-secondary" id="check-id-btn" style="margin-top: 0.5rem;">
+      ID ilə İstifadəçini Yoxla
+    </button>
+
     <div id="debug-results" class="user-info hidden" style="margin-top: 1rem;">
       <h3>Debug Nəticələri</h3>
       <pre id="debug-content"></pre>
@@ -240,6 +244,11 @@
         // Fix user button
         document.getElementById('fix-user-btn').addEventListener('click', () => {
           this.fixUser();
+        });
+
+        // Check ID button
+        document.getElementById('check-id-btn').addEventListener('click', () => {
+          this.checkUserById();
         });
       }
 
@@ -321,6 +330,47 @@
           // Re-enable button
           fixBtn.disabled = false;
           fixBtn.textContent = 'İstifadəçini Düzəlt və Admin Et';
+        }
+      }
+
+      async checkUserById() {
+        const email = document.getElementById('email').value;
+        const adminToken = document.getElementById('admin-token').value;
+        const checkBtn = document.getElementById('check-id-btn');
+
+        if (!email || !adminToken) {
+          this.showMessage('Zəhmət olmasa e-poçt və admin token daxil edin', 'error');
+          return;
+        }
+
+        // Disable button and show loading
+        checkBtn.disabled = true;
+        checkBtn.textContent = 'Yoxlanılır...';
+
+        try {
+          const response = await fetch('/api/check-user-by-id', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, adminToken }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            document.getElementById('debug-content').textContent = JSON.stringify(data, null, 2);
+            document.getElementById('debug-results').classList.remove('hidden');
+            this.showMessage('ID ilə istifadəçi məlumatları yükləndi', 'info');
+          } else {
+            const error = await response.json();
+            this.showMessage(`Xəta: ${error.message}`, 'error');
+          }
+        } catch (error) {
+          this.showMessage(`Xəta: ${error.message}`, 'error');
+        } finally {
+          // Re-enable button
+          checkBtn.disabled = false;
+          checkBtn.textContent = 'ID ilə İstifadəçini Yoxla';
         }
       }
 
