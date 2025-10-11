@@ -95,9 +95,9 @@
       border: 1px solid var(--accent);
     }
     .method.post { 
-      background: color-mix(in oklab, #007bff 20%, var(--panel) 80%); 
-      color: #007bff;
-      border: 1px solid #007bff;
+      background: color-mix(in oklab, var(--accent) 20%, var(--panel) 80%); 
+      color: var(--accent);
+      border: 1px solid var(--accent);
     }
     
     .endpoint-url {
@@ -249,8 +249,8 @@
     }
     
     .info {
-      background: color-mix(in oklab, #007bff 10%, var(--panel) 90%);
-      border: 1px solid #007bff;
+      background: color-mix(in oklab, var(--accent) 10%, var(--panel) 90%);
+      border: 1px solid var(--accent);
       border-radius: 8px;
       padding: 1rem;
       margin: 1rem 0;
@@ -407,13 +407,11 @@
   <div class="wrap">
     <div id="site-header"></div>
     <main id="main" role="main">
-      <div class="documentation">
-        <div class="doc-header">
-          <h1>API sənədləri</h1>
-          <p class="sub" style="margin-top:8px">
-            Tərtibatçılar üçün media qərəzi və etibarlılıq təhlili API-si
-          </p>
-        </div>
+      <article>
+        <h1>API sənədləri</h1>
+        <p class="sub" style="margin-top:8px">
+          Tərtibatçılar üçün media qərəzi və etibarlılıq təhlili API-si
+        </p>
 
         <nav class="toc" aria-label="Mündəricat">
           <strong>Mündəricat</strong>
@@ -432,7 +430,7 @@
           </ul>
         </nav>
 
-        <div class="api-section" id="overview">
+        <section id="overview">
           <h2>Ümumi baxış</h2>
           <div class="api-endpoint">
             <p>LNK.az media qərəzini və etibarlılığını təhlil etmək üçün geniş imkanlara malik API təqdim edir. API xəbər məqalələrini qiymətləndirmək və etibarlılıq göstəriciləri, siyasi qərəz analizi və mənbə istinadları daxil olmaqla ətraflı təhlil təmin etmək üçün qabaqcıl süni intellekt modellərindən istifadə edir.</p>
@@ -445,9 +443,9 @@
               <strong>Qeyd:</strong> Bu sənəd yalnız daxili istifadə üçündür. Bu URL-i ictimaiyyətlə paylaşmayın.
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="developer-registration">
+        <section id="developer-registration">
           <h2>Developer qeydiyyatı</h2>
           <div class="api-endpoint">
             <p>API istifadəsi üçün developer hesabı yaratmaq lazımdır. Qeydiyyat prosesi sadə və sürətlidir.</p>
@@ -482,9 +480,9 @@
               <strong>Developer paneli:</strong> <a href="/dev" target="_blank">Developer paneli</a>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="api-plans">
+        <section id="api-plans">
           <h2>API planları və limitlər</h2>
           <div class="api-endpoint">
             <p>LNK.az müxtəlif ehtiyaclar üçün fərqli API planları təqdim edir. Hər plan müəyyən limitlər və imkanlarla gəlir.</p>
@@ -620,9 +618,9 @@
               <strong>Limit aşımı:</strong> Plan limitinizi aşdıqda əlavə ödəniş tələb olunur və ya sorğular bloklanır. Limitlərinizi izləmək üçün developer panelindən istifadə edin.
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="authentication">
+        <section id="authentication">
           <h2>Autentifikasiya</h2>
           <div class="api-endpoint">
             <p>API istifadəsi üçün developer hesabı və API açarları tələb olunur. API açarları developer panelindən yaradıla bilər.</p>
@@ -661,9 +659,9 @@
               <strong>Qeyd:</strong> API açarı olmadan sorğular IP ünvanına əsaslanan sürət limitlərinə tabedir. API açarı ilə plan limitlərinizdən istifadə edə bilərsiniz.
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="rate-limits">
+        <section id="rate-limits">
           <h2>Sürət limitləri</h2>
           <div class="api-endpoint">
             <p>Sürət limitləri developer planınıza və API açarı istifadəsinə əsaslanır:</p>
@@ -729,9 +727,9 @@
               <strong>Qeyd:</strong> Limit aşımı zamanı sorğular bloklanır. Yeni sorğu göndərməzdən əvvəl limitin sıfırlanmasını gözləyin.
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="analysis-apis">
+        <section id="analysis-apis">
           <h2>Təhlil API-ləri</h2>
           
           <div class="api-endpoint">
@@ -845,9 +843,9 @@
               </table>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="data-apis">
+        <section id="data-apis">
           <h2>Məlumat və statistika API-ləri</h2>
           
           <div class="api-endpoint">
@@ -916,9 +914,9 @@
               Reklam olmayan ən son 5 təhlili əldə edin.
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="utility-apis">
+        <section id="utility-apis">
           <h2>Köməkçi API-lər</h2>
           
           <div class="api-endpoint">
@@ -940,9 +938,9 @@
               SEO məqsədləri üçün XML sayt xəritəsini əldə edin.
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="response-formats">
+        <section id="response-formats">
           <h2>Cavab formatları</h2>
           <div class="api-endpoint">
             <h3>Təhlil cavabı sxemi</h3>
@@ -996,9 +994,9 @@
   "contentSource": "string"   // "Live", "Archive.org", "Archive.md" və s.
 }</div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="error-handling">
+        <section id="error-handling">
           <h2>Səhv idarəetməsi</h2>
           <div class="api-endpoint">
             <p>Bütün API-lər uyğun HTTP status kodlarını və JSON formatında səhv mesajlarını qaytarır:</p>
@@ -1040,9 +1038,9 @@
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section" id="examples">
+        <section id="examples">
           <h2>Kod nümunələri</h2>
           
           <div class="api-endpoint">
@@ -1130,16 +1128,17 @@ curl "https://lnk.az/api/statistics?api_key=$LNK_API_KEY"
 # Sayt üzrə ortalamaları əldə et
 curl "https://lnk.az/api/site-averages?host=oxu.az&api_key=$LNK_API_KEY"</div>
           </div>
-        </div>
+        </section>
 
-        <div class="api-section">
+        <section>
           <h2>Dəstək</h2>
           <div class="api-endpoint">
             <p>API ilə bağlı sual və ya problemlər üçün xahiş edirik daxili şəkildə inkişaf komandası ilə əlaqə saxlayın.</p>
             <p><strong>Son Yenilənmə:</strong> 16 yanvar 2025</p>
           </div>
-        </div>
-      </div>
+        </section>
+
+      </article>
     </main>
     <div id="site-footer"></div>
   </div>
