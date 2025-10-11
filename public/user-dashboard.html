@@ -497,6 +497,7 @@
                 <div id="2fa-actions">
                   <button id="enable-2fa-btn" class="btn btn-primary hidden">2FA Aktiv Et</button>
                   <button id="disable-2fa-btn" class="btn btn-danger hidden">2FA Deaktiv Et</button>
+                  <button id="debug-2fa-btn" class="btn btn-secondary" style="margin-top: 0.5rem;">Debug 2FA Status</button>
                 </div>
                 <div id="2fa-msg" class="error-message hidden" style="margin-top:.75rem"></div>
               </div>
@@ -843,7 +844,11 @@
           const enableBtn = document.getElementById('enable-2fa-btn');
           const disableBtn = document.getElementById('disable-2fa-btn');
           
-          if (user.twoFactorEnabled) {
+          // Debug logging
+          console.log('User data:', user);
+          console.log('2FA enabled:', user.twoFactorEnabled);
+          
+          if (user.twoFactorEnabled === true) {
             statusText.textContent = '✅ 2FA aktivdir';
             statusText.style.color = '#16a34a';
             statusText.style.fontSize = '14px';
@@ -899,6 +904,19 @@
       } catch (error) {
         msg.textContent = 'Xəta: ' + error.message;
         msg.classList.remove('hidden');
+      }
+    });
+
+    // Debug 2FA button
+    document.getElementById('debug-2fa-btn').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/debug-user-2fa');
+        const data = await response.json();
+        console.log('Debug 2FA data:', data);
+        alert('Debug data logged to console. Check browser console for details.');
+      } catch (error) {
+        console.error('Debug error:', error);
+        alert('Debug failed: ' + error.message);
       }
     });
 

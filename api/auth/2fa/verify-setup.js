@@ -79,7 +79,12 @@ export default async function handler(req, res) {
       twoFactorEnabledAt: new Date().toISOString()
     };
 
+    console.log('Updating user with 2FA:', updatedUser.id, '2FA enabled:', updatedUser.twoFactorEnabled);
     await kv.set(`user:id:${user.id}`, updatedUser);
+    
+    // Verify the update
+    const verifyUser = await kv.get(`user:id:${user.id}`);
+    console.log('User after update:', verifyUser.id, '2FA enabled:', verifyUser.twoFactorEnabled);
 
     // Clean up temporary secret
     await kv.del(tempSecretKey);
