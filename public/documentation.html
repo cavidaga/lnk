@@ -180,15 +180,16 @@
     }
     
     .code-block {
-      background: var(--bg);
-      color: var(--text);
+      background: #0d1117;
+      color: #00ff00;
       padding: 1rem;
       border-radius: 6px;
       overflow-x: auto;
       font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
       font-size: 0.9rem;
       line-height: 1.4;
-      border: 1px solid var(--border);
+      border: 1px solid #30363d;
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
     }
     
     .response-example {
@@ -263,6 +264,96 @@
       font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
       font-size: 0.9rem;
     }
+
+    /* Additional styling to align with methodology.html */
+    .api-section {
+      margin-bottom: 2rem;
+    }
+    
+    .api-section h2 {
+      background: var(--panel);
+      padding: 1.5rem;
+      margin: 0 0 0 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-size: 1.5rem;
+      border-radius: 12px 12px 0 0;
+    }
+    
+    .api-endpoint {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+    }
+    
+    .api-endpoint:last-child {
+      border-bottom: none;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* Plan comparison styling */
+    .plan-comparison {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .plan-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .plan-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .plan-card h4 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .plan-price {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .plan-card ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .plan-card li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .plan-card li:last-child {
+      border-bottom: none;
+    }
+
+    .plan-card li:before {
+      content: "✓";
+      color: var(--accent);
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
   </style>
 </head>
 <body>
@@ -278,20 +369,22 @@
         <div class="toc">
           <h3>Mündəricat</h3>
           <ul>
-            <li><a href="#overview">Ümumi Baxış</a></li>
+            <li><a href="#overview">Ümumi baxış</a></li>
+            <li><a href="#developer-registration">Developer qeydiyyatı</a></li>
+            <li><a href="#api-plans">API planları və limitlər</a></li>
             <li><a href="#authentication">Autentifikasiya</a></li>
-            <li><a href="#rate-limits">Sürət Limitləri</a></li>
+            <li><a href="#rate-limits">Sürət limitləri</a></li>
             <li><a href="#analysis-apis">Təhlil API-ləri</a></li>
-            <li><a href="#data-apis">Məlumat və Statistika API-ləri</a></li>
+            <li><a href="#data-apis">Məlumat və statistika API-ləri</a></li>
             <li><a href="#utility-apis">Köməkçi API-lər</a></li>
-            <li><a href="#response-formats">Cavab Formatları</a></li>
-            <li><a href="#error-handling">Səhv İdarəetməsi</a></li>
-            <li><a href="#examples">Kod Nümunələri</a></li>
+            <li><a href="#response-formats">Cavab formatları</a></li>
+            <li><a href="#error-handling">Səhv idarəetməsi</a></li>
+            <li><a href="#examples">Kod nümunələri</a></li>
           </ul>
         </div>
 
         <div class="api-section" id="overview">
-          <h2>Ümumi Baxış</h2>
+          <h2>Ümumi baxış</h2>
           <div class="api-endpoint">
             <p>LNK.az media qərəzini və etibarlılığını təhlil etmək üçün geniş imkanlara malik API təqdim edir. API xəbər məqalələrini qiymətləndirmək və etibarlılıq göstəriciləri, siyasi qərəz analizi və mənbə istinadları daxil olmaqla ətraflı təhlil təmin etmək üçün qabaqcıl süni intellekt modellərindən istifadə edir.</p>
 
@@ -305,22 +398,276 @@
           </div>
         </div>
 
+        <div class="api-section" id="developer-registration">
+          <h2>Developer qeydiyyatı</h2>
+          <div class="api-endpoint">
+            <p>API istifadəsi üçün developer hesabı yaratmaq lazımdır. Qeydiyyat prosesi sadə və sürətlidir.</p>
+            
+            <div class="info">
+              <strong>Qeydiyyat linki:</strong> <a href="/dev-register.html" target="_blank">Developer qeydiyyatı</a>
+            </div>
+
+            <h3>Qeydiyyat addımları</h3>
+            <ol>
+              <li><strong>Məlumatları doldurun:</strong> E-poçt ünvanı, şifrə və şirkət məlumatlarınızı daxil edin</li>
+              <li><strong>API istifadə məqsədini bildirin:</strong> Layihənizin məqsədini və API-ni necə istifadə edəcəyinizi izah edin</li>
+              <li><strong>Təsdiqləməni gözləyin:</strong> Admin tərəfindən təsdiqlənməsi üçün gözləyin (adətən 24 saat ərzində)</li>
+              <li><strong>API açarlarını əldə edin:</strong> Təsdiqləndikdən sonra developer panelindən API açarlarını yarada bilərsiniz</li>
+            </ol>
+
+            <div class="warning">
+              <strong>Vacib:</strong> Qeydiyyat zamanı düzgün və etibarlı məlumatlar daxil edin. Yalnış məlumatlar təsdiqlənməni gecikdirə bilər.
+            </div>
+
+            <h3>Developer paneli</h3>
+            <p>Təsdiqləndikdən sonra aşağıdakı imkanlara malik olacaqsınız:</p>
+            <ul>
+              <li><strong>API açarları idarəetməsi:</strong> Yeni açarlar yaradın, mövcud açarları silin və ya yeniləyin</li>
+              <li><strong>İstifadə statistikaları:</strong> API istifadənizi real vaxtda izləyin</li>
+              <li><strong>Limitlərə nəzarət:</strong> Plan limitlərinizi və istifadə həddinizi görün</li>
+              <li><strong>API sınağı:</strong> Daxili test aləti ilə API-ni sınayın</li>
+              <li><strong>Ödəniş idarəetməsi:</strong> Plan yeniləməsi və ödənişləri idarə edin</li>
+            </ul>
+
+            <div class="info">
+              <strong>Developer paneli:</strong> <a href="/dev" target="_blank">Developer paneli</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="api-section" id="api-plans">
+          <h2>API planları və limitlər</h2>
+          <div class="api-endpoint">
+            <p>LNK.az müxtəlif ehtiyaclar üçün fərqli API planları təqdim edir. Hər plan müəyyən limitlər və imkanlarla gəlir.</p>
+
+            <h3>Mövcud planlar</h3>
+            
+            <div class="plan-comparison">
+              <div class="plan-card">
+                <h4>🆓 Pulsuz plan</h4>
+                <div class="plan-price">$0/ay</div>
+                <ul>
+                  <li>Dəqiqədə 10 sorğu</li>
+                  <li>Günlük 1000 sorğu</li>
+                  <li>Əsas təhlil funksiyaları</li>
+                  <li>E-poçt dəstəyi</li>
+                </ul>
+              </div>
+
+              <div class="plan-card">
+                <h4>⭐ Əsas plan</h4>
+                <div class="plan-price">$29/ay</div>
+                <ul>
+                  <li>Dəqiqədə 50 sorğu</li>
+                  <li>Günlük 10,000 sorğu</li>
+                  <li>Bütün təhlil funksiyaları</li>
+                  <li>API açarları idarəetməsi</li>
+                  <li>İstifadə statistikaları</li>
+                  <li>E-poçt dəstəyi</li>
+                </ul>
+              </div>
+
+              <div class="plan-card">
+                <h4>💎 Pro plan</h4>
+                <div class="plan-price">$99/ay</div>
+                <ul>
+                  <li>Dəqiqədə 200 sorğu</li>
+                  <li>Günlük 50,000 sorğu</li>
+                  <li>Bütün təhlil funksiyaları</li>
+                  <li>Çoxlu API açarları</li>
+                  <li>Real vaxt statistikaları</li>
+                  <li>Prioritet dəstək</li>
+                  <li>Webhook dəstəyi</li>
+                </ul>
+              </div>
+
+              <div class="plan-card">
+                <h4>🏢 Enterprise plan</h4>
+                <div class="plan-price">Müqavilə əsasında</div>
+                <ul>
+                  <li>Limitsiz sorğu</li>
+                  <li>Xüsusi API endpointləri</li>
+                  <li>Dedicated dəstək</li>
+                  <li>SLA zəmanəti</li>
+                  <li>Xüsusi inteqrasiya</li>
+                  <li>24/7 texniki dəstək</li>
+                </ul>
+              </div>
+            </div>
+
+            <h3>Plan xüsusiyyətləri</h3>
+            <table class="param-table">
+              <thead>
+                <tr>
+                  <th>Xüsusiyyət</th>
+                  <th>Pulsuz</th>
+                  <th>Əsas</th>
+                  <th>Pro</th>
+                  <th>Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>API sorğu limiti</td>
+                  <td>10/dəqiqə</td>
+                  <td>50/dəqiqə</td>
+                  <td>200/dəqiqə</td>
+                  <td>Limitsiz</td>
+                </tr>
+                <tr>
+                  <td>Günlük sorğu limiti</td>
+                  <td>1,000</td>
+                  <td>10,000</td>
+                  <td>50,000</td>
+                  <td>Limitsiz</td>
+                </tr>
+                <tr>
+                  <td>API açarları</td>
+                  <td>1</td>
+                  <td>5</td>
+                  <td>25</td>
+                  <td>Limitsiz</td>
+                </tr>
+                <tr>
+                  <td>İstifadə statistikaları</td>
+                  <td>❌</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Webhook dəstəyi</td>
+                  <td>❌</td>
+                  <td>❌</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Dəstək</td>
+                  <td>E-poçt</td>
+                  <td>E-poçt</td>
+                  <td>Prioritet</td>
+                  <td>24/7</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="info">
+              <strong>Plan yeniləməsi:</strong> Hər zaman developer panelindən planınızı yeniləyə bilərsiniz. Yeniləmə dərhal təsir göstərir.
+            </div>
+
+            <div class="warning">
+              <strong>Limit aşımı:</strong> Plan limitinizi aşdıqda əlavə ödəniş tələb olunur və ya sorğular bloklanır. Limitlərinizi izləmək üçün developer panelindən istifadə edin.
+            </div>
+          </div>
+        </div>
+
         <div class="api-section" id="authentication">
           <h2>Autentifikasiya</h2>
           <div class="api-endpoint">
-            <p>Hazırda API autentifikasiya tələb etmir. Bununla belə, sui-istifadənin qarşısını almaq üçün IP ünvanına əsaslanan sürət limitləri tətbiq olunur.</p>
+            <p>API istifadəsi üçün developer hesabı və API açarları tələb olunur. API açarları developer panelindən yaradıla bilər.</p>
+
+            <h3>API açarı əldə etmə</h3>
+            <ol>
+              <li>Developer hesabınızı yaradın və təsdiqləndiyindən əmin olun</li>
+              <li>Developer panelinə daxil olun</li>
+              <li>"API açarları" bölməsindən yeni açar yaradın</li>
+              <li>Açarı təhlükəsiz yerdə saxlayın</li>
+            </ol>
+
+            <h3>API açarı istifadəsi</h3>
+            <p>API sorğularında açarı aşağıdakı üsullardan biri ilə göndərin:</p>
+
+            <div class="example">
+              <h4>Header ilə (tövsiyə olunan)</h4>
+              <div class="code-block">curl -X POST https://lnk.az/api/analyze \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key-here" \
+  -d '{"url": "https://example.com/news-article"}'</div>
+            </div>
+
+            <div class="example">
+              <h4>Query parametri ilə</h4>
+              <div class="code-block">curl -X POST "https://lnk.az/api/analyze?api_key=your-api-key-here" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com/news-article"}'</div>
+            </div>
+
+            <div class="warning">
+              <strong>Təhlükəsizlik:</strong> API açarlarınızı heç vaxt kodunuzda açıq şəkildə saxlamayın. Mühit dəyişənləri və ya təhlükəsiz konfiqurasiya faylları istifadə edin.
+            </div>
+
+            <div class="info">
+              <strong>Qeyd:</strong> API açarı olmadan sorğular IP ünvanına əsaslanan sürət limitlərinə tabedir. API açarı ilə plan limitlərinizdən istifadə edə bilərsiniz.
+            </div>
           </div>
         </div>
 
         <div class="api-section" id="rate-limits">
-          <h2>Sürət Limitləri</h2>
+          <h2>Sürət limitləri</h2>
           <div class="api-endpoint">
-            <p>Sürət limitləri hər bir IP ünvanına ayrıca tətbiq olunur:</p>
+            <p>Sürət limitləri developer planınıza və API açarı istifadəsinə əsaslanır:</p>
+
+            <h3>Plan əsaslı limitlər</h3>
+            <table class="param-table">
+              <thead>
+                <tr>
+                  <th>Plan</th>
+                  <th>Dəqiqə limiti</th>
+                  <th>Günlük limit</th>
+                  <th>API açarları</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Pulsuz</td>
+                  <td>10 sorğu</td>
+                  <td>1,000 sorğu</td>
+                  <td>1 açar</td>
+                </tr>
+                <tr>
+                  <td>Əsas</td>
+                  <td>50 sorğu</td>
+                  <td>10,000 sorğu</td>
+                  <td>5 açar</td>
+                </tr>
+                <tr>
+                  <td>Pro</td>
+                  <td>200 sorğu</td>
+                  <td>50,000 sorğu</td>
+                  <td>25 açar</td>
+                </tr>
+                <tr>
+                  <td>Enterprise</td>
+                  <td>Limitsiz</td>
+                  <td>Limitsiz</td>
+                  <td>Limitsiz</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3>API açarı olmadan</h3>
+            <p>API açarı olmadan sorğular IP ünvanına əsaslanan ümumi limitlərə tabedir:</p>
             <ul>
               <li><strong>Təhlil API-si:</strong> dəqiqədə 10 sorğu</li>
-              <li><strong>Digər API-lər:</strong> xüsusi limit yoxdur (məqbul istifadə gözlənilir)</li>
+              <li><strong>Digər API-lər:</strong> məqbul istifadə gözlənilir</li>
             </ul>
-            <p>Sürət limitini aşdıqda 429 status kodu və səhv mesajı alacaqsınız.</p>
+
+            <h3>Limit aşımı</h3>
+            <p>Sürət limitini aşdıqda aşağıdakı cavabları alacaqsınız:</p>
+            <ul>
+              <li><strong>429 Too Many Requests:</strong> Dəqiqə limiti aşılıb</li>
+              <li><strong>429 Daily Limit Exceeded:</strong> Günlük limit aşılıb</li>
+              <li><strong>403 Forbidden:</strong> API açarı etibarsızdır və ya deaktivdir</li>
+            </ul>
+
+            <div class="info">
+              <strong>Məsləhət:</strong> Limitlərinizi izləmək üçün developer panelindən istifadə edin. Real vaxtda istifadə statistikalarınızı görə bilərsiniz.
+            </div>
+
+            <div class="warning">
+              <strong>Qeyd:</strong> Limit aşımı zamanı sorğular bloklanır. Yeni sorğu göndərməzdən əvvəl limitin sıfırlanmasını gözləyin.
+            </div>
           </div>
         </div>
 
@@ -337,7 +684,7 @@
             </div>
             
             <div class="parameters">
-              <h4>Sorğunun Gövdəsi</h4>
+              <h4>Sorğunun gövdəsi</h4>
               <table class="param-table">
                 <thead>
                   <tr>
@@ -365,7 +712,7 @@
             </div>
             
             <div class="example">
-              <h4>Nümunə Sorğu</h4>
+              <h4>Nümunə sorğu</h4>
               <div class="code-block">curl -X POST https://lnk.az/api/analyze \
   -H "Content-Type: application/json" \
   -d '{
@@ -375,7 +722,7 @@
             </div>
             
             <div class="response-example">
-              <h4>Nümunə Cavab</h4>
+              <h4>Nümunə cavab</h4>
               <div class="code-block">{
   "hash": "abc123def456",
   "meta": {
@@ -417,7 +764,7 @@
             </div>
             
             <div class="parameters">
-              <h4>Sorğu Parametrləri</h4>
+              <h4>Sorğu parametrləri</h4>
               <table class="param-table">
                 <thead>
                   <tr>
@@ -441,7 +788,7 @@
         </div>
 
         <div class="api-section" id="data-apis">
-          <h2>Məlumat və Statistika API-ləri</h2>
+          <h2>Məlumat və statistika API-ləri</h2>
           
           <div class="api-endpoint">
             <div class="endpoint-header">
@@ -453,7 +800,7 @@
             </div>
             
             <div class="response-example">
-              <h4>Nümunə Cavab</h4>
+              <h4>Nümunə cavab</h4>
               <div class="code-block">{
   "total_analyses": 1250,
   "recent_analyses": 15,
@@ -472,7 +819,7 @@
             </div>
             
             <div class="parameters">
-              <h4>Sorğu Parametrləri</h4>
+              <h4>Sorğu parametrləri</h4>
               <table class="param-table">
                 <thead>
                   <tr>
@@ -536,9 +883,9 @@
         </div>
 
         <div class="api-section" id="response-formats">
-          <h2>Cavab Formatları</h2>
+          <h2>Cavab formatları</h2>
           <div class="api-endpoint">
-            <h3>Təhlil Cavabı Sxemi</h3>
+            <h3>Təhlil cavabı sxemi</h3>
             <div class="code-block">{
   "hash": "string",           // Unikal təhlil ID-si
   "meta": {
@@ -592,7 +939,7 @@
         </div>
 
         <div class="api-section" id="error-handling">
-          <h2>Səhv İdarəetməsi</h2>
+          <h2>Səhv idarəetməsi</h2>
           <div class="api-endpoint">
             <p>Bütün API-lər uyğun HTTP status kodlarını və JSON formatında səhv mesajlarını qaytarır:</p>
 
@@ -636,15 +983,19 @@
         </div>
 
         <div class="api-section" id="examples">
-          <h2>Kod Nümunələri</h2>
+          <h2>Kod nümunələri</h2>
           
           <div class="api-endpoint">
             <h3>JavaScript/Node.js</h3>
-            <div class="code-block">// Məqaləni təhlil et
+            <div class="code-block">// API açarınızı təyin edin
+const API_KEY = process.env.LNK_API_KEY || 'your-api-key-here';
+
+// Məqaləni təhlil et
 const response = await fetch('https://lnk.az/api/analyze', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
+    'X-API-Key': API_KEY
   },
   body: JSON.stringify({
     url: 'https://example.com/news-article',
@@ -652,12 +1003,16 @@ const response = await fetch('https://lnk.az/api/analyze', {
   })
 });
 
+if (!response.ok) {
+  throw new Error(`API səhvi: ${response.status}`);
+}
+
 const analysis = await response.json();
 console.log('Etibarlılıq:', analysis.scores.reliability.value);
 console.log('Qərəz:', analysis.scores.political_establishment_bias.value);
 
 // Sayt statistikalarını əldə et
-const siteStats = await fetch('https://lnk.az/api/site-averages?host=oxu.az');
+const siteStats = await fetch(`https://lnk.az/api/site-averages?host=oxu.az&api_key=${API_KEY}`);
 const stats = await siteStats.json();
 console.log('Orta etibarlılıq:', stats.avg_rel);</div>
           </div>
@@ -665,22 +1020,30 @@ console.log('Orta etibarlılıq:', stats.avg_rel);</div>
           <div class="api-endpoint">
             <h3>Python</h3>
             <div class="code-block">import requests
-import json
+import os
+
+# API açarınızı təyin edin
+API_KEY = os.getenv('LNK_API_KEY', 'your-api-key-here')
 
 # Məqaləni təhlil et
 response = requests.post('https://lnk.az/api/analyze',
+  headers={'X-API-Key': API_KEY},
   json={
     'url': 'https://example.com/news-article',
     'modelType': 'auto'
   }
 )
 
+if response.status_code != 200:
+    raise Exception(f"API səhvi: {response.status_code}")
+
 analysis = response.json()
 print(f"Etibarlılıq: {analysis['scores']['reliability']['value']}")
 print(f"Qərəz: {analysis['scores']['political_establishment_bias']['value']}")
 
 # Son təhlilləri əldə et
-recent = requests.get('https://lnk.az/api/recent-analyses')
+recent = requests.get('https://lnk.az/api/recent-analyses', 
+                     params={'api_key': API_KEY})
 analyses = recent.json()
 for analysis in analyses:
     print(f"Başlıq: {analysis['title']}")
@@ -689,19 +1052,23 @@ for analysis in analyses:
 
           <div class="api-endpoint">
             <h3>cURL</h3>
-            <div class="code-block"># Məqaləni təhlil et
+            <div class="code-block"># API açarınızı təyin edin
+export LNK_API_KEY="your-api-key-here"
+
+# Məqaləni təhlil et
 curl -X POST https://lnk.az/api/analyze \
   -H "Content-Type: application/json" \
+  -H "X-API-Key: $LNK_API_KEY" \
   -d '{"url": "https://example.com/news-article", "modelType": "auto"}'
 
 # Təhlili hash vasitəsilə əldə et
-curl "https://lnk.az/api/get-analysis?id=abc123def456"
+curl "https://lnk.az/api/get-analysis?id=abc123def456&api_key=$LNK_API_KEY"
 
 # Statistikaları əldə et
-curl "https://lnk.az/api/statistics"
+curl "https://lnk.az/api/statistics?api_key=$LNK_API_KEY"
 
 # Sayt üzrə ortalamaları əldə et
-curl "https://lnk.az/api/site-averages?host=oxu.az"</div>
+curl "https://lnk.az/api/site-averages?host=oxu.az&api_key=$LNK_API_KEY"</div>
           </div>
         </div>
 

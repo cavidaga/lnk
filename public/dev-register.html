@@ -1,40 +1,33 @@
 <!DOCTYPE html>
-<html lang="az" class="no-js">
+<html lang="az">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="robots" content="noindex, nofollow" />
-
-  <title>LNK.az Developer Registration</title>
-  <meta name="description" content="LNK.az Developer Paneli - Qeydiyyat" />
-  <meta name="theme-color" content="#0c0d12">
-  <meta name="color-scheme" content="light dark" />
-  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Icons -->
-  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-  <link rel="alternate icon" href="/static/favicon.ico">
-  <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
-  <link rel="icon" href="/static/favicon-dark.svg"  media="(prefers-color-scheme: dark)">
-  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
-
-  <link rel="stylesheet" href="/static/styles.css">
-  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Qeydiyyatı - LNK.az</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    
     .register-container {
-      max-width: 400px;
-      margin: 4rem auto;
-      padding: 2rem;
-      background: var(--card);
+      background: white;
       border-radius: 12px;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
     }
     
     .register-header {
@@ -70,6 +63,15 @@
       border: 1px solid #c3e6cb;
     }
     
+    .info-message {
+      background: #d1ecf1;
+      color: #0c5460;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #bee5eb;
+    }
+    
     .form-group {
       margin-bottom: 1.5rem;
     }
@@ -81,7 +83,8 @@
       color: #1f2937;
     }
     
-    .form-group input {
+    .form-group input,
+    .form-group textarea {
       width: 100%;
       padding: 0.75rem;
       border: 1px solid #d1d5db;
@@ -89,12 +92,19 @@
       background: #ffffff;
       color: #1f2937;
       font-size: 1rem;
+      font-family: inherit;
     }
     
-    .form-group input:focus {
+    .form-group input:focus,
+    .form-group textarea:focus {
       outline: none;
       border-color: #3b82f6;
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
     }
     
     .btn {
@@ -140,88 +150,137 @@
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div id="site-header"></div>
-    <main id="main" role="main">
-      <div class="register-container">
-        <div class="register-header">
-          <h1>🔧 Developer Qeydiyyatı</h1>
-          <p>API test və idarəetmə interfeysi</p>
-        </div>
+  <div class="register-container">
+    <div class="register-header">
+      <h1>🔧 Developer Qeydiyyatı</h1>
+      <p>API istifadəsi üçün developer hesabı yaradın</p>
+    </div>
 
-        <div id="error-message" class="error-message hidden"></div>
-        <div id="success-message" class="success-message hidden"></div>
+    <div id="error-message" class="error-message hidden"></div>
+    <div id="success-message" class="success-message hidden"></div>
+    <div id="info-message" class="info-message hidden"></div>
 
-        <form id="register-form">
-          <div class="form-group">
-            <label for="email">E-poçt</label>
-            <input type="email" id="email" required>
-          </div>
-          <div class="form-group">
-            <label for="password">Şifrə (minimum 8 simvol)</label>
-            <input type="password" id="password" minlength="8" required>
-          </div>
-          <div class="form-group">
-            <label for="token">Admin qeydiyyat tokeni</label>
-            <input type="password" id="token" required>
-          </div>
-          <button type="submit" class="btn" id="register-btn">Qeydiyyatdan keç</button>
-        </form>
+    <div class="info-message">
+      <p><strong>Qeyd:</strong> Developer hesabınız admin tərəfindən təsdiqlənməlidir. Təsdiqləndikdən sonra e-poçt alacaqsınız.</p>
+    </div>
 
-        <div class="login-link">
-          <p>Hesabınız var? <a href="/dev-login.html">Daxil olun</a></p>
-        </div>
+    <form id="register-form">
+      <div class="form-group">
+        <label for="email">E-poçt *</label>
+        <input type="email" id="email" required placeholder="developer@example.com">
       </div>
-    </main>
+      
+      <div class="form-group">
+        <label for="password">Şifrə *</label>
+        <input type="password" id="password" required placeholder="Ən azı 6 simvol">
+      </div>
+      
+      <div class="form-group">
+        <label for="company">Şirkət (istəyə görə)</label>
+        <input type="text" id="company" placeholder="Şirkət adı">
+      </div>
+      
+      <div class="form-group">
+        <label for="reason">API istifadə məqsədi *</label>
+        <textarea id="reason" required placeholder="API-ni necə istifadə etmək istədiyinizi qısaca izah edin..."></textarea>
+      </div>
+      
+      <button type="submit" class="btn" id="register-btn">
+        Qeydiyyatdan keç
+      </button>
+    </form>
+
+    <div class="login-link">
+      <p>Artıq hesabınız var? <a href="/dev-login.html">Daxil olun</a></p>
+    </div>
   </div>
 
-  <script src="/static/layout.js"></script>
   <script>
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const token = document.getElementById('token').value;
-      const registerBtn = document.getElementById('register-btn');
-      const errorEl = document.getElementById('error-message');
-      const successEl = document.getElementById('success-message');
-      
-      // Show loading state
-      registerBtn.disabled = true;
-      registerBtn.textContent = 'Qeydiyyat edilir...';
-      errorEl.classList.add('hidden');
-      successEl.classList.add('hidden');
-      
-      try {
-        const response = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password, registrationToken: token })
-        });
-        
-        if (response.ok) {
-          // Registration successful
-          successEl.textContent = 'Qeydiyyat uğurla tamamlandı! İndi daxil ola bilərsiniz.';
-          successEl.classList.remove('hidden');
-          
-          // Redirect to login after 2 seconds
-          setTimeout(() => {
-            window.location.href = '/dev-login.html';
-          }, 2000);
-        } else {
-          const error = await response.json();
-          errorEl.textContent = error.message || 'Qeydiyyat uğursuz oldu';
-          errorEl.classList.remove('hidden');
-        }
-      } catch (error) {
-        errorEl.textContent = 'Xəta: ' + error.message;
-        errorEl.classList.remove('hidden');
-      } finally {
-        registerBtn.disabled = false;
-        registerBtn.textContent = 'Qeydiyyatdan keç';
+    class DevRegister {
+      constructor() {
+        this.init();
       }
-    });
+
+      init() {
+        // Register form
+        document.getElementById('register-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.handleRegister();
+        });
+      }
+
+      async handleRegister() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const company = document.getElementById('company').value;
+        const reason = document.getElementById('reason').value;
+        const registerBtn = document.getElementById('register-btn');
+
+        // Disable button and show loading
+        registerBtn.disabled = true;
+        registerBtn.textContent = 'Qeydiyyat edilir...';
+
+        try {
+          const response = await fetch('/api/auth/register-dev', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              email, 
+              password, 
+              company,
+              reason
+            }),
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            this.showMessage(data.message, 'success');
+            document.getElementById('register-form').reset();
+            
+            // Show additional info
+            setTimeout(() => {
+              this.showMessage('Təsdiqləndikdən sonra e-poçt ünvanınızı yoxlayın və daxil olmaq üçün /dev-login.html səhifəsinə keçin.', 'info');
+            }, 2000);
+          } else {
+            const error = await response.json();
+            this.showMessage(`Qeydiyyat alınmadı: ${error.message}`, 'error');
+          }
+        } catch (error) {
+          this.showMessage(`Qeydiyyat zamanı səhv: ${error.message}`, 'error');
+        } finally {
+          // Re-enable button
+          registerBtn.disabled = false;
+          registerBtn.textContent = 'Qeydiyyatdan keç';
+        }
+      }
+
+      showMessage(message, type) {
+        const errorDiv = document.getElementById('error-message');
+        const successDiv = document.getElementById('success-message');
+        const infoDiv = document.getElementById('info-message');
+        
+        // Hide all messages first
+        errorDiv.classList.add('hidden');
+        successDiv.classList.add('hidden');
+        infoDiv.classList.add('hidden');
+        
+        if (type === 'error') {
+          errorDiv.textContent = message;
+          errorDiv.classList.remove('hidden');
+        } else if (type === 'success') {
+          successDiv.textContent = message;
+          successDiv.classList.remove('hidden');
+        } else {
+          infoDiv.textContent = message;
+          infoDiv.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Initialize when page loads
+    new DevRegister();
   </script>
 </body>
 </html>
