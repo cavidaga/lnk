@@ -357,6 +357,16 @@
       font-size: 13px;
       color: var(--muted);
     }
+    
+    @media (prefers-color-scheme: dark) {
+      .note {
+        color: #a0a9c0 !important;
+      }
+    }
+    
+    .theme-dark .note {
+      color: #a0a9c0 !important;
+    }
 
     /* TOC styling to match methodology.html */
     .toc { 
@@ -367,7 +377,11 @@
       background:var(--panel) 
     }
     .toc a { 
-      text-decoration:none 
+      text-decoration:none;
+      color: var(--text);
+    }
+    .toc a:hover {
+      color: var(--accent);
     }
     .toc ul { 
       margin:0; 
@@ -375,6 +389,22 @@
     }
     .toc li { 
       margin:6px 0 
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .toc a {
+        color: var(--text) !important;
+      }
+      .toc a:hover {
+        color: var(--accent) !important;
+      }
+    }
+    
+    .theme-dark .toc a {
+      color: var(--text) !important;
+    }
+    .theme-dark .toc a:hover {
+      color: var(--accent) !important;
     }
 
     /* Plan comparison styling */
@@ -462,6 +492,36 @@
       border-radius: 4px;
       font-size: 0.75rem;
       font-weight: 600;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .plan-card {
+        background: var(--card) !important;
+        border-color: var(--border) !important;
+      }
+      
+      .plan-card h4 {
+        color: var(--text) !important;
+      }
+      
+      .plan-card li {
+        color: var(--muted) !important;
+        border-color: var(--border) !important;
+      }
+    }
+    
+    .theme-dark .plan-card {
+      background: var(--card) !important;
+      border-color: var(--border) !important;
+    }
+    
+    .theme-dark .plan-card h4 {
+      color: var(--text) !important;
+    }
+    
+    .theme-dark .plan-card li {
+      color: var(--muted) !important;
+      border-color: var(--border) !important;
     }
   </style>
 </head>

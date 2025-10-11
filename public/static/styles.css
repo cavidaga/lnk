@@ -108,11 +108,22 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow for better contrast */
 }
 
-/* Improve contrast for muted text in light mode */
+/* Improve contrast for muted text in both modes */
+.muted {
+  color: var(--muted);
+}
+
 @media (prefers-color-scheme: light) {
   .muted {
     color: #4b5563 !important; /* Darker gray for better contrast */
   }
+}
+
+@media (prefers-color-scheme: dark) {
+  .muted {
+    color: #a0a9c0 !important; /* Lighter gray for better contrast on dark */
+  }
+}
   
   .recent-item-meta {
     color: #4b5563 !important; /* Darker gray for better contrast */
@@ -1101,6 +1112,86 @@ footer.site-footer{
 .icon{ width:20px; height:20px; display:inline-block }
 .muted{ color:var(--muted) }
 .small{ font-size:12px }
+
+/* Dark mode improvements for better contrast */
+@media (prefers-color-scheme: dark) {
+  .toc {
+    background: var(--panel) !important;
+    border-color: var(--border) !important;
+  }
+  
+  .toc a {
+    color: var(--text) !important;
+  }
+  
+  .toc a:hover {
+    color: var(--accent) !important;
+  }
+  
+  .note {
+    color: #a0a9c0 !important;
+  }
+  
+  .kpi {
+    background: var(--panel) !important;
+    border-color: var(--border) !important;
+  }
+  
+  .kpi strong {
+    color: var(--text) !important;
+  }
+  
+  .chip {
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+  }
+  
+  .chip.active {
+    background: var(--accent) !important;
+    color: white !important;
+  }
+}
+
+/* Manual dark theme override */
+.theme-dark .toc {
+  background: var(--panel) !important;
+  border-color: var(--border) !important;
+}
+
+.theme-dark .toc a {
+  color: var(--text) !important;
+}
+
+.theme-dark .toc a:hover {
+  color: var(--accent) !important;
+}
+
+.theme-dark .note {
+  color: #a0a9c0 !important;
+}
+
+.theme-dark .kpi {
+  background: var(--panel) !important;
+  border-color: var(--border) !important;
+}
+
+.theme-dark .kpi strong {
+  color: var(--text) !important;
+}
+
+.theme-dark .chip {
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+.theme-dark .chip.active {
+  background: var(--accent) !important;
+  color: white !important;
+}
+
+.theme-dark .muted {
+  color: #a0a9c0 !important;
+}
 
 /* Footer icons: ICON-ONLY + tooltips */
 .footer-icons{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }

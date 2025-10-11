@@ -61,6 +61,14 @@
       border: 1px solid #f5c6cb;
     }
     
+    @media (prefers-color-scheme: dark) {
+      .error-message {
+        background: #2d1b1b;
+        color: #fca5a5;
+        border-color: #7f1d1d;
+      }
+    }
+    
     .form-group {
       margin-bottom: 1.5rem;
     }
@@ -124,6 +132,16 @@
     
     .register-link a:hover {
       text-decoration: underline;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      .register-link a {
+        color: #60a5fa;
+      }
+      
+      .register-link a:hover {
+        color: #93c5fd;
+      }
     }
     
     .hidden {
