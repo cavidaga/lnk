@@ -294,6 +294,39 @@
           <div style="text-align: right; margin: 0 0 1rem 0;">
             <button id="logout-btn" class="btn">Çıxış</button>
           </div>
+          <div class="analyses-section" style="margin-bottom: 1.5rem;">
+            <div class="analyses-header">
+              <h2>Hesab ayarları</h2>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;">
+              <div class="stat-card" style="text-align:left;">
+                <h3>E-poçtu dəyiş</h3>
+                <div class="form-group">
+                  <label>Yeni e-poçt</label>
+                  <input type="email" id="new-email" placeholder="yeni@example.com" />
+                </div>
+                <div class="form-group">
+                  <label>Mövcud şifrə</label>
+                  <input type="password" id="confirm-email-password" placeholder="Şifrənizi təsdiqləyin" />
+                </div>
+                <button id="save-email" class="btn btn-primary">E-poçtu yenilə</button>
+                <div id="email-change-msg" class="error-message hidden" style="margin-top:.75rem"></div>
+              </div>
+              <div class="stat-card" style="text-align:left;">
+                <h3>Şifrəni dəyiş</h3>
+                <div class="form-group">
+                  <label>Mövcud şifrə</label>
+                  <input type="password" id="current-password" placeholder="Cari şifrə" />
+                </div>
+                <div class="form-group">
+                  <label>Yeni şifrə</label>
+                  <input type="password" id="new-password" placeholder="Minimum 8 simvol" />
+                </div>
+                <button id="save-password" class="btn btn-primary">Şifrəni yenilə</button>
+                <div id="password-change-msg" class="error-message hidden" style="margin-top:.75rem"></div>
+              </div>
+            </div>
+          </div>
           <div class="dashboard-header">
             <h1 id="welcome-title">İstifadəçi Paneli</h1>
             <p id="welcome-subtitle">Analiz tarixçənizi görün və idarə edin</p>
@@ -549,6 +582,52 @@
           await fetch('/api/auth/logout', { method: 'POST' });
         } catch {}
         window.location.href = '/user-login.html';
+      }
+      if (target && target.id === 'save-email') {
+        const msg = document.getElementById('email-change-msg');
+        if (msg) msg.classList.add('hidden');
+        const newEmail = (document.getElementById('new-email') || {}).value?.trim()?.toLowerCase() || '';
+        const pwd = (document.getElementById('confirm-email-password') || {}).value || '';
+        if (!newEmail || !pwd) {
+          if (msg) { msg.textContent = 'Yeni e-poçt və mövcud şifrə tələb olunur'; msg.classList.remove('hidden'); }
+          return;
+        }
+        try {
+          const r = await fetch('/api/account/change-email', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ newEmail, currentPassword: pwd }) });
+          const data = await r.json().catch(() => ({}));
+          if (r.ok) {
+            if (msg) { msg.style.background = '#f0fdf4'; msg.style.color = '#16a34a'; msg.style.borderColor = '#bbf7d0'; msg.textContent = 'E-poçt yeniləndi'; msg.classList.remove('hidden'); }
+            const ne = document.getElementById('new-email'); if (ne) ne.value='';
+            const cp = document.getElementById('confirm-email-password'); if (cp) cp.value='';
+            if (data.user && data.user.email) {
+              const wt = document.getElementById('welcome-title');
+              if (wt) wt.textContent = `Xoş gəlmisiniz, ${data.user.username || data.user.email}!`;
+            }
+          } else {
+            if (msg) { msg.textContent = data.message || 'Yeniləmə alınmadı'; msg.classList.remove('hidden'); }
+          }
+        } catch { if (msg) { msg.textContent = 'Xəta baş verdi'; msg.classList.remove('hidden'); } }
+      }
+      if (target && target.id === 'save-password') {
+        const msg = document.getElementById('password-change-msg');
+        if (msg) msg.classList.add('hidden');
+        const currentPassword = (document.getElementById('current-password') || {}).value || '';
+        const newPassword = (document.getElementById('new-password') || {}).value || '';
+        if (!currentPassword || !newPassword) {
+          if (msg) { msg.textContent = 'Cari və yeni şifrə tələb olunur'; msg.classList.remove('hidden'); }
+          return;
+        }
+        try {
+          const r = await fetch('/api/account/change-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ currentPassword, newPassword }) });
+          const data = await r.json().catch(() => ({}));
+          if (r.ok) {
+            if (msg) { msg.style.background = '#f0fdf4'; msg.style.color = '#16a34a'; msg.style.borderColor = '#bbf7d0'; msg.textContent = 'Şifrə yeniləndi'; msg.classList.remove('hidden'); }
+            const cp = document.getElementById('current-password'); if (cp) cp.value='';
+            const np = document.getElementById('new-password'); if (np) np.value='';
+          } else {
+            if (msg) { msg.textContent = data.message || 'Yeniləmə alınmadı'; msg.classList.remove('hidden'); }
+          }
+        } catch { if (msg) { msg.textContent = 'Xəta baş verdi'; msg.classList.remove('hidden'); } }
       }
     });
 
