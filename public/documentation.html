@@ -307,22 +307,8 @@
       border-radius: 8px;
       padding: 1rem;
       margin: 1rem 0;
-      color: #1f2937;
     }
     
-    @media (prefers-color-scheme: dark) {
-      .warning,
-      .warning *,
-      .warning strong {
-        color: #1f2937 !important;
-      }
-    }
-    
-    .theme-dark .warning,
-    .theme-dark .warning *,
-    .theme-dark .warning strong {
-      color: #1f2937 !important;
-    }
     
     .info {
       background: color-mix(in oklab, var(--accent) 10%, var(--panel) 90%);
@@ -536,6 +522,25 @@
     .theme-dark .plan-card li {
       color: var(--muted) !important;
       border-color: var(--border) !important;
+    }
+    
+    /* Dark mode link colors */
+    @media (prefers-color-scheme: dark) {
+      a {
+        color: #60a5fa !important;
+      }
+      
+      a:hover {
+        color: #93c5fd !important;
+      }
+    }
+    
+    .theme-dark a {
+      color: #60a5fa !important;
+    }
+    
+    .theme-dark a:hover {
+      color: #93c5fd !important;
     }
   </style>
 </head>

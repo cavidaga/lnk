@@ -1205,12 +1205,29 @@ footer.site-footer{
   .warning strong {
     color: #1f2937 !important;
   }
+  
+  /* Dark mode link colors */
+  a {
+    color: #60a5fa !important;
+  }
+  
+  a:hover {
+    color: #93c5fd !important;
+  }
 }
 
 .theme-dark .warning,
 .theme-dark .warning *,
 .theme-dark .warning strong {
   color: #1f2937 !important;
+}
+
+.theme-dark a {
+  color: #60a5fa !important;
+}
+
+.theme-dark a:hover {
+  color: #93c5fd !important;
 }
 
 /* Footer link buttons */
