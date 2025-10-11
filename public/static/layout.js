@@ -90,9 +90,38 @@
             <span class="label">Əlaqə</span>
           </a>
 
+          <!-- User login/register links -->
+          <a href="/user-login.html" class="radial-item nav-link" data-tooltip="Daxil ol" aria-label="Daxil ol" data-angle="288">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="10,17 15,12 10,7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="15" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="label">Daxil ol</span>
+          </a>
+
+          <a href="/user-register.html" class="radial-item nav-link" data-tooltip="Qeydiyyat" aria-label="Qeydiyyat" data-angle="306">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="label">Qeydiyyat</span>
+          </a>
+
+          <a href="/user-dashboard.html" class="radial-item nav-link" data-tooltip="Panel" aria-label="İstifadəçi paneli" data-angle="324">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="14" y="3" width="7" height="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="14" y="14" width="7" height="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="3" y="14" width="7" height="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="label">Panel</span>
+          </a>
+
           <!-- Support button (desktop) -->
           <a href="https://www.buymeacoffee.com/cavidaga" target="_blank" rel="noopener"
-            class="radial-item support-item" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol" data-angle="324">
+            class="radial-item support-item" data-tooltip="Layihəyə dəstək ol" aria-label="Layihəyə dəstək ol" data-angle="342">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 7h14a3 3 0 0 1 0 6h-1.2l-.7 4.2A3 3 0 0 1 13.14 20H8.86A3 3 0 0 1 6.9 17.2L6.2 13H6a3 3 0 0 1 0-6Z"
                     stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>

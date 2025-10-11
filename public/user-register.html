@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="az" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <title>Qeydiyyat - LNK.az</title>
+  <meta name="description" content="LNK.az - Media bias analysis platform. Register for a free account to track your analysis history." />
+  <meta name="theme-color" content="#0c0d12">
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="/static/favicon-dark.svg"  media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="/static/styles.css">
+  
+  <style>
+    .auth-container {
+      max-width: 400px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-header h1 {
+      color: #1f2937;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+
+    .auth-links {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .auth-links a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .auth-links a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      border: 1px solid #fecaca;
+    }
+
+    .success-message {
+      background: #f0fdf4;
+      color: #16a34a;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      border: 1px solid #bbf7d0;
+    }
+
+    .loading {
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <main>
+      <div class="auth-container">
+        <div class="auth-header">
+          <h1>👤 Qeydiyyat</h1>
+          <p>Hesab yaradın və analiz tarixçənizi izləyin</p>
+        </div>
+
+        <div id="error-message" class="error-message hidden"></div>
+        <div id="success-message" class="success-message hidden"></div>
+
+        <form id="register-form">
+          <div class="form-group">
+            <label for="username">İstifadəçi adı</label>
+            <input type="text" id="username" name="username" required minlength="3" placeholder="İstifadəçi adınızı daxil edin">
+          </div>
+
+          <div class="form-group">
+            <label for="email">E-poçt ünvanı</label>
+            <input type="email" id="email" name="email" required placeholder="E-poçt ünvanınızı daxil edin">
+          </div>
+
+          <div class="form-group">
+            <label for="password">Şifrə</label>
+            <input type="password" id="password" name="password" required minlength="8" placeholder="Ən azı 8 simvol">
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            <span id="submit-text">Hesab yarat</span>
+            <span id="submit-loading" class="loading hidden">Yaradılır...</span>
+          </button>
+        </form>
+
+        <div class="auth-links">
+          <p>Artıq hesabınız var? <a href="/user-login.html">Daxil olun</a></p>
+          <p><a href="/">Ana səhifəyə qayıt</a></p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/layout.js"></script>
+  <script>
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submit-btn');
+      const submitText = document.getElementById('submit-text');
+      const submitLoading = document.getElementById('submit-loading');
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      
+      // Hide previous messages
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      submitText.classList.add('hidden');
+      submitLoading.classList.remove('hidden');
+      
+      const formData = {
+        username: document.getElementById('username').value.trim(),
+        email: document.getElementById('email').value.trim().toLowerCase(),
+        password: document.getElementById('password').value
+      };
+      
+      try {
+        const response = await fetch('/api/auth/register-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          successDiv.textContent = data.message || 'Hesab uğurla yaradıldı!';
+          successDiv.classList.remove('hidden');
+          
+          // Redirect to login after 2 seconds
+          setTimeout(() => {
+            window.location.href = '/user-login.html';
+          }, 2000);
+        } else {
+          errorDiv.textContent = data.message || 'Xəta baş verdi';
+          errorDiv.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorDiv.textContent = 'Şəbəkə xətası: ' + error.message;
+        errorDiv.classList.remove('hidden');
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitText.classList.remove('hidden');
+        submitLoading.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

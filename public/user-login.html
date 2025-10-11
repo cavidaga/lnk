@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="az" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <title>Daxil ol - LNK.az</title>
+  <meta name="description" content="LNK.az - Media bias analysis platform. Login to access your analysis history." />
+  <meta name="theme-color" content="#0c0d12">
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="/static/favicon-dark.svg"  media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="/static/styles.css">
+  
+  <style>
+    .auth-container {
+      max-width: 400px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-header h1 {
+      color: #1f2937;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .auth-header p {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+
+    .auth-links {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .auth-links a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-size: 0.875rem;
+    }
+
+    .auth-links a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      border: 1px solid #fecaca;
+    }
+
+    .success-message {
+      background: #f0fdf4;
+      color: #16a34a;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      border: 1px solid #bbf7d0;
+    }
+
+    .loading {
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .user-info {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .user-info h3 {
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .user-info p {
+      color: #6b7280;
+      font-size: 0.875rem;
+      margin: 0.25rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <main>
+      <div class="auth-container">
+        <div class="auth-header">
+          <h1>🔐 Daxil ol</h1>
+          <p>Hesabınıza daxil olun və analiz tarixçənizi görün</p>
+        </div>
+
+        <div id="error-message" class="error-message hidden"></div>
+        <div id="success-message" class="success-message hidden"></div>
+
+        <!-- User info (shown after login) -->
+        <div id="user-info" class="user-info hidden">
+          <h3 id="welcome-text">Xoş gəlmisiniz!</h3>
+          <p id="user-details"></p>
+          <p id="analysis-count"></p>
+        </div>
+
+        <form id="login-form">
+          <div class="form-group">
+            <label for="email">E-poçt ünvanı</label>
+            <input type="email" id="email" name="email" required placeholder="E-poçt ünvanınızı daxil edin">
+          </div>
+
+          <div class="form-group">
+            <label for="password">Şifrə</label>
+            <input type="password" id="password" name="password" required placeholder="Şifrənizi daxil edin">
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="submit-btn">
+            <span id="submit-text">Daxil ol</span>
+            <span id="submit-loading" class="loading hidden">Daxil olunur...</span>
+          </button>
+        </form>
+
+        <div class="auth-links">
+          <p>Hesabınız yoxdur? <a href="/user-register.html">Qeydiyyatdan keçin</a></p>
+          <p><a href="/">Ana səhifəyə qayıt</a></p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/layout.js"></script>
+  <script>
+    // Check if user is already logged in
+    async function checkAuthStatus() {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const user = await response.json();
+          if (user.user && user.user.role === 'user') {
+            showUserInfo(user.user);
+          }
+        }
+      } catch (error) {
+        console.log('Not logged in');
+      }
+    }
+
+    function showUserInfo(user) {
+      document.getElementById('login-form').classList.add('hidden');
+      document.getElementById('user-info').classList.remove('hidden');
+      
+      document.getElementById('welcome-text').textContent = `Xoş gəlmisiniz, ${user.username || user.email}!`;
+      document.getElementById('user-details').textContent = `E-poçt: ${user.email}`;
+      document.getElementById('analysis-count').textContent = `Analiz sayı: ${user.analysisCount || 0}`;
+      
+      // Add logout button
+      const logoutBtn = document.createElement('button');
+      logoutBtn.className = 'btn btn-secondary';
+      logoutBtn.textContent = 'Çıxış';
+      logoutBtn.onclick = () => {
+        fetch('/api/auth/logout', { method: 'POST' })
+          .then(() => {
+            window.location.reload();
+          });
+      };
+      
+      document.getElementById('user-info').appendChild(logoutBtn);
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submit-btn');
+      const submitText = document.getElementById('submit-text');
+      const submitLoading = document.getElementById('submit-loading');
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      
+      // Hide previous messages
+      errorDiv.classList.add('hidden');
+      successDiv.classList.add('hidden');
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      submitText.classList.add('hidden');
+      submitLoading.classList.remove('hidden');
+      
+      const formData = {
+        email: document.getElementById('email').value.trim().toLowerCase(),
+        password: document.getElementById('password').value
+      };
+      
+      try {
+        const response = await fetch('/api/auth/login-user', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          successDiv.textContent = 'Uğurla daxil oldunuz!';
+          successDiv.classList.remove('hidden');
+          
+          // Show user info
+          showUserInfo(data.user);
+        } else {
+          errorDiv.textContent = data.message || 'Daxil olma xətası';
+          errorDiv.classList.remove('hidden');
+        }
+      } catch (error) {
+        errorDiv.textContent = 'Şəbəkə xətası: ' + error.message;
+        errorDiv.classList.remove('hidden');
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitText.classList.remove('hidden');
+        submitLoading.classList.add('hidden');
+      }
+    });
+
+    // Check auth status on page load
+    checkAuthStatus();
+  </script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="az" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <title>İstifadəçi Paneli - LNK.az</title>
+  <meta name="description" content="LNK.az - İstifadəçi paneli. Analiz tarixçənizi görün və idarə edin." />
+  <meta name="theme-color" content="#0c0d12">
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="/static/favicon-dark.svg"  media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="/static/styles.css">
+  
+  <style>
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .dashboard-header {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+
+    .dashboard-header h1 {
+      color: #1f2937;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .dashboard-header p {
+      color: #6b7280;
+      font-size: 1rem;
+    }
+
+    .user-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      color: #6b7280;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-card p {
+      color: #1f2937;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .analyses-section {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+    }
+
+    .analyses-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .analyses-header h2 {
+      color: #1f2937;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-secondary {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #4b5563;
+    }
+
+    .analyses-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .analysis-item {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1rem;
+      border: 1px solid #e9ecef;
+      transition: all 0.2s;
+    }
+
+    .analysis-item:hover {
+      background: #f1f3f4;
+      border-color: #d1d5db;
+    }
+
+    .analysis-item h3 {
+      color: #1f2937;
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .analysis-item p {
+      color: #6b7280;
+      font-size: 0.875rem;
+      margin: 0.25rem 0;
+    }
+
+    .analysis-meta {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      color: #6b7280;
+      font-size: 0.75rem;
+    }
+
+    .reliability-score {
+      font-weight: 600;
+    }
+
+    .reliability-high { color: #16a34a; }
+    .reliability-medium { color: #d97706; }
+    .reliability-low { color: #dc2626; }
+
+    .bias-score {
+      font-weight: 600;
+    }
+
+    .bias-positive { color: #dc2626; }
+    .bias-neutral { color: #6b7280; }
+    .bias-negative { color: #2563eb; }
+
+    .loading {
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.875rem;
+      padding: 2rem;
+    }
+
+    .error-message {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+      border: 1px solid #fecaca;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #6b7280;
+    }
+
+    .empty-state h3 {
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .auth-required {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    .auth-required h2 {
+      color: #1f2937;
+      margin-bottom: 1rem;
+    }
+
+    .auth-required p {
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+
+    .auth-links {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <main>
+      <div class="dashboard-container">
+        <!-- Auth required message -->
+        <div id="auth-required" class="auth-required hidden">
+          <h2>🔐 Daxil olmaq lazımdır</h2>
+          <p>Bu səhifəni görmək üçün hesabınıza daxil olmalısınız.</p>
+          <div class="auth-links">
+            <a href="/user-login.html" class="btn btn-primary">Daxil ol</a>
+            <a href="/user-register.html" class="btn btn-secondary">Qeydiyyat</a>
+          </div>
+        </div>
+
+        <!-- Dashboard content -->
+        <div id="dashboard-content" class="hidden">
+          <div class="dashboard-header">
+            <h1 id="welcome-title">İstifadəçi Paneli</h1>
+            <p id="welcome-subtitle">Analiz tarixçənizi görün və idarə edin</p>
+          </div>
+
+          <div class="user-stats">
+            <div class="stat-card">
+              <h3>📊 Ümumi Analizlər</h3>
+              <p id="total-analyses">-</p>
+            </div>
+            <div class="stat-card">
+              <h3>📅 Bu Ay</h3>
+              <p id="monthly-analyses">-</p>
+            </div>
+            <div class="stat-card">
+              <h3>⭐ Orta Etibarlılıq</h3>
+              <p id="avg-reliability">-</p>
+            </div>
+            <div class="stat-card">
+              <h3>📋 Plan</h3>
+              <p id="user-plan">-</p>
+            </div>
+          </div>
+
+          <div class="analyses-section">
+            <div class="analyses-header">
+              <h2>📋 Analiz Tarixçəsi</h2>
+              <div>
+                <button id="refresh-btn" class="btn btn-primary">🔄 Yenilə</button>
+                <button id="clear-btn" class="btn btn-danger">🗑️ Təmizlə</button>
+              </div>
+            </div>
+
+            <div id="error-message" class="error-message hidden"></div>
+
+            <div id="analyses-list" class="analyses-list">
+              <div class="loading">Analizlər yüklənir...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/layout.js"></script>
+  <script>
+    class UserDashboard {
+      constructor() {
+        this.user = null;
+        this.analyses = [];
+        this.init();
+      }
+
+      async init() {
+        await this.checkAuthStatus();
+        if (this.user) {
+          this.setupEventListeners();
+          await this.loadAnalyses();
+          this.updateStats();
+        }
+      }
+
+      async checkAuthStatus() {
+        try {
+          const response = await fetch('/api/auth/me');
+          if (response.ok) {
+            const data = await response.json();
+            if (data.user && data.user.role === 'user') {
+              this.user = data.user;
+              document.getElementById('dashboard-content').classList.remove('hidden');
+              document.getElementById('auth-required').classList.add('hidden');
+              
+              document.getElementById('welcome-title').textContent = `Xoş gəlmisiniz, ${this.user.username || this.user.email}!`;
+              document.getElementById('user-plan').textContent = this.user.plan || 'free';
+            } else {
+              this.showAuthRequired();
+            }
+          } else {
+            this.showAuthRequired();
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          this.showAuthRequired();
+        }
+      }
+
+      showAuthRequired() {
+        document.getElementById('auth-required').classList.remove('hidden');
+        document.getElementById('dashboard-content').classList.add('hidden');
+      }
+
+      setupEventListeners() {
+        document.getElementById('refresh-btn').addEventListener('click', () => {
+          this.loadAnalyses();
+        });
+
+        document.getElementById('clear-btn').addEventListener('click', () => {
+          if (confirm('Bütün analiz tarixçənizi silmək istədiyinizə əminsiniz?')) {
+            this.clearAnalyses();
+          }
+        });
+      }
+
+      async loadAnalyses() {
+        try {
+          const response = await fetch('/api/user/analyses');
+          if (response.ok) {
+            const data = await response.json();
+            this.analyses = data.analyses || [];
+            this.displayAnalyses();
+          } else {
+            this.showError('Analizlər yüklənə bilmədi');
+          }
+        } catch (error) {
+          this.showError('Xəta: ' + error.message);
+        }
+      }
+
+      displayAnalyses() {
+        const container = document.getElementById('analyses-list');
+        
+        if (this.analyses.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <h3>📭 Analiz yoxdur</h3>
+              <p>Hələ heç bir analiz etməmisiniz. <a href="/">İlk analizinizi edin</a></p>
+            </div>
+          `;
+          return;
+        }
+
+        const html = this.analyses.map(analysis => {
+          const reliabilityClass = analysis.reliability >= 70 ? 'reliability-high' : 
+                                 analysis.reliability >= 40 ? 'reliability-medium' : 'reliability-low';
+          
+          const biasClass = analysis.political_bias > 1 ? 'bias-positive' : 
+                           analysis.political_bias < -1 ? 'bias-negative' : 'bias-neutral';
+          
+          const biasText = analysis.political_bias > 1 ? 'Hakimiyyət meyilli' : 
+                          analysis.political_bias < -1 ? 'Müxalifət meyilli' : 'Neytral';
+
+          return `
+            <div class="analysis-item">
+              <h3>${analysis.title}</h3>
+              <p><strong>📰 Nəşriyyat:</strong> ${analysis.publication || 'Naməlum'}</p>
+              <p><strong>🔗 Link:</strong> <a href="${analysis.url}" target="_blank" rel="noopener">${analysis.url}</a></p>
+              <div class="analysis-meta">
+                <div class="meta-item">
+                  <span>📊 Etibarlılıq:</span>
+                  <span class="reliability-score ${reliabilityClass}">${analysis.reliability}/100</span>
+                </div>
+                <div class="meta-item">
+                  <span>⚖️ Siyasi meyl:</span>
+                  <span class="bias-score ${biasClass}">${analysis.political_bias} (${biasText})</span>
+                </div>
+                <div class="meta-item">
+                  <span>📅 Təhlil edilib:</span>
+                  <span>${new Date(analysis.analyzed_at).toLocaleDateString('az-AZ')}</span>
+                </div>
+                ${analysis.published_at ? `
+                  <div class="meta-item">
+                    <span>📰 Nəşr tarixi:</span>
+                    <span>${new Date(analysis.published_at).toLocaleDateString('az-AZ')}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = html;
+      }
+
+      updateStats() {
+        document.getElementById('total-analyses').textContent = this.analyses.length;
+        
+        // Calculate monthly analyses
+        const now = new Date();
+        const thisMonth = now.getMonth();
+        const thisYear = now.getFullYear();
+        const monthlyAnalyses = this.analyses.filter(analysis => {
+          const analysisDate = new Date(analysis.analyzed_at);
+          return analysisDate.getMonth() === thisMonth && analysisDate.getFullYear() === thisYear;
+        }).length;
+        document.getElementById('monthly-analyses').textContent = monthlyAnalyses;
+
+        // Calculate average reliability
+        if (this.analyses.length > 0) {
+          const avgReliability = Math.round(
+            this.analyses.reduce((sum, analysis) => sum + analysis.reliability, 0) / this.analyses.length
+          );
+          document.getElementById('avg-reliability').textContent = avgReliability + '/100';
+        } else {
+          document.getElementById('avg-reliability').textContent = '-';
+        }
+      }
+
+      async clearAnalyses() {
+        try {
+          const response = await fetch('/api/user/analyses', {
+            method: 'DELETE'
+          });
+          
+          if (response.ok) {
+            this.analyses = [];
+            this.displayAnalyses();
+            this.updateStats();
+            this.showSuccess('Analiz tarixçəsi təmizləndi');
+          } else {
+            this.showError('Təmizləmə uğursuz oldu');
+          }
+        } catch (error) {
+          this.showError('Xəta: ' + error.message);
+        }
+      }
+
+      showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+        setTimeout(() => {
+          errorDiv.classList.add('hidden');
+        }, 5000);
+      }
+
+      showSuccess(message) {
+        // Create a temporary success message
+        const successDiv = document.createElement('div');
+        successDiv.className = 'error-message';
+        successDiv.style.background = '#f0fdf4';
+        successDiv.style.color = '#16a34a';
+        successDiv.style.borderColor = '#bbf7d0';
+        successDiv.textContent = message;
+        
+        const container = document.querySelector('.analyses-section');
+        container.insertBefore(successDiv, container.firstChild);
+        
+        setTimeout(() => {
+          successDiv.remove();
+        }, 3000);
+      }
+    }
+
+    // Initialize dashboard when page loads
+    new UserDashboard();
+  </script>
+</body>
+</html>

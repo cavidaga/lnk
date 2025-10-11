@@ -46,6 +46,46 @@ async function incrementTotalAnalysesCounter() {
   }
 }
 
+// Helper function to track user analysis
+async function trackUserAnalysis(userId, analysisHash, analysisData) {
+  try {
+    if (!userId) return;
+    
+    // Add analysis to user's analysis list
+    const userAnalysesKey = `user:analyses:${userId}`;
+    const userAnalyses = await kv.get(userAnalysesKey) || [];
+    
+    // Add new analysis to the beginning of the list
+    userAnalyses.unshift({
+      hash: analysisHash,
+      url: analysisData?.meta?.original_url || '',
+      title: analysisData?.meta?.title || 'Başlıq yoxdur',
+      publication: analysisData?.meta?.publication || '',
+      published_at: analysisData?.meta?.published_at || '',
+      reliability: analysisData?.scores?.reliability?.value || 0,
+      political_bias: analysisData?.scores?.political_establishment_bias?.value || 0,
+      analyzed_at: new Date().toISOString()
+    });
+    
+    // Keep only last 100 analyses per user
+    const trimmedAnalyses = userAnalyses.slice(0, 100);
+    await kv.set(userAnalysesKey, trimmedAnalyses);
+    
+    // Update user's analysis count
+    const userKey = `user:id:${userId}`;
+    const user = await kv.get(userKey);
+    if (user) {
+      user.analysisCount = (user.analysisCount || 0) + 1;
+      await kv.set(userKey, user);
+    }
+    
+    console.log(`Tracked analysis for user ${userId}: ${analysisHash}`);
+  } catch (e) {
+    console.error('Failed to track user analysis:', e);
+    // Don't throw - this is not critical for the main functionality
+  }
+}
+
 // Update per-site running statistics (reliability and political bias)
 function normalizeHost(host) {
   const h = String(host || '').toLowerCase().replace(/^www\./, '');
@@ -1245,6 +1285,12 @@ async function analyzeHandler(req, res) {
             // Increment total analyses counter
             await incrementTotalAnalysesCounter();
             try { await updateSiteStatsFromAnalysis(normalized); } catch {}
+            
+            // Track user analysis if user is authenticated
+            if (authUser && authUser.id) {
+              try { await trackUserAnalysis(authUser.id, cacheKey, normalized); } catch {}
+            }
+            
             return normalized;
             }
           }
@@ -1297,6 +1343,12 @@ async function analyzeHandler(req, res) {
               // Increment total analyses counter
               await incrementTotalAnalysesCounter();
               try { await updateSiteStatsFromAnalysis(normalized); } catch {}
+              
+              // Track user analysis if user is authenticated
+              if (authUser && authUser.id) {
+                try { await trackUserAnalysis(authUser.id, cacheKey, normalized); } catch {}
+              }
+              
               return normalized;
             }
           } catch {}
@@ -1366,6 +1418,12 @@ async function analyzeHandler(req, res) {
             // Increment total analyses counter
             await incrementTotalAnalysesCounter();
             try { await updateSiteStatsFromAnalysis(normalized); } catch {}
+            
+            // Track user analysis if user is authenticated
+            if (authUser && authUser.id) {
+              try { await trackUserAnalysis(authUser.id, cacheKey, normalized); } catch {}
+            }
+            
             return normalized;
           }
 
@@ -1424,6 +1482,12 @@ async function analyzeHandler(req, res) {
             // Increment total analyses counter
             await incrementTotalAnalysesCounter();
             try { await updateSiteStatsFromAnalysis(normalized); } catch {}
+            
+            // Track user analysis if user is authenticated
+            if (authUser && authUser.id) {
+              try { await trackUserAnalysis(authUser.id, cacheKey, normalized); } catch {}
+            }
+            
             return normalized;
           }
 
@@ -1465,6 +1529,12 @@ async function analyzeHandler(req, res) {
               }
               
               await incrementTotalAnalysesCounter();
+              
+              // Track user analysis if user is authenticated
+              if (authUser && authUser.id) {
+                try { await trackUserAnalysis(authUser.id, cacheKey, normalized); } catch {}
+              }
+              
               return normalized;
             } else {
               console.log(`Markdowner failed, proceeding to full browser approach for: ${effectiveUrl}`);
@@ -1780,6 +1850,12 @@ async function analyzeHandler(req, res) {
             // Increment total analyses counter
             await incrementTotalAnalysesCounter();
             try { await updateSiteStatsFromAnalysis(normalized); } catch {}
+            
+            // Track user analysis if user is authenticated
+            if (authUser && authUser.id) {
+              try { await trackUserAnalysis(authUser.id, cacheKey, normalized); } catch {}
+            }
+            
             return normalized;
           }
 
@@ -1959,6 +2035,11 @@ async function analyzeHandler(req, res) {
 
           // Update per-site stats
           try { await updateSiteStatsFromAnalysis(normalized); } catch {}
+
+          // Track user analysis if user is authenticated
+          if (authUser && authUser.id) {
+            try { await trackUserAnalysis(authUser.id, cacheKey, normalized); } catch {}
+          }
 
           // Upsert to Upstash Search (if configured)
           try {
