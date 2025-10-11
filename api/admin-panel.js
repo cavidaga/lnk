@@ -19,8 +19,7 @@ export default async function handler(req, res) {
     const user = session.user;
     const isAdmin = user.role === 'admin' || 
                    user.isAdmin === true || 
-                   user.email === process.env.ADMIN_EMAIL ||
-                   (process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL);
+                   user.email === process.env.ADMIN_EMAIL;
 
     if (!isAdmin) {
       // Redirect to admin login with error message

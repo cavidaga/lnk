@@ -164,28 +164,29 @@
     <div id="success-message" class="success-message hidden"></div>
     <div id="info-message" class="info-message hidden"></div>
 
-    <div id="user-info" class="user-info hidden">
-      <h3>Mövcud İstifadəçi Məlumatları</h3>
-      <p><strong>E-poçt:</strong> <span id="user-email"></span></p>
-      <p><strong>Rol:</strong> <span id="user-role"></span></p>
-      <p><strong>Admin:</strong> <span id="user-is-admin"></span></p>
-      <p><strong>Admin E-poçt (ENV):</strong> <span id="admin-email"></span></p>
+    <div class="info-message">
+      <p><strong>İstifadə təlimatı:</strong></p>
+      <p>1. E-poçtunuzu daxil edin (məsələn: cavid@cavid.info)</p>
+      <p>2. ADMIN_REGISTRATION_TOKEN dəyərini daxil edin</p>
+      <p>3. "Admin Et" düyməsini basın</p>
+      <p>4. Uğurlu olduqdan sonra admin paneline daxil olun</p>
     </div>
 
     <form id="promote-form">
       <div class="form-group">
         <label for="email">E-poçt (admin etmək istədiyiniz istifadəçi)</label>
-        <input type="email" id="email" required placeholder="user@example.com">
+        <input type="email" id="email" required placeholder="cavid@cavid.info">
+      </div>
+      
+      <div class="form-group">
+        <label for="admin-token">Admin Token (ADMIN_REGISTRATION_TOKEN)</label>
+        <input type="password" id="admin-token" required placeholder="Admin tokeni daxil edin">
       </div>
       
       <button type="submit" class="btn" id="promote-btn">
         Admin Et
       </button>
     </form>
-
-    <button class="btn btn-secondary" id="check-user-btn">
-      Mövcud İstifadəçi Məlumatlarını Yoxla
-    </button>
 
     <div style="text-align: center; margin-top: 1rem;">
       <a href="/admin-login.html" style="color: #3b82f6; text-decoration: none;">Admin Paneline Daxil Ol</a>
@@ -204,36 +205,12 @@
           e.preventDefault();
           this.handlePromote();
         });
-
-        // Check user button
-        document.getElementById('check-user-btn').addEventListener('click', () => {
-          this.checkCurrentUser();
-        });
       }
 
-      async checkCurrentUser() {
-        try {
-          const response = await fetch('/api/debug-user');
-          const data = await response.json();
-
-          if (data.authenticated) {
-            document.getElementById('user-email').textContent = data.user.email;
-            document.getElementById('user-role').textContent = data.user.role || 'undefined';
-            document.getElementById('user-is-admin').textContent = data.user.isAdmin ? 'Bəli' : 'Xeyr';
-            document.getElementById('admin-email').textContent = data.adminCheck.adminEmail || 'Təyin edilməyib';
-            document.getElementById('user-info').classList.remove('hidden');
-            
-            this.showMessage('İstifadəçi məlumatları yükləndi', 'info');
-          } else {
-            this.showMessage('Daxil olmamısınız. Zəhmət olmasa əvvəlcə daxil olun.', 'error');
-          }
-        } catch (error) {
-          this.showMessage(`Xəta: ${error.message}`, 'error');
-        }
-      }
 
       async handlePromote() {
         const email = document.getElementById('email').value;
+        const adminToken = document.getElementById('admin-token').value;
         const promoteBtn = document.getElementById('promote-btn');
 
         // Disable button and show loading
@@ -241,17 +218,17 @@
         promoteBtn.textContent = 'Admin edilir...';
 
         try {
-          const response = await fetch('/api/promote-to-admin', {
+          const response = await fetch('/api/setup-admin', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email }),
+            body: JSON.stringify({ email, adminToken }),
           });
 
           if (response.ok) {
             const data = await response.json();
-            this.showMessage(`İstifadəçi uğurla admin edildi: ${data.user.email}`, 'success');
+            this.showMessage(`İstifadəçi uğurla admin edildi: ${data.user.email}. İndi admin paneline daxil ola bilərsiniz!`, 'success');
             document.getElementById('promote-form').reset();
           } else {
             const error = await response.json();
