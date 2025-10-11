@@ -762,7 +762,7 @@
 
         <!-- User Status -->
         <div class="admin-section">
-          <h2>Mövcud İstifadəçi Statusu</h2>
+          <h2>Mövcud istifadəçi statusu</h2>
           <div class="admin-content">
             <div id="user-status">
               <div class="status-indicator status-offline"></div>
@@ -799,7 +799,7 @@
 
         <!-- Registration Form -->
         <div class="admin-section" id="register-section">
-          <h2>Yeni İstifadəçi Qeydiyyatı</h2>
+          <h2>Yeni istifadəçi qeydiyyatı</h2>
           <div class="admin-content">
             <form id="register-form">
               <div class="form-group">
@@ -811,7 +811,7 @@
                 <input type="password" id="register-password" minlength="8" required>
               </div>
               <div class="form-group">
-                <label for="register-token">Admin Qeydiyyat Tokeni</label>
+                <label for="register-token">Admin qeydiyyat tokeni</label>
                 <input type="password" id="register-token" required>
               </div>
               <button type="submit" class="btn btn-success">Qeydiyyatdan keç</button>
@@ -826,14 +826,14 @@
             <div class="api-grid">
               <!-- API Key Management -->
               <div class="api-subsection">
-                <h3>API Açarlarının idarə edilməsi</h3>
+                <h3>API açarlarının idarə edilməsi</h3>
                 <div class="button-group">
-                  <button id="create-key-btn" class="btn btn-success">Yeni API Açarı Yarat</button>
+                  <button id="create-key-btn" class="btn btn-success">Yeni API açarı yarat</button>
                   <button id="refresh-keys-btn" class="btn btn-secondary">Siyahını yenilə</button>
                 </div>
 
                 <div id="create-key-form" class="hidden" style="background: var(--panel); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border);">
-                  <h4>Yeni API Açarı Yarat</h4>
+                  <h4>Yeni API açarı yarat</h4>
                   <div class="form-group">
                     <label for="key-name">Açarın adı</label>
                     <input type="text" id="key-name" placeholder="API açarım">
@@ -850,7 +850,7 @@
                 </div>
 
                 <div id="api-keys-list">
-                  <h4>API Açarlarınız</h4>
+                  <h4>API açarlarınız</h4>
                   <div id="keys-container">
                     <p>Yüklənir...</p>
                   </div>
@@ -956,7 +956,7 @@
 
         <!-- Protected Endpoints Testing -->
         <div class="admin-section">
-          <h2>Qorunan Endpointlərin Sınanması</h2>
+          <h2>Qorunan endpointlərin sınanması</h2>
           <div class="admin-content">
             <div class="form-group">
               <label for="protected-api-key">API açarı (istəyə görə)</label>
@@ -1264,7 +1264,7 @@
         <div class="limit-card">
           <h4>Planın təfərrüatları</h4>
           <div class="limit-text">
-            <strong>Cari plan:</strong> ${plan || 'Naməlum'}<br>
+            <strong>Cari plan:</strong> ${typeof plan === 'object' ? (plan.name || plan.id || 'Naməlum') : (plan || 'Naməlum')}<br>
             <strong>Bir sorğu üçün xərc:</strong> $${safeLimits.costPerRequest.toFixed(4)}<br>
             <strong>Status:</strong> ${canMakeRequest ? 'Aktiv' : 'Məhdud'}
           </div>
@@ -1411,44 +1411,79 @@
         return;
       }
       
+      // Azerbaijani translations for plan names and descriptions
+      const planTranslations = {
+        'Free': {
+          name: 'Pulsuz',
+          description: 'Təkmilləşdiricilər və kiçik layihələr üçün mükəmməl. Media təhlili ilə başlamaq üçün əsas etibarlılıq və qərəz qiymətləndirməsi daxildir.',
+          billing: 'Həmişəlik pulsuz'
+        },
+        'Basic': {
+          name: 'Əsas',
+          description: 'Kiçik bizneslər, bloqçular və məzmun yaradıcıları üçün ideal. Artan layihələr üçün prioritet dəstək və yüksək istifadə limitləri daxildir.',
+          billing: 'Tezliklə'
+        },
+        'Pro': {
+          name: 'Peşəkar',
+          description: 'Media şirkətləri, xəbər təşkilatları və agentliklər üçün mükəmməl. Peşəkar iş axınları üçün qabaqcıl xüsusiyyətlər, webhooklar və xüsusi dəstək daxildir.',
+          billing: 'Tezliklə'
+        },
+        'Enterprise': {
+          name: 'Korporativ',
+          description: 'Böyük təşkilatlar üçün nəzərdə tutulub. Korporativ ehtiyaclar üçün xüsusi inteqrasiyalar, SLA zəmanətləri və missiya-kritik media təhlili üçün xüsusi dəstək daxildir.',
+          billing: 'Tezliklə'
+        }
+      };
+      
       const plansHTML = plans.map(plan => {
         const isFree = plan.isFree;
         const isComingSoon = plan.isComingSoon;
         const cardClass = isComingSoon ? 'plan-card coming-soon' : 'plan-card';
         
+        // Get translation or use original
+        const translation = planTranslations[plan.name] || {
+          name: plan.name,
+          description: plan.description,
+          billing: plan.billing
+        };
+        
+        // Fix pricing display for free plans
+        const displayPrice = isFree ? 'Pulsuz' : `$${plan.priceDollars}`;
+        const displayBilling = isFree ? 'Həmişəlik pulsuz' : (translation.billing || plan.billing);
+        
         return `
           <div class="${cardClass}">
             <div class="plan-header">
-              <h3 class="plan-name">${plan.name}</h3>
+              <h3 class="plan-name">${translation.name}</h3>
               <div class="plan-price ${isFree ? 'free' : ''}">
-                ${isFree ? 'Free' : `$${plan.priceDollars}`}
-                ${plan.billing ? `<small style="display: block; font-size: 0.7rem; color: var(--muted);">${plan.billing}</small>` : ''}
+                ${displayPrice}
+                ${displayBilling ? `<small style="display: block; font-size: 0.7rem; color: var(--muted);">${displayBilling}</small>` : ''}
               </div>
             </div>
             
-            <p class="plan-description">${plan.description}</p>
+            <p class="plan-description">${translation.description}</p>
             
             <ul class="plan-features">
               ${plan.features.map(feature => `<li>${feature}</li>`).join('')}
             </ul>
             
             <div class="plan-limits">
-              <h4>Usage Limits</h4>
+              <h4>İstifadə limitləri</h4>
               <div class="limit-item">
-                <span>Requests per month</span>
+                <span>Ayda sorğu sayı</span>
                 <span class="limit-value ${plan.maxRequestsPerMonth === -1 ? 'unlimited' : ''}">
-                  ${plan.maxRequestsPerMonth === -1 ? 'Unlimited' : plan.maxRequestsPerMonth.toLocaleString()}
+                  ${plan.maxRequestsPerMonth === -1 ? 'Limitsiz' : plan.maxRequestsPerMonth.toLocaleString()}
                 </span>
               </div>
               <div class="limit-item">
-                <span>Cost per month</span>
+                <span>Aylıq xərc</span>
                 <span class="limit-value ${plan.maxCostPerMonth === -1 ? 'unlimited' : ''}">
-                  ${plan.maxCostPerMonth === -1 ? 'Unlimited' : `$${plan.maxCostPerMonth.toFixed(2)}`}
+                  ${isFree ? 'Pulsuz' : (plan.maxCostPerMonth === -1 ? 'Limitsiz' : `$${plan.maxCostPerMonth.toFixed(2)}`)}
                 </span>
               </div>
               <div class="limit-item">
-                <span>Cost per request</span>
-                <span class="limit-value">$${plan.costPerRequest.toFixed(4)}</span>
+                <span>Bir sorğu üçün xərc</span>
+                <span class="limit-value">${isFree ? 'Pulsuz' : `$${plan.costPerRequest.toFixed(4)}`}</span>
               </div>
             </div>
           </div>
