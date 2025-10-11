@@ -1151,7 +1151,8 @@ footer.site-footer{
     color: white !important;
   }
   
-  .warning {
+  .warning,
+  .warning * {
     color: #1f2937 !important;
   }
 }
@@ -1197,7 +1198,18 @@ footer.site-footer{
   color: #a0a9c0 !important;
 }
 
-.theme-dark .warning {
+/* Additional specificity for warning elements */
+@media (prefers-color-scheme: dark) {
+  .warning,
+  .warning *,
+  .warning strong {
+    color: #1f2937 !important;
+  }
+}
+
+.theme-dark .warning,
+.theme-dark .warning *,
+.theme-dark .warning strong {
   color: #1f2937 !important;
 }
 
