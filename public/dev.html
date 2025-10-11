@@ -2175,9 +2175,8 @@
       async handleLogout() {
         try {
           await fetch('/api/auth/logout', { method: 'POST' });
-          this.currentUser = null;
-          this.updateUserStatus();
-          this.showMessage('Çıxış uğurla tamamlandı!', 'info');
+          // Redirect to login page after logout
+          window.location.href = '/dev-login.html';
         } catch (error) {
           this.showMessage(`Çıxış zamanı səhv: ${error.message}`, 'danger');
         }
