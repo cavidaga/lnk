@@ -137,8 +137,8 @@
     <main id="main" role="main">
       <div class="login-container">
         <div class="login-header">
-          <h1>ğŸ”§ Developer Paneli</h1>
-          <p>API test vÉ™ idarÉ™etmÉ™ interfeysi</p>
+          <h1>🔧 Developer Paneli</h1>
+          <p>API test və idarəetmə interfeysi</p>
         </div>
 
         <div id="error-message" class="error-message hidden"></div>
@@ -157,7 +157,7 @@
 
     <div class="register-link">
       <p>Hesabınız yoxdur? <a href="/dev-register.html">Developer Qeydiyyatı</a></p>
-      <p><a href="/reset-password.html">ÅifrÉ™ni unutmusunuz?</a></p>
+      <p><a href="/reset-password.html">Şifrəni unutmusunuz?</a></p>
     </div>
       </div>
     </main>
@@ -190,11 +190,11 @@
           window.location.href = '/dev';
         } else {
           const error = await response.json();
-          errorEl.textContent = error.message || 'GiriÅŸ uÄŸursuz oldu';
+          errorEl.textContent = error.message || 'Giriş uğursuz oldu';
           errorEl.classList.remove('hidden');
         }
       } catch (error) {
-        errorEl.textContent = 'XÉ™ta: ' + error.message;
+        errorEl.textContent = 'Xəta: ' + error.message;
         errorEl.classList.remove('hidden');
       } finally {
         loginBtn.disabled = false;
@@ -205,10 +205,10 @@
     // Check if redirected from login required or pending status
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('login') === 'required') {
-      document.getElementById('error-message').textContent = 'Bu sÉ™hifÉ™yÉ™ daxil olmaq Ã¼Ã§Ã¼n giriÅŸ edin';
+      document.getElementById('error-message').textContent = 'Bu səhifəyə daxil olmaq üçün giriş edin';
       document.getElementById('error-message').classList.remove('hidden');
     } else if (urlParams.get('status') === 'pending') {
-      document.getElementById('error-message').textContent = 'Developer hesabÄ±nÄ±z hÉ™lÉ™ tÉ™sdiqlÉ™nmÉ™yib. ZÉ™hmÉ™t olmasa gÃ¶zlÉ™yin vÉ™ ya admin ilÉ™ É™laqÉ™ saxlayÄ±n.';
+      document.getElementById('error-message').textContent = 'Developer hesabınız hələ təsdiqlənməyib. Zəhmət olmasa gözləyin və ya admin ilə əlaqə saxlayın.';
       document.getElementById('error-message').classList.remove('hidden');
     }
   </script>
