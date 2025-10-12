@@ -380,6 +380,16 @@ async function renderAnalysis(root, data, hash) {
     </section>
     ` : ''}
     
+    <!-- Alternative Versions Section -->
+    <section class="card" id="alternative-versions-card" style="display:none; margin-bottom:16px">
+      <div class="bd">
+        <h3 style="margin:0 0 8px">🔄 Alternativ təhlil versiyaları</h3>
+        <div id="alternative-versions-content">
+          <div class="small muted">Yüklənir…</div>
+        </div>
+      </div>
+    </section>
+    
     <article class="card">
       <div class="bd">
 
@@ -623,6 +633,94 @@ async function renderAnalysis(root, data, hash) {
   } catch (e) {
     const statusEl = document.getElementById('site-averages-status');
     if (statusEl) statusEl.textContent = 'Yükləmə alınmadı';
+  }
+  
+  // Fetch and render alternative versions
+  try {
+    const currentHash = data.hash || hash;
+    const versionsCard = document.getElementById('alternative-versions-card');
+    const versionsContent = document.getElementById('alternative-versions-content');
+    
+    if (currentHash && versionsCard && versionsContent) {
+      const res = await fetch(`/api/analysis-versions?hash=${encodeURIComponent(currentHash)}`);
+      if (res.ok) {
+        const versions = await res.json();
+        if (versions.hasAlternatives && versions.alternativeVersions.length > 0) {
+          // Group by model type
+          const modelGroups = {};
+          versions.alternativeVersions.forEach(version => {
+            const model = version.modelUsed || 'unknown';
+            if (!modelGroups[model]) {
+              modelGroups[model] = [];
+            }
+            modelGroups[model].push(version);
+          });
+          
+          // Create HTML for each model group
+          const modelHtml = Object.entries(modelGroups).map(([model, versions]) => {
+            const modelDisplayName = {
+              'gemini-2.5-pro': 'Gemini Pro',
+              'gemini-2.5-flash': 'Gemini Flash',
+              'gemini-2.5-flash-lite': 'Gemini Flash Lite',
+              'unknown': 'Naməlum model'
+            }[model] || model;
+            
+            const versionLinks = versions.map(version => {
+              const date = new Date(version.analyzed_at).toLocaleDateString('az-AZ');
+              const relScore = Math.round(version.reliability);
+              const biasScore = version.political_bias > 0 ? `+${version.political_bias.toFixed(1)}` : version.political_bias.toFixed(1);
+              
+              return `
+                <a href="/analysis/${version.hash}" class="version-link" style="
+                  display: block; 
+                  padding: 12px; 
+                  margin: 8px 0; 
+                  background: var(--card-bg, rgba(255,255,255,0.02)); 
+                  border: 1px solid var(--border, #222); 
+                  border-radius: 8px; 
+                  text-decoration: none; 
+                  color: var(--text, #e9edf3);
+                  transition: all 0.2s ease;
+                " onmouseover="this.style.background='var(--hover-bg, rgba(255,255,255,0.05))'" onmouseout="this.style.background='var(--card-bg, rgba(255,255,255,0.02))'">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <strong style="color: var(--accent, #3b82f6);">${modelDisplayName}</strong>
+                    <span class="small muted">${date}</span>
+                  </div>
+                  <div style="display: flex; gap: 16px; font-size: 14px; color: var(--muted, #8e97ab);">
+                    <span>Etibarlılıq: <strong style="color: var(--text, #e9edf3);">${relScore}/100</strong></span>
+                    <span>Siyasi meyl: <strong style="color: var(--text, #e9edf3);">${biasScore}</strong></span>
+                  </div>
+                </a>
+              `;
+            }).join('');
+            
+            return `
+              <div style="margin-bottom: 16px;">
+                <h4 style="margin: 0 0 8px 0; color: var(--text, #e9edf3); font-size: 16px;">${modelDisplayName}</h4>
+                ${versionLinks}
+              </div>
+            `;
+          }).join('');
+          
+          versionsContent.innerHTML = `
+            <div class="small muted" style="margin-bottom: 12px;">
+              Bu məqalənin ${versions.totalVersions} fərqli təhlil versiyası mövcuddur. Aşağıdakı linklərə klik edərək digər modellərin təhlilini görə bilərsiniz.
+            </div>
+            ${modelHtml}
+          `;
+          
+          versionsCard.style.display = 'block';
+        } else {
+          versionsCard.style.display = 'none';
+        }
+      } else {
+        versionsCard.style.display = 'none';
+      }
+    }
+  } catch (e) {
+    console.error('Error fetching alternative versions:', e);
+    const versionsCard = document.getElementById('alternative-versions-card');
+    if (versionsCard) versionsCard.style.display = 'none';
   }
   
 }

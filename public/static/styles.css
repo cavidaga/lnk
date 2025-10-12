@@ -2145,6 +2145,39 @@ footer.site-footer{
   }
 }
 
+/* Alternative Versions Section */
+.version-link {
+  display: block;
+  padding: 12px;
+  margin: 8px 0;
+  background: var(--card-bg, rgba(255,255,255,0.02));
+  border: 1px solid var(--border, #222);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text, #e9edf3);
+  transition: all 0.2s ease;
+}
+
+.version-link:hover {
+  background: var(--hover-bg, rgba(255,255,255,0.05));
+  border-color: var(--accent, #3b82f6);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.version-link:active {
+  transform: translateY(0);
+}
+
+.version-link strong {
+  color: var(--accent, #3b82f6);
+}
+
+.version-link .small {
+  color: var(--muted, #8e97ab);
+  font-size: 12px;
+}
+
 /* Recent analyses section */
 .recent-section {
   margin-top: 2rem;
