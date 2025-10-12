@@ -45,15 +45,27 @@ async function handler(req, res) {
       })
     );
 
-    // Filter out null results and advertisements, then limit to 5
+    // Filter out null results and advertisements
     const validAnalyses = analyses
-      .filter(analysis => analysis && !analysis.is_advertisement)
-      .slice(0, 5); // Limit to 5 analyses
+      .filter(analysis => analysis && !analysis.is_advertisement);
+    
+    // Deduplicate by URL - keep only the most recent analysis per URL
+    const urlMap = new Map();
+    validAnalyses.forEach(analysis => {
+      const url = analysis.url;
+      if (!urlMap.has(url) || new Date(analysis.analyzed_at || 0) > new Date(urlMap.get(url).analyzed_at || 0)) {
+        urlMap.set(url, analysis);
+      }
+    });
+    
+    // Convert back to array and limit to 5
+    const deduplicatedAnalyses = Array.from(urlMap.values()).slice(0, 5);
     console.log('Valid analyses after filtering:', validAnalyses.length);
+    console.log('Deduplicated analyses:', deduplicatedAnalyses.length);
     
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
-    return res.status(200).json(validAnalyses);
+    return res.status(200).json(deduplicatedAnalyses);
   } catch (e) {
     console.error('recent-analyses error:', e);
     res.setHeader('Content-Type', 'application/json; charset=utf-8');

@@ -107,6 +107,19 @@ async function updateSiteStatsFromAnalysis(analysis) {
     if (typeof rel !== 'number' || typeof bias !== 'number') return;
 
     const key = `site_stats:${host}`;
+    const urlKey = `site_urls:${host}`;
+    
+    // Check if this URL has already been counted for this site
+    const existingUrls = await kv.get(urlKey) || [];
+    if (existingUrls.includes(originalUrl)) {
+      console.log(`URL ${originalUrl} already counted for site ${host}, skipping`);
+      return;
+    }
+    
+    // Add this URL to the list of counted URLs
+    existingUrls.push(originalUrl);
+    await kv.set(urlKey, existingUrls, { ex: 2592000 }); // 30 days expiry
+    
     const existing = await kv.get(key) || { count: 0, sum_rel: 0, sum_bias: 0 };
 
     const count = (existing.count || 0) + 1;
@@ -124,6 +137,8 @@ async function updateSiteStatsFromAnalysis(analysis) {
       avg_bias,
       updated_at: new Date().toISOString()
     });
+    
+    console.log(`Updated site stats for ${host}: count=${count}, avg_rel=${avg_rel.toFixed(1)}, avg_bias=${avg_bias.toFixed(1)}`);
   } catch (e) {
     console.error('updateSiteStatsFromAnalysis error:', e);
   }
