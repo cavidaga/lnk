@@ -1051,8 +1051,40 @@ async function analyzeHandler(req, res) {
   
   // Rate limiting check (different limits for authenticated vs public)
   const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  
+  // Check if this is a browser extension request
+  const userAgent = req.headers['user-agent'] || '';
+  const isExtensionRequest = userAgent.includes('Chrome-Lighthouse') || 
+                           userAgent.includes('Mozilla/5.0') && userAgent.includes('Chrome') ||
+                           req.headers['x-extension-request'] === 'true' ||
+                           req.headers['origin']?.includes('chrome-extension://');
+  
+  // Debug logging for extension requests
+  if (isExtensionRequest) {
+    console.log('Extension request detected:', {
+      userAgent,
+      origin: req.headers['origin'],
+      xExtensionRequest: req.headers['x-extension-request'],
+      clientIP
+    });
+  }
+  
   const rateLimitKey = authUser ? `rate_limit_user:${authUser.id}` : `rate_limit:${clientIP}`;
-  const rateLimit = authUser ? 100 : 10; // Higher limit for authenticated users
+  
+  // Much higher limits for extension requests and authenticated users
+  let rateLimit;
+  if (authUser) {
+    rateLimit = 100; // Authenticated users
+  } else if (isExtensionRequest) {
+    rateLimit = 50; // Browser extension requests (temporarily increased)
+  } else {
+    rateLimit = 20; // Regular public requests (increased from 10)
+  }
+  
+  // TEMPORARY: If extension detection fails, be more lenient with Chrome requests
+  if (!authUser && userAgent.includes('Chrome') && !isExtensionRequest) {
+    rateLimit = 30; // Extra lenient for Chrome users (might be extension)
+  }
   
   try {
     const currentRequests = await kv.get(rateLimitKey) || 0;
@@ -2103,6 +2135,7 @@ async function analyzeHandler(req, res) {
     if (result?.contentSource) res.setHeader('X-Content-Source', result.contentSource);
     if (authMethod !== 'none') res.setHeader('X-Auth-Method', authMethod);
     if (authUser) res.setHeader('X-User-ID', authUser.id);
+    if (isExtensionRequest) res.setHeader('X-Extension-Request', 'true');
     return res.status(200).json(result);
 
   } catch (e) {
