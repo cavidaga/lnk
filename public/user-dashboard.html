@@ -348,9 +348,9 @@
     // Initialize dashboard when page loads
     new UserDashboard();
 
-    // Global handler for logout button (event delegation)
+    // Global handler for top-right buttons (event delegation)
     document.addEventListener('click', async (e) => {
-      const target = e.target;
+      const target = e.target && e.target.closest('#logout-btn, #settings-btn, #save-email, #save-password');
       if (target && target.id === 'logout-btn') {
         try {
           await fetch('/api/auth/logout', { method: 'POST' });
