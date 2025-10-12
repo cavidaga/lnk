@@ -54,11 +54,13 @@ export default async function handler(req, res) {
 
     let verified = false;
 
-    // Try backup code first if provided
+    // Try backup code first if provided (hashed storage)
     if (backupCode) {
       if (user.twoFactorBackupCodes && Array.isArray(user.twoFactorBackupCodes)) {
+        const { createHash } = await import('crypto');
+        const hash = createHash('sha256').update(backupCode.toUpperCase()).digest('hex');
         const backupCodeEntry = user.twoFactorBackupCodes.find(entry => 
-          entry.code === backupCode.toUpperCase() && !entry.used
+          (entry.codeHash === hash) && !entry.used
         );
         
         if (backupCodeEntry) {

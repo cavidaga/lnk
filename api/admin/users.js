@@ -20,15 +20,7 @@ async function checkAdminAccess(user) {
   }
   
   
-  // Check if this is the first user (super admin) - only if no ADMIN_EMAIL is set
-  if (!process.env.ADMIN_EMAIL) {
-    const allUsers = await kv.keys('user:id:*');
-    console.log('Total users:', allUsers.length);
-    if (allUsers.length === 1) {
-      console.log('First user - granting admin access (no ADMIN_EMAIL set)');
-      return true;
-    }
-  }
+  // Removed unsafe first-user admin fallback; require explicit admin assignment
   
   console.log('User does not have admin access');
   return false;

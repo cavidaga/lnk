@@ -65,17 +65,20 @@ export default async function handler(req, res) {
     const backupCodes = Array.from({ length: 10 }, () => 
       Math.random().toString(36).substring(2, 8).toUpperCase()
     );
+    // Hash backup codes before storing
+    const { createHash } = await import('crypto');
+    const hashedBackupCodes = backupCodes.map(code => ({
+      codeHash: createHash('sha256').update(code).digest('hex'),
+      used: false,
+      usedAt: null
+    }));
 
     // Update user with 2FA settings
     const updatedUser = {
       ...user,
       twoFactorEnabled: true,
       twoFactorSecret: tempSecret.secret,
-      twoFactorBackupCodes: backupCodes.map(code => ({
-        code: code,
-        used: false,
-        usedAt: null
-      })),
+      twoFactorBackupCodes: hashedBackupCodes,
       twoFactorEnabledAt: new Date().toISOString()
     };
 

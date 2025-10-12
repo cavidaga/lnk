@@ -1,4 +1,4 @@
-import { getSessionFromRequest } from '../lib/auth.js';
+import { requireAuth } from '../lib/auth.js';
 import { kv } from '@vercel/kv';
 import { fileURLToPath } from 'url';
 
@@ -9,23 +9,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Check if user is authenticated
-    const session = getSessionFromRequest(req);
-    if (!session?.sub) {
-      res.statusCode = 302;
-      res.setHeader('Location', '/admin-login.html');
-      res.end();
-      return;
-    }
-
-    // Get full user data from database
-    const user = await kv.get(`user:id:${session.sub}`);
-    if (!user) {
-      res.statusCode = 302;
-      res.setHeader('Location', '/admin-login.html');
-      res.end();
-      return;
-    }
+    // Check if user is authenticated (with session invalidation semantics)
+    const user = await requireAuth(req, res);
+    if (!user) return;
 
     // Check if user is admin
     const isAdmin = user.role === 'admin' || 

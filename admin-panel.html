@@ -616,6 +616,25 @@
   <script src="/static/layout.js"></script>
   <script>
     // Admin panel JavaScript
+    function esc(s) {
+      s = String(s == null ? '' : s);
+      return s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+    function safePlan(plan) {
+      const allowed = ['free','basic','pro','enterprise'];
+      const p = String(plan || '').toLowerCase();
+      return allowed.includes(p) ? p : 'free';
+    }
+    function safeRole(role) {
+      const allowed = ['admin','developer','user'];
+      const r = String(role || '').toLowerCase();
+      return allowed.includes(r) ? r : 'user';
+    }
     class AdminPanel {
       constructor() {
         this.currentUser = null;
@@ -781,12 +800,12 @@
 
         const html = this.users.map(user => `
           <div class="user-card">
-            <h4>👤 ${user.email}</h4>
-            <p><strong>🆔 ID:</strong> ${user.id}</p>
-            <p><strong>📋 Plan:</strong> <span class="plan-badge plan-${user.plan}">${user.plan}</span></p>
+            <h4>👤 ${esc(user.email)}</h4>
+            <p><strong>🆔 ID:</strong> ${esc(user.id)}</p>
+            <p><strong>📋 Plan:</strong> <span class="plan-badge plan-${safePlan(user.plan)}">${esc(user.plan)}</span></p>
             <p><strong>📅 Yaradılıb:</strong> ${new Date(user.createdAt).toLocaleDateString('az-AZ')}</p>
             ${user.planUpdatedAt ? `<p><strong>🔄 Plan yeniləndi:</strong> ${new Date(user.planUpdatedAt).toLocaleDateString('az-AZ')}</p>` : ''}
-            ${user.role ? `<p><strong>👑 Rol:</strong> <span class="plan-badge plan-${user.role === 'admin' ? 'enterprise' : 'free'}">${user.role === 'admin' ? '👑 Admin' : user.role === 'developer' ? '🔧 Developer' : '👤 İstifadəçi'}</span></p>` : ''}
+            ${user.role ? (()=>{ const r=safeRole(user.role); const cls = r==='admin'?'enterprise':(r==='developer'?'pro':'free'); const label = r==='admin'?'👑 Admin':(r==='developer'?'🔧 Developer':'👤 İstifadəçi'); return `<p><strong>👑 Rol:</strong> <span class=\"plan-badge plan-${cls}\">${label}</span></p>`; })() : ''}
             <div class="user-actions">
               <button class="btn btn-sm btn-primary" onclick="adminPanel.editUser('${user.id}')">✏️ Redaktə et</button>
               ${user.role === 'admin' ? 
@@ -822,16 +841,16 @@
 
         const html = filtered.map(user => `
           <div class="user-card">
-            <h4>👤 ${user.displayName || user.username || user.email}</h4>
-            <p><strong>📧 E-poçt:</strong> ${user.email}</p>
-            ${user.username ? `<p><strong>👤 İstifadəçi adı:</strong> ${user.displayName || user.username}</p>` : ''}
-            <p><strong>🆔 ID:</strong> ${user.id}</p>
-            <p><strong>📋 Plan:</strong> <span class="plan-badge plan-${user.plan}">${user.plan}</span></p>
+            <h4>👤 ${esc(user.displayName || user.username || user.email)}</h4>
+            <p><strong>📧 E-poçt:</strong> ${esc(user.email)}</p>
+            ${user.username ? `<p><strong>👤 İstifadəçi adı:</strong> ${esc(user.displayName || user.username)}</p>` : ''}
+            <p><strong>🆔 ID:</strong> ${esc(user.id)}</p>
+            <p><strong>📋 Plan:</strong> <span class="plan-badge plan-${safePlan(user.plan)}">${esc(user.plan)}</span></p>
             <p><strong>📅 Yaradılıb:</strong> ${new Date(user.createdAt).toLocaleDateString('az-AZ')}</p>
             ${user.lastLoginAt ? `<p><strong>🔐 Son giriş:</strong> ${new Date(user.lastLoginAt).toLocaleDateString('az-AZ')}</p>` : ''}
             ${user.planUpdatedAt ? `<p><strong>🔄 Plan yeniləndi:</strong> ${new Date(user.planUpdatedAt).toLocaleDateString('az-AZ')}</p>` : ''}
-            ${user.role ? `<p><strong>👑 Rol:</strong> <span class="plan-badge plan-${user.role === 'admin' ? 'enterprise' : user.role === 'developer' ? 'pro' : 'free'}">${user.role === 'admin' ? '👑 Admin' : user.role === 'developer' ? '🔧 Developer' : '👤 İstifadəçi'}</span></p>` : ''}
-            ${user.analysisCount !== undefined ? `<p><strong>📊 Analiz sayı:</strong> ${user.analysisCount}</p>` : ''}
+            ${user.role ? (()=>{ const r=safeRole(user.role); const cls = r==='admin'?'enterprise':(r==='developer'?'pro':'free'); const label = r==='admin'?'👑 Admin':(r==='developer'?'🔧 Developer':'👤 İstifadəçi'); return `<p><strong>👑 Rol:</strong> <span class=\"plan-badge plan-${cls}\">${label}</span></p>`; })() : ''}
+            ${user.analysisCount !== undefined ? `<p><strong>📊 Analiz sayı:</strong> ${String(user.analysisCount)}</p>` : ''}
             <div class="user-actions">
               <button class="btn btn-sm btn-primary" onclick="adminPanel.editUser('${user.id}')">✏️ Redaktə et</button>
               ${user.role === 'admin' ? 

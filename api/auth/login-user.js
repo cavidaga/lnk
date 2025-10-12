@@ -31,6 +31,18 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: true, message: 'Email and password required' });
     }
 
+    // Basic per-identity throttle using KV (5 attempts per 5 minutes)
+    try {
+      const { kv } = await import('@vercel/kv');
+      const key = `login_attempts:${email}`;
+      const attempts = await kv.incr(key);
+      if (attempts === 1) { await kv.expire(key, 300); }
+      if (attempts > 5) {
+        await new Promise(r => setTimeout(r, 350));
+        return res.status(429).json({ error: true, message: 'Too many attempts. Try again later.' });
+      }
+    } catch {}
+
     const user = await findUserByEmail(email);
     if (!user) {
       await new Promise(r => setTimeout(r, 300)); // Prevent timing attacks

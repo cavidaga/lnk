@@ -1,4 +1,4 @@
-import { getSessionFromRequest } from '../../lib/auth.js';
+import { requireAuth } from '../../lib/auth.js';
 import { kv } from '@vercel/kv';
 
 export default async function handler(req, res) {
@@ -7,17 +7,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Check if user is authenticated
-    const session = getSessionFromRequest(req);
-    if (!session?.sub) {
-      return res.status(401).json({ message: 'Not authenticated' });
-    }
-
-    // Get full user data from database
-    const user = await kv.get(`user:id:${session.sub}`);
-    if (!user) {
-      return res.status(401).json({ message: 'User not found' });
-    }
+    // Check if user is authenticated using strict session validation
+    const user = await requireAuth(req, res);
+    if (!user) return;
 
     // Check if user is admin
     const isAdmin = user.role === 'admin' || 
