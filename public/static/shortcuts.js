@@ -5,20 +5,11 @@
 
   // Safe shortcuts that won't conflict with OS/browser defaults
   const SHORTCUTS = {
+    // Core functionality
     'Ctrl+Alt+A': {
       action: 'analyze',
       description: 'Yeni analiz başlat',
       page: 'home'
-    },
-    'Ctrl+Alt+M': {
-      action: 'methodology',
-      description: 'Metodologiyaya keç',
-      page: 'all'
-    },
-    'Ctrl+Alt+P': {
-      action: 'privacy',
-      description: 'Məxfilik səhifəsinə keç',
-      page: 'all'
     },
     'Ctrl+Alt+F': {
       action: 'focus-input',
@@ -40,6 +31,81 @@
       description: 'Keçidi kopyala',
       page: 'analysis'
     },
+    
+    // Navigation
+    'Ctrl+Alt+H': {
+      action: 'home',
+      description: 'Ana səhifəyə keç',
+      page: 'all'
+    },
+    'Ctrl+Alt+M': {
+      action: 'methodology',
+      description: 'Metodologiyaya keç',
+      page: 'all'
+    },
+    'Ctrl+Alt+B': {
+      action: 'about',
+      description: 'Haqqımızda səhifəsinə keç',
+      page: 'all'
+    },
+    'Ctrl+Alt+P': {
+      action: 'privacy',
+      description: 'Məxfilik səhifəsinə keç',
+      page: 'all'
+    },
+    'Ctrl+Alt+D': {
+      action: 'documentation',
+      description: 'Sənədlərə keç',
+      page: 'all'
+    },
+    
+    // User authentication & dashboard
+    'Ctrl+Alt+L': {
+      action: 'login',
+      description: 'Daxil ol səhifəsinə keç',
+      page: 'all'
+    },
+    'Ctrl+Alt+R': {
+      action: 'register',
+      description: 'Qeydiyyat səhifəsinə keç',
+      page: 'all'
+    },
+    'Ctrl+Alt+U': {
+      action: 'user-dashboard',
+      description: 'İstifadəçi panelinə keç',
+      page: 'all'
+    },
+    
+    // Developer features
+    'Ctrl+Alt+E': {
+      action: 'dev-login',
+      description: 'Təkmilləşdirici daxil ol',
+      page: 'all'
+    },
+    'Ctrl+Alt+G': {
+      action: 'dev-register',
+      description: 'Təkmilləşdirici qeydiyyatı',
+      page: 'all'
+    },
+    'Ctrl+Alt+J': {
+      action: 'dev-panel',
+      description: 'Təkmilləşdirici panelinə keç',
+      page: 'all'
+    },
+    
+    // Admin features
+    'Ctrl+Alt+K': {
+      action: 'admin-login',
+      description: 'Admin daxil ol',
+      page: 'all'
+    },
+    'Ctrl+Alt+I': {
+      action: 'admin-panel',
+      description: 'Admin panelinə keç',
+      page: 'all'
+    },
+    
+    // Utility functions
     'Ctrl+Alt+T': {
       action: 'toggle-theme',
       description: 'Tema dəyişdir',
@@ -49,6 +115,11 @@
       action: 'help',
       description: 'Qısayollar köməyini göstər',
       page: 'all'
+    },
+    'Ctrl+Alt+Backspace': {
+      action: 'logout',
+      description: 'Çıxış et',
+      page: 'dashboard'
     }
   };
 
@@ -70,6 +141,9 @@
     const path = location.pathname;
     if (path === '/' || path === '/index.html') return 'home';
     if (path.startsWith('/analysis/')) return 'analysis';
+    if (path.includes('user-dashboard') || path.includes('dashboard')) return 'dashboard';
+    if (path.includes('dev-panel') || path.includes('dev-login') || path.includes('dev-register')) return 'developer';
+    if (path.includes('admin-panel') || path.includes('admin-login') || path.includes('admin-register')) return 'admin';
     return 'other';
   }
 
@@ -77,6 +151,7 @@
     const currentPage = getCurrentPage();
     
     switch (action) {
+      // Core functionality
       case 'analyze':
         if (currentPage === 'home') {
           const input = document.getElementById('url');
@@ -87,15 +162,6 @@
         } else {
           location.href = '/';
         }
-        break;
-
-
-      case 'methodology':
-        location.href = '/methodology.html';
-        break;
-
-      case 'privacy':
-        location.href = '/privacy.html';
         break;
 
       case 'focus-input':
@@ -130,7 +196,6 @@
         }
         break;
 
-
       case 'share':
         if (currentPage === 'analysis') {
           const copyBtn = document.getElementById('copy-link');
@@ -140,10 +205,79 @@
         }
         break;
 
+      // Navigation
+      case 'home':
+        location.href = '/';
+        break;
+
+      case 'methodology':
+        location.href = '/methodology.html';
+        break;
+
+      case 'about':
+        location.href = '/about.html';
+        break;
+
+      case 'privacy':
+        location.href = '/privacy.html';
+        break;
+
+      case 'documentation':
+        location.href = '/documentation.html';
+        break;
+
+      // User authentication & dashboard
+      case 'login':
+        location.href = '/user-login.html';
+        break;
+
+      case 'register':
+        location.href = '/user-register.html';
+        break;
+
+      case 'user-dashboard':
+        location.href = '/user-dashboard.html';
+        break;
+
+      // Developer features
+      case 'dev-login':
+        location.href = '/dev-login.html';
+        break;
+
+      case 'dev-register':
+        location.href = '/dev-register.html';
+        break;
+
+      case 'dev-panel':
+        location.href = '/dev';
+        break;
+
+      // Admin features
+      case 'admin-login':
+        location.href = '/admin-login.html';
+        break;
+
+      case 'admin-panel':
+        location.href = '/admin';
+        break;
+
+      // Utility functions
       case 'toggle-theme':
         const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
           themeToggle.click();
+        }
+        break;
+
+      case 'logout':
+        if (currentPage === 'dashboard' || currentPage === 'developer' || currentPage === 'admin') {
+          const logoutBtn = document.getElementById('logout-btn');
+          if (logoutBtn) {
+            logoutBtn.click();
+          } else {
+            // Fallback: try to find logout link or redirect to logout API
+            location.href = '/api/auth/logout';
+          }
         }
         break;
 
