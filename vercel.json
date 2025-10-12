@@ -6,7 +6,19 @@
     { "source": "/dev", "destination": "/api/dev-panel" },
     { "source": "/admin", "destination": "/api/admin-panel" },
     { "source": "/user-dashboard", "destination": "/api/user-dashboard" },
-    { "source": "/user-dashboard.html", "destination": "/api/user-dashboard" }
+    { "source": "/user-dashboard.html", "destination": "/api/user-dashboard" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/methodology", "destination": "/methodology.html" },
+    { "source": "/complaint", "destination": "/complaint.html" },
+    { "source": "/user-login", "destination": "/user-login.html" },
+    { "source": "/user-register", "destination": "/user-register.html" },
+    { "source": "/dev-login", "destination": "/dev-login.html" },
+    { "source": "/dev-register", "destination": "/dev-register.html" },
+    { "source": "/admin-login", "destination": "/admin-login.html" },
+    { "source": "/admin-register", "destination": "/admin-register.html" },
+    { "source": "/reset-password", "destination": "/reset-password.html" },
+    { "source": "/2fa-setup", "destination": "/2fa-setup.html" }
   ],
   "trailingSlash": false,
   "functions": {
