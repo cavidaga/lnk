@@ -8,6 +8,7 @@
     { "source": "/user-dashboard", "destination": "/api/user-dashboard" },
     { "source": "/user-dashboard.html", "destination": "/api/user-dashboard" }
   ],
+  "trailingSlash": false,
   "functions": {
     "api/analysis-html.js": {
       "excludeFiles": "api/**"
