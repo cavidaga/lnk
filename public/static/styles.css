@@ -128,7 +128,6 @@
   .recent-item-meta {
     color: #4b5563 !important; /* Darker gray for better contrast */
   }
-}
 
 .theme-dark{
   background:
@@ -695,7 +694,6 @@ select.input {
 .btn:disabled{ background:var(--border); cursor:not-allowed; transform:none; color:var(--muted) }
 
 /* Button variants & utilities */
-.btn-primary{ /* primary is the default .btn gradient */ }
 .btn-secondary{ background:var(--panel); color:var(--text); border:1px solid var(--border) }
 .btn-secondary:hover{ transform: translateY(-1px); background: color-mix(in oklab, var(--panel) 92%, #fff 8%) }
 .btn-danger{ background:#dc2626; color:#fff; border:0 }
@@ -785,6 +783,89 @@ select.input {
 /* Only tint simple text links inside auth-links; do not override button text */
 .auth-links a:not(.btn){ color:var(--accent); text-decoration:none; font-size:.875rem }
 .auth-links a:hover{ text-decoration:underline }
+
+/* Mobile responsive auth pages */
+@media (max-width: 768px) {
+  .auth-container {
+    max-width: 100%;
+    margin: 1rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+  
+  .auth-header h1 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .auth-header p {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+  
+  .auth-links {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+  }
+  
+  .auth-links p {
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .auth-links a:not(.btn) {
+    font-size: 0.8rem;
+  }
+  
+  /* Form improvements for mobile */
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-group label {
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+  }
+  
+  .form-group input {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+  
+  .form-group small {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
+  }
+  
+  /* Button improvements */
+  .btn-block {
+    padding: 14px 20px;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+  
+  /* 2FA form specific mobile styles */
+  #2fa-form .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  #2fa-form input[type="text"] {
+    text-align: center;
+    font-size: 18px;
+    letter-spacing: 2px;
+    font-family: monospace;
+  }
+  
+  /* Error and success messages */
+  .error-message, .success-message {
+    font-size: 0.8rem;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+}
 
 /* Form details */
 .form-group{ margin-bottom:1rem }
@@ -1925,6 +2006,12 @@ footer.site-footer{
   .wrap {
     padding: 16px 12px 96px;
   }
+  
+  /* Auth pages container improvements */
+  .container {
+    padding: 0 0.5rem;
+  }
+  
   .hdr {
     padding: 16px;
     margin-bottom: 20px;
