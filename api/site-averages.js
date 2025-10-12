@@ -1,5 +1,4 @@
 import { kv } from '@vercel/kv';
-import { withAuth } from '../lib/middleware.js';
 
 export const config = { runtime: 'nodejs' };
 
@@ -39,11 +38,7 @@ async function handler(req, res) {
   }
 }
 
-// Export with authentication required
-export default withAuth(handler, { 
-  require: 'any', // Accepts both session and API key
-  permission: 'site-averages', // Requires site-averages permission for API keys
-  rateLimit: true // Apply rate limiting
-});
+// Export without authentication - site averages are public data
+export default handler;
 
 
