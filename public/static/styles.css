@@ -767,7 +767,8 @@ select.input {
 .auth-header h1{ color:var(--text); font-size:1.5rem; font-weight:700; margin-bottom:.5rem }
 .auth-header p{ color:var(--muted); font-size:.875rem }
 .auth-links{ text-align:center; margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border) }
-.auth-links a{ color:var(--accent); text-decoration:none; font-size:.875rem }
+/* Only tint simple text links inside auth-links; do not override button text */
+.auth-links a:not(.btn){ color:var(--accent); text-decoration:none; font-size:.875rem }
 .auth-links a:hover{ text-decoration:underline }
 
 /* Form details */
