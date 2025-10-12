@@ -54,7 +54,7 @@
             <span class="label">Əsas</span>
           </a>
           
-          <a href="/about.html" class="radial-item nav-link" data-tooltip="Haqqımızda" aria-label="Haqqımızda" data-angle="72">
+          <a href="/about" class="radial-item nav-link" data-tooltip="Haqqımızda" aria-label="Haqqımızda" data-angle="72">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -62,7 +62,7 @@
             <span class="label">Haqqımızda</span>
           </a>
           
-          <a href="/methodology.html" class="radial-item nav-link" data-tooltip="Metodologiya" aria-label="Metodologiya" data-angle="144">
+          <a href="/methodology" class="radial-item nav-link" data-tooltip="Metodologiya" aria-label="Metodologiya" data-angle="144">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -74,7 +74,7 @@
           </a>
 
           
-          <a href="/privacy.html" class="radial-item nav-link" data-tooltip="Məxfilik" aria-label="Məxfilik" data-angle="216">
+          <a href="/privacy" class="radial-item nav-link" data-tooltip="Məxfilik" aria-label="Məxfilik" data-angle="216">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="12" cy="16" r="1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -83,7 +83,7 @@
             <span class="label">Məxfilik</span>
           </a>
 
-          <a href="/about.html#contact" class="radial-item nav-link" data-tooltip="Əlaqə" aria-label="Əlaqə" data-angle="252">
+          <a href="/about#contact" class="radial-item nav-link" data-tooltip="Əlaqə" aria-label="Əlaqə" data-angle="252">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5"/>
               <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -93,7 +93,7 @@
 
           <!-- User login/register links -->
           
-          <a href="/user-login.html" class="radial-item nav-link" data-tooltip="Daxil ol" aria-label="Daxil ol" data-angle="288">
+          <a href="/user-login" class="radial-item nav-link" data-tooltip="Daxil ol" aria-label="Daxil ol" data-angle="288">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <polyline points="10,17 15,12 10,7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -102,7 +102,7 @@
             <span class="label">Daxil ol</span>
           </a>
 
-          <a href="/user-register.html" class="radial-item nav-link" data-tooltip="Qeydiyyat" aria-label="Qeydiyyat" data-angle="306">
+          <a href="/user-register" class="radial-item nav-link" data-tooltip="Qeydiyyat" aria-label="Qeydiyyat" data-angle="306">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -111,7 +111,7 @@
             <span class="label">Qeydiyyat</span>
           </a>
 
-          <a href="/user-dashboard.html" class="radial-item nav-link" data-tooltip="İstifadəçi Paneli" aria-label="İstifadəçi paneli" data-angle="324">
+          <a href="/user-dashboard" class="radial-item nav-link" data-tooltip="İstifadəçi Paneli" aria-label="İstifadəçi paneli" data-angle="324">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <rect x="14" y="3" width="7" height="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -233,7 +233,7 @@
             <span class="sr-only">Layihəyə dəstək ol</span>
           </a>
 
-          <a id="contact-link" href="/about.html#contact" data-tooltip="Əlaqə" aria-label="Əlaqə">
+          <a id="contact-link" href="/about#contact" data-tooltip="Əlaqə" aria-label="Əlaqə">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="1.5"/>
               <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -241,7 +241,7 @@
             <span class="sr-only">Əlaqə</span>
           </a>
 
-          <a href="/privacy.html" data-tooltip="Məxfilik" aria-label="Məxfilik">
+          <a href="/privacy" data-tooltip="Məxfilik" aria-label="Məxfilik">
             <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
               <path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
