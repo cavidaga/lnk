@@ -49,6 +49,12 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: true, message: 'Invalid credentials' });
     }
 
+    // Require email verification for regular users (new accounts only)
+    if ((user.role === 'user' || !user.role) && Object.prototype.hasOwnProperty.call(user, 'emailVerified') && user.emailVerified !== true) {
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      return res.status(403).json({ error: true, message: 'Zəhmət olmasa e‑poçtunuzu təsdiqləyin. Poçtunuza təsdiq linki göndərilib.' });
+    }
+
     // Check if 2FA is enabled
     if (user.twoFactorEnabled) {
       // Return a special response indicating 2FA is required

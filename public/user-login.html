@@ -248,6 +248,16 @@
       e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
     });
 
+    // Show message after email verification
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('verified') === '1') {
+        const successDiv = document.getElementById('success-message');
+        successDiv.textContent = 'E‑poçt təsdiqləndi! İndi daxil ola bilərsiniz.';
+        successDiv.classList.remove('hidden');
+      }
+    } catch (_) {}
+
     // Check auth status on page load
     checkAuthStatus();
   </script>
