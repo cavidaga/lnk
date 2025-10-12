@@ -106,30 +106,30 @@
         </ul>
 
         <h2>Kimlər İstifadə Edə Bilər?</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 1.5rem 0;">
-          <div style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb;">
-            <h3 style="margin-top: 0; color: #1f2937;">👤 Ümumi İstifadəçilər</h3>
+        <div class="grid-cards">
+          <div class="card"><div class="bd">
+            <h3>👤 Ümumi İstifadəçilər</h3>
             <p>Xəbərlərin etibarlılığını yoxlamaq və analiz etmək istəyənlər üçün:</p>
-            <ul style="margin: 0.5rem 0;">
+            <ul>
               <li>Pulsuz analiz imkanı</li>
               <li>İstifadəçi paneli</li>
               <li>Analiz tarixçəsi</li>
               <li>2FA təhlükəsizliyi</li>
             </ul>
-            <p style="margin-bottom: 0;"><a href="/user-register.html" class="btn" style="display: inline-block; margin-top: 1rem;">Qeydiyyatdan Keç</a></p>
-          </div>
+            <p class="mb-0"><a href="/user-register.html" class="btn">Qeydiyyatdan Keç</a></p>
+          </div></div>
           
-          <div style="padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb;">
-            <h3 style="margin-top: 0; color: #1f2937;">⚙️ Təkmilləşdiricilər</h3>
+          <div class="card"><div class="bd">
+            <h3>⚙️ Təkmilləşdiricilər</h3>
             <p>API ilə platformanı inteqrasiya etmək istəyənlər üçün:</p>
-            <ul style="margin: 0.5rem 0;">
+            <ul>
               <li>RESTful API girişi</li>
               <li>API açarı idarəetməsi</li>
               <li>İstifadə statistikaları</li>
               <li>Texniki dəstək</li>
             </ul>
-            <p style="margin-bottom: 0;"><a href="/dev-register.html" class="btn" style="display: inline-block; margin-top: 1rem;">Təkmilləşdirici Ol</a></p>
-          </div>
+            <p class="mb-0"><a href="/dev-register.html" class="btn">Təkmilləşdirici Ol</a></p>
+          </div></div>
         </div>
 
         <h2>Təhlükəsizlik və Məxfilik</h2>
@@ -156,48 +156,48 @@
           istehlakçısı olmasına yardım etmək üçün güclü bir köməkçi kimi hazırlanmışdır.
         </p>
 
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; border-radius: 12px; text-align: center; margin: 2rem 0;">
-          <h2 style="color: white; margin-top: 0;">Başlayaq!</h2>
-          <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+        <div class="cta-banner">
+          <h2>Başlayaq!</h2>
+          <p>
             İndi LNK.az platformasını sınayın və xəbərlərin etibarlılığını analiz edin.
           </p>
-          <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="/" class="btn" style="background: white; color: #667eea; font-weight: 600;">Analiz Et</a>
-            <a href="/user-register.html" class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">Hesab Yarat</a>
-            <a href="/documentation.html" class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">Sənədlər</a>
+          <div class="btn-group-center">
+            <a href="/" class="btn btn-light">Analiz Et</a>
+            <a href="/user-register.html" class="btn btn-outline-light">Hesab Yarat</a>
+            <a href="/documentation.html" class="btn btn-outline-light">Sənədlər</a>
           </div>
         </div>
 
         <!-- Contact -->
-        <section id="contact" aria-labelledby="contact-title" style="margin-top:22px">
+        <section id="contact" aria-labelledby="contact-title" class="mt-22">
           <h2 id="contact-title">Əlaqə</h2>
           <p>Təklif və suallar üçün bu formanı doldura bilərsiniz:</p>
 
           <div class="card">
             <div class="bd">
               <form action="https://formspree.io/f/xgvlpegn" method="POST" id="contact-form" aria-describedby="contact-note">
-                <p id="contact-note" class="small muted" style="margin-top:0">
+                <p id="contact-note" class="small muted mb-0">
                   E-poçt ünvanınızı düzgün yazın ki, cavab göndərə bilək.
                 </p>
 
                 <label for="cf-email" class="label">E-poçt</label>
                 <input id="cf-email" class="input" type="email" name="email" required autocomplete="email" placeholder="E-poçt ünvanınız">
 
-                <label for="cf-message" class="label" style="margin-top:12px">Məktubunuz</label>
+                <label for="cf-message" class="label mt-12">Məktubunuz</label>
                 <textarea id="cf-message" class="input" name="message" rows="5" required placeholder="Mesajınızı yazın..."></textarea>
 
                 <!-- Honeypot (spam protection) -->
-                <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="position:absolute;left:-10000px;opacity:0" aria-hidden="true">
+                <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true">
 
                 <!-- Optional: success redirect -->
                 <input type="hidden" name="_subject" value="LNK.az: Əlaqə formu">
                 <input type="hidden" name="_next" value="https://lnk.az/about.html#contact-success">
 
-                <div style="margin-top:12px">
+                <div class="mt-12">
                   <button type="submit" class="btn">Göndər</button>
                 </div>
 
-                <p id="contact-success" class="small muted" style="display:none;margin-top:10px">
+                <p id="contact-success" class="small muted hidden mt-12">
                   Təşəkkür edirik! Mesajınız göndərildi.
                 </p>
               </form>
@@ -220,7 +220,7 @@
   </script>
   
   <!-- Shortcuts help overlay -->
-  <div id="shortcuts-help" class="shortcuts-overlay" style="display: none;" role="dialog" aria-labelledby="shortcuts-title" aria-hidden="true">
+  <div id="shortcuts-help" class="shortcuts-overlay hidden" role="dialog" aria-labelledby="shortcuts-title" aria-hidden="true">
     <div class="shortcuts-backdrop" onclick="hideShortcuts()"></div>
     <div class="shortcuts-content">
       <div class="shortcuts-header">

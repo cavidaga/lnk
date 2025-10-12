@@ -26,126 +26,14 @@
 
   <link rel="stylesheet" href="/static/styles.css">
   
-  <style>
-    .login-container {
-      max-width: 400px;
-      margin: 4rem auto;
-      padding: 2rem;
-      background: var(--card);
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    }
-    
-    .login-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    
-    .login-header h1 {
-      font-size: 1.8rem;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-    
-    .login-header p {
-      color: var(--muted);
-    }
-    
-    .error-message {
-      background: #f8d7da;
-      color: #721c24;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      border: 1px solid #f5c6cb;
-    }
-    
-    @media (prefers-color-scheme: dark) {
-      .error-message {
-        background: #2d1b1b;
-        color: #fca5a5;
-        border-color: #7f1d1d;
-      }
-    }
-    
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-    
-    .form-group input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      font-size: 1rem;
-    }
-    
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);
-    }
-    
-    
-    .btn {
-      width: 100%;
-      padding: 0.75rem;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    
-    .btn:hover {
-      background: var(--accent-2);
-    }
-    
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    
-    .register-link {
-      text-align: center;
-      margin-top: 1.5rem;
-      color: var(--muted);
-    }
-    
-    .register-link a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-    
-    .register-link a:hover {
-      text-decoration: underline;
-    }
-    
-    
-    .hidden {
-      display: none !important;
-    }
-  </style>
+  
 </head>
 <body>
   <div class="wrap">
     <div id="site-header"></div>
     <main id="main" role="main">
-      <div class="login-container">
-        <div class="login-header">
+      <div class="auth-container">
+        <div class="auth-header">
           <h1>🔧 Təkmilləşdirici Paneli</h1>
           <p>API test və idarəetmə interfeysi</p>
         </div>
@@ -161,7 +49,7 @@
             <label for="password">Şifrə</label>
             <input type="password" id="password" required>
           </div>
-          <button type="submit" class="btn" id="login-btn">Daxil ol</button>
+          <button type="submit" class="btn btn-primary btn-block" id="login-btn">Daxil ol</button>
         </form>
 
         <!-- 2FA Verification Form (hidden by default) -->
@@ -176,8 +64,8 @@
             <input type="text" id="backup-code" placeholder="Backup kodu">
             <small>Əgər telefonunuz yoxdursa, backup kodlarından birini istifadə edin</small>
           </div>
-          <button type="submit" class="btn" id="2fa-submit-btn">Doğrula</button>
-          <button type="button" class="btn btn-secondary" id="back-to-login-btn">Geri</button>
+          <button type="submit" class="btn btn-primary btn-block" id="2fa-submit-btn">Doğrula</button>
+          <button type="button" class="btn btn-secondary btn-block" id="back-to-login-btn">Geri</button>
         </form>
 
     <div class="register-link">
