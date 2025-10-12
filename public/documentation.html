@@ -524,23 +524,157 @@
       border-color: var(--border) !important;
     }
     
-    /* Dark mode link colors */
+    /* Dark mode link colors - only for documentation content */
     @media (prefers-color-scheme: dark) {
-      a {
+      .api-endpoint a {
         color: #60a5fa !important;
       }
       
-      a:hover {
+      .api-endpoint a:hover {
         color: #93c5fd !important;
       }
     }
     
-    .theme-dark a {
+    .theme-dark .api-endpoint a {
       color: #60a5fa !important;
     }
     
-    .theme-dark a:hover {
+    .theme-dark .api-endpoint a:hover {
       color: #93c5fd !important;
+    }
+    
+    /* Mobile responsive tables */
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 1rem 0;
+    }
+    
+    .param-table {
+      width: 100%;
+      min-width: 600px; /* Minimum width to prevent cramping */
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      background: var(--card);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .param-table th,
+    .param-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      word-wrap: break-word;
+      white-space: normal;
+    }
+    
+    /* Mobile specific adjustments */
+    @media (max-width: 768px) {
+      .param-table {
+        font-size: 0.8rem;
+      }
+      
+      .param-table th,
+      .param-table td {
+        padding: 0.5rem;
+      }
+      
+      .endpoint-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      
+      .endpoint-url {
+        width: 100%;
+        font-size: 0.9rem;
+        word-break: break-all;
+      }
+      
+      .method {
+        align-self: flex-start;
+      }
+      
+      .code-block {
+        font-size: 0.8rem;
+        padding: 0.75rem;
+      }
+      
+      .plan-comparison {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .param-table {
+        font-size: 0.75rem;
+        min-width: 500px; /* Slightly smaller minimum width for very small screens */
+      }
+      
+      .param-table th,
+      .param-table td {
+        padding: 0.4rem;
+      }
+      
+      .api-endpoint {
+        padding: 1rem;
+      }
+      
+      .doc-header {
+        padding: 1.5rem;
+      }
+      
+      .doc-header h1 {
+        font-size: 2rem;
+      }
+      
+      .doc-header p {
+        font-size: 1rem;
+      }
+      
+      .code-block {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+      }
+      
+      .endpoint-url {
+        font-size: 0.8rem;
+      }
+      
+      .method {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.5rem;
+      }
+    }
+    
+    /* Additional mobile improvements */
+    @media (max-width: 768px) {
+      .toc {
+        margin: 12px 0 20px;
+        padding: 12px;
+      }
+      
+      .toc ul {
+        padding-left: 16px;
+      }
+      
+      .toc li {
+        margin: 4px 0;
+      }
+      
+      .api-section h2 {
+        font-size: 1.3rem;
+        padding: 1rem;
+      }
+      
+      .support-form {
+        padding: 1rem;
+      }
+      
+      .support-form .form-group {
+        margin-bottom: 1rem;
+      }
     }
   </style>
 </head>
@@ -679,7 +813,10 @@
             </div>
 
             <h3>Plan xüsusiyyətləri</h3>
-            <table class="param-table">
+            <div class="table-wrapper">
+              <div class="table-wrapper">
+                <div class="table-wrapper">
+              <table class="param-table">
               <thead>
                 <tr>
                   <th>Xüsusiyyət</th>
@@ -741,6 +878,8 @@
                 </tr>
               </tbody>
             </table>
+            </div>
+            </div>
 
             <div class="info">
               <strong>Plan mövcudluğu:</strong> Hazırda yalnız pulsuz plan mövcuddur. Digər planlar tezliklə istifadəyə veriləcək.
@@ -809,7 +948,10 @@
             <p>Sürət limitləri təkmilləşdirici planınıza və API açarı istifadəsinə əsaslanır:</p>
 
             <h3>Plan əsaslı limitlər</h3>
-            <table class="param-table">
+            <div class="table-wrapper">
+              <div class="table-wrapper">
+                <div class="table-wrapper">
+              <table class="param-table">
               <thead>
                 <tr>
                   <th>Plan</th>
@@ -845,6 +987,8 @@
                 </tr>
               </tbody>
             </table>
+            </div>
+            </div>
 
             <h3>API açarı olmadan</h3>
             <p>API açarı olmadan sorğular IP ünvanına əsaslanan ümumi limitlərə tabedir:</p>
@@ -885,6 +1029,9 @@
             
             <div class="parameters">
               <h4>Sorğunun gövdəsi</h4>
+              <div class="table-wrapper">
+                <div class="table-wrapper">
+                <div class="table-wrapper">
               <table class="param-table">
                 <thead>
                   <tr>
@@ -909,6 +1056,9 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+              </div>
+              </div>
             </div>
             
             <div class="example">
@@ -971,6 +1121,8 @@
             
             <div class="parameters">
               <h4>Sorğu parametrləri</h4>
+              <div class="table-wrapper">
+                <div class="table-wrapper">
               <table class="param-table">
                 <thead>
                   <tr>
@@ -989,6 +1141,8 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+              </div>
             </div>
           </div>
         </section>
@@ -1029,6 +1183,8 @@
             
             <div class="parameters">
               <h4>Sorğu parametrləri</h4>
+              <div class="table-wrapper">
+                <div class="table-wrapper">
               <table class="param-table">
                 <thead>
                   <tr>
@@ -1053,6 +1209,8 @@
                   </tr>
                 </tbody>
               </table>
+            </div>
+              </div>
             </div>
           </div>
 
@@ -1155,7 +1313,8 @@
           <div class="api-endpoint">
             <p>Bütün API-lər uyğun HTTP status kodlarını və JSON formatında səhv mesajlarını qaytarır:</p>
 
-            <table class="param-table">
+            <div class="table-wrapper">
+              <table class="param-table">
               <thead>
                 <tr>
                   <th>Status Kodu</th>
@@ -1191,6 +1350,7 @@
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </section>
 
