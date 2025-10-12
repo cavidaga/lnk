@@ -531,7 +531,7 @@ async function renderAnalysis(root, data, hash) {
             <p style="margin:0 0 12px;color:var(--muted);font-size:14px">
               Əgər analizimizdə səhv tapmısınızsa və ya təklifiniz varsa, lütfən bizə bildirin.
             </p>
-            <button class="btn" onclick="window.open('/complaint.html?analysis_url=${encodeURIComponent(window.location.href)}', '_blank')" style="display:inline-flex;align-items:center;gap:6px">
+            <button class="btn" onclick="window.open('/complaint?analysis_url=${encodeURIComponent(window.location.href)}', '_blank')" style="display:inline-flex;align-items:center;gap:6px">
               👎 Şikayət et
             </button>
           </div>
@@ -1192,7 +1192,7 @@ function headerBlock({ title, publication, published_at, url, title_inferred, is
           <path d="M12 8h.01"></path>
         </svg>
         <span>Promosional məzmun</span>
-        <button class="complaint-btn" onclick="window.open('/complaint.html?analysis_url=' + encodeURIComponent(window.location.href), '_blank')" title="Şikayət et">
+        <button class="complaint-btn" onclick="window.open('/complaint?analysis_url=' + encodeURIComponent(window.location.href), '_blank')" title="Şikayət et">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 12l2 2 4-4"></path>
             <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.5 0 2.91.37 4.15 1.02"></path>

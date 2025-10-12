@@ -211,41 +211,41 @@
         break;
 
       case 'methodology':
-        location.href = '/methodology.html';
+        location.href = '/methodology';
         break;
 
       case 'about':
-        location.href = '/about.html';
+        location.href = '/about';
         break;
 
       case 'privacy':
-        location.href = '/privacy.html';
+        location.href = '/privacy';
         break;
 
       case 'documentation':
-        location.href = '/documentation.html';
+        location.href = '/documentation';
         break;
 
       // User authentication & dashboard
       case 'login':
-        location.href = '/user-login.html';
+        location.href = '/user-login';
         break;
 
       case 'register':
-        location.href = '/user-register.html';
+        location.href = '/user-register';
         break;
 
       case 'user-dashboard':
-        location.href = '/user-dashboard.html';
+        location.href = '/user-dashboard';
         break;
 
       // Developer features
       case 'dev-login':
-        location.href = '/dev-login.html';
+        location.href = '/dev-login';
         break;
 
       case 'dev-register':
-        location.href = '/dev-register.html';
+        location.href = '/dev-register';
         break;
 
       case 'dev-panel':
@@ -254,7 +254,7 @@
 
       // Admin features
       case 'admin-login':
-        location.href = '/admin-login.html';
+        location.href = '/admin-login';
         break;
 
       case 'admin-panel':
