@@ -348,6 +348,40 @@
     // Initialize dashboard when page loads
     new UserDashboard();
 
+    // Inject "Delete Account" UI into Account Settings for normal users
+    (function addDeleteAccountUI(){
+      try {
+        const grid = document.querySelector('#account-settings .grid-settings');
+        if (!grid || document.getElementById('delete-account-card')) return;
+        const card = document.createElement('div');
+        card.className = 'stat-card text-left';
+        card.id = 'delete-account-card';
+        card.innerHTML = `
+          <h3>Hesabı sil</h3>
+          <p style="font-size:14px;color:#6b7280;margin:0 0 12px 0;">Bu əməliyyat geri qaytarıla bilməz. Bütün məlumatlarınız silinəcək.</p>
+          <button id="delete-account-btn" class="btn btn-danger">Hesabı sil</button>
+        `;
+        grid.appendChild(card);
+
+        const onClick = async () => {
+          if (!confirm('Hesabınızı və bütün məlumatlarınızı silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarıla bilməz.')) return;
+          try {
+            const r = await fetch('/api/account/delete', { method: 'POST' });
+            if (r.ok) {
+              // Redirect to home after deletion
+              window.location.href = '/';
+            } else {
+              const data = await r.json().catch(() => ({}));
+              alert(data.message || 'Hesab silinə bilmədi');
+            }
+          } catch (e) {
+            alert('Şəbəkə xətası: ' + e.message);
+          }
+        };
+        document.getElementById('delete-account-btn').addEventListener('click', onClick);
+      } catch {}
+    })();
+
     // Global handler for top-right buttons (event delegation)
     document.addEventListener('click', async (e) => {
       const target = e.target && e.target.closest('#logout-btn, #settings-btn, #save-email, #save-password');

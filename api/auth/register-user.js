@@ -2,6 +2,7 @@ import { hashPassword } from '../../lib/auth.js';
 import { kv } from '@vercel/kv';
 import crypto from 'crypto';
 import { sendMail } from '../../lib/email.js';
+import { verificationEmailHtml } from '../../lib/email-templates.js';
 
 export const config = { runtime: 'nodejs' };
 
@@ -57,14 +58,14 @@ export default async function handler(req, res) {
     // Create user
     const id = `u_${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
     const passwordHash = await hashPassword(password);
-    
+
     const user = {
       id,
       email,
       username: username.toLowerCase(),
-      displayName: username, // Store original case for display
+      displayName: username,
       passwordHash,
-      role: 'user', // Regular user role
+      role: 'user',
       isAdmin: false,
       plan: 'free',
       createdAt: new Date().toISOString(),
@@ -92,26 +93,17 @@ export default async function handler(req, res) {
       const base = process.env.PUBLIC_BASE_URL || (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-host'] ? `${req.headers['x-forwarded-proto']}://${req.headers['x-forwarded-host']}` : '');
       const link = `${base}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
 
-      const subject = 'E-poçtunuzu təsdiqləyin • LNK.az';
+      const subject = 'E-poçtunuzu təsdiqləyin | LNK.az';
       const text = `Qeydiyyatı tamamlamaq üçün bu linkə klikləyin (48 saat etibarlıdır): ${link}`;
-      const html = `<!DOCTYPE html><html lang="az"><body style="font-family:Arial,Helvetica,sans-serif">
-      <div style="max-width:520px;margin:0 auto;padding:20px">
-        <h2 style="margin:0 0 12px 0;color:#111827">E‑poçtunuzu təsdiq edin</h2>
-        <p style="margin:0 0 12px 0;color:#374151">Qeydiyyatı tamamlamaq üçün aşağıdakı düyməni klikləyin. Link 48 saat etibarlıdır.</p>
-        <p style="margin:16px 0"><a href="${link}" style="display:inline-block;background:#16a34a;color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none">E‑poçtu təsdiq et</a></p>
-        <p style="margin:12px 0;color:#374151;word-break:break-all">Düymə işləmirsə, bu linki köçürüb brauzerə yapışdırın:<br><a href="${link}">${link}</a></p>
-        <p style="margin-top:24px;color:#6b7280">Hörmətlə,<br>LNK komandası</p>
-      </div></body></html>`;
-
-      await sendMail({ to: email, subject, text, html });
+      await sendMail({ to: email, subject, text, html: verificationEmailHtml(link, base) });
     } catch (e) {
       console.error('Failed to send verification email:', e);
       // Do not fail registration if email fails; user can request resend later
     }
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    return res.status(201).json({ 
-      message: 'Qeydiyyat uğurludur! Zəhmət olmasa e‑poçtunuzu təsdiqləyin (poçtunuza link göndərdik).',
+    return res.status(201).json({
+      message: 'Qeydiyyat uğurludur! Zəhmət olmasa e-poçtunuzu təsdiqləyin (poçtunuza link göndərdik).',
       user: {
         id: user.id,
         email: user.email,
