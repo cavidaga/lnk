@@ -206,7 +206,7 @@
             <div class="scoreboard-item">
               <div class="col-rank">#${rank}</div>
               <div class="col-site">
-                <a href="https://${site.host}" target="_blank" rel="noopener" class="site-host">
+                <a href="/analyses-by-domain?domain=${encodeURIComponent(site.host)}" class="site-host">
                   ${this.escapeHtml(site.host)}
                 </a>
                 <div class="site-meta">

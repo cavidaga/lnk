@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="az" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Analizlər - LNK</title>
+  <meta name="description" content="Müxtəlif saytlardan analiz edilmiş məqalələrin siyahısı">
+  <meta name="theme-color" content="#0c0d12">
+  <meta name="color-scheme" content="light dark" />
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Canonical & Open Graph -->
+  <link rel="canonical" href="https://lnk.az/analyses-by-domain" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="LNK.az" />
+  <meta property="og:title" content="Analizlər - LNK" />
+  <meta property="og:description" content="Müxtəlif saytlardan analiz edilmiş məqalələrin siyahısı" />
+  <meta property="og:url" content="https://lnk.az/analyses-by-domain" />
+  <meta property="og:image" content="https://lnk.az/static/og-cover.png" />
+  <meta property="og:locale" content="az_AZ" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Analizlər - LNK" />
+  <meta name="twitter:description" content="Müxtəlif saytlardan analiz edilmiş məqalələrin siyahısı" />
+  <meta name="twitter:image" content="https://lnk.az/static/og-cover.png" />
+
+  <!-- Icons -->
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon-light.svg" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="/static/favicon-dark.svg"  media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <link rel="mask-icon" href="/static/safari-pinned-tab.svg" color="#e10600">
+
+  <link rel="stylesheet" href="/static/styles.css">
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div id="site-header"></div>
+    
+    <main class="main">
+      <div class="container">
+        <div class="page-header">
+          <h1 id="page-title">📰 Analizlər</h1>
+          <p class="page-description" id="page-description">
+            Yüklənir...
+          </p>
+        </div>
+
+        <div id="loading" class="loading">
+          <div class="spinner"></div>
+          <p>Analizlər yüklənir...</p>
+        </div>
+        
+        <div id="error-message" class="error-message hidden">
+          <p>Analizlər yüklənə bilmədi. Zəhmət olmasa səhifəni yeniləyin.</p>
+        </div>
+        
+        <div id="analyses-content" class="analyses-content hidden">
+          <div class="analyses-stats">
+            <div class="stat-item">
+              <span class="stat-label">Ümumi analiz sayı:</span>
+              <span id="total-analyses" class="stat-value">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Göstərilən analiz sayı:</span>
+              <span id="shown-analyses" class="stat-value">-</span>
+            </div>
+          </div>
+          
+          <div id="analyses-list" class="analyses-list">
+            <!-- Analyses will be populated here -->
+          </div>
+          
+          <div id="load-more-container" class="load-more-container hidden">
+            <button id="load-more-btn" class="btn btn-primary">Daha çox yüklə</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/layout.js"></script>
+  <script>
+    class DomainAnalyses {
+      constructor() {
+        this.domain = '';
+        this.analyses = [];
+        this.currentOffset = 0;
+        this.limit = 20;
+        this.total = 0;
+        this.loading = false;
+        this.init();
+      }
+
+      async init() {
+        // Get domain from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        this.domain = urlParams.get('domain') || '';
+        
+        if (!this.domain) {
+          this.showError('Domain parametri tələb olunur');
+          return;
+        }
+
+        this.updatePageTitle();
+        await this.loadAnalyses();
+      }
+
+      updatePageTitle() {
+        document.getElementById('page-title').textContent = `📰 ${this.domain} analizləri`;
+        document.getElementById('page-description').textContent = 
+          `${this.domain} saytından analiz edilmiş məqalələrin siyahısı`;
+      }
+
+      async loadAnalyses(append = false) {
+        if (this.loading) return;
+        
+        this.loading = true;
+        this.showLoading();
+        this.hideError();
+
+        try {
+          const params = new URLSearchParams({
+            domain: this.domain,
+            limit: this.limit,
+            offset: this.currentOffset
+          });
+
+          const response = await fetch(`/api/analyses-by-domain?${params}`);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          
+          if (append) {
+            this.analyses = [...this.analyses, ...data.analyses];
+          } else {
+            this.analyses = data.analyses;
+          }
+          
+          this.total = data.total;
+          this.currentOffset += data.analyses.length;
+          
+          this.updateStats(data);
+          this.renderAnalyses();
+          this.hideLoading();
+          this.showContent();
+
+          // Show/hide load more button
+          if (data.hasMore) {
+            document.getElementById('load-more-container').classList.remove('hidden');
+          } else {
+            document.getElementById('load-more-container').classList.add('hidden');
+          }
+
+        } catch (error) {
+          console.error('Error loading analyses:', error);
+          this.hideLoading();
+          this.showError();
+        } finally {
+          this.loading = false;
+        }
+      }
+
+      updateStats(data) {
+        document.getElementById('total-analyses').textContent = data.total.toLocaleString('az-AZ');
+        document.getElementById('shown-analyses').textContent = this.analyses.length.toLocaleString('az-AZ');
+      }
+
+      renderAnalyses() {
+        const container = document.getElementById('analyses-list');
+        
+        if (this.analyses.length === 0) {
+          container.innerHTML = '<div class="no-results">Bu saytdan hələ analiz edilmiş məqalə yoxdur.</div>';
+          return;
+        }
+
+        const html = this.analyses.map((analysis, index) => {
+          const reliabilityClass = this.getReliabilityClass(analysis.reliability);
+          const biasClass = this.getBiasClass(analysis.political_bias);
+          const biasText = this.formatBias(analysis.political_bias);
+          
+          return `
+            <div class="analysis-item">
+              <div class="analysis-header">
+                <h3 class="analysis-title">
+                  <a href="/analysis/${analysis.hash}" target="_blank" rel="noopener">
+                    ${this.escapeHtml(analysis.title)}
+                  </a>
+                </h3>
+                <div class="analysis-scores">
+                  <div class="score-item ${reliabilityClass}">
+                    <span class="score-label">Etibarlılıq</span>
+                    <span class="score-value">${Math.round(analysis.reliability)}/100</span>
+                  </div>
+                  <div class="score-item ${biasClass}">
+                    <span class="score-label">Siyasi meyl</span>
+                    <span class="score-value">${biasText}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="analysis-meta">
+                <span class="analysis-url">
+                  <a href="${analysis.url}" target="_blank" rel="noopener">${this.escapeHtml(analysis.url)}</a>
+                </span>
+                <span class="analysis-date">${this.formatDate(analysis.analyzed_at)}</span>
+              </div>
+              ${analysis.human_summary ? `
+                <div class="analysis-summary">
+                  <p>${this.escapeHtml(analysis.human_summary)}</p>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = html;
+      }
+
+      getReliabilityClass(score) {
+        if (score >= 80) return 'reliability-excellent';
+        if (score >= 60) return 'reliability-good';
+        if (score >= 40) return 'reliability-fair';
+        if (score >= 20) return 'reliability-poor';
+        return 'reliability-very-poor';
+      }
+
+      getBiasClass(score) {
+        if (Math.abs(score) >= 3) return 'bias-strong';
+        if (Math.abs(score) >= 1) return 'bias-moderate';
+        return 'bias-neutral';
+      }
+
+      formatBias(score) {
+        if (score > 0) return `+${score.toFixed(1)}`;
+        return score.toFixed(1);
+      }
+
+      formatDate(dateString) {
+        if (!dateString) return '—';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('az-AZ');
+      }
+
+      escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      showLoading() {
+        document.getElementById('loading').classList.remove('hidden');
+      }
+
+      hideLoading() {
+        document.getElementById('loading').classList.add('hidden');
+      }
+
+      showError(message = 'Analizlər yüklənə bilmədi') {
+        const errorEl = document.getElementById('error-message');
+        errorEl.querySelector('p').textContent = message;
+        errorEl.classList.remove('hidden');
+      }
+
+      hideError() {
+        document.getElementById('error-message').classList.add('hidden');
+      }
+
+      showContent() {
+        document.getElementById('analyses-content').classList.remove('hidden');
+      }
+
+      hideContent() {
+        document.getElementById('analyses-content').classList.add('hidden');
+      }
+    }
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      new DomainAnalyses();
+      
+      // Load more button
+      document.getElementById('load-more-btn').addEventListener('click', () => {
+        const domainAnalyses = window.domainAnalysesInstance;
+        if (domainAnalyses) {
+          domainAnalyses.loadAnalyses(true);
+        }
+      });
+    });
+
+    // Store instance globally for load more button
+    window.domainAnalysesInstance = null;
+    document.addEventListener('DOMContentLoaded', () => {
+      window.domainAnalysesInstance = new DomainAnalyses();
+    });
+  </script>
+</body>
+</html>
