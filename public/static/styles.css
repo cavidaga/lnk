@@ -3027,19 +3027,41 @@ button.action-btn {
   color: var(--text, #e9edf3);
 }
 
-/* Scoreboard list */
+/* Scoreboard table */
+.scoreboard-table {
+  background: var(--card, rgba(255,255,255,0.02));
+  border: 1px solid var(--border, #222);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.scoreboard-header {
+  display: grid;
+  grid-template-columns: 60px 1fr 100px 100px 100px;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: var(--bg, #0a0a0a);
+  border-bottom: 1px solid var(--border, #222);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--muted, #8e97ab);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .scoreboard-list {
   max-height: 70vh;
   overflow-y: auto;
 }
 
 .scoreboard-item {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 60px 1fr 100px 100px 100px;
   gap: 1rem;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border, #222);
   transition: background-color 0.2s;
+  align-items: center;
 }
 
 .scoreboard-item:last-child {
@@ -3050,23 +3072,19 @@ button.action-btn {
   background: var(--bg, rgba(0,0,0,0.1));
 }
 
-.rank {
-  font-size: 1.5rem;
+.col-rank {
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--primary, #3b82f6);
-  min-width: 3rem;
   text-align: center;
-  flex-shrink: 0;
 }
 
-.site-info {
-  flex: 1;
+.col-site {
   min-width: 0;
-  max-width: 300px;
 }
 
 .site-host {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--primary, #3b82f6);
   text-decoration: none;
@@ -3082,54 +3100,31 @@ button.action-btn {
 }
 
 .site-meta {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--muted, #8e97ab);
 }
 
-.analysis-count {
-  font-weight: 500;
-}
-
-.last-updated {
-  font-size: 0.8rem;
-}
-
-.site-scores {
-  display: flex;
-  gap: 1.5rem;
-  min-width: 280px;
-  flex-shrink: 0;
-}
-
-.score-item {
+.col-analyses {
   text-align: center;
-  padding: 0.75rem;
-  border-radius: 8px;
-  width: 120px;
-  flex-shrink: 0;
-  overflow: hidden;
 }
 
-.score-label {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.25rem;
-  opacity: 0.8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.analysis-count {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text, #e9edf3);
+}
+
+.col-reliability,
+.col-bias {
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-weight: 700;
 }
 
 .score-value {
   font-size: 0.9rem;
   font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* Reliability score colors */
@@ -3248,31 +3243,38 @@ button.action-btn {
     gap: 1rem;
   }
   
+  .scoreboard-header {
+    grid-template-columns: 50px 1fr 80px 80px 80px;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+  }
+  
   .scoreboard-item {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-    padding: 1rem;
+    grid-template-columns: 50px 1fr 80px 80px 80px;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
   }
   
-  .rank {
-    min-width: auto;
-    text-align: left;
-    font-size: 1.25rem;
+  .col-rank {
+    font-size: 1rem;
   }
   
-  .site-info {
-    max-width: none;
+  .site-host {
+    font-size: 0.9rem;
   }
   
-  .site-scores {
-    min-width: auto;
-    justify-content: space-between;
+  .analysis-count {
+    font-size: 1rem;
   }
   
-  .score-item {
-    width: 110px;
-    padding: 0.5rem;
+  .col-reliability,
+  .col-bias {
+    padding: 0.25rem;
+  }
+  
+  .score-value {
+    font-size: 0.8rem;
   }
 }
 
@@ -3281,22 +3283,32 @@ button.action-btn {
     padding: 1rem;
   }
   
-  .scoreboard-item {
-    padding: 0.75rem;
-  }
-  
-  .site-meta {
-    flex-direction: column;
+  .scoreboard-header {
+    grid-template-columns: 40px 1fr 60px 60px 60px;
     gap: 0.25rem;
+    padding: 0.5rem;
+    font-size: 0.7rem;
   }
   
-  .site-scores {
-    flex-direction: column;
-    gap: 0.5rem;
+  .scoreboard-item {
+    grid-template-columns: 40px 1fr 60px 60px 60px;
+    gap: 0.25rem;
+    padding: 0.5rem;
   }
   
-  .score-item {
-    width: 100%;
-    max-width: 160px;
+  .col-rank {
+    font-size: 0.9rem;
+  }
+  
+  .site-host {
+    font-size: 0.8rem;
+  }
+  
+  .analysis-count {
+    font-size: 0.9rem;
+  }
+  
+  .score-value {
+    font-size: 0.7rem;
   }
 }

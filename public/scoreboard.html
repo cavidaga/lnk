@@ -44,9 +44,9 @@
           <div class="control-group">
             <label for="sort-select">Sıralama:</label>
             <select id="sort-select" class="form-select">
+              <option value="count">Analiz sayı (çox → az)</option>
               <option value="reliability">Etibarlılıq (yüksək → aşağı)</option>
               <option value="bias">Siyasi meyl (güclü → zəif)</option>
-              <option value="count">Analiz sayı (çox → az)</option>
             </select>
           </div>
           
@@ -96,8 +96,17 @@
               </div>
             </div>
             
-            <div id="scoreboard-list" class="scoreboard-list">
-              <!-- Sites will be populated here -->
+            <div class="scoreboard-table">
+              <div class="scoreboard-header">
+                <div class="col-rank">#</div>
+                <div class="col-site">Sayt</div>
+                <div class="col-analyses">Analiz sayı</div>
+                <div class="col-reliability">Etibarlılıq</div>
+                <div class="col-bias">Siyasi meyl</div>
+              </div>
+              <div id="scoreboard-list" class="scoreboard-list">
+                <!-- Sites will be populated here -->
+              </div>
             </div>
           </div>
         </div>
@@ -110,7 +119,7 @@
     class Scoreboard {
       constructor() {
         this.sites = [];
-        this.currentSort = 'reliability';
+        this.currentSort = 'count';
         this.currentMinCount = 1;
         this.currentLimit = 50;
         this.init();
@@ -195,25 +204,23 @@
           
           return `
             <div class="scoreboard-item">
-              <div class="rank">#${rank}</div>
-              <div class="site-info">
+              <div class="col-rank">#${rank}</div>
+              <div class="col-site">
                 <a href="https://${site.host}" target="_blank" rel="noopener" class="site-host">
                   ${this.escapeHtml(site.host)}
                 </a>
                 <div class="site-meta">
-                  <span class="analysis-count">${site.count} analiz</span>
                   <span class="last-updated">${this.formatDate(site.updated_at)}</span>
                 </div>
               </div>
-              <div class="site-scores">
-                <div class="score-item ${reliabilityClass}">
-                  <div class="score-label">Etibarlılıq</div>
-                  <div class="score-value">${Math.round(site.avg_reliability)}/100</div>
-                </div>
-                <div class="score-item ${biasClass}">
-                  <div class="score-label">Siyasi meyl</div>
-                  <div class="score-value">${biasText}</div>
-                </div>
+              <div class="col-analyses">
+                <span class="analysis-count">${site.count}</span>
+              </div>
+              <div class="col-reliability ${reliabilityClass}">
+                <span class="score-value">${Math.round(site.avg_reliability)}/100</span>
+              </div>
+              <div class="col-bias ${biasClass}">
+                <span class="score-value">${biasText}</span>
               </div>
             </div>
           `;
