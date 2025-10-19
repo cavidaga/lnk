@@ -329,6 +329,17 @@
     throw new Error(a.message || `Nəticə tapılmadı (HTTP ${res.status})`);
   }
 
+  // ---------- HELPERS ----------
+function isAnalysisOld(analyzedAt) {
+  if (!analyzedAt) return false;
+  
+  const analysisDate = new Date(analyzedAt);
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  
+  return analysisDate < threeMonthsAgo;
+}
+
   // ---------- RENDERERS ----------
 async function renderAnalysis(root, data, hash) {
   const { meta = {}, scores = {}, diagnostics = {}, cited_sources = [], human_summary = '', warnings = [], is_advertisement = false, advertisement_reason = '' } = data || {};
@@ -376,6 +387,25 @@ async function renderAnalysis(root, data, hash) {
             </li>
           `).join('')}
         </ul>
+      </div>
+    </section>
+    ` : ''}
+    
+    <!-- Refresh Analysis Section -->
+    ${isAnalysisOld(data.analyzed_at) ? `
+    <section class="card refresh-section" style="margin-bottom:16px; border-left: 4px solid #ffc107; background: rgba(255, 193, 7, 0.05);">
+      <div class="bd">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="margin:0 0 4px; color: #ffc107;">🔄 Köhnə Analiz</h3>
+            <p style="margin:0; font-size: 0.9rem; color: var(--text-muted);">
+              Bu analiz 3 aydan köhnədir. Məqalə yenilənə bilər və ya dəyişə bilər.
+            </p>
+          </div>
+          <button id="refresh-analysis-btn" class="btn btn-outline" style="background: transparent; border: 1px solid #007bff; color: #007bff; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;">
+            🔄 Yenidən analiz et
+          </button>
+        </div>
       </div>
     </section>
     ` : ''}
@@ -721,6 +751,59 @@ async function renderAnalysis(root, data, hash) {
     console.error('Error fetching alternative versions:', e);
     const versionsCard = document.getElementById('alternative-versions-card');
     if (versionsCard) versionsCard.style.display = 'none';
+  }
+  
+  // Setup refresh analysis button
+  const refreshBtn = document.getElementById('refresh-analysis-btn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      if (refreshBtn.disabled) return;
+      
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = '🗑️ Silinir...';
+      
+      try {
+        // Delete the old analysis
+        const deleteResponse = await fetch('/api/delete-analysis', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ hash: hash })
+        });
+        
+        if (!deleteResponse.ok) {
+          throw new Error('Failed to delete old analysis');
+        }
+        
+        refreshBtn.textContent = '🔄 Yenidən analiz edilir...';
+        
+        // Redirect to the analysis page with the URL
+        const analysisUrl = meta.original_url || '';
+        if (analysisUrl) {
+          window.location.href = `/?url=${encodeURIComponent(analysisUrl)}`;
+        } else {
+          throw new Error('No URL found for re-analysis');
+        }
+        
+      } catch (error) {
+        console.error('Error refreshing analysis:', error);
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = '❌ Xəta';
+        
+        // Show error message
+        const errorMsg = document.createElement('div');
+        errorMsg.style.cssText = 'background: #dc3545; color: white; padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem; font-size: 0.9rem;';
+        errorMsg.textContent = 'Xəta: Analiz yenilənə bilmədi. Zəhmət olmasa yenidən cəhd edin.';
+        refreshBtn.parentNode.appendChild(errorMsg);
+        
+        setTimeout(() => {
+          if (errorMsg.parentNode) {
+            errorMsg.parentNode.removeChild(errorMsg);
+          }
+        }, 5000);
+      }
+    });
   }
   
 }

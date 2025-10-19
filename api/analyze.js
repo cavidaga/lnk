@@ -118,7 +118,7 @@ async function updateSiteStatsFromAnalysis(analysis) {
     
     // Add this URL to the list of counted URLs
     existingUrls.push(originalUrl);
-    await kv.set(urlKey, existingUrls, { ex: 2592000 }); // 30 days expiry
+    await kv.set(urlKey, existingUrls); // No TTL - URLs persist until manually deleted
     
     const existing = await kv.get(key) || { count: 0, sum_rel: 0, sum_bias: 0 };
 
@@ -1324,7 +1324,7 @@ async function analyzeHandler(req, res) {
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
             normalized.contentSource = contentSource;
-            await kv.set(cacheKey, normalized, { ex: 2592000 });
+            await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
             console.log(`SAVED TO CACHE (blocked-safe) for URL: ${effectiveUrl} with hash: ${cacheKey}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             
@@ -1382,7 +1382,7 @@ async function analyzeHandler(req, res) {
               normalized.hash = cacheKey;
               normalized.modelUsed = r2.modelUsed;
               normalized.contentSource = contentSource;
-              await kv.set(cacheKey, normalized, { ex: 2592000 });
+              await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
               console.log(`SAVED TO CACHE (jam-news safe) for URL: ${effectiveUrl}`);
               try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
               
@@ -1457,7 +1457,7 @@ async function analyzeHandler(req, res) {
             normalized.hash = cacheKey;
             normalized.modelUsed = modelUsedQuick;
             normalized.contentSource = contentSource;
-            await kv.set(cacheKey, normalized, { ex: 2592000 });
+            await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
             console.log(`SAVED TO CACHE (light) for URL: ${effectiveUrl}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             
@@ -1521,7 +1521,7 @@ async function analyzeHandler(req, res) {
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
             normalized.contentSource = contentSource;
-            await kv.set(cacheKey, normalized, { ex: 2592000 });
+            await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
             console.log(`SAVED TO CACHE (light-safe) for URL: ${effectiveUrl}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             
@@ -1564,7 +1564,7 @@ async function analyzeHandler(req, res) {
                 schema_version: '2025-09-16'
               };
               
-              await kv.set(cacheKey, normalized, { ex: 2592000 });
+              await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
               console.log(`SAVED TO CACHE (markdowner) for URL: ${effectiveUrl}`);
               
               try {
@@ -1889,7 +1889,7 @@ async function analyzeHandler(req, res) {
             normalized.hash = cacheKey;
             normalized.modelUsed = r2.modelUsed;
             normalized.contentSource = contentSource;
-            await kv.set(cacheKey, normalized, { ex: 2592000 });
+            await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
             console.log(`SAVED TO CACHE (jam-news chromium-safe) for URL: ${effectiveUrl}`);
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             
@@ -2064,7 +2064,7 @@ async function analyzeHandler(req, res) {
           normalized.modelUsed = modelUsed;
           normalized.contentSource = contentSource;
 
-          await kv.set(cacheKey, normalized, { ex: 2592000 });
+          await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
           console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
 
           try {

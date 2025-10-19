@@ -71,7 +71,7 @@
             </div>
             <div class="stat-item">
               <span class="stat-label">Qeyd:</span>
-              <span class="stat-value" style="font-size: 0.9rem; color: #666;">Köhnə analizlər avtomatik silinir. Yenidən analiz etmək üçün "Yenilə" düyməsini basın.</span>
+              <span class="stat-value" style="font-size: 0.9rem; color: #666;">Analizlər indi həmişəlik saxlanılır. Köhnə analizləri yeniləmək üçün "Yenilə" düyməsini basın.</span>
             </div>
             <div class="stat-item" id="missing-analyses" style="display: none;">
               <span class="stat-label">Silinmiş analizlər:</span>
@@ -263,17 +263,40 @@
         if (button.disabled) return;
         
         button.disabled = true;
-        button.textContent = '🔄 Analiz edilir...';
+        button.textContent = '🗑️ Silinir...';
         
         try {
-          // Redirect to the analysis page with the URL
+          // First, delete the old analysis
+          const deleteResponse = await fetch('/api/delete-analysis', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url: url })
+          });
+          
+          if (!deleteResponse.ok) {
+            throw new Error('Failed to delete old analysis');
+          }
+          
+          button.textContent = '🔄 Yenidən analiz edilir...';
+          
+          // Then redirect to the analysis page with the URL
           window.open(`/?url=${encodeURIComponent(url)}`, '_blank');
+          
+          // Remove the analysis item from the UI
+          const analysisItem = button.closest('.analysis-item');
+          if (analysisItem) {
+            analysisItem.style.opacity = '0.5';
+            analysisItem.style.textDecoration = 'line-through';
+            analysisItem.querySelector('.refresh-analysis-btn').textContent = '✅ Silindi';
+          }
           
           // Reset button after a delay
           setTimeout(() => {
             button.disabled = false;
             button.textContent = '🔄 Yenidən analiz et';
-          }, 3000);
+          }, 5000);
         } catch (error) {
           console.error('Error refreshing analysis:', error);
           button.disabled = false;

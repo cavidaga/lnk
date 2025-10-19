@@ -114,7 +114,7 @@ async function handler(req, res) {
       limit: limit,
       offset: offset,
       hasMore: (offset + limit) < domainAnalyses.length,
-      note: "Some older analyses may have been automatically deleted. Click 'Refresh Analysis' to re-analyze old articles.",
+      note: "Analyses are now preserved indefinitely. Click 'Yenilə' to delete and re-analyze old articles.",
       timestamp: new Date().toISOString()
     });
 
