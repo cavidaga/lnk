@@ -3056,19 +3056,29 @@ button.action-btn {
   color: var(--primary, #3b82f6);
   min-width: 3rem;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .site-info {
   flex: 1;
   min-width: 0;
+  max-width: 300px;
 }
 
 .site-host {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--text, #e9edf3);
+  color: var(--primary, #3b82f6);
+  text-decoration: none;
   margin-bottom: 0.25rem;
   word-break: break-all;
+  display: block;
+  transition: color 0.2s;
+}
+
+.site-host:hover {
+  color: var(--accent, #ef4444);
+  text-decoration: none;
 }
 
 .site-meta {
@@ -3090,6 +3100,7 @@ button.action-btn {
   display: flex;
   gap: 1rem;
   min-width: 200px;
+  flex-shrink: 0;
 }
 
 .score-item {
@@ -3098,20 +3109,27 @@ button.action-btn {
   border-radius: 8px;
   width: 90px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .score-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.25rem;
   opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .score-value {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Reliability score colors */
@@ -3164,26 +3182,6 @@ button.action-btn {
   color: #6b7280;
 }
 
-.site-actions {
-  min-width: 100px;
-}
-
-.site-url {
-  text-align: center;
-}
-
-.site-link {
-  color: var(--primary, #3b82f6);
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.site-link:hover {
-  color: var(--accent, #ef4444);
-  text-decoration: none;
-}
 
 .no-results {
   text-align: center;
@@ -3263,6 +3261,10 @@ button.action-btn {
     font-size: 1.25rem;
   }
   
+  .site-info {
+    max-width: none;
+  }
+  
   .site-scores {
     min-width: auto;
     justify-content: space-between;
@@ -3271,14 +3273,6 @@ button.action-btn {
   .score-item {
     width: 80px;
     padding: 0.5rem;
-  }
-  
-  .site-actions {
-    min-width: auto;
-  }
-  
-  .site-actions .btn {
-    width: 100%;
   }
 }
 
@@ -3302,6 +3296,7 @@ button.action-btn {
   }
   
   .score-item {
-    width: 70px;
+    width: 100%;
+    max-width: 120px;
   }
 }

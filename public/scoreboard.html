@@ -195,7 +195,9 @@
             <div class="scoreboard-item">
               <div class="rank">#${rank}</div>
               <div class="site-info">
-                <div class="site-host">${this.escapeHtml(site.host)}</div>
+                <a href="https://${site.host}" target="_blank" rel="noopener" class="site-host">
+                  ${this.escapeHtml(site.host)}
+                </a>
                 <div class="site-meta">
                   <span class="analysis-count">${site.count} analiz</span>
                   <span class="last-updated">${this.formatDate(site.updated_at)}</span>
@@ -209,13 +211,6 @@
                 <div class="score-item ${biasClass}">
                   <div class="score-label">Siyasi meyl</div>
                   <div class="score-value">${biasText}</div>
-                </div>
-              </div>
-              <div class="site-actions">
-                <div class="site-url">
-                  <a href="https://${site.host}" target="_blank" rel="noopener" class="site-link">
-                    ${site.host}
-                  </a>
                 </div>
               </div>
             </div>
