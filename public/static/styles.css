@@ -2750,7 +2750,7 @@ button.action-btn {
   }
 }
 
-/* =================== Çıxarış Düymələri =================== */
+/* =================== Çıxarış və Çap Düymələri =================== */
 .export-buttons {
   display: flex;
   gap: 8px;
@@ -2827,6 +2827,20 @@ button.action-btn {
   background: #1d4ed8;
   border-color: #1d4ed8;
   box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.print-btn {
+  background: #6b7280;
+  color: white;
+  border-color: #6b7280;
+}
+
+.print-btn:hover {
+  background: #4b5563;
+  color: white;
+  border-color: #4b5563;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
 }
 
 /* Çıxarış düymələri üçün mobil uyğunluq */

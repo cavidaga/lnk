@@ -130,7 +130,7 @@
               <h2>📋 Analiz Tarixçəsi</h2>
               <div>
                 <button id="export-all-csv-btn" class="btn btn-secondary">📊 Bütün CSV Çıxarışı</button>
-                <button id="export-all-html-btn" class="btn btn-secondary">📄 Bütün HTML Çıxarışı</button>
+                <button id="print-all-btn" class="btn btn-secondary">🖨️ Bütünü Çap Et</button>
                 <button id="refresh-btn" class="btn btn-primary">🔄 Yenilə</button>
                 <button id="clear-btn" class="btn btn-danger">🗑️ Təmizlə</button>
               </div>
@@ -211,16 +211,16 @@
           this.exportAllAnalyses('csv');
         });
 
-        // Bütün analizləri HTML formatında çıxar
-        document.getElementById('export-all-html-btn').addEventListener('click', () => {
-          this.exportAllAnalyses('html');
+        // Bütün analizləri çap et
+        document.getElementById('print-all-btn').addEventListener('click', () => {
+          this.printAllAnalyses();
         });
 
         // Fərdi çıxarış düymələri (event delegation istifadə edərək)
         document.addEventListener('click', (e) => {
-          if (e.target.classList.contains('export-pdf-btn')) {
+          if (e.target.classList.contains('print-btn')) {
             const hash = e.target.getAttribute('data-hash');
-            this.exportSingleAnalysis(hash, 'pdf');
+            this.printSingleAnalysis(hash);
           } else if (e.target.classList.contains('export-csv-btn')) {
             const hash = e.target.getAttribute('data-hash');
             this.exportSingleAnalysis(hash, 'csv');
@@ -271,8 +271,11 @@
               <div class="analysis-header">
                 <h3>${analysis.title}</h3>
                 <div class="analysis-actions">
-                  <button class="btn btn-sm btn-secondary export-pdf-btn" data-hash="${analysis.hash}" title="PDF olaraq yüklə">
-                    📄 PDF Çıxarışı
+                  <a href="/analysis/${analysis.hash}" class="btn btn-sm btn-primary" title="Analizi görüntülə">
+                    👁️ Analizi Gör
+                  </a>
+                  <button class="btn btn-sm btn-secondary print-btn" data-hash="${analysis.hash}" title="Çap et">
+                    🖨️ Çap Et
                   </button>
                   <button class="btn btn-sm btn-secondary export-csv-btn" data-hash="${analysis.hash}" title="CSV olaraq yüklə">
                     📊 CSV Çıxarışı
@@ -399,6 +402,83 @@
           }
         } catch (error) {
           this.showError(`Çıxarış xətası: ${error.message}`);
+        }
+      }
+
+      async printSingleAnalysis(hash) {
+        try {
+          // Open analysis page in new window for printing
+          const analysisUrl = `/analysis/${hash}`;
+          const printWindow = window.open(analysisUrl, '_blank', 'width=800,height=600');
+          
+          if (printWindow) {
+            printWindow.onload = () => {
+              printWindow.print();
+            };
+            this.showSuccess('Çap pəncərəsi açıldı');
+          } else {
+            this.showError('Çap pəncərəsi açıla bilmədi. Pop-up blokeri yoxlayın.');
+          }
+        } catch (error) {
+          this.showError(`Çap xətası: ${error.message}`);
+        }
+      }
+
+      async printAllAnalyses() {
+        try {
+          // Create a printable HTML page with all analyses
+          const analysesHtml = this.analyses.map(analysis => {
+            const reliabilityClass = analysis.reliability >= 70 ? 'high' : analysis.reliability >= 40 ? 'medium' : 'low';
+            return `
+              <div class="analysis-item" style="page-break-inside: avoid; margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <h3 style="color: #1f2937; margin-bottom: 15px;">${analysis.title}</h3>
+                <p><strong>Nəşriyyat:</strong> ${analysis.publication || 'Naməlum'}</p>
+                <p><strong>URL:</strong> <a href="${analysis.url}" target="_blank">${analysis.url}</a></p>
+                <p><strong>Etibarlılıq:</strong> <span class="reliability-score ${reliabilityClass}">${analysis.reliability}/100</span></p>
+                <p><strong>Siyasi Meyl:</strong> ${analysis.political_bias}</p>
+                <p><strong>Reklam Məzmunu:</strong> ${analysis.is_advertisement ? 'Bəli' : 'Xeyr'}</p>
+                ${analysis.summary ? `<p><strong>Xülasə:</strong> ${analysis.summary}</p>` : ''}
+                <hr style="margin: 20px 0;">
+              </div>
+            `;
+          }).join('');
+
+          const printHtml = `
+            <!DOCTYPE html>
+            <html lang="az">
+            <head>
+              <meta charset="UTF-8">
+              <title>LNK.az - Bütün Analizlər</title>
+              <style>
+                body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+                .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #dc2626; padding-bottom: 20px; }
+                .logo { font-size: 24px; font-weight: bold; color: #dc2626; }
+                .reliability-score.high { color: #059669; font-weight: bold; }
+                .reliability-score.medium { color: #d97706; font-weight: bold; }
+                .reliability-score.low { color: #dc2626; font-weight: bold; }
+                @media print { body { margin: 0; } }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <div class="logo">LNK.az</div>
+                <p>Media Bias Analizlər Hesabatı</p>
+                <p>Çap tarixi: ${new Date().toLocaleDateString('az-AZ')}</p>
+              </div>
+              ${analysesHtml}
+            </body>
+            </html>
+          `;
+
+          const printWindow = window.open('', '_blank', 'width=800,height=600');
+          printWindow.document.write(printHtml);
+          printWindow.document.close();
+          printWindow.onload = () => {
+            printWindow.print();
+          };
+          this.showSuccess('Bütün analizlər çap pəncərəsində açıldı');
+        } catch (error) {
+          this.showError(`Çap xətası: ${error.message}`);
         }
       }
 
