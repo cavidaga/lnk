@@ -1150,10 +1150,10 @@
           <div class="api-endpoint">
             <div class="endpoint-header">
               <span class="method post">POST</span>
-              <span class="endpoint-url">/api/delete-analysis</span>
+              <span class="endpoint-url">/api/refresh-analysis</span>
             </div>
             <div class="endpoint-description">
-              Köhnə analizi silərək yenidən təhlil etməyə imkan verir. 1 aydan köhnə analizlər üçün istifadə olunur.
+              Köhnə analizi yeniləmək üçün işarələyir. 1 aydan köhnə analizlər üçün istifadə olunur. Analiz silinmir, sadəcə yenidən təhlil edilməsi üçün işarələnir.
             </div>
             
             <div class="parameters">
@@ -1191,7 +1191,7 @@
             <div class="example">
               <h4>Nümunə sorğu</h4>
               <div class="code-block-container">
-                <div class="code-block">curl -X POST https://lnk.az/api/delete-analysis \
+                <div class="code-block">curl -X POST https://lnk.az/api/refresh-analysis \
   -H "Content-Type: application/json" \
   -H "X-API-Key: your-api-key-here" \
   -d '{"hash": "abc123def456"}'</div>

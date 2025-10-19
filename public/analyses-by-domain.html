@@ -253,11 +253,11 @@
         if (button.disabled) return;
         
         button.disabled = true;
-        button.textContent = '🗑️ Silinir...';
+        button.textContent = '🔄 Yenilənir...';
         
         try {
-          // First, delete the old analysis
-          const deleteResponse = await fetch('/api/delete-analysis', {
+          // Mark the analysis for refresh
+          const refreshResponse = await fetch('/api/refresh-analysis', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -265,8 +265,8 @@
             body: JSON.stringify({ url: url })
           });
           
-          if (!deleteResponse.ok) {
-            throw new Error('Failed to delete old analysis');
+          if (!refreshResponse.ok) {
+            throw new Error('Failed to mark analysis for refresh');
           }
           
           button.textContent = '🔄 Yenidən analiz edilir...';

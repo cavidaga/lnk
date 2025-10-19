@@ -761,11 +761,11 @@ async function renderAnalysis(root, data, hash) {
       if (refreshBtn.disabled) return;
       
       refreshBtn.disabled = true;
-      refreshBtn.textContent = '🗑️ Silinir...';
+      refreshBtn.textContent = '🔄 Yenilənir...';
       
       try {
-        // Delete the old analysis
-        const deleteResponse = await fetch('/api/delete-analysis', {
+        // Mark the analysis for refresh
+        const refreshResponse = await fetch('/api/refresh-analysis', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -773,8 +773,8 @@ async function renderAnalysis(root, data, hash) {
           body: JSON.stringify({ hash: hash })
         });
         
-        if (!deleteResponse.ok) {
-          throw new Error('Failed to delete old analysis');
+        if (!refreshResponse.ok) {
+          throw new Error('Failed to mark analysis for refresh');
         }
         
         refreshBtn.textContent = '🔄 Yenidən analiz edilir...';
