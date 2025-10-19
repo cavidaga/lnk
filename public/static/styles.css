@@ -3096,7 +3096,8 @@ button.action-btn {
   text-align: center;
   padding: 0.75rem;
   border-radius: 8px;
-  min-width: 80px;
+  width: 90px;
+  flex-shrink: 0;
 }
 
 .score-label {
@@ -3165,6 +3166,23 @@ button.action-btn {
 
 .site-actions {
   min-width: 100px;
+}
+
+.site-url {
+  text-align: center;
+}
+
+.site-link {
+  color: var(--primary, #3b82f6);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.site-link:hover {
+  color: var(--accent, #ef4444);
+  text-decoration: none;
 }
 
 .no-results {
@@ -3251,7 +3269,7 @@ button.action-btn {
   }
   
   .score-item {
-    min-width: 70px;
+    width: 80px;
     padding: 0.5rem;
   }
   
@@ -3284,6 +3302,6 @@ button.action-btn {
   }
   
   .score-item {
-    min-width: auto;
+    width: 70px;
   }
 }

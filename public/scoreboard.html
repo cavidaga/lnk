@@ -28,13 +28,12 @@
 </head>
 <body>
   <div id="app">
-
     <main class="main">
       <div class="container">
         <div class="page-header">
           <h1>🏆 Sayt Reytinqi</h1>
           <p class="page-description">
-            Azərbaycan saytlarının etibarlılıq və siyasi meyl göstəriciləri üzrə reytinqi. 
+            Müxtəlif dillərdəki saytların etibarlılıq və siyasi meyl göstəriciləri üzrə reytinqi. 
             Daha çox analiz olunan saytlar daha etibarlı statistikalar təqdim edir.
           </p>
         </div>
@@ -213,9 +212,11 @@
                 </div>
               </div>
               <div class="site-actions">
-                <a href="/?url=${encodeURIComponent('https://' + site.host)}" class="btn btn-sm btn-primary">
-                  Analiz et
-                </a>
+                <div class="site-url">
+                  <a href="https://${site.host}" target="_blank" rel="noopener" class="site-link">
+                    ${site.host}
+                  </a>
+                </div>
               </div>
             </div>
           `;
