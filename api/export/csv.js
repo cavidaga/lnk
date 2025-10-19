@@ -105,10 +105,11 @@ async function csvHandler(req, res) {
     // Generate CSV
     const csv = generateCSV(analyses);
     
-    // Set headers for CSV download
+    // Set headers for CSV download (sanitize filename for HTTP headers)
+    const date = new Date().toISOString().split('T')[0];
     const filename = hash ? 
       `lnk-analiz-${hash.substring(0, 8)}.csv` : 
-      `lnk-analizlər-${new Date().toISOString().split('T')[0]}.csv`;
+      `lnk-analizler-${date}.csv`;
     
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);

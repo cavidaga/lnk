@@ -4,6 +4,8 @@ export const config = { runtime: 'nodejs', maxDuration: 30 };
 import { kv } from '@vercel/kv';
 import { getSessionFromRequest } from '../../lib/auth.js';
 import { withAuth } from '../../lib/middleware.js';
+import puppeteer from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 
 async function generatePDF(analysis) {
   // Simple HTML to PDF conversion using browser-like rendering
@@ -350,6 +352,50 @@ async function generatePDF(analysis) {
   return html;
 }
 
+async function generatePDFBuffer(analysis) {
+  let browser = null;
+  
+  try {
+    // Configure Puppeteer for Vercel
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
+
+    const page = await browser.newPage();
+    
+    // Generate HTML content
+    const html = await generatePDF(analysis);
+    
+    // Set content and wait for it to load
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    
+    // Generate PDF
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: {
+        top: '20mm',
+        right: '20mm',
+        bottom: '20mm',
+        left: '20mm'
+      }
+    });
+
+    return pdfBuffer;
+    
+  } catch (error) {
+    console.error('PDF generation error:', error);
+    throw error;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+}
+
 async function pdfHandler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -369,15 +415,15 @@ async function pdfHandler(req, res) {
       return res.status(404).json({ error: 'Analiz tapılmadı' });
     }
 
-    // Generate PDF HTML
-    const html = await generatePDF(analysis);
+    // Generate PDF buffer
+    const pdfBuffer = await generatePDFBuffer(analysis);
     
     // Set headers for PDF download
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="lnk-analiz-${hash.substring(0, 8)}.html"`);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="lnk-analiz-${hash.substring(0, 8)}.pdf"`);
     res.setHeader('Cache-Control', 'no-cache');
     
-    return res.status(200).send(html);
+    return res.status(200).send(pdfBuffer);
     
   } catch (error) {
     console.error('PDF export error:', error);

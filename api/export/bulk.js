@@ -327,7 +327,9 @@ async function bulkHandler(req, res) {
       return res.status(404).json({ error: 'Export ediləcək analiz tapılmadı' });
     }
 
-    const filename = `lnk-analizlər-${new Date().toISOString().split('T')[0]}`;
+    // Sanitize filename for HTTP headers (remove non-ASCII characters)
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `lnk-analizler-${date}`;
     
     if (format === 'csv') {
       const csv = generateCSV(analyses);
