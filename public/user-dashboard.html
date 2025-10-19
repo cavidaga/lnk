@@ -129,6 +129,8 @@
             <div class="analyses-header">
               <h2>📋 Analiz Tarixçəsi</h2>
               <div>
+                <button id="export-all-csv-btn" class="btn btn-secondary">📊 Bütün CSV Çıxarışı</button>
+                <button id="export-all-html-btn" class="btn btn-secondary">📄 Bütün HTML Çıxarışı</button>
                 <button id="refresh-btn" class="btn btn-primary">🔄 Yenilə</button>
                 <button id="clear-btn" class="btn btn-danger">🗑️ Təmizlə</button>
               </div>
@@ -203,6 +205,27 @@
             this.clearAnalyses();
           }
         });
+
+        // Bütün analizləri CSV formatında çıxar
+        document.getElementById('export-all-csv-btn').addEventListener('click', () => {
+          this.exportAllAnalyses('csv');
+        });
+
+        // Bütün analizləri HTML formatında çıxar
+        document.getElementById('export-all-html-btn').addEventListener('click', () => {
+          this.exportAllAnalyses('html');
+        });
+
+        // Fərdi çıxarış düymələri (event delegation istifadə edərək)
+        document.addEventListener('click', (e) => {
+          if (e.target.classList.contains('export-pdf-btn')) {
+            const hash = e.target.getAttribute('data-hash');
+            this.exportSingleAnalysis(hash, 'pdf');
+          } else if (e.target.classList.contains('export-csv-btn')) {
+            const hash = e.target.getAttribute('data-hash');
+            this.exportSingleAnalysis(hash, 'csv');
+          }
+        });
       }
 
       async loadAnalyses() {
@@ -245,7 +268,17 @@
 
           return `
             <div class="analysis-item">
-              <h3>${analysis.title}</h3>
+              <div class="analysis-header">
+                <h3>${analysis.title}</h3>
+                <div class="analysis-actions">
+                  <button class="btn btn-sm btn-secondary export-pdf-btn" data-hash="${analysis.hash}" title="PDF olaraq yüklə">
+                    📄 PDF Çıxarışı
+                  </button>
+                  <button class="btn btn-sm btn-secondary export-csv-btn" data-hash="${analysis.hash}" title="CSV olaraq yüklə">
+                    📊 CSV Çıxarışı
+                  </button>
+                </div>
+              </div>
               <p><strong>📰 Nəşriyyat:</strong> ${analysis.publication || 'Naməlum'}</p>
               <p><strong>🔗 Link:</strong> <a href="${analysis.url}" target="_blank" rel="noopener">${analysis.url}</a></p>
               <div class="analysis-meta">
@@ -342,6 +375,56 @@
         setTimeout(() => {
           successDiv.remove();
         }, 3000);
+      }
+
+      async exportSingleAnalysis(hash, format) {
+        try {
+          const url = `/api/export/${format}?hash=${encodeURIComponent(hash)}`;
+          const response = await fetch(url);
+          
+          if (response.ok) {
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `lnk-analiz-${hash.substring(0, 8)}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(downloadUrl);
+            this.showSuccess(`${format.toUpperCase()} çıxarışı tamamlandı`);
+          } else {
+            const errorData = await response.json();
+            this.showError(`Çıxarış xətası: ${errorData.error || 'Naməlum xəta'}`);
+          }
+        } catch (error) {
+          this.showError(`Çıxarış xətası: ${error.message}`);
+        }
+      }
+
+      async exportAllAnalyses(format) {
+        try {
+          const url = `/api/export/bulk?format=${format}&user=true`;
+          const response = await fetch(url);
+          
+          if (response.ok) {
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `lnk-analizlər-${new Date().toISOString().split('T')[0]}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(downloadUrl);
+            this.showSuccess(`Bütün analizlər ${format.toUpperCase()} formatında çıxarıldı`);
+          } else {
+            const errorData = await response.json();
+            this.showError(`Çıxarış xətası: ${errorData.error || 'Naməlum xəta'}`);
+          }
+        } catch (error) {
+          this.showError(`Çıxarış xətası: ${error.message}`);
+        }
       }
     }
 

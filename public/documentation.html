@@ -699,6 +699,7 @@
             <li><a href="#analysis-apis">Təhlil API-ləri</a></li>
             <li><a href="#data-apis">Məlumat və statistika API-ləri</a></li>
             <li><a href="#utility-apis">Köməkçi API-lər</a></li>
+            <li><a href="#export-apis">Export API-ləri</a></li>
             <li><a href="#response-formats">Cavab formatları</a></li>
             <li><a href="#error-handling">Səhv idarəetməsi</a></li>
             <li><a href="#examples">Kod nümunələri</a></li>
@@ -1249,6 +1250,175 @@
           </div>
         </section>
 
+        <section id="export-apis">
+          <h2>Export API-ləri</h2>
+          
+          <div class="api-endpoint">
+            <div class="endpoint-header">
+              <span class="method get">GET</span>
+              <span class="endpoint-url">/api/export/pdf?id={analysis_id}</span>
+            </div>
+            <div class="endpoint-description">
+              Təhlil hesabatını PDF formatında yükləyin. Professional formatda tərtib edilmiş hesabat.
+            </div>
+            
+            <div class="parameters">
+              <h4>Sorğu parametrləri</h4>
+              <div class="table-wrapper">
+                <table class="param-table">
+                  <thead>
+                    <tr>
+                      <th>Parametr</th>
+                      <th>Növ</th>
+                      <th>Tələb olunur</th>
+                      <th>Təsvir</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="param-name">id</span></td>
+                      <td>string</td>
+                      <td><span class="param-required">Yes</span></td>
+                      <td>Təhlilin unikal ID-si</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="example">
+              <h4>Nümunə sorğu</h4>
+              <div class="code-block-container">
+                <div class="code-block">curl -X GET "https://lnk.az/api/export/pdf?id=abc123def456" \
+  -H "X-API-Key: your-api-key-here" \
+  -o analysis-report.pdf</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="api-endpoint">
+            <div class="endpoint-header">
+              <span class="method get">GET</span>
+              <span class="endpoint-url">/api/export/csv?id={analysis_id}</span>
+            </div>
+            <div class="endpoint-description">
+              Təhlil məlumatlarını CSV formatında yükləyin. Spreadsheet təhlili üçün uyğundur.
+            </div>
+            
+            <div class="example">
+              <h4>Nümunə sorğu</h4>
+              <div class="code-block-container">
+                <div class="code-block">curl -X GET "https://lnk.az/api/export/csv?id=abc123def456" \
+  -H "X-API-Key: your-api-key-here" \
+  -o analysis-data.csv</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="api-endpoint">
+            <div class="endpoint-header">
+              <span class="method get">GET</span>
+              <span class="endpoint-url">/api/export/html?id={analysis_id}</span>
+            </div>
+            <div class="endpoint-description">
+              Təhlil hesabatını HTML formatında yükləyin. Web paylaşımı üçün uyğundur.
+            </div>
+            
+            <div class="example">
+              <h4>Nümunə sorğu</h4>
+              <div class="code-block-container">
+                <div class="code-block">curl -X GET "https://lnk.az/api/export/html?id=abc123def456" \
+  -H "X-API-Key: your-api-key-here" \
+  -o analysis-report.html</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="api-endpoint">
+            <div class="endpoint-header">
+              <span class="method get">GET</span>
+              <span class="endpoint-url">/api/export/bulk?format={format}&user_id={user_id}</span>
+            </div>
+            <div class="endpoint-description">
+              İstifadəçinin bütün təhlillərini toplu olaraq export edin. CSV və ya HTML formatında.
+            </div>
+            
+            <div class="parameters">
+              <h4>Sorğu parametrləri</h4>
+              <div class="table-wrapper">
+                <table class="param-table">
+                  <thead>
+                    <tr>
+                      <th>Parametr</th>
+                      <th>Növ</th>
+                      <th>Tələb olunur</th>
+                      <th>Təsvir</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="param-name">format</span></td>
+                      <td>string</td>
+                      <td><span class="param-required">Yes</span></td>
+                      <td>Export formatı: "csv" və ya "html"</td>
+                    </tr>
+                    <tr>
+                      <td><span class="param-name">user_id</span></td>
+                      <td>string</td>
+                      <td><span class="param-required">Yes</span></td>
+                      <td>İstifadəçinin unikal ID-si</td>
+                    </tr>
+                    <tr>
+                      <td><span class="param-name">limit</span></td>
+                      <td>number</td>
+                      <td><span class="param-optional">No</span></td>
+                      <td>Export ediləcək maksimum təhlil sayı (default: 100)</td>
+                    </tr>
+                    <tr>
+                      <td><span class="param-name">offset</span></td>
+                      <td>number</td>
+                      <td><span class="param-optional">No</span></td>
+                      <td>Başlanğıc pozisiyası (pagination üçün)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div class="example">
+              <h4>Nümunə sorğu</h4>
+              <div class="code-block-container">
+                <div class="code-block"># Bütün təhlilləri CSV formatında export et
+curl -X GET "https://lnk.az/api/export/bulk?format=csv&user_id=user123" \
+  -H "X-API-Key: your-api-key-here" \
+  -o all-analyses.csv
+
+# Bütün təhlilləri HTML formatında export et
+curl -X GET "https://lnk.az/api/export/bulk?format=html&user_id=user123" \
+  -H "X-API-Key: your-api-key-here" \
+  -o all-analyses.html</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="info">
+            <strong>Export formatları:</strong>
+            <ul>
+              <li><strong>PDF:</strong> Professional hesabat formatı, çap üçün uyğundur</li>
+              <li><strong>CSV:</strong> Spreadsheet təhlili üçün məlumat formatı</li>
+              <li><strong>HTML:</strong> Web paylaşımı üçün formatlanmış səhifə</li>
+            </ul>
+          </div>
+
+          <div class="warning">
+            <strong>Qeyd:</strong> Export API-ləri təkmilləşdirici hesabı və API açarı tələb edir. Bütün export əməliyyatları istifadəçi autentifikasiyası ilə məhdudlaşdırılıb.
+          </div>
+        </section>
+
         <section id="response-formats">
           <h2>Cavab formatları</h2>
           <div class="api-endpoint">
@@ -1423,7 +1593,40 @@ recent = requests.get('https://lnk.az/api/recent-analyses',
 analyses = recent.json()
 for analysis in analyses:
     print(f"Başlıq: {analysis['title']}")
-    print(f"Nəşr: {analysis['publication']}")</div>
+    print(f"Nəşr: {analysis['publication']}")
+
+# Təhlili PDF formatında export et
+def export_analysis(analysis_id, format_type):
+    response = requests.get(f'https://lnk.az/api/export/{format_type}',
+                          params={'id': analysis_id},
+                          headers={'X-API-Key': API_KEY})
+    
+    if response.status_code == 200:
+        with open(f'analysis-{analysis_id}.{format_type}', 'wb') as f:
+            f.write(response.content)
+        print(f"Export tamamlandı: analysis-{analysis_id}.{format_type}")
+    else:
+        print(f"Export səhvi: {response.status_code}")
+
+# Export nümunələri
+export_analysis('abc123def456', 'pdf')
+export_analysis('abc123def456', 'csv')
+export_analysis('abc123def456', 'html')
+
+# Bulk export
+def export_all_analyses(user_id, format_type):
+    response = requests.get('https://lnk.az/api/export/bulk',
+                          params={'format': format_type, 'user_id': user_id},
+                          headers={'X-API-Key': API_KEY})
+    
+    if response.status_code == 200:
+        with open(f'all-analyses.{format_type}', 'wb') as f:
+            f.write(response.content)
+        print(f"Bulk export tamamlandı: all-analyses.{format_type}")
+    else:
+        print(f"Bulk export səhvi: {response.status_code}")
+
+export_all_analyses('user123', 'csv')</div>
               <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
             </div>
           </div>
@@ -1447,7 +1650,70 @@ curl "https://lnk.az/api/get-analysis?id=abc123def456&api_key=$LNK_API_KEY"
 curl "https://lnk.az/api/statistics?api_key=$LNK_API_KEY"
 
 # Sayt üzrə ortalamaları əldə et
-curl "https://lnk.az/api/site-averages?host=oxu.az&api_key=$LNK_API_KEY"</div>
+curl "https://lnk.az/api/site-averages?host=oxu.az&api_key=$LNK_API_KEY"
+
+# Təhlili PDF formatında export et
+curl -X GET "https://lnk.az/api/export/pdf?id=abc123def456" \
+  -H "X-API-Key: $LNK_API_KEY" \
+  -o analysis-report.pdf
+
+# Bütün təhlilləri CSV formatında export et
+curl -X GET "https://lnk.az/api/export/bulk?format=csv&user_id=user123" \
+  -H "X-API-Key: $LNK_API_KEY" \
+  -o all-analyses.csv</div>
+              <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+            </div>
+          </div>
+
+          <div class="api-endpoint">
+            <h3>Export nümunələri</h3>
+            <div class="code-block-container">
+              <div class="code-block">// JavaScript ilə export funksiyaları
+async function exportAnalysis(analysisId, format) {
+  const response = await fetch(`/api/export/${format}?id=${analysisId}`, {
+    headers: {
+      'X-API-Key': API_KEY
+    }
+  });
+  
+  if (!response.ok) {
+    throw new Error(`Export səhvi: ${response.status}`);
+  }
+  
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `analysis-${analysisId}.${format}`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+// PDF export
+await exportAnalysis('abc123def456', 'pdf');
+
+// CSV export
+await exportAnalysis('abc123def456', 'csv');
+
+// HTML export
+await exportAnalysis('abc123def456', 'html');
+
+// Bulk export
+async function exportAllAnalyses(userId, format) {
+  const response = await fetch(`/api/export/bulk?format=${format}&user_id=${userId}`, {
+    headers: {
+      'X-API-Key': API_KEY
+    }
+  });
+  
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `all-analyses.${format}`;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}</div>
               <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
             </div>
           </div>

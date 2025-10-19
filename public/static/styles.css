@@ -2749,3 +2749,116 @@ button.action-btn {
     padding: 5px 8px;
   }
 }
+
+/* =================== Çıxarış Düymələri =================== */
+.export-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.export-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 0, 0, 0.2);
+}
+
+.export-btn:active {
+  transform: translateY(0);
+}
+
+.export-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.export-btn.pdf {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+
+.export-btn.pdf:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.export-btn.csv {
+  background: #059669;
+  color: white;
+  border-color: #059669;
+}
+
+.export-btn.csv:hover {
+  background: #047857;
+  border-color: #047857;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+}
+
+.export-btn.html {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.export-btn.html:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Çıxarış düymələri üçün mobil uyğunluq */
+@media (max-width: 768px) {
+  .export-buttons {
+    gap: 6px;
+    margin-top: 10px;
+  }
+  
+  .export-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .export-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* Başlıqda toplu çıxarış düymələri */
+.analyses-header .export-buttons {
+  margin-top: 0;
+  gap: 8px;
+}
+
+.analyses-header .export-btn {
+  padding: 8px 14px;
+  font-size: 14px;
+}
+
+.analyses-header .export-btn svg {
+  width: 16px;
+  height: 16px;
+}
