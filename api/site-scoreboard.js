@@ -10,19 +10,19 @@ function normalizeHost(host) {
 
 async function calculateSiteAverages() {
   try {
-    // Get all analysis keys
-    const analysisKeys = await kv.keys('analysis:*');
+    // Get all analysis hashes from the recent_hashes list
+    const hashes = await kv.lrange('recent_hashes', 0, 499);
     
-    if (!analysisKeys || analysisKeys.length === 0) {
+    if (!hashes || hashes.length === 0) {
       return [];
     }
 
     // Group analyses by host
     const siteData = new Map();
     
-    for (const key of analysisKeys) {
+    for (const hash of hashes) {
       try {
-        const analysis = await kv.get(key);
+        const analysis = await kv.get(hash);
         if (!analysis || analysis.is_advertisement) continue;
 
         const originalUrl = analysis?.meta?.original_url || '';
@@ -54,13 +54,13 @@ async function calculateSiteAverages() {
         site.sum_rel += rel;
         site.sum_bias += bias;
         site.analyses.push({
-          hash: key.replace('analysis:', ''),
+          hash: hash,
           reliability: rel,
           bias: bias,
           analyzed_at: analysis.analyzed_at
         });
       } catch (e) {
-        console.error(`Error processing analysis ${key}:`, e);
+        console.error(`Error processing analysis ${hash}:`, e);
       }
     }
 
