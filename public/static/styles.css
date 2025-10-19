@@ -3099,7 +3099,7 @@ button.action-btn {
 .site-scores {
   display: flex;
   gap: 1rem;
-  min-width: 200px;
+  min-width: 220px;
   flex-shrink: 0;
 }
 
@@ -3107,7 +3107,7 @@ button.action-btn {
   text-align: center;
   padding: 0.75rem;
   border-radius: 8px;
-  width: 90px;
+  width: 100px;
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -3271,7 +3271,7 @@ button.action-btn {
   }
   
   .score-item {
-    width: 80px;
+    width: 90px;
     padding: 0.5rem;
   }
 }
@@ -3297,6 +3297,6 @@ button.action-btn {
   
   .score-item {
     width: 100%;
-    max-width: 120px;
+    max-width: 140px;
   }
 }
