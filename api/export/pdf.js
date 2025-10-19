@@ -4,8 +4,7 @@ export const config = { runtime: 'nodejs', maxDuration: 30 };
 import { kv } from '@vercel/kv';
 import { getSessionFromRequest } from '../../lib/auth.js';
 import { withAuth } from '../../lib/middleware.js';
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
+import PdfPrinter from 'pdfmake';
 
 async function generatePDF(analysis) {
   // Simple HTML to PDF conversion using browser-like rendering
@@ -352,101 +351,260 @@ async function generatePDF(analysis) {
   return html;
 }
 
+function generatePDFDocument(analysis) {
+  // Use built-in fonts for serverless compatibility
+  const fonts = {
+    Helvetica: {
+      normal: 'Helvetica',
+      bold: 'Helvetica-Bold',
+      italics: 'Helvetica-Oblique',
+      bolditalics: 'Helvetica-BoldOblique'
+    }
+  };
+  
+  const printer = new PdfPrinter(fonts);
+
+  // Create document definition
+  const docDefinition = {
+    pageSize: 'A4',
+    pageMargins: [40, 60, 40, 60],
+    defaultStyle: {
+      font: 'Helvetica'
+    },
+    content: [
+      // Header
+      {
+        text: 'LNK.az Analiz Hesabatı',
+        style: 'header',
+        alignment: 'center',
+        margin: [0, 0, 0, 20]
+      },
+      
+      // Analysis Title
+      {
+        text: analysis.title || 'Başlıq yoxdur',
+        style: 'title',
+        margin: [0, 0, 0, 20]
+      },
+      
+      // Basic Information Table
+      {
+        table: {
+          widths: ['30%', '70%'],
+          body: [
+            [
+              { text: 'Nəşriyyat:', style: 'label' },
+              { text: analysis.publication || 'Naməlum', style: 'value' }
+            ],
+            [
+              { text: 'URL:', style: 'label' },
+              { text: analysis.url || 'Naməlum', style: 'value' }
+            ],
+            [
+              { text: 'Nəşr Tarixi:', style: 'label' },
+              { text: analysis.published_date || 'Naməlum', style: 'value' }
+            ],
+            [
+              { text: 'Təhlil Tarixi:', style: 'label' },
+              { text: new Date(analysis.analyzed_at).toLocaleString('az-AZ'), style: 'value' }
+            ],
+            [
+              { text: 'Model:', style: 'label' },
+              { text: analysis.model || 'auto', style: 'value' }
+            ],
+            [
+              { text: 'Məzmun Mənbəyi:', style: 'label' },
+              { text: analysis.content_source || 'web', style: 'value' }
+            ]
+          ]
+        },
+        layout: 'noBorders',
+        margin: [0, 0, 0, 20]
+      },
+      
+      // Scores Section
+      {
+        text: 'Təhlil Nəticələri',
+        style: 'sectionHeader',
+        margin: [0, 20, 0, 10]
+      },
+      
+      {
+        table: {
+          widths: ['50%', '50%'],
+          body: [
+            [
+              { text: 'Etibarlılıq', style: 'label' },
+              { 
+                text: `${analysis.reliability || 0}/100`, 
+                style: analysis.reliability >= 70 ? 'scoreHigh' : analysis.reliability >= 40 ? 'scoreMedium' : 'scoreLow'
+              }
+            ],
+            [
+              { text: 'Siyasi Meyl', style: 'label' },
+              { 
+                text: analysis.political_bias || 0, 
+                style: analysis.political_bias > 1 ? 'biasPositive' : analysis.political_bias < -1 ? 'biasNegative' : 'biasNeutral'
+              }
+            ],
+            [
+              { text: 'Reklam Məzmunu', style: 'label' },
+              { text: analysis.is_advertisement ? 'Bəli' : 'Xeyr', style: 'value' }
+            ]
+          ]
+        },
+        layout: 'noBorders',
+        margin: [0, 0, 0, 20]
+      },
+      
+      // Summary Section
+      ...(analysis.summary ? [{
+        text: 'Xülasə',
+        style: 'sectionHeader',
+        margin: [0, 20, 0, 10]
+      }, {
+        text: analysis.summary,
+        style: 'summary',
+        margin: [0, 0, 0, 20]
+      }] : []),
+      
+      // Additional Information
+      ...(analysis.socio_cultural_groups && analysis.socio_cultural_groups.length > 0 ? [{
+        text: 'Sosial-Mədəni Qruplar',
+        style: 'sectionHeader',
+        margin: [0, 20, 0, 10]
+      }, {
+        text: analysis.socio_cultural_groups.join(', '),
+        style: 'value',
+        margin: [0, 0, 0, 20]
+      }] : []),
+      
+      ...(analysis.language_issues && analysis.language_issues.length > 0 ? [{
+        text: 'Dil Problemləri',
+        style: 'sectionHeader',
+        margin: [0, 20, 0, 10]
+      }, {
+        text: analysis.language_issues.join(', '),
+        style: 'value',
+        margin: [0, 0, 0, 20]
+      }] : []),
+      
+      // Sources Section
+      ...(analysis.sources && analysis.sources.length > 0 ? [{
+        text: 'İstinad Mənbələri',
+        style: 'sectionHeader',
+        margin: [0, 20, 0, 10]
+      }, {
+        ul: analysis.sources.map(source => ({ text: source, style: 'value' })),
+        margin: [0, 0, 0, 20]
+      }] : []),
+      
+      // Footer
+      {
+        text: 'Bu hesabat LNK.az tərəfindən avtomatik olaraq yaradılıb.',
+        style: 'footer',
+        alignment: 'center',
+        margin: [0, 40, 0, 0]
+      }
+    ],
+    
+    styles: {
+      header: {
+        fontSize: 24,
+        bold: true,
+        color: '#dc2626'
+      },
+      title: {
+        fontSize: 18,
+        bold: true,
+        color: '#1f2937'
+      },
+      sectionHeader: {
+        fontSize: 14,
+        bold: true,
+        color: '#374151'
+      },
+      label: {
+        fontSize: 12,
+        bold: true,
+        color: '#6b7280'
+      },
+      value: {
+        fontSize: 12,
+        color: '#1f2937'
+      },
+      summary: {
+        fontSize: 12,
+        color: '#1f2937',
+        lineHeight: 1.5
+      },
+      scoreHigh: {
+        fontSize: 12,
+        color: '#059669',
+        bold: true
+      },
+      scoreMedium: {
+        fontSize: 12,
+        color: '#d97706',
+        bold: true
+      },
+      scoreLow: {
+        fontSize: 12,
+        color: '#dc2626',
+        bold: true
+      },
+      biasPositive: {
+        fontSize: 12,
+        color: '#dc2626',
+        bold: true
+      },
+      biasNegative: {
+        fontSize: 12,
+        color: '#2563eb',
+        bold: true
+      },
+      biasNeutral: {
+        fontSize: 12,
+        color: '#6b7280',
+        bold: true
+      },
+      footer: {
+        fontSize: 10,
+        color: '#6b7280',
+        italics: true
+      }
+    }
+  };
+
+  return printer.createPdfKitDocument(docDefinition);
+}
+
 async function generatePDFBuffer(analysis) {
   try {
-    // For now, return HTML as a fallback since Puppeteer might not work in Vercel
-    // In production, you might want to use a service like PDFShift or similar
-    const html = await generatePDF(analysis);
+    const doc = generatePDFDocument(analysis);
     
-    // Convert HTML to a simple text-based PDF format
-    // This is a basic implementation - for production use a proper PDF library
-    const pdfContent = `%PDF-1.4
-1 0 obj
-<<
-/Type /Catalog
-/Pages 2 0 R
->>
-endobj
-
-2 0 obj
-<<
-/Type /Pages
-/Kids [3 0 R]
-/Count 1
->>
-endobj
-
-3 0 obj
-<<
-/Type /Page
-/Parent 2 0 R
-/MediaBox [0 0 612 792]
-/Contents 4 0 R
-/Resources <<
-/Font <<
-/F1 5 0 R
->>
->>
->>
-endobj
-
-4 0 obj
-<<
-/Length 500
->>
-stream
-BT
-/F1 12 Tf
-50 750 Td
-(LNK.az Analiz Hesabati) Tj
-0 -20 Td
-(${analysis.title || 'Basliq yoxdur'}) Tj
-0 -20 Td
-(Nesriyyat: ${analysis.publication || 'Naməlum'}) Tj
-0 -20 Td
-(Etibarliliq: ${analysis.reliability || 0}/100) Tj
-0 -20 Td
-(Siyasi Meyl: ${analysis.political_bias || 0}) Tj
-0 -20 Td
-(Reklam Mezmunu: ${analysis.is_advertisement ? 'Bəli' : 'Xeyr'}) Tj
-0 -20 Td
-(Xulase: ${analysis.summary || 'Mövcud deyil'}) Tj
-ET
-endstream
-endobj
-
-5 0 obj
-<<
-/Type /Font
-/Subtype /Type1
-/BaseFont /Helvetica
->>
-endobj
-
-xref
-0 6
-0000000000 65535 f 
-0000000009 00000 n 
-0000000058 00000 n 
-0000000115 00000 n 
-0000000274 00000 n 
-0000000835 00000 n 
-trailer
-<<
-/Size 6
-/Root 1 0 R
->>
-startxref
-920
-%%EOF`;
-
-    return Buffer.from(pdfContent, 'utf8');
+    return new Promise((resolve, reject) => {
+      const chunks = [];
+      
+      doc.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+      
+      doc.on('end', () => {
+        const pdfBuffer = Buffer.concat(chunks);
+        resolve(pdfBuffer);
+      });
+      
+      doc.on('error', (error) => {
+        reject(error);
+      });
+      
+      doc.end();
+    });
     
   } catch (error) {
     console.error('PDF generation error:', error);
-    // Fallback to HTML if PDF generation fails
-    const html = await generatePDF(analysis);
-    return Buffer.from(html, 'utf8');
+    throw error;
   }
 }
 
@@ -469,15 +627,15 @@ async function pdfHandler(req, res) {
       return res.status(404).json({ error: 'Analiz tapılmadı' });
     }
 
-    // Generate HTML content (for now, return HTML instead of PDF due to Vercel limitations)
-    const html = await generatePDF(analysis);
+    // Generate PDF buffer using pdfmake
+    const pdfBuffer = await generatePDFBuffer(analysis);
     
-    // Set headers for HTML download (temporarily until proper PDF solution)
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="lnk-analiz-${hash.substring(0, 8)}.html"`);
+    // Set headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="lnk-analiz-${hash.substring(0, 8)}.pdf"`);
     res.setHeader('Cache-Control', 'no-cache');
     
-    return res.status(200).send(html);
+    return res.status(200).send(pdfBuffer);
     
   } catch (error) {
     console.error('PDF export error:', error);
