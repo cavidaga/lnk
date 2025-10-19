@@ -69,14 +69,10 @@
               <span class="stat-label">Göstərilən analiz sayı:</span>
               <span id="shown-analyses" class="stat-value">-</span>
             </div>
-            <div class="stat-item">
-              <span class="stat-label">Qeyd:</span>
-              <span class="stat-value" style="font-size: 0.9rem; color: #666;">Analizlər indi həmişəlik saxlanılır. Köhnə analizləri yeniləmək üçün "Yenilə" düyməsini basın.</span>
-            </div>
-            <div class="stat-item" id="missing-analyses" style="display: none;">
-              <span class="stat-label">Silinmiş analizlər:</span>
-              <span id="missing-count" class="stat-value" style="color: #dc3545;">-</span>
-            </div>
+          <div class="stat-item">
+            <span class="stat-label">Qeyd:</span>
+            <span class="stat-value" style="font-size: 0.9rem; color: #666;">19 oktyabr 2025-ci ilə qədər LNK sistemi analizləri müəyyən müddətdən sonra avtomatik silirdi, lakin reytinqi tarixi olaraq saxladıq. Bundan sonra analizləri həmişəlik saxlayacağıq və istifadəçilər 1 aydan sonra onları yeniləyə biləcəklər.</span>
+          </div>
           </div>
           
           <div id="analyses-list" class="analyses-list">
@@ -179,13 +175,7 @@
       updateStats(data) {
         document.getElementById('shown-analyses').textContent = this.analyses.length.toLocaleString('az-AZ');
         
-        // Show missing analyses count if any
-        if (data.missing_count && data.missing_count > 0) {
-          document.getElementById('missing-count').textContent = data.missing_count.toLocaleString('az-AZ');
-          document.getElementById('missing-analyses').style.display = 'block';
-        } else {
-          document.getElementById('missing-analyses').style.display = 'none';
-        }
+        // Missing analyses count removed - not accurate per domain
       }
 
       renderAnalyses() {

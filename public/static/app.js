@@ -120,8 +120,8 @@
         // Refresh recent analyses and statistics before redirecting
         try {
           await Promise.all([
-            loadRecentAnalyses(),
-            loadStatistics()
+            loadRecentAnalyses()
+            // loadStatistics() - removed since statistics display was removed from homepage
           ]);
         } catch (refreshErr) {
           console.warn('Failed to refresh data:', refreshErr);
@@ -148,9 +148,9 @@
     });
 
 
-    // Load recent analyses and statistics
+    // Load recent analyses
     loadRecentAnalyses();
-    loadStatistics();
+    // loadStatistics() - removed since statistics display was removed from homepage
   }
 
   // ---------- RECENT ANALYSES ----------
@@ -202,22 +202,23 @@
       const stats = await res.json();
       console.log('Statistics data:', stats);
       
-      const totalElement = $('#total-analyses');
-      const recentElement = $('#recent-analyses-count');
+      // Statistics elements removed from homepage - no longer needed
+      // const totalElement = $('#total-analyses');
+      // const recentElement = $('#recent-analyses-count');
       
-      if (totalElement && stats.total_analyses !== undefined) {
-        // Format the number with thousands separator
-        const formattedTotal = stats.total_analyses.toLocaleString('az-AZ');
-        totalElement.textContent = formattedTotal;
-        console.log('Updated total analyses display:', formattedTotal);
-      }
+      // if (totalElement && stats.total_analyses !== undefined) {
+      //   // Format the number with thousands separator
+      //   const formattedTotal = stats.total_analyses.toLocaleString('az-AZ');
+      //   totalElement.textContent = formattedTotal;
+      //   console.log('Updated total analyses display:', formattedTotal);
+      // }
       
-      if (recentElement && stats.recent_analyses !== undefined) {
-        // Format the number with thousands separator
-        const formattedRecent = stats.recent_analyses.toLocaleString('az-AZ');
-        recentElement.textContent = formattedRecent;
-        console.log('Updated recent analyses display:', formattedRecent);
-      }
+      // if (recentElement && stats.recent_analyses !== undefined) {
+      //   // Format the number with thousands separator
+      //   const formattedRecent = stats.recent_analyses.toLocaleString('az-AZ');
+      //   recentElement.textContent = formattedRecent;
+      //   console.log('Updated recent analyses display:', formattedRecent);
+      // }
     } catch (e) {
       console.error('Failed to load statistics:', e);
     }
@@ -334,10 +335,10 @@ function isAnalysisOld(analyzedAt) {
   if (!analyzedAt) return false;
   
   const analysisDate = new Date(analyzedAt);
-  const threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
   
-  return analysisDate < threeMonthsAgo;
+  return analysisDate < oneMonthAgo;
 }
 
   // ---------- RENDERERS ----------
@@ -399,7 +400,7 @@ async function renderAnalysis(root, data, hash) {
           <div>
             <h3 style="margin:0 0 4px; color: #ffc107;">🔄 Köhnə Analiz</h3>
             <p style="margin:0; font-size: 0.9rem; color: var(--text-muted);">
-              Bu analiz 3 aydan köhnədir. Məqalə yenilənə bilər və ya dəyişə bilər.
+              Bu analiz 1 aydan köhnədir. Məqalə yenilənə bilər və ya dəyişə bilər.
             </p>
           </div>
           <button id="refresh-analysis-btn" class="btn btn-outline" style="background: transparent; border: 1px solid #007bff; color: #007bff; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; transition: all 0.2s ease;">

@@ -1146,6 +1146,63 @@
               </div>
             </div>
           </div>
+
+          <div class="api-endpoint">
+            <div class="endpoint-header">
+              <span class="method post">POST</span>
+              <span class="endpoint-url">/api/delete-analysis</span>
+            </div>
+            <div class="endpoint-description">
+              Köhnə analizi silərək yenidən təhlil etməyə imkan verir. 1 aydan köhnə analizlər üçün istifadə olunur.
+            </div>
+            
+            <div class="parameters">
+              <h4>Sorğunun gövdəsi</h4>
+              <div class="table-wrapper">
+                <div class="table-wrapper">
+              <table class="param-table">
+                <thead>
+                  <tr>
+                    <th>Parametr</th>
+                    <th>Növ</th>
+                    <th>Tələb olunur</th>
+                    <th>Təsvir</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="param-name">hash</span></td>
+                    <td>string</td>
+                    <td><span class="param-optional">No</span></td>
+                    <td>Təhlilin hash/ID dəyəri</td>
+                  </tr>
+                  <tr>
+                    <td><span class="param-name">url</span></td>
+                    <td>string</td>
+                    <td><span class="param-optional">No</span></td>
+                    <td>Məqalənin URL-i (hash tapmaq üçün)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+              </div>
+            </div>
+            
+            <div class="example">
+              <h4>Nümunə sorğu</h4>
+              <div class="code-block-container">
+                <div class="code-block">curl -X POST https://lnk.az/api/delete-analysis \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key-here" \
+  -d '{"hash": "abc123def456"}'</div>
+                <button class="copy-button" onclick="copyCode(this)">Kopyala</button>
+              </div>
+            </div>
+            
+            <div class="info">
+              <strong>Qeyd:</strong> 19 oktyabr 2025-ci ilə qədər LNK sistemi analizləri avtomatik silirdi. Bundan sonra analizlər həmişəlik saxlanılır və istifadəçilər 1 aydan köhnə analizləri yeniləyə bilərlər.
+            </div>
+          </div>
         </section>
 
         <section id="data-apis">
