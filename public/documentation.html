@@ -1253,9 +1253,6 @@
         <section id="export-apis">
           <h2>Export API-ləri</h2>
           
-          <div class="info">
-            <strong>PDF Export:</strong> PDF export funksionallığı çıxarılıb. Bunun əvəzinə "Çap Et" düyməsi istifadə olunur. Modern brauzerlər HTML səhifələrini PDF formatında çap edə bilər.
-          </div>
 
           <div class="api-endpoint">
             <div class="endpoint-header">
@@ -1368,7 +1365,6 @@ curl -X GET "https://lnk.az/api/export/bulk?format=html&user_id=user123" \
           <div class="info">
             <strong>Export formatları:</strong>
             <ul>
-              <li><strong>PDF:</strong> Professional hesabat formatı, çap üçün uyğundur</li>
               <li><strong>CSV:</strong> Spreadsheet təhlili üçün məlumat formatı</li>
               <li><strong>HTML:</strong> Web paylaşımı üçün formatlanmış səhifə</li>
             </ul>
@@ -1645,9 +1641,6 @@ async function exportAnalysis(analysisId, format) {
   a.click();
   window.URL.revokeObjectURL(url);
 }
-
-// PDF export
-await exportAnalysis('abc123def456', 'pdf');
 
 // CSV export
 await exportAnalysis('abc123def456', 'csv');

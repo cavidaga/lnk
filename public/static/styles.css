@@ -2791,6 +2791,10 @@ button.action-btn {
   justify-content: flex-end;
 }
 
+.analysis-actions a {
+  text-decoration: none;
+}
+
 .export-buttons {
   display: flex;
   gap: 6px;
