@@ -17,18 +17,10 @@ async function handler(req, res) {
     // Normalize domain (remove www, convert to lowercase)
     const normalizedDomain = domain.toLowerCase().replace(/^www\./, '');
     
-    // Get all analysis hashes from the database
-    // We need to scan all analyses, not just recent ones
-    const allKeys = await kv.keys('*');
-    const hashes = allKeys.filter(key => 
-      key.length === 64 && // Analysis hashes are 64 characters
-      !key.startsWith('user:') &&
-      !key.startsWith('site_stats:') &&
-      !key.startsWith('site_urls:') &&
-      !key.startsWith('total_') &&
-      !key.startsWith('processed_') &&
-      key !== 'recent_hashes'
-    );
+    // Get all recent hashes - this is our primary source
+    // Note: This will only show recent analyses, not all analyses for the domain
+    // The scoreboard shows all analyses because it uses pre-calculated site statistics
+    const hashes = await kv.lrange('recent_hashes', 0, 9999);
     
     if (!hashes || hashes.length === 0) {
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -91,6 +83,7 @@ async function handler(req, res) {
       limit: limit,
       offset: offset,
       hasMore: (offset + limit) < domainAnalyses.length,
+      note: "This shows recent analyses only. The scoreboard shows all analyses for this domain.",
       timestamp: new Date().toISOString()
     });
 

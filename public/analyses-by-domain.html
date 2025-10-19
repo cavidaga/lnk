@@ -66,12 +66,12 @@
         <div id="analyses-content" class="analyses-content hidden">
           <div class="analyses-stats">
             <div class="stat-item">
-              <span class="stat-label">Ümumi analiz sayı:</span>
-              <span id="total-analyses" class="stat-value">-</span>
-            </div>
-            <div class="stat-item">
               <span class="stat-label">Göstərilən analiz sayı:</span>
               <span id="shown-analyses" class="stat-value">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Qeyd:</span>
+              <span class="stat-value" style="font-size: 0.9rem; color: #666;">Bu səhifə yalnız son analizləri göstərir. Bütün analizləri görmək üçün <a href="/scoreboard" style="color: #007bff;">reytinq səhifəsinə</a> baxın.</span>
             </div>
           </div>
           
@@ -173,7 +173,6 @@
       }
 
       updateStats(data) {
-        document.getElementById('total-analyses').textContent = data.total.toLocaleString('az-AZ');
         document.getElementById('shown-analyses').textContent = this.analyses.length.toLocaleString('az-AZ');
       }
 
