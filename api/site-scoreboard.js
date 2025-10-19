@@ -2,6 +2,96 @@ import { kv } from '@vercel/kv';
 
 export const config = { runtime: 'nodejs' };
 
+function normalizeHost(host) {
+  const h = String(host || '').toLowerCase().replace(/^www\./, '');
+  if (h === 'abzas.info' || h === 'abzas.net' || h === 'abzas.org') return 'abzas.org';
+  return h;
+}
+
+async function calculateSiteAverages() {
+  try {
+    // Get all analysis keys
+    const analysisKeys = await kv.keys('analysis:*');
+    
+    if (!analysisKeys || analysisKeys.length === 0) {
+      return [];
+    }
+
+    // Group analyses by host
+    const siteData = new Map();
+    
+    for (const key of analysisKeys) {
+      try {
+        const analysis = await kv.get(key);
+        if (!analysis || analysis.is_advertisement) continue;
+
+        const originalUrl = analysis?.meta?.original_url || '';
+        let host = '';
+        try { 
+          host = normalizeHost(new URL(originalUrl).hostname); 
+        } catch { 
+          continue; 
+        }
+        
+        if (!host) continue;
+
+        const rel = analysis?.scores?.reliability?.value;
+        const bias = analysis?.scores?.political_establishment_bias?.value;
+        if (typeof rel !== 'number' || typeof bias !== 'number') continue;
+
+        if (!siteData.has(host)) {
+          siteData.set(host, {
+            host,
+            count: 0,
+            sum_rel: 0,
+            sum_bias: 0,
+            analyses: []
+          });
+        }
+
+        const site = siteData.get(host);
+        site.count += 1;
+        site.sum_rel += rel;
+        site.sum_bias += bias;
+        site.analyses.push({
+          hash: key.replace('analysis:', ''),
+          reliability: rel,
+          bias: bias,
+          analyzed_at: analysis.analyzed_at
+        });
+      } catch (e) {
+        console.error(`Error processing analysis ${key}:`, e);
+      }
+    }
+
+    // Calculate averages and return results
+    const sites = [];
+    for (const [host, data] of siteData) {
+      const avg_rel = data.sum_rel / data.count;
+      const avg_bias = data.sum_bias / data.count;
+      
+      // Find the most recent analysis date
+      const mostRecent = data.analyses.reduce((latest, analysis) => {
+        return !latest || new Date(analysis.analyzed_at) > new Date(latest.analyzed_at) 
+          ? analysis : latest;
+      }, null);
+
+      sites.push({
+        host: data.host,
+        count: data.count,
+        avg_reliability: Number(avg_rel.toFixed(2)),
+        avg_bias: Number(avg_bias.toFixed(2)),
+        updated_at: mostRecent?.analyzed_at || new Date().toISOString()
+      });
+    }
+
+    return sites;
+  } catch (e) {
+    console.error('calculateSiteAverages error:', e);
+    return [];
+  }
+}
+
 async function handler(req, res) {
   try {
     const url = new URL(req.url, 'http://localhost');
@@ -9,10 +99,10 @@ async function handler(req, res) {
     const limit = parseInt(url.searchParams.get('limit') || '50');
     const minCount = parseInt(url.searchParams.get('min_count') || '1');
 
-    // Get all site stats keys
-    const siteStatsKeys = await kv.keys('site_stats:*');
+    // Calculate site averages dynamically from existing analyses
+    const sites = await calculateSiteAverages();
     
-    if (!siteStatsKeys || siteStatsKeys.length === 0) {
+    if (sites.length === 0) {
       return res.status(200).json({
         sites: [],
         total: 0,
@@ -22,27 +112,11 @@ async function handler(req, res) {
       });
     }
 
-    // Fetch all site statistics
-    const sites = [];
-    for (const key of siteStatsKeys) {
-      try {
-        const stats = await kv.get(key);
-        if (stats && stats.count >= minCount) {
-          sites.push({
-            host: stats.host,
-            count: stats.count || 0,
-            avg_reliability: Number(stats.avg_rel || 0),
-            avg_bias: Number(stats.avg_bias || 0),
-            updated_at: stats.updated_at
-          });
-        }
-      } catch (e) {
-        console.error(`Error fetching stats for key ${key}:`, e);
-      }
-    }
+    // Filter by minimum count
+    const filteredSites = sites.filter(site => site.count >= minCount);
 
     // Sort sites based on sortBy parameter
-    sites.sort((a, b) => {
+    filteredSites.sort((a, b) => {
       switch (sortBy) {
         case 'reliability':
           return b.avg_reliability - a.avg_reliability;
@@ -56,13 +130,13 @@ async function handler(req, res) {
     });
 
     // Apply limit
-    const limitedSites = sites.slice(0, limit);
+    const limitedSites = filteredSites.slice(0, limit);
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=60');
     return res.status(200).json({
       sites: limitedSites,
-      total: sites.length,
+      total: filteredSites.length,
       sort_by: sortBy,
       limit: limit,
       min_count: minCount,
