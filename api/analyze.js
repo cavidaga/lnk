@@ -96,6 +96,33 @@ function normalizeHost(host) {
 // Site averages are now calculated dynamically from existing analyses
 // No need to maintain separate site_stats keys
 
+// Helper function to handle refresh case when saving analyses
+async function handleRefreshCase(cacheKey, originalCacheKey, normalized, isRefreshRequest, authUser) {
+  if (isRefreshRequest) {
+    try {
+      const oldAnalysis = await kv.get(originalCacheKey);
+      if (oldAnalysis) {
+        // Clear the needs_refresh flag and add reference to new analysis
+        const updatedOldAnalysis = {
+          ...oldAnalysis,
+          needs_refresh: false,
+          refreshed_at: new Date().toISOString(),
+          refreshed_by: authUser?.id || 'anonymous',
+          new_analysis_hash: cacheKey
+        };
+        await kv.set(originalCacheKey, updatedOldAnalysis);
+        console.log(`Updated old analysis ${originalCacheKey} with refresh info`);
+        
+        // Add reference to old analysis in new analysis
+        normalized.previous_analysis_hash = originalCacheKey;
+        await kv.set(cacheKey, normalized);
+      }
+    } catch (e) {
+      console.error('Error handling refresh case:', e);
+    }
+  }
+}
+
 // Markdowner API integration
 async function tryMarkdowner(url) {
   try {
@@ -1066,12 +1093,34 @@ async function analyzeHandler(req, res) {
 
   // Add version to cache key to invalidate old blocked content results
   const cacheVersion = 'v4-advertisement-detection';
-  // Include modelType in cache key to avoid cross-model cache collisions
-  const cacheKey = crypto
+  
+  // Check if this is a refresh request - if so, create a new analysis instead of overwriting
+  let isRefreshRequest = false;
+  let originalCacheKey = crypto
     .createHash('md5')
     .update(`${url}|ver=${cacheVersion}|mt=${modelType}`)
     .digest('hex');
-  console.log(`Cache key for ${url}: ${cacheKey} (version: ${cacheVersion})`);
+  
+  // Check if there's an existing analysis that needs refresh
+  try {
+    const existingAnalysis = await kv.get(originalCacheKey);
+    if (existingAnalysis && existingAnalysis.needs_refresh) {
+      isRefreshRequest = true;
+      console.log(`Refresh request detected for URL: ${url}, preserving old analysis`);
+    }
+  } catch (e) {
+    // Continue with normal flow if check fails
+  }
+  
+  // Include modelType in cache key to avoid cross-model cache collisions
+  // For refresh requests, add timestamp to create new analysis
+  const cacheKey = isRefreshRequest ? 
+    crypto.createHash('md5')
+      .update(`${url}|ver=${cacheVersion}|mt=${modelType}|refresh=${Date.now()}`)
+      .digest('hex') :
+    originalCacheKey;
+    
+  console.log(`Cache key for ${url}: ${cacheKey} (version: ${cacheVersion}, refresh: ${isRefreshRequest})`);
 
   try {
     // KV cache
@@ -1278,6 +1327,10 @@ async function analyzeHandler(req, res) {
             normalized.contentSource = contentSource;
             await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
             console.log(`SAVED TO CACHE (blocked-safe) for URL: ${effectiveUrl} with hash: ${cacheKey}`);
+            
+            // Handle refresh case
+            await handleRefreshCase(cacheKey, originalCacheKey, normalized, isRefreshRequest, req.authUser);
+            
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             
             // Increment total analyses counter
@@ -1335,6 +1388,10 @@ async function analyzeHandler(req, res) {
               normalized.contentSource = contentSource;
               await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
               console.log(`SAVED TO CACHE (jam-news safe) for URL: ${effectiveUrl}`);
+              
+              // Handle refresh case
+              await handleRefreshCase(cacheKey, originalCacheKey, normalized, isRefreshRequest, req.authUser);
+              
               try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
               
               // Increment total analyses counter
@@ -1409,6 +1466,10 @@ async function analyzeHandler(req, res) {
             normalized.contentSource = contentSource;
             await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
             console.log(`SAVED TO CACHE (light) for URL: ${effectiveUrl}`);
+            
+            // Handle refresh case
+            await handleRefreshCase(cacheKey, originalCacheKey, normalized, isRefreshRequest, req.authUser);
+            
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             
             // Increment total analyses counter
@@ -1472,6 +1533,10 @@ async function analyzeHandler(req, res) {
             normalized.contentSource = contentSource;
             await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
             console.log(`SAVED TO CACHE (light-safe) for URL: ${effectiveUrl}`);
+            
+            // Handle refresh case
+            await handleRefreshCase(cacheKey, originalCacheKey, normalized, isRefreshRequest, req.authUser);
+            
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             
             // Increment total analyses counter
@@ -1514,6 +1579,9 @@ async function analyzeHandler(req, res) {
               
               await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
               console.log(`SAVED TO CACHE (markdowner) for URL: ${effectiveUrl}`);
+              
+              // Handle refresh case
+              await handleRefreshCase(cacheKey, originalCacheKey, normalized, isRefreshRequest, req.authUser);
               
               try {
                 await kv.lpush('recent_hashes', cacheKey);
@@ -1839,6 +1907,10 @@ async function analyzeHandler(req, res) {
             normalized.contentSource = contentSource;
             await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
             console.log(`SAVED TO CACHE (jam-news chromium-safe) for URL: ${effectiveUrl}`);
+            
+            // Handle refresh case
+            await handleRefreshCase(cacheKey, originalCacheKey, normalized, isRefreshRequest, req.authUser);
+            
             try { await kv.lpush('recent_hashes', cacheKey); await kv.ltrim('recent_hashes', 0, 499); } catch {}
             
             // Increment total analyses counter
@@ -2013,6 +2085,9 @@ async function analyzeHandler(req, res) {
 
           await kv.set(cacheKey, normalized); // No TTL - analyses persist until manually deleted
           console.log(`SAVED TO CACHE for URL: ${effectiveUrl}`);
+
+          // Handle refresh case - clear needs_refresh flag from old analysis and link them
+          await handleRefreshCase(cacheKey, originalCacheKey, normalized, isRefreshRequest, req.authUser);
 
           try {
             await kv.lpush('recent_hashes', cacheKey);

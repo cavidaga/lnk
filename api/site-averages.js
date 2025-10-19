@@ -17,11 +17,9 @@ async function calculateSiteAveragesForHost(targetHost) {
       return { host: targetHost, count: 0, avg_rel: 0, avg_bias: 0 };
     }
 
-    let count = 0;
-    let sumRel = 0;
-    let sumBias = 0;
-    let mostRecentDate = null;
-
+    // Deduplicate by URL - keep only most recent analysis per URL
+    const urlToAnalysis = new Map();
+    
     for (const hash of hashes) {
       try {
         const analysis = await kv.get(hash);
@@ -41,17 +39,42 @@ async function calculateSiteAveragesForHost(targetHost) {
         const bias = analysis?.scores?.political_establishment_bias?.value;
         if (typeof rel !== 'number' || typeof bias !== 'number') continue;
 
-        count += 1;
-        sumRel += rel;
-        sumBias += bias;
-
-        // Track most recent analysis date
-        const analysisDate = new Date(analysis.analyzed_at);
-        if (!mostRecentDate || analysisDate > mostRecentDate) {
-          mostRecentDate = analysisDate;
+        // Check if we already have a more recent analysis for this URL
+        const existingAnalysis = urlToAnalysis.get(originalUrl);
+        if (existingAnalysis) {
+          const existingDate = new Date(existingAnalysis.analyzed_at);
+          const currentDate = new Date(analysis.analyzed_at);
+          if (currentDate <= existingDate) {
+            continue; // Skip older analysis
+          }
         }
+
+        // Store this analysis as the most recent for this URL
+        urlToAnalysis.set(originalUrl, {
+          reliability: rel,
+          bias: bias,
+          analyzed_at: analysis.analyzed_at
+        });
       } catch (e) {
         console.error(`Error processing analysis ${hash}:`, e);
+      }
+    }
+
+    // Calculate averages from deduplicated analyses
+    let count = 0;
+    let sumRel = 0;
+    let sumBias = 0;
+    let mostRecentDate = null;
+
+    for (const [url, analysis] of urlToAnalysis) {
+      count += 1;
+      sumRel += analysis.reliability;
+      sumBias += analysis.bias;
+
+      // Track most recent analysis date
+      const analysisDate = new Date(analysis.analyzed_at);
+      if (!mostRecentDate || analysisDate > mostRecentDate) {
+        mostRecentDate = analysisDate;
       }
     }
 

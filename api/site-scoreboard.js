@@ -17,8 +17,9 @@ async function calculateSiteAverages() {
       return [];
     }
 
-    // Group analyses by host
+    // Group analyses by host, deduplicating by URL (keep most recent per URL)
     const siteData = new Map();
+    const urlToAnalysis = new Map(); // Track most recent analysis per URL
     
     for (const hash of hashes) {
       try {
@@ -39,29 +40,53 @@ async function calculateSiteAverages() {
         const bias = analysis?.scores?.political_establishment_bias?.value;
         if (typeof rel !== 'number' || typeof bias !== 'number') continue;
 
-        if (!siteData.has(host)) {
-          siteData.set(host, {
-            host,
-            count: 0,
-            sum_rel: 0,
-            sum_bias: 0,
-            analyses: []
-          });
+        // Check if we already have a more recent analysis for this URL
+        const existingAnalysis = urlToAnalysis.get(originalUrl);
+        if (existingAnalysis) {
+          const existingDate = new Date(existingAnalysis.analyzed_at);
+          const currentDate = new Date(analysis.analyzed_at);
+          if (currentDate <= existingDate) {
+            continue; // Skip older analysis
+          }
         }
 
-        const site = siteData.get(host);
-        site.count += 1;
-        site.sum_rel += rel;
-        site.sum_bias += bias;
-        site.analyses.push({
+        // Store this analysis as the most recent for this URL
+        urlToAnalysis.set(originalUrl, {
           hash: hash,
           reliability: rel,
           bias: bias,
-          analyzed_at: analysis.analyzed_at
+          analyzed_at: analysis.analyzed_at,
+          host: host
         });
       } catch (e) {
         console.error(`Error processing analysis ${hash}:`, e);
       }
+    }
+
+    // Now process only the most recent analysis per URL
+    for (const [url, analysis] of urlToAnalysis) {
+      const host = analysis.host;
+      
+      if (!siteData.has(host)) {
+        siteData.set(host, {
+          host,
+          count: 0,
+          sum_rel: 0,
+          sum_bias: 0,
+          analyses: []
+        });
+      }
+
+      const site = siteData.get(host);
+      site.count += 1;
+      site.sum_rel += analysis.reliability;
+      site.sum_bias += analysis.bias;
+      site.analyses.push({
+        hash: analysis.hash,
+        reliability: analysis.reliability,
+        bias: analysis.bias,
+        analyzed_at: analysis.analyzed_at
+      });
     }
 
     // Calculate averages and return results
