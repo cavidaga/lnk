@@ -71,7 +71,11 @@
             </div>
             <div class="stat-item">
               <span class="stat-label">Qeyd:</span>
-              <span class="stat-value" style="font-size: 0.9rem; color: #666;">Bu səhifə yalnız son analizləri göstərir. Bütün analizləri görmək üçün <a href="/scoreboard" style="color: #007bff;">reytinq səhifəsinə</a> baxın.</span>
+              <span class="stat-value" style="font-size: 0.9rem; color: #666;">Köhnə analizlər avtomatik silinir. Yenidən analiz etmək üçün "Yenilə" düyməsini basın.</span>
+            </div>
+            <div class="stat-item" id="missing-analyses" style="display: none;">
+              <span class="stat-label">Silinmiş analizlər:</span>
+              <span id="missing-count" class="stat-value" style="color: #dc3545;">-</span>
             </div>
           </div>
           
@@ -174,6 +178,14 @@
 
       updateStats(data) {
         document.getElementById('shown-analyses').textContent = this.analyses.length.toLocaleString('az-AZ');
+        
+        // Show missing analyses count if any
+        if (data.missing_count && data.missing_count > 0) {
+          document.getElementById('missing-count').textContent = data.missing_count.toLocaleString('az-AZ');
+          document.getElementById('missing-analyses').style.display = 'block';
+        } else {
+          document.getElementById('missing-analyses').style.display = 'none';
+        }
       }
 
       renderAnalyses() {
@@ -188,14 +200,16 @@
           const reliabilityClass = this.getReliabilityClass(analysis.reliability);
           const biasClass = this.getBiasClass(analysis.political_bias);
           const biasText = this.formatBias(analysis.political_bias);
+          const isOld = analysis.is_old || analysis.needs_refresh;
           
           return `
-            <div class="analysis-item">
+            <div class="analysis-item ${isOld ? 'analysis-old' : ''}">
               <div class="analysis-header">
                 <h3 class="analysis-title">
                   <a href="/analysis/${analysis.hash}" target="_blank" rel="noopener">
                     ${this.escapeHtml(analysis.title)}
                   </a>
+                  ${isOld ? '<span class="old-badge">Köhnə</span>' : ''}
                 </h3>
                 <div class="analysis-scores">
                   <div class="score-item ${reliabilityClass}">
@@ -213,6 +227,11 @@
                   <a href="${analysis.url}" target="_blank" rel="noopener">${this.escapeHtml(analysis.url)}</a>
                 </span>
                 <span class="analysis-date">${this.formatDate(analysis.analyzed_at)}</span>
+                ${isOld ? `
+                  <button class="btn btn-sm btn-outline refresh-analysis-btn" data-url="${this.escapeHtml(analysis.url)}">
+                    🔄 Yenidən analiz et
+                  </button>
+                ` : ''}
               </div>
               ${analysis.human_summary ? `
                 <div class="analysis-summary">
@@ -224,6 +243,42 @@
         }).join('');
 
         container.innerHTML = html;
+        
+        // Add event listeners for refresh analysis buttons
+        this.setupRefreshButtons();
+      }
+      
+      setupRefreshButtons() {
+        const refreshButtons = document.querySelectorAll('.refresh-analysis-btn');
+        refreshButtons.forEach(button => {
+          button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = button.getAttribute('data-url');
+            this.refreshAnalysis(url, button);
+          });
+        });
+      }
+      
+      async refreshAnalysis(url, button) {
+        if (button.disabled) return;
+        
+        button.disabled = true;
+        button.textContent = '🔄 Analiz edilir...';
+        
+        try {
+          // Redirect to the analysis page with the URL
+          window.open(`/?url=${encodeURIComponent(url)}`, '_blank');
+          
+          // Reset button after a delay
+          setTimeout(() => {
+            button.disabled = false;
+            button.textContent = '🔄 Yenidən analiz et';
+          }, 3000);
+        } catch (error) {
+          console.error('Error refreshing analysis:', error);
+          button.disabled = false;
+          button.textContent = '❌ Xəta';
+        }
       }
 
       getReliabilityClass(score) {

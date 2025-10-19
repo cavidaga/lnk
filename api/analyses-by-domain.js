@@ -2,6 +2,17 @@ import { kv } from '@vercel/kv';
 
 export const config = { runtime: 'nodejs' };
 
+// Helper function to check if analysis is older than 3 months
+function isAnalysisOld(analyzedAt) {
+  if (!analyzedAt) return false;
+  
+  const analysisDate = new Date(analyzedAt);
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  
+  return analysisDate < threeMonthsAgo;
+}
+
 async function handler(req, res) {
   try {
     const url = new URL(req.url, 'http://localhost');
@@ -36,6 +47,7 @@ async function handler(req, res) {
 
     // Fetch analyses and filter by domain
     const domainAnalyses = [];
+    const missingAnalyses = [];
     
     for (const hash of hashes) {
       try {
@@ -44,23 +56,41 @@ async function handler(req, res) {
           const analysisDomain = new URL(analysis.meta.original_url).hostname.toLowerCase().replace(/^www\./, '');
           
           if (analysisDomain === normalizedDomain && !analysis.is_advertisement) {
+            const analyzedAt = analysis.analyzed_at || '';
+            const isOld = isAnalysisOld(analyzedAt);
+            
             domainAnalyses.push({
               hash: analysis.hash || hash,
               title: analysis.meta.title || 'Başlıq yoxdur',
               publication: analysis.meta.publication || '',
               url: analysis.meta.original_url || '',
               published_at: analysis.meta.published_at || '',
-              analyzed_at: analysis.analyzed_at || '',
+              analyzed_at: analyzedAt,
               reliability: analysis.scores?.reliability?.value || 0,
               political_bias: analysis.scores?.political_establishment_bias?.value || 0,
               is_advertisement: analysis.is_advertisement || false,
               human_summary: analysis.human_summary || '',
-              warnings: analysis.warnings || []
+              warnings: analysis.warnings || [],
+              is_old: isOld,
+              needs_refresh: isOld
             });
           }
+        } else if (!analysis) {
+          // Analysis was deleted due to TTL, but we still have the hash
+          // We'll track this as a missing analysis
+          missingAnalyses.push({
+            hash: hash,
+            status: 'deleted',
+            reason: 'TTL expired'
+          });
         }
       } catch (e) {
         console.error(`Error processing analysis ${hash}:`, e);
+        missingAnalyses.push({
+          hash: hash,
+          status: 'error',
+          reason: e.message || 'Unknown error'
+        });
       }
     }
 
@@ -79,11 +109,12 @@ async function handler(req, res) {
     return res.status(200).json({
       analyses: paginatedAnalyses,
       total: domainAnalyses.length,
+      missing_count: missingAnalyses.length,
       domain: normalizedDomain,
       limit: limit,
       offset: offset,
       hasMore: (offset + limit) < domainAnalyses.length,
-      note: "This shows recent analyses only. The scoreboard shows all analyses for this domain.",
+      note: "Some older analyses may have been automatically deleted. Click 'Refresh Analysis' to re-analyze old articles.",
       timestamp: new Date().toISOString()
     });
 
