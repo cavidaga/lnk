@@ -129,11 +129,17 @@
             <div class="analyses-header">
               <h2>📋 Analiz Tarixçəsi</h2>
               <div>
-                <button id="export-all-csv-btn" class="btn btn-secondary">📊 Bütün CSV Çıxarışı</button>
-                <button id="print-all-btn" class="btn btn-secondary">🖨️ Bütünü Çap Et</button>
-                <button id="refresh-btn" class="btn btn-primary">🔄 Yenilə</button>
-                <button id="clear-btn" class="btn btn-danger">🗑️ Təmizlə</button>
+                <button id="export-all-csv-btn" class="btn btn-sm btn-secondary">📊 CSV</button>
+                <button id="print-all-btn" class="btn btn-sm btn-secondary">🖨️ Çap</button>
+                <button id="refresh-btn" class="btn btn-sm btn-primary">🔄 Yenilə</button>
+                <button id="clear-btn" class="btn btn-sm btn-danger">🗑️ Təmizlə</button>
               </div>
+            </div>
+            
+            <div class="analyses-table-header">
+              <div class="col-title">Başlıq</div>
+              <div class="col-meta">Məlumatlar</div>
+              <div class="col-actions">Əməliyyatlar</div>
             </div>
 
             <div id="error-message" class="error-message hidden"></div>
@@ -268,41 +274,33 @@
 
           return `
             <div class="analysis-item">
-              <div class="analysis-header">
-                <h3>${analysis.title}</h3>
+              <div class="analysis-main">
+                <div class="analysis-title">
+                  <h3>${analysis.title}</h3>
+                  <div class="analysis-meta">
+                    <span class="meta-item">${analysis.publication || 'Naməlum'}</span>
+                    <span class="meta-item">${new Date(analysis.analyzed_at).toLocaleDateString('az-AZ')}</span>
+                    <span class="reliability-score ${reliabilityClass}">${analysis.reliability}/100</span>
+                  </div>
+                </div>
                 <div class="analysis-actions">
-                  <a href="/analysis/${analysis.hash}" class="btn btn-sm btn-primary" title="Analizi görüntülə">
-                    👁️ Analizi Gör
+                  <a href="/analysis/${analysis.hash}" class="btn btn-xs btn-primary" title="Analizi görüntülə">
+                    👁️
                   </a>
-                  <button class="btn btn-sm btn-secondary print-btn" data-hash="${analysis.hash}" title="Çap et">
-                    🖨️ Çap Et
+                  <button class="btn btn-xs btn-secondary print-btn" data-hash="${analysis.hash}" title="Çap et">
+                    🖨️
                   </button>
-                  <button class="btn btn-sm btn-secondary export-csv-btn" data-hash="${analysis.hash}" title="CSV olaraq yüklə">
-                    📊 CSV Çıxarışı
+                  <button class="btn btn-xs btn-secondary export-csv-btn" data-hash="${analysis.hash}" title="CSV olaraq yüklə">
+                    📊
                   </button>
                 </div>
               </div>
-              <p><strong>📰 Nəşriyyat:</strong> ${analysis.publication || 'Naməlum'}</p>
-              <p><strong>🔗 Link:</strong> <a href="${analysis.url}" target="_blank" rel="noopener">${analysis.url}</a></p>
-              <div class="analysis-meta">
-                <div class="meta-item">
-                  <span>📊 Etibarlılıq:</span>
-                  <span class="reliability-score ${reliabilityClass}">${analysis.reliability}/100</span>
+              <div class="analysis-details">
+                <p><strong>URL:</strong> <a href="${analysis.url}" target="_blank" rel="noopener">${analysis.url}</a></p>
+                <div class="analysis-stats">
+                  <span class="stat">Siyasi: ${analysis.political_bias} (${biasText})</span>
+                  <span class="stat">Reklam: ${analysis.is_advertisement ? 'Bəli' : 'Xeyr'}</span>
                 </div>
-                <div class="meta-item">
-                  <span>⚖️ Siyasi meyl:</span>
-                  <span class="bias-score ${biasClass}">${analysis.political_bias} (${biasText})</span>
-                </div>
-                <div class="meta-item">
-                  <span>📅 Təhlil edilib:</span>
-                  <span>${new Date(analysis.analyzed_at).toLocaleDateString('az-AZ')}</span>
-                </div>
-                ${analysis.published_at ? `
-                  <div class="meta-item">
-                    <span>📰 Nəşr tarixi:</span>
-                    <span>${new Date(analysis.published_at).toLocaleDateString('az-AZ')}</span>
-                  </div>
-                ` : ''}
               </div>
             </div>
           `;

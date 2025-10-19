@@ -905,24 +905,55 @@ pre.schema{ background:var(--panel); border:1px solid var(--border); border-radi
 .btn-outline-light{ background:rgba(255,255,255,.2); color:#fff; border:1px solid rgba(255,255,255,.3) }
 .btn-outline-light:hover{ background:rgba(255,255,255,.3) }
 
-/* Dashboard shared blocks */
-.dashboard-container{ max-width:1200px; margin:2rem auto; padding:0 1rem }
-.dashboard-header{ background:var(--card); border-radius:12px; padding:2rem; margin-bottom:2rem; box-shadow:var(--shadow); border:1px solid var(--border) }
-.dashboard-header h1{ color:var(--text); font-size:1.8rem; font-weight:700; margin-bottom:.5rem }
-.dashboard-header p{ color:var(--muted); font-size:1rem }
-.user-stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:2rem }
-.stat-card{ background:var(--card); border-radius:12px; padding:1.5rem; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center }
-.stat-card h3{ color:var(--muted); font-size:.875rem; font-weight:500; margin-bottom:.5rem; text-transform:uppercase; letter-spacing:.05em }
-.stat-card p{ color:var(--text); font-size:2rem; font-weight:700; margin:0 }
-.analyses-section{ background:var(--card); border-radius:12px; padding:2rem; box-shadow:var(--shadow); border:1px solid var(--border) }
-.analyses-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem }
-.analyses-header h2{ color:var(--text); font-size:1.25rem; font-weight:600; margin:0 }
-.analyses-list{ display:grid; gap:1rem }
-.analysis-item{ background:var(--panel); border-radius:8px; padding:1rem; border:1px solid var(--border); transition:all .2s }
-.analysis-item:hover{ background:var(--bg) }
-.analysis-item h3{ color:var(--text); font-size:1rem; font-weight:600; margin-bottom:.5rem }
-.analysis-item p{ color:var(--muted); font-size:.875rem; margin:.25rem 0 }
-.analysis-meta{ display:flex; gap:1rem; margin-top:.5rem; flex-wrap:wrap }
+/* Button sizes */
+.btn-xs {
+  padding: 0.125rem 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  border-radius: 0.25rem;
+}
+
+/* Dashboard shared blocks - WordPress Style */
+.dashboard-container{ max-width:1200px; margin:1rem auto; padding:0 1rem }
+.dashboard-header{ background:var(--card); border-radius:6px; padding:1rem 1.5rem; margin-bottom:1rem; box-shadow:0 1px 3px rgba(0,0,0,0.1); border:1px solid var(--border) }
+.dashboard-header h1{ color:var(--text); font-size:1.25rem; font-weight:600; margin-bottom:.25rem }
+.dashboard-header p{ color:var(--muted); font-size:.875rem; margin:0 }
+.user-stats{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.75rem; margin-bottom:1rem }
+.stat-card{ background:var(--card); border-radius:4px; padding:.75rem 1rem; box-shadow:0 1px 3px rgba(0,0,0,0.1); border:1px solid var(--border); text-align:left }
+.stat-card h3{ color:var(--muted); font-size:.75rem; font-weight:500; margin-bottom:.25rem; text-transform:uppercase; letter-spacing:.05em }
+.stat-card p{ color:var(--text); font-size:1.5rem; font-weight:700; margin:0 }
+.analyses-section{ background:var(--card); border-radius:6px; padding:1rem; box-shadow:0 1px 3px rgba(0,0,0,0.1); border:1px solid var(--border) }
+.analyses-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding-bottom:.75rem; border-bottom:1px solid var(--border) }
+.analyses-header h2{ color:var(--text); font-size:1rem; font-weight:600; margin:0 }
+
+.analyses-table-header{ display:flex; background:var(--bg); padding:.5rem; border:1px solid var(--border); border-bottom:none; font-size:.7rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.05em }
+.analyses-table-header .col-title{ flex:1; min-width:0 }
+.analyses-table-header .col-meta{ flex:0 0 200px; text-align:center }
+.analyses-table-header .col-actions{ flex:0 0 120px; text-align:right }
+.analyses-list{ display:block }
+.analysis-item{ background:var(--panel); border-radius:0; padding:.5rem; border:1px solid var(--border); border-bottom:none; transition:all .2s; margin:0 }
+.analysis-item:nth-child(even){ background:var(--bg) }
+.analysis-item:last-child{ border-bottom:1px solid var(--border); border-radius:0 0 4px 4px }
+.analysis-item:first-child{ border-radius:4px 4px 0 0 }
+.analysis-item:hover{ background:var(--card); box-shadow:0 1px 3px rgba(0,0,0,0.1) }
+
+.analysis-main{ display:flex; align-items:center; margin-bottom:.25rem }
+.analysis-title{ flex:1; min-width:0 }
+.analysis-title h3{ color:var(--text); font-size:.8rem; font-weight:600; margin:0; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.analysis-title .analysis-meta{ display:none }
+.analysis-title .meta-item{ color:var(--muted); font-size:.7rem; background:var(--bg); padding:.125rem .25rem; border-radius:2px }
+.analysis-title .reliability-score{ font-weight:600; color:var(--text) }
+
+.analysis-meta{ flex:0 0 200px; text-align:center; display:flex; flex-direction:column; gap:.125rem }
+.analysis-meta .meta-item{ color:var(--muted); font-size:.65rem; background:none; padding:0; border-radius:0; text-align:center }
+.analysis-meta .reliability-score{ font-weight:600; color:var(--text) }
+
+.analysis-details{ display:none }
+.analysis-details p{ color:var(--muted); font-size:.7rem; margin:.125rem 0; line-height:1.4; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.analysis-stats{ display:none }
+.analysis-stats .stat{ color:var(--muted); font-size:.65rem; background:var(--bg); padding:.125rem .25rem; border-radius:2px }
+
+.analysis-meta{ display:flex; gap:.5rem; margin-top:.25rem; flex-wrap:wrap }
 .meta-item{ display:flex; align-items:center; gap:.25rem; color:var(--muted); font-size:.75rem }
 .reliability-score{ font-weight:600 }
 .reliability-high{ color:#16a34a }
@@ -2750,25 +2781,34 @@ button.action-btn {
   }
 }
 
-/* =================== Çıxarış və Çap Düymələri =================== */
+/* =================== Çıxarış və Çap Düymələri - WordPress Style =================== */
+.analysis-actions {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  flex-wrap: wrap;
+  flex: 0 0 120px;
+  justify-content: flex-end;
+}
+
 .export-buttons {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 6px;
+  margin-top: 8px;
   flex-wrap: wrap;
 }
 
 .export-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 4px;
+  padding: 4px 8px;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 4px;
   color: var(--text);
   text-decoration: none;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 500;
   transition: all 0.2s ease;
   cursor: pointer;
@@ -2851,13 +2891,13 @@ button.action-btn {
   }
   
   .export-btn {
-    padding: 6px 10px;
-    font-size: 12px;
+    padding: 4px 6px;
+    font-size: 10px;
   }
   
   .export-btn svg {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
   }
 }
 
@@ -2868,11 +2908,11 @@ button.action-btn {
 }
 
 .analyses-header .export-btn {
-  padding: 8px 14px;
-  font-size: 14px;
+  padding: 6px 10px;
+  font-size: 12px;
 }
 
 .analyses-header .export-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
