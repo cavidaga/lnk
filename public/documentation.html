@@ -1310,6 +1310,13 @@
         <section id="export-apis">
           <h2>Çıxarış API-ləri</h2>
           
+          <div class="api-endpoint">
+            <h3>İstifadəçi Paneli Çıxarışı</h3>
+            <p>Qeydiyyatdan keçmiş istifadəçilər öz analiz tarixçələrini <a href="/user-dashboard.html">İstifadəçi Paneli</a> vasitəsilə asanlıqla çıxara bilərlər. Bu funksiya heç bir API açarı tələb etmir və session autentifikasiyası ilə işləyir.</p>
+            <div class="info">
+              <strong>Mövcud formatlar:</strong> CSV, HTML (çap üçün)
+            </div>
+          </div>
 
           <div class="api-endpoint">
             <div class="endpoint-header">
@@ -1317,7 +1324,7 @@
               <span class="endpoint-url">/api/export/csv?id={analysis_id}</span>
             </div>
             <div class="endpoint-description">
-              Təhlil məlumatlarını CSV formatında yükləyin. Cədvəl təhlili üçün uyğundur.
+              Təhlil məlumatlarını CSV formatında yükləyin. Cədvəl təhlili üçün uyğundur. İstifadəçi paneli üçün session autentifikasiyası, API istifadəsi üçün isə API açarı tələb olunur.
             </div>
             
             <div class="example">
@@ -1427,8 +1434,8 @@ curl -X GET "https://lnk.az/api/export/bulk?format=html&user_id=user123" \
             </ul>
           </div>
 
-          <div class="warning">
-            <strong>Qeyd:</strong> Çıxarış API-ləri təkmilləşdirici hesabı və API açarı tələb edir. Bütün çıxarış əməliyyatları istifadəçi autentifikasiyası ilə məhdudlaşdırılıb.
+          <div class="info">
+            <strong>Qeyd:</strong> Çıxarış API-ləri həm istifadəçi autentifikasiyası, həm də API açarı ilə işləyir. İstifadəçi paneli üçün session autentifikasiyası, API istifadəsi üçün isə API açarı tələb olunur.
           </div>
         </section>
 
