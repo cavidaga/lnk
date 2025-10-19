@@ -219,7 +219,7 @@ async function generateHTML(analyses) {
           <div class="stat-label">Ümumi Analizlər</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">${Math.round(analyses.reduce((sum, a) => sum + (a.scores?.reliability?.value || 0), 0) / analyses.length)}</div>
+          <div class="stat-value">${Math.round(analyses.reduce((sum, a) => sum + (a.reliability || 0), 0) / analyses.length)}</div>
           <div class="stat-label">Orta Etibarlılıq</div>
         </div>
         <div class="stat-card">
@@ -227,19 +227,19 @@ async function generateHTML(analyses) {
           <div class="stat-label">Reklam Məzmunu</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value">${new Set(analyses.map(a => a.meta?.publication).filter(Boolean)).size}</div>
+          <div class="stat-value">${new Set(analyses.map(a => a.publication).filter(Boolean)).size}</div>
           <div class="stat-label">Fərqli Nəşriyyatlar</div>
         </div>
       </div>
 
       ${analyses.map(analysis => `
         <div class="analysis-item">
-          <div class="analysis-title">${analysis.meta?.title || 'Başlıq yoxdur'}</div>
+          <div class="analysis-title">${analysis.title || 'Başlıq yoxdur'}</div>
           
           <div class="analysis-meta">
             <div class="meta-item">
               <span class="meta-label">Nəşriyyat:</span>
-              <span class="meta-value">${analysis.meta?.publication || 'Naməlum'}</span>
+              <span class="meta-value">${analysis.publication || 'Naməlum'}</span>
             </div>
             <div class="meta-item">
               <span class="meta-label">Təhlil tarixi:</span>
@@ -247,32 +247,32 @@ async function generateHTML(analyses) {
             </div>
             <div class="meta-item">
               <span class="meta-label">Model:</span>
-              <span class="meta-value">${analysis.modelUsed || 'Naməlum'}</span>
+              <span class="meta-value">${analysis.model || 'Naməlum'}</span>
             </div>
             <div class="meta-item">
               <span class="meta-label">Mənbə:</span>
-              <span class="meta-value">${analysis.contentSource || 'Live'}</span>
+              <span class="meta-value">${analysis.content_source || 'web'}</span>
             </div>
           </div>
 
           <div class="scores">
             <div class="score-item">
               <div class="score-label">Etibarlılıq</div>
-              <div class="score-value reliability-${analysis.scores?.reliability?.value >= 70 ? 'high' : analysis.scores?.reliability?.value >= 40 ? 'medium' : 'low'}">
-                ${analysis.scores?.reliability?.value || 0}/100
+              <div class="score-value reliability-${analysis.reliability >= 70 ? 'high' : analysis.reliability >= 40 ? 'medium' : 'low'}">
+                ${analysis.reliability || 0}/100
               </div>
             </div>
             <div class="score-item">
               <div class="score-label">Siyasi Meyl</div>
-              <div class="score-value bias-${analysis.scores?.political_establishment_bias?.value > 1 ? 'positive' : analysis.scores?.political_establishment_bias?.value < -1 ? 'negative' : 'neutral'}">
-                ${analysis.scores?.political_establishment_bias?.value || 0}
+              <div class="score-value bias-${analysis.political_bias > 1 ? 'positive' : analysis.political_bias < -1 ? 'negative' : 'neutral'}">
+                ${analysis.political_bias || 0}
               </div>
             </div>
           </div>
 
-          ${analysis.human_summary ? `
+          ${analysis.summary ? `
           <div class="summary-text">
-            <strong>Xülasə:</strong> ${analysis.human_summary}
+            <strong>Xülasə:</strong> ${analysis.summary}
           </div>
           ` : ''}
         </div>

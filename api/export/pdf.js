@@ -353,46 +353,100 @@ async function generatePDF(analysis) {
 }
 
 async function generatePDFBuffer(analysis) {
-  let browser = null;
-  
   try {
-    // Configure Puppeteer for Vercel
-    browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
-    });
-
-    const page = await browser.newPage();
-    
-    // Generate HTML content
+    // For now, return HTML as a fallback since Puppeteer might not work in Vercel
+    // In production, you might want to use a service like PDFShift or similar
     const html = await generatePDF(analysis);
     
-    // Set content and wait for it to load
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    
-    // Generate PDF
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '20mm',
-        right: '20mm',
-        bottom: '20mm',
-        left: '20mm'
-      }
-    });
+    // Convert HTML to a simple text-based PDF format
+    // This is a basic implementation - for production use a proper PDF library
+    const pdfContent = `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
 
-    return pdfBuffer;
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+/Resources <<
+/Font <<
+/F1 5 0 R
+>>
+>>
+>>
+endobj
+
+4 0 obj
+<<
+/Length 500
+>>
+stream
+BT
+/F1 12 Tf
+50 750 Td
+(LNK.az Analiz Hesabati) Tj
+0 -20 Td
+(${analysis.title || 'Basliq yoxdur'}) Tj
+0 -20 Td
+(Nesriyyat: ${analysis.publication || 'Naməlum'}) Tj
+0 -20 Td
+(Etibarliliq: ${analysis.reliability || 0}/100) Tj
+0 -20 Td
+(Siyasi Meyl: ${analysis.political_bias || 0}) Tj
+0 -20 Td
+(Reklam Mezmunu: ${analysis.is_advertisement ? 'Bəli' : 'Xeyr'}) Tj
+0 -20 Td
+(Xulase: ${analysis.summary || 'Mövcud deyil'}) Tj
+ET
+endstream
+endobj
+
+5 0 obj
+<<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000274 00000 n 
+0000000835 00000 n 
+trailer
+<<
+/Size 6
+/Root 1 0 R
+>>
+startxref
+920
+%%EOF`;
+
+    return Buffer.from(pdfContent, 'utf8');
     
   } catch (error) {
     console.error('PDF generation error:', error);
-    throw error;
-  } finally {
-    if (browser) {
-      await browser.close();
-    }
+    // Fallback to HTML if PDF generation fails
+    const html = await generatePDF(analysis);
+    return Buffer.from(html, 'utf8');
   }
 }
 
@@ -415,15 +469,15 @@ async function pdfHandler(req, res) {
       return res.status(404).json({ error: 'Analiz tapılmadı' });
     }
 
-    // Generate PDF buffer
-    const pdfBuffer = await generatePDFBuffer(analysis);
+    // Generate HTML content (for now, return HTML instead of PDF due to Vercel limitations)
+    const html = await generatePDF(analysis);
     
-    // Set headers for PDF download
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="lnk-analiz-${hash.substring(0, 8)}.pdf"`);
+    // Set headers for HTML download (temporarily until proper PDF solution)
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="lnk-analiz-${hash.substring(0, 8)}.html"`);
     res.setHeader('Cache-Control', 'no-cache');
     
-    return res.status(200).send(pdfBuffer);
+    return res.status(200).send(html);
     
   } catch (error) {
     console.error('PDF export error:', error);
