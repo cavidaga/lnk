@@ -10,6 +10,7 @@
     { "source": "/about", "destination": "/about.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/methodology", "destination": "/methodology.html" },
+    { "source": "/scoreboard", "destination": "/scoreboard.html" },
     { "source": "/complaint", "destination": "/complaint.html" },
     { "source": "/user-login", "destination": "/user-login.html" },
     { "source": "/user-register", "destination": "/user-register.html" },

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="az" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sayt Reytinqi - LNK</title>
+  <meta name="description" content="Azərbaycan saytlarının etibarlılıq və siyasi meyl reytinqi">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Sayt Reytinqi - LNK">
+  <meta property="og:description" content="Azərbaycan saytlarının etibarlılıq və siyasi meyl reytinqi">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://lnk.az/scoreboard">
+  <meta property="og:image" content="https://lnk.az/static/og-cover.png">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sayt Reytinqi - LNK">
+  <meta name="twitter:description" content="Azərbaycan saytlarının etibarlılıq və siyasi meyl reytinqi">
+  <meta name="twitter:image" content="https://lnk.az/static/og-cover.png">
+  
+  <link rel="canonical" href="https://lnk.az/scoreboard">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="/static/layout.js">
+</head>
+<body>
+  <div id="app">
+
+    <main class="main">
+      <div class="container">
+        <div class="page-header">
+          <h1>🏆 Sayt Reytinqi</h1>
+          <p class="page-description">
+            Azərbaycan saytlarının etibarlılıq və siyasi meyl göstəriciləri üzrə reytinqi. 
+            Daha çox analiz olunan saytlar daha etibarlı statistikalar təqdim edir.
+          </p>
+        </div>
+
+        <div class="scoreboard-controls">
+          <div class="control-group">
+            <label for="sort-select">Sıralama:</label>
+            <select id="sort-select" class="form-select">
+              <option value="reliability">Etibarlılıq (yüksək → aşağı)</option>
+              <option value="bias">Siyasi meyl (güclü → zəif)</option>
+              <option value="count">Analiz sayı (çox → az)</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <label for="min-count-select">Minimum analiz sayı:</label>
+            <select id="min-count-select" class="form-select">
+              <option value="1">1+ analiz</option>
+              <option value="3">3+ analiz</option>
+              <option value="5">5+ analiz</option>
+              <option value="10">10+ analiz</option>
+            </select>
+          </div>
+          
+          <div class="control-group">
+            <label for="limit-select">Göstəriləcək sayt sayı:</label>
+            <select id="limit-select" class="form-select">
+              <option value="25">25 sayt</option>
+              <option value="50" selected>50 sayt</option>
+              <option value="100">100 sayt</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="scoreboard-container">
+          <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Reytinq yüklənir...</p>
+          </div>
+          
+          <div id="error-message" class="error-message hidden">
+            <p>Reytinq yüklənə bilmədi. Zəhmət olmasa səhifəni yeniləyin.</p>
+          </div>
+          
+          <div id="scoreboard-content" class="scoreboard-content hidden">
+            <div class="scoreboard-stats">
+              <div class="stat-item">
+                <span class="stat-label">Ümumi sayt sayı:</span>
+                <span id="total-sites" class="stat-value">-</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Göstərilən sayt sayı:</span>
+                <span id="shown-sites" class="stat-value">-</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Son yenilənmə:</span>
+                <span id="last-updated" class="stat-value">-</span>
+              </div>
+            </div>
+            
+            <div id="scoreboard-list" class="scoreboard-list">
+              <!-- Sites will be populated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/layout.js"></script>
+  <script>
+    class Scoreboard {
+      constructor() {
+        this.sites = [];
+        this.currentSort = 'reliability';
+        this.currentMinCount = 1;
+        this.currentLimit = 50;
+        this.init();
+      }
+
+      async init() {
+        this.setupEventListeners();
+        await this.loadScoreboard();
+      }
+
+      setupEventListeners() {
+        document.getElementById('sort-select').addEventListener('change', (e) => {
+          this.currentSort = e.target.value;
+          this.loadScoreboard();
+        });
+
+        document.getElementById('min-count-select').addEventListener('change', (e) => {
+          this.currentMinCount = parseInt(e.target.value);
+          this.loadScoreboard();
+        });
+
+        document.getElementById('limit-select').addEventListener('change', (e) => {
+          this.currentLimit = parseInt(e.target.value);
+          this.loadScoreboard();
+        });
+      }
+
+      async loadScoreboard() {
+        this.showLoading();
+        this.hideError();
+        this.hideContent();
+
+        try {
+          const params = new URLSearchParams({
+            sort: this.currentSort,
+            min_count: this.currentMinCount,
+            limit: this.currentLimit
+          });
+
+          const response = await fetch(`/api/site-scoreboard?${params}`);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const data = await response.json();
+          this.sites = data.sites;
+          
+          this.updateStats(data);
+          this.renderScoreboard();
+          this.hideLoading();
+          this.showContent();
+
+        } catch (error) {
+          console.error('Error loading scoreboard:', error);
+          this.hideLoading();
+          this.showError();
+        }
+      }
+
+      updateStats(data) {
+        document.getElementById('total-sites').textContent = data.total.toLocaleString('az-AZ');
+        document.getElementById('shown-sites').textContent = data.sites.length.toLocaleString('az-AZ');
+        
+        const updatedAt = new Date(data.timestamp);
+        document.getElementById('last-updated').textContent = updatedAt.toLocaleString('az-AZ');
+      }
+
+      renderScoreboard() {
+        const container = document.getElementById('scoreboard-list');
+        
+        if (this.sites.length === 0) {
+          container.innerHTML = '<div class="no-results">Seçilmiş kriteriyalara uyğun sayt tapılmadı.</div>';
+          return;
+        }
+
+        const html = this.sites.map((site, index) => {
+          const rank = index + 1;
+          const reliabilityClass = this.getReliabilityClass(site.avg_reliability);
+          const biasClass = this.getBiasClass(site.avg_bias);
+          const biasText = this.formatBias(site.avg_bias);
+          
+          return `
+            <div class="scoreboard-item">
+              <div class="rank">#${rank}</div>
+              <div class="site-info">
+                <div class="site-host">${this.escapeHtml(site.host)}</div>
+                <div class="site-meta">
+                  <span class="analysis-count">${site.count} analiz</span>
+                  <span class="last-updated">${this.formatDate(site.updated_at)}</span>
+                </div>
+              </div>
+              <div class="site-scores">
+                <div class="score-item ${reliabilityClass}">
+                  <div class="score-label">Etibarlılıq</div>
+                  <div class="score-value">${Math.round(site.avg_reliability)}/100</div>
+                </div>
+                <div class="score-item ${biasClass}">
+                  <div class="score-label">Siyasi meyl</div>
+                  <div class="score-value">${biasText}</div>
+                </div>
+              </div>
+              <div class="site-actions">
+                <a href="/?url=${encodeURIComponent('https://' + site.host)}" class="btn btn-sm btn-primary">
+                  Analiz et
+                </a>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.innerHTML = html;
+      }
+
+      getReliabilityClass(score) {
+        if (score >= 80) return 'reliability-excellent';
+        if (score >= 60) return 'reliability-good';
+        if (score >= 40) return 'reliability-fair';
+        if (score >= 20) return 'reliability-poor';
+        return 'reliability-very-poor';
+      }
+
+      getBiasClass(score) {
+        if (Math.abs(score) >= 3) return 'bias-strong';
+        if (Math.abs(score) >= 1) return 'bias-moderate';
+        return 'bias-neutral';
+      }
+
+      formatBias(score) {
+        if (score > 0) return `+${score.toFixed(1)}`;
+        return score.toFixed(1);
+      }
+
+      formatDate(dateString) {
+        if (!dateString) return '—';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('az-AZ');
+      }
+
+      escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      showLoading() {
+        document.getElementById('loading').classList.remove('hidden');
+      }
+
+      hideLoading() {
+        document.getElementById('loading').classList.add('hidden');
+      }
+
+      showError() {
+        document.getElementById('error-message').classList.remove('hidden');
+      }
+
+      hideError() {
+        document.getElementById('error-message').classList.add('hidden');
+      }
+
+      showContent() {
+        document.getElementById('scoreboard-content').classList.remove('hidden');
+      }
+
+      hideContent() {
+        document.getElementById('scoreboard-content').classList.add('hidden');
+      }
+    }
+
+    // Initialize scoreboard when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      new Scoreboard();
+    });
+  </script>
+</body>
+</html>
